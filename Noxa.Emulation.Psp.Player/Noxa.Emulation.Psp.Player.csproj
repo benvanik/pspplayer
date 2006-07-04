@@ -1,0 +1,177 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1497FF04-09C9-4D55-A617-E4EB10747319}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Noxa.Emulation.Psp.Player</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp.Player</AssemblyName>
+    <ApplicationIcon>Resources\psp.ico</ApplicationIcon>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DirectShowLib-2005, Version=1.4.0.15470, Culture=neutral, PublicKeyToken=67e7b740cdfc2d3f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\DirectShowLibV1-4\src\bin\Release\DirectShowLib-2005.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DirectX, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Configuration\ConfigurationHost.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Configuration\ConfigurationHost.Designer.cs">
+      <DependentUpon>ConfigurationHost.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CrossMediaBar\BarGroup.cs" />
+    <Compile Include="CrossMediaBar\BarItem.cs" />
+    <Compile Include="CrossMediaBar\GameBarItem.cs" />
+    <Compile Include="CrossMediaBar\Helpers\Vmr9Allocator.cs" />
+    <Compile Include="CrossMediaBar\InputManager.cs" />
+    <Compile Include="CrossMediaBar\Manager.cs" />
+    <Compile Include="CrossMediaBar\MemoryStickBarGroup.cs" />
+    <Compile Include="CrossMediaBar\Scene.cs" />
+    <Compile Include="CrossMediaBar\SoundManager.cs" />
+    <Compile Include="CrossMediaBar\UmdBarGroup.cs" />
+    <Compile Include="CrossMediaBar\VideoManager.cs" />
+    <Compile Include="Host.cs" />
+    <Compile Include="Instance.cs" />
+    <Compile Include="Configuration\Options.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Configuration\Options.Designer.cs">
+      <DependentUpon>Options.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Player.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Player.Designer.cs">
+      <DependentUpon>Player.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Configuration\ConfigurationHost.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ConfigurationHost.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Configuration\Options.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Player.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Player.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj">
+      <Project>{67000884-BAF0-40B5-8D24-F06D2D623787}</Project>
+      <Name>Noxa.Utilities.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Noxa.Utilities\Noxa.Utilities.csproj">
+      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
+      <Name>Noxa.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">
+      <Project>{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}</Project>
+      <Name>Noxa.Emulation.Psp.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
+      <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
+      <Name>Noxa.Emulation.Psp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OptionsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InvalidIcon.png" />
+    <Content Include="Resources\IconBackground.png" />
+    <Content Include="Resources\MemoryStickIcon.png" />
+    <Content Include="Resources\psp.ico" />
+    <None Include="Resources\PspBoot.wmv" />
+    <None Include="Resources\Sound Bank.xsb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Wave Bank.xwb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\PspShake.png" />
+    <Content Include="Resources\SelectedMemoryStickIcon.png" />
+    <Content Include="Resources\SelectedUmdIcon.png" />
+    <Content Include="Resources\StartIcon.png" />
+    <Content Include="Resources\PauseIcon.png" />
+    <Content Include="Resources\RestartIcon.png" />
+    <Content Include="Resources\StopIcon.png" />
+    <Content Include="Resources\UmdIcon.png" />
+    <Content Include="Resources\Wallpaper01.jpg" />
+    <Content Include="Resources\Wallpaper02.jpg" />
+    <Content Include="Resources\Wallpaper03.jpg" />
+    <Content Include="Resources\Wallpaper04.jpg" />
+    <Content Include="Resources\Wallpaper05.jpg" />
+    <Content Include="Resources\Wallpaper06.jpg" />
+    <Content Include="Resources\Wallpaper07.jpg" />
+    <Content Include="Resources\Wallpaper08.jpg" />
+    <Content Include="Resources\Wallpaper09.jpg" />
+    <Content Include="Resources\Wallpaper10.jpg" />
+    <Content Include="Resources\Wallpaper11.jpg" />
+    <Content Include="Resources\Wallpaper12.jpg" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
