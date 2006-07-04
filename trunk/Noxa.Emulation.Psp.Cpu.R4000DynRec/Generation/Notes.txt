@@ -1,0 +1,11 @@
+AHHHHHHHHHHHHHHHHHHHHH
+For some reason interpreted jumps in to _main + 4, instead of _main
+This skips an addiu on $sp, which I'd think would be needed
+BUT if this instruction is not skipped, the whole thing breaks!
+
+
+DynRec overview:
+ foreach instruction i:
+	t = gettype( i )
+	generate( t, i )
+

@@ -1,0 +1,94 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Noxa.Emulation.Psp</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp</AssemblyName>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Audio\IAudioDriver.cs" />
+    <Compile Include="Bios\IBios.cs" />
+    <Compile Include="Bios\IKernel.cs" />
+    <Compile Include="Bios\IModule.cs" />
+    <Compile Include="Bios\IStatefulModule.cs" />
+    <Compile Include="ComponentParameters.cs" />
+    <Compile Include="Cpu\IAvcDecoder.cs" />
+    <Compile Include="Cpu\IClock.cs" />
+    <Compile Include="Cpu\ICpu.cs" />
+    <Compile Include="Cpu\ICpuCore.cs" />
+    <Compile Include="Cpu\ICpuCoreProfiler.cs" />
+    <Compile Include="Cpu\IDmaController.cs" />
+    <Compile Include="Cpu\IMemory.cs" />
+    <Compile Include="Debugging\IDebugger.cs" />
+    <Compile Include="EmulationParameters.cs" />
+    <Compile Include="Games\ElfFile.cs" />
+    <Compile Include="Games\GameInformation.cs" />
+    <Compile Include="Games\PbpReader.cs" />
+    <Compile Include="Games\SfoReader.cs" />
+    <Compile Include="IComponent.cs" />
+    <Compile Include="IComponentConfiguration.cs" />
+    <Compile Include="IComponentInstance.cs" />
+    <Compile Include="IEmulationHost.cs" />
+    <Compile Include="IEmulationInstance.cs" />
+    <Compile Include="IO\IIODriver.cs" />
+    <Compile Include="IO\Input\IInputDevice.cs" />
+    <Compile Include="IO\Media\IMediaDevice.cs" />
+    <Compile Include="IO\Media\IMediaFolder.cs" />
+    <Compile Include="IO\Media\IMediaFile.cs" />
+    <Compile Include="IO\Media\IMediaItem.cs" />
+    <Compile Include="IO\Media\IMemoryStickDevice.cs" />
+    <Compile Include="IO\Media\IUmdDevice.cs" />
+    <Compile Include="Games\GameLoader.cs" />
+    <Compile Include="NullComponent.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PspDebug.cs" />
+    <Compile Include="Utilities\PerformanceTimer.cs" />
+    <Compile Include="Video\IVideoDriver.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Noxa.Utilities\Noxa.Utilities.csproj">
+      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
+      <Name>Noxa.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
