@@ -9,10 +9,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Noxa.Emulation.Psp.Configuration</RootNamespace>
     <AssemblyName>Noxa.Emulation.Psp.Configuration</AssemblyName>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -53,17 +57,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj">
-      <Project>{67000884-BAF0-40B5-8D24-F06D2D623787}</Project>
-      <Name>Noxa.Utilities.Controls</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Noxa.Utilities\Noxa.Utilities.csproj">
-      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
-      <Name>Noxa.Utilities</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
       <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
       <Name>Noxa.Emulation.Psp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities\Noxa.Utilities.csproj">
+      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
+      <Name>Noxa.Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

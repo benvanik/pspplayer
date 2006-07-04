@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{77003BA1-5A2F-4EDC-95F1-897E9A8C6031}</ProjectGuid>
+    <ProjectGuid>{67000884-BAF0-40B5-8D24-F06D2D623787}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Noxa.Emulation.Psp.Audio.DirectSound</RootNamespace>
-    <AssemblyName>Noxa.Emulation.Psp.Audio.DirectSound</AssemblyName>
+    <RootNamespace>Noxa.Utilities.Controls</RootNamespace>
+    <AssemblyName>Noxa.Utilities.Controls</AssemblyName>
     <SccProjectName>
     </SccProjectName>
     <SccLocalPath>
@@ -38,10 +38,53 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DoubleBufferedListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DoubleBufferedTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="FilteredListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GraphicalHeader.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GraphicalHeader.designer.cs">
+      <DependentUpon>GraphicalHeader.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WhidbeyTabCollection.cs" />
+    <Compile Include="WhidbeyTabControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WhidbeyTabControl.designer.cs">
+      <DependentUpon>WhidbeyTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WhidbeyTabControlDesigner.cs" />
+    <Compile Include="WhidbeyTabEventArgs.cs" />
+    <Compile Include="WhidbeyTabPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WhidbeyTabPage.designer.cs">
+      <DependentUpon>WhidbeyTabPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WhidbeyTabPageConverter.cs" />
+    <Compile Include="Win32Enum.cs" />
+    <Compile Include="Win32Msgs.cs" />
+    <Compile Include="Win32Struct.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="GraphicalHeader.resx">
+      <DependentUpon>GraphicalHeader.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
