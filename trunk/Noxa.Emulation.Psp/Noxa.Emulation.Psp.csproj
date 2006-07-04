@@ -9,10 +9,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Noxa.Emulation.Psp</RootNamespace>
     <AssemblyName>Noxa.Emulation.Psp</AssemblyName>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -78,7 +82,7 @@
     <Compile Include="Video\IVideoDriver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Noxa.Utilities\Noxa.Utilities.csproj">
+    <ProjectReference Include="..\Noxa.Utilities\Noxa.Utilities.csproj">
       <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
       <Name>Noxa.Utilities</Name>
     </ProjectReference>

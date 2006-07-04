@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A95B2ED1-7889-4CE4-9B09-14451057DA12}</ProjectGuid>
+    <ProjectGuid>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Noxa.Emulation.Psp.IO.Input.XInput</RootNamespace>
-    <AssemblyName>Noxa.Emulation.Psp.IO.Input.XInput</AssemblyName>
+    <RootNamespace>Noxa</RootNamespace>
+    <AssemblyName>Noxa.Utilities</AssemblyName>
     <SccProjectName>
     </SccProjectName>
     <SccLocalPath>
@@ -22,7 +22,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -30,31 +30,26 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.DirectX, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="XInputDriver.cs" />
+    <Compile Include="CircularList.cs" />
+    <Compile Include="EventfulList.cs" />
+    <Compile Include="FastRandom.cs" />
+    <Compile Include="ISettingsType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XInputPad.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
-      <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
-      <Name>Noxa.Emulation.Psp</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Noxa.Utilities\Noxa.Utilities.csproj">
-      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
-      <Name>Noxa.Utilities</Name>
-    </ProjectReference>
+    <Compile Include="RandomTools.cs" />
+    <Compile Include="Range.cs" />
+    <Compile Include="ReadOnlyDictionary.cs" />
+    <Compile Include="Settings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

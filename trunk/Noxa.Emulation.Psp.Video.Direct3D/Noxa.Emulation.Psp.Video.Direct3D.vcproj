@@ -5,10 +5,6 @@
 	Name="Noxa.Emulation.Psp.Video.Direct3D"
 	ProjectGUID="{A2A7CE7D-F158-4C82-A16B-C9815502D83F}"
 	RootNamespace="NoxaEmulationPspVideoDirect3D"
-	SccProjectName="SAK"
-	SccAuxPath="SAK"
-	SccLocalPath="SAK"
-	SccProvider="SAK"
 	Keyword="ManagedCProj"
 	>
 	<Platforms>
@@ -182,7 +178,7 @@
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{7609D1BE-23AC-4E67-AD44-9D1E637FB202}"
-			RelativePathToProject="..\Noxa.Utilities\Noxa.Utilities.csproj"
+			RelativePathToProject=".\Noxa.Utilities\Noxa.Utilities.csproj"
 		/>
 		<ProjectReference
 			ReferencedProjectIdentifier="{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}"

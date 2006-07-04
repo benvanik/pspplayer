@@ -21,7 +21,7 @@ namespace Noxa.Emulation.Psp.Player
 				Properties.Settings.Default.PluginSearchPaths = new System.Collections.Specialized.StringCollection();
 
 #if DEBUG
-			string PluginPath = @"C:\Dev\Noxa.Emulation\debug\";
+			string PluginPath = @"C:\Dev\Noxa.Emulation\trunk\debug\";
 			if( Properties.Settings.Default.PluginSearchPaths.Contains( PluginPath ) == false )
 				Properties.Settings.Default.PluginSearchPaths.Add( PluginPath );
 #endif

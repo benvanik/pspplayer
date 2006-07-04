@@ -11,10 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Player",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.DevelopmentStudio", "Noxa.Emulation.Psp.DevelopmentStudio\Noxa.Emulation.Psp.DevelopmentStudio.csproj", "{8C36B49A-FED9-4ECB-AA63-73849A375926}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Utilities", "..\Noxa.Utilities\Noxa.Utilities.csproj", "{7609D1BE-23AC-4E67-AD44-9D1E637FB202}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Utilities.Controls", "..\Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj", "{67000884-BAF0-40B5-8D24-F06D2D623787}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.IO.Media.Iso", "Noxa.Emulation.Psp.IO.Media.Iso\Noxa.Emulation.Psp.IO.Media.Iso.csproj", "{C8A3B65C-322A-431A-A7EA-3A7A0CDA80A3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.IO.Input.DirectInput", "Noxa.Emulation.Psp.IO.Input.DirectInput\Noxa.Emulation.Psp.IO.Input.DirectInput.csproj", "{EDB1DA0A-2FE8-478D-93F6-5D8141D1C123}"
@@ -37,65 +33,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Cpu.R400
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Cpu.R4000DynRec", "Noxa.Emulation.Psp.Cpu.R4000DynRec\Noxa.Emulation.Psp.Cpu.R4000DynRec.csproj", "{BDAC73D0-51AD-4AB4-A3E4-BB425C48E75C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Utilities", "Noxa.Utilities\Noxa.Utilities.csproj", "{7609D1BE-23AC-4E67-AD44-9D1E637FB202}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Utilities.Controls", "Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj", "{67000884-BAF0-40B5-8D24-F06D2D623787}"
+EndProject
 Global
-	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 19
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = ..\\Noxa.Utilities\\Noxa.Utilities.csproj
-		SccProjectName1 = \u0022$/Noxa.Hiranipra/Noxa.Utilities\u0022,\u0020LBBAAAAA
-		SccLocalPath1 = ..\\Noxa.Utilities
-		SccProjectUniqueName2 = ..\\Noxa.Utilities.Controls\\Noxa.Utilities.Controls.csproj
-		SccProjectName2 = \u0022$/Noxa.Hiranipra/Noxa.Utilities.Controls\u0022,\u0020LCBAAAAA
-		SccLocalPath2 = ..\\Noxa.Utilities.Controls
-		SccProjectUniqueName3 = Noxa.Emulation.Psp.Audio.DirectSound\\Noxa.Emulation.Psp.Audio.DirectSound.csproj
-		SccLocalPath3 = .
-		SccProjectFilePathRelativizedFromConnection3 = Noxa.Emulation.Psp.Audio.DirectSound\\
-		SccProjectUniqueName4 = Noxa.Emulation.Psp.Bios.GenericHle\\Noxa.Emulation.Psp.Bios.GenericHle.csproj
-		SccLocalPath4 = .
-		SccProjectFilePathRelativizedFromConnection4 = Noxa.Emulation.Psp.Bios.GenericHle\\
-		SccProjectUniqueName5 = Noxa.Emulation.Psp.Configuration\\Noxa.Emulation.Psp.Configuration.csproj
-		SccLocalPath5 = .
-		SccProjectFilePathRelativizedFromConnection5 = Noxa.Emulation.Psp.Configuration\\
-		SccProjectUniqueName6 = Noxa.Emulation.Psp.Cpu.R4000\\Noxa.Emulation.Psp.Cpu.R4000.vcproj
-		SccLocalPath6 = .
-		SccProjectFilePathRelativizedFromConnection6 = Noxa.Emulation.Psp.Cpu.R4000\\
-		SccProjectUniqueName7 = Noxa.Emulation.Psp.DevelopmentStudio\\Noxa.Emulation.Psp.DevelopmentStudio.csproj
-		SccLocalPath7 = .
-		SccProjectFilePathRelativizedFromConnection7 = Noxa.Emulation.Psp.DevelopmentStudio\\
-		SccProjectUniqueName8 = Noxa.Emulation.Psp.IO.Input.DirectInput\\Noxa.Emulation.Psp.IO.Input.DirectInput.csproj
-		SccLocalPath8 = .
-		SccProjectFilePathRelativizedFromConnection8 = Noxa.Emulation.Psp.IO.Input.DirectInput\\
-		SccProjectUniqueName9 = Noxa.Emulation.Psp.IO.Input.XInput\\Noxa.Emulation.Psp.IO.Input.XInput.csproj
-		SccLocalPath9 = .
-		SccProjectFilePathRelativizedFromConnection9 = Noxa.Emulation.Psp.IO.Input.XInput\\
-		SccProjectUniqueName10 = Noxa.Emulation.Psp.IO.Media.HostFileSystem\\Noxa.Emulation.Psp.IO.Media.HostFileSystem.csproj
-		SccLocalPath10 = .
-		SccProjectFilePathRelativizedFromConnection10 = Noxa.Emulation.Psp.IO.Media.HostFileSystem\\
-		SccProjectUniqueName11 = Noxa.Emulation.Psp.IO.Media.Iso\\Noxa.Emulation.Psp.IO.Media.Iso.csproj
-		SccLocalPath11 = .
-		SccProjectFilePathRelativizedFromConnection11 = Noxa.Emulation.Psp.IO.Media.Iso\\
-		SccProjectUniqueName12 = Noxa.Emulation.Psp.IO.Usb\\Noxa.Emulation.Psp.IO.Usb.csproj
-		SccLocalPath12 = .
-		SccProjectFilePathRelativizedFromConnection12 = Noxa.Emulation.Psp.IO.Usb\\
-		SccProjectUniqueName13 = Noxa.Emulation.Psp.IO.Wifi\\Noxa.Emulation.Psp.IO.Wifi.csproj
-		SccLocalPath13 = .
-		SccProjectFilePathRelativizedFromConnection13 = Noxa.Emulation.Psp.IO.Wifi\\
-		SccProjectUniqueName14 = Noxa.Emulation.Psp.Player\\Noxa.Emulation.Psp.Player.csproj
-		SccLocalPath14 = .
-		SccProjectFilePathRelativizedFromConnection14 = Noxa.Emulation.Psp.Player\\
-		SccProjectUniqueName15 = Noxa.Emulation.Psp.Video.Direct3D\\Noxa.Emulation.Psp.Video.Direct3D.vcproj
-		SccLocalPath15 = .
-		SccProjectFilePathRelativizedFromConnection15 = Noxa.Emulation.Psp.Video.Direct3D\\
-		SccProjectUniqueName16 = Noxa.Emulation.Psp.Video.Direct3DM\\Noxa.Emulation.Psp.Video.Direct3DM.csproj
-		SccLocalPath16 = .
-		SccProjectFilePathRelativizedFromConnection16 = Noxa.Emulation.Psp.Video.Direct3DM\\
-		SccProjectUniqueName17 = Noxa.Emulation.Psp\\Noxa.Emulation.Psp.csproj
-		SccLocalPath17 = .
-		SccProjectFilePathRelativizedFromConnection17 = Noxa.Emulation.Psp\\
-		SccProjectUniqueName18 = Noxa.Emulation.Psp.Cpu.R4000DynRec\\Noxa.Emulation.Psp.Cpu.R4000DynRec.csproj
-		SccLocalPath18 = .
-		SccProjectFilePathRelativizedFromConnection18 = Noxa.Emulation.Psp.Cpu.R4000DynRec\\
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -151,26 +93,6 @@ Global
 		{8C36B49A-FED9-4ECB-AA63-73849A375926}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C36B49A-FED9-4ECB-AA63-73849A375926}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{8C36B49A-FED9-4ECB-AA63-73849A375926}.Release|Win32.ActiveCfg = Release|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Win32.ActiveCfg = Release|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Any CPU.Build.0 = Release|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Win32.ActiveCfg = Release|Any CPU
 		{C8A3B65C-322A-431A-A7EA-3A7A0CDA80A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C8A3B65C-322A-431A-A7EA-3A7A0CDA80A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8A3B65C-322A-431A-A7EA-3A7A0CDA80A3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -281,6 +203,26 @@ Global
 		{BDAC73D0-51AD-4AB4-A3E4-BB425C48E75C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{BDAC73D0-51AD-4AB4-A3E4-BB425C48E75C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{BDAC73D0-51AD-4AB4-A3E4-BB425C48E75C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7609D1BE-23AC-4E67-AD44-9D1E637FB202}.Release|Win32.ActiveCfg = Release|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{67000884-BAF0-40B5-8D24-F06D2D623787}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
