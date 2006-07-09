@@ -201,3 +201,13 @@ void Memory::Save( String^ fileName )
 		stream->Close();
 	}
 }
+
+void Memory::DumpMainMemory( String^ fileName )
+{
+	IMemorySegment^ seg = this->FindSegment( "Main Memory" );
+	FileStream^ stream = File::OpenWrite( fileName );
+	BinaryWriter^ writer = gcnew BinaryWriter( stream );
+	array<unsigned char>^ bytes = seg->ReadBytes( seg->BaseAddress, seg->Length );
+	writer->Write( bytes );
+	writer->Close();
+}

@@ -140,6 +140,10 @@ bool R4000Core::Process( int instruction )
 {
 	bool continueBlock = true;
 
+	bool targetPcValid = false;
+	bool nullifyDelay = false;
+	bool incrementPc = true;
+
 	// NOP
 	if( instruction == 0 )
 		goto postOp;
@@ -158,9 +162,6 @@ bool R4000Core::Process( int instruction )
 	int code = ( instruction >> 6 ) & 0xFFFFF;
 	
 	int targetPc = getpc() + ( signextend16( imm ) << 2 ) + 4;
-	bool targetPcValid = false;
-	bool nullifyDelay = false;
-	bool incrementPc = true;
 
 	// Handle the COP stuff seperate, don't waste time in the switch
 	// if we don't need to
