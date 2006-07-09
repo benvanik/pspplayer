@@ -1,3 +1,4 @@
+2006/07/09 - is this still valid
 AHHHHHHHHHHHHHHHHHHHHH
 For some reason interpreted jumps in to _main + 4, instead of _main
 This skips an addiu on $sp, which I'd think would be needed
@@ -9,3 +10,11 @@ DynRec overview:
 	t = gettype( i )
 	generate( t, i )
 
+Optimization:
+don't break blocks on branches, only on jumps
+even jumps could be simulated in a way that would eliminate the
+entire overhead of the system (have inlined instructions to fetch
+the next code block, etc)
+-
+in pass 1, define labels and add to hash table in pc/label pairs
+in pass 2, mark labels
