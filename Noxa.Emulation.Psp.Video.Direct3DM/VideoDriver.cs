@@ -167,7 +167,26 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			_presentParams.BackBufferFormat = Format.A8R8G8B8;
 
 			int adapter = 0;
-			_device = new Device( adapter, DeviceType.Hardware, _controlHandle, CreateFlags.FpuPreserve | CreateFlags.HardwareVertexProcessing, _presentParams );
+			_device = TryCreate( adapter, DeviceType.Hardware, CreateFlags.FpuPreserve | CreateFlags.HardwareVertexProcessing );
+			if( _device == null )
+			{
+				_device = TryCreate( adapter, DeviceType.Hardware, CreateFlags.FpuPreserve | CreateFlags.MixedVertexProcessing );
+				if( _device == null )
+				{
+					_device = TryCreate( adapter, DeviceType.Hardware, CreateFlags.FpuPreserve | CreateFlags.SoftwareVertexProcessing );
+					if( _device == null )
+					{
+						_device = TryCreate( adapter, DeviceType.Software, CreateFlags.FpuPreserve | CreateFlags.SoftwareVertexProcessing );
+						if( _device == null )
+						{
+							_device = TryCreate( adapter, DeviceType.Reference, CreateFlags.FpuPreserve | CreateFlags.SoftwareVertexProcessing );
+						}
+					}
+				}
+			}
+
+			if( _device == null )
+				return false;
 
 			_sprite = new Sprite( _device );
 
@@ -181,6 +200,18 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			_thread.Start();
 
 			return true;
+		}
+
+		private Device TryCreate( int adapter, DeviceType deviceType, CreateFlags createFlags )
+		{
+			try
+			{
+				return new Device( adapter, deviceType, _controlHandle, createFlags, _presentParams );
+			}
+			catch
+			{
+				return null;
+			}
 		}
 
 		private void VideoThread()

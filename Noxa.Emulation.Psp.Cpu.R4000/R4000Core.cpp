@@ -243,7 +243,6 @@ bool R4000Core::Process( int instruction )
 				vv = reg( rt );
 				storelo( (int)( tt / vv ) );
 				storehi( (int)( tt % vv ) );
-				Debug::WriteLine( String::Format( "divu {0}/{1}", tt, vv ) );
 				break;
 			case B8(0010000):	// mfhi rd
 				storereg( rd, gethi() );

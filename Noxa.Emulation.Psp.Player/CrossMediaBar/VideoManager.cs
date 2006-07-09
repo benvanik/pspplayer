@@ -54,6 +54,7 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 			presentParams.PresentFlag = PresentFlag.DeviceClip;
 			presentParams.SwapEffect = SwapEffect.Flip;
 			presentParams.PresentationInterval = PresentInterval.Default;
+
 			int adapter = 0;
 
 			_device = TryCreate( _controlHandle, adapter, DeviceType.Hardware, CreateFlags.FpuPreserve | CreateFlags.HardwareVertexProcessing, presentParams );
