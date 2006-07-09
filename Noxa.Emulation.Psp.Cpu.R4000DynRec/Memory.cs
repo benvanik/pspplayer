@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
+using System.IO;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
@@ -246,6 +247,15 @@ namespace Noxa.Emulation.Psp.Cpu
 		public void Save( string fileName )
 		{
 			throw new NotImplementedException();
+		}
+
+		public void DumpMainMemory( string fileName )
+		{
+			using( FileStream file = File.OpenWrite( fileName ) )
+			using( BinaryWriter writer = new BinaryWriter( file ) )
+			{
+				writer.Write( _mainMemory );
+			}
 		}
 	}
 }

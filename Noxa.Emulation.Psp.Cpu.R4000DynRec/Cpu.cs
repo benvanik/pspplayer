@@ -254,6 +254,8 @@ namespace Noxa.Emulation.Psp.Cpu
 				address = _core0.TranslateAddress( address );
 				if( address == 0x8900350 )
 					_debug = true;
+				//if( address == 0x089004D0 )
+				//	_debug = true;
 				//if( address == 0x8900350 )
 				//	Debugger.Break();
 				//if( address == 0x8900374 )
@@ -512,7 +514,12 @@ namespace Noxa.Emulation.Psp.Cpu
 #endif
 					}
 
+					Label omfg = ilgen.DefineLabel();
+					ilgen.Emit( OpCodes.Br, omfg );
 					ilgen.MarkLabel( nullDelaySkip );
+					if( pass == 1 )
+						EmitDebugInfo( _context, address, 0x0, "NOP", "" );
+					ilgen.MarkLabel( omfg );
 
 					if( pass == 0 )
 					{
