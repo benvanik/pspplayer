@@ -33,6 +33,8 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 
 		public void Play( Sounds sound )
 		{
+			if( _engine == null )
+				return;
 			_soundBank.Play( _sounds[ sound ] );
 		}
 
@@ -51,7 +53,16 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 
 			RuntimeParameters rtParams = new RuntimeParameters();
 			rtParams.LookAheadTime = 250;
-			_engine.Initialize( rtParams );
+			try
+			{
+				_engine.Initialize( rtParams );
+			}
+			catch
+			{
+				_engine.Dispose();
+				_engine = null;
+				return;
+			}
 
 			Microsoft.DirectX.GraphicsBuffer gb;
 			int fileSize;

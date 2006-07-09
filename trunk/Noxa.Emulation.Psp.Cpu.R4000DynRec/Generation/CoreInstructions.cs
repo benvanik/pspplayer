@@ -688,14 +688,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					EmitLoadRegister( context, rt );
 					context.ILGen.Emit( OpCodes.Stloc_1 );
 
-					context.ILGen.Emit( OpCodes.Ldstr, "divu {0}/{1}" );
-					context.ILGen.Emit( OpCodes.Ldloc_0 );
-					context.ILGen.Emit( OpCodes.Box, typeof( int ) );
-					context.ILGen.Emit( OpCodes.Ldloc_1 );
-					context.ILGen.Emit( OpCodes.Box, typeof( int ) );
-					context.ILGen.Emit( OpCodes.Call, typeof( string ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object ), typeof( object ) } ) );
-					context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
-
 					context.ILGen.Emit( OpCodes.Ldarg_0 );
 					context.ILGen.Emit( OpCodes.Ldloc_0 );
 					context.ILGen.Emit( OpCodes.Conv_U4 );
