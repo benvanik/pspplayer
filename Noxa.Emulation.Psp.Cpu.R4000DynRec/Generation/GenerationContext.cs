@@ -77,6 +77,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		public FieldInfo Core0Hi;
 		public FieldInfo Core0Lo;
 		public FieldInfo Core0LL;
+		public FieldInfo Core0BlockCounter;
 		public FieldInfo MemoryMainBuffer;
 		public MethodInfo MemoryReadWord;
 		public MethodInfo MemoryWriteWord;
@@ -93,6 +94,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			Core0Hi = typeof( Core ).GetField( "Hi", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0Lo = typeof( Core ).GetField( "Lo", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0LL = typeof( Core ).GetField( "LL", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
+			Core0BlockCounter = typeof( Core ).GetField( "BlockCounter", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 
 			MemoryMainBuffer = typeof( Memory ).GetField( "_mainMemory", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			MemoryReadWord = typeof( Memory ).GetMethod( "ReadWord" );
