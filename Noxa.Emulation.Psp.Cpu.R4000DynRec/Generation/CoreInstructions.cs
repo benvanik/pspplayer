@@ -14,6 +14,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		public static GenerateInstructionI[] TableI = SetupTableI();
 		public static GenerateInstructionJ[] TableJ = SetupTableJ();
 		public static GenerateInstructionCop0[] TableCop0 = SetupTableCop0();
+		public static GenerateInstructionSpecial3[] TableSpecial3 = SetupTableSpecial3();
 
 		// void c( core0, memory, generalRegisters[], syscallList[] )
 
@@ -156,6 +157,21 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			return instrs;
 		}
 
+		private static GenerateInstructionSpecial3[] SetupTableSpecial3()
+		{
+			GenerateInstructionSpecial3[] instrs = new GenerateInstructionSpecial3[ 64 ];
+
+			// Populate table
+			GenerateInstructionSpecial3 unk = new GenerateInstructionSpecial3( UnknownSpecial3 );
+			for( int n = 0; n < instrs.Length; n++ )
+				instrs[ n ] = unk;
+
+			instrs[ 16 ] = new GenerateInstructionSpecial3( Arithmetic.SEB );
+			instrs[ 24 ] = new GenerateInstructionSpecial3( Arithmetic.SEH );
+
+			return instrs;
+		}
+
 		#endregion
 
 		#region Unknown helpers
@@ -176,6 +192,11 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		}
 
 		public static GenerationResult UnknownCop0( GenerationContext context, int pass, int address, uint code, byte function )
+		{
+			return GenerationResult.Invalid;
+		}
+
+		public static GenerationResult UnknownSpecial3( GenerationContext context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
 		{
 			return GenerationResult.Invalid;
 		}
@@ -377,6 +398,18 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 		public static void EmitNop( GenerationContext context )
 		{
+		}
+
+		public static void DefineBranchTarget( GenerationContext context, int target )
+		{
+			if( context.BranchLabels.ContainsKey( target ) == false )
+			{
+				Debug.WriteLine( string.Format( "Defining branch target {0:X8}", target ) );
+				LabelMarker lm = new LabelMarker( target );
+				context.BranchLabels.Add( target, lm );
+			}
+			if( context.LastBranchTarget < target )
+				context.LastBranchTarget = target;
 		}
 
 		#region Arithmetic
@@ -1121,6 +1154,42 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				return GenerationResult.Success;
 			}
+
+			public static GenerationResult SEB( GenerationContext context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
+			{
+				if( pass == 0 )
+				{
+					context.ReadRegisters[ rt ] = true;
+					context.WriteRegisters[ rd ] = true;
+				}
+				else if( pass == 1 )
+				{
+					EmitLoadRegister( context, rt );
+					context.ILGen.Emit( OpCodes.Conv_I1 );
+					context.ILGen.Emit( OpCodes.Conv_I4 );
+					EmitStoreRegister( context, rd );
+					//storereg( rd, signextend( reg( rt ) ) );
+				}
+				return GenerationResult.Success;
+			}
+
+			public static GenerationResult SEH( GenerationContext context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
+			{
+				if( pass == 0 )
+				{
+					context.ReadRegisters[ rt ] = true;
+					context.WriteRegisters[ rd ] = true;
+				}
+				else if( pass == 1 )
+				{
+					EmitLoadRegister( context, rt );
+					context.ILGen.Emit( OpCodes.Conv_I2 );
+					context.ILGen.Emit( OpCodes.Conv_I4 );
+					EmitStoreRegister( context, rd );
+					//storereg( rd, signextend( reg( rt ) ) );
+				}
+				return GenerationResult.Success;
+			}
 		}
 		#endregion
 
@@ -1498,6 +1567,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult JR( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 			{
+				bool theEnd = ( context.LastBranchTarget <= address );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -1511,11 +1582,13 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 				}
 				//context.PC.Value = rs;
-				return GenerationResult.Branch;
+				return GenerationResult.Jump;
 			}
 
 			public static GenerationResult JALR( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 			{
+				bool theEnd = ( context.LastBranchTarget <= address );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -1531,13 +1604,15 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 				}
-				//context.Registers[ 31 ].Value = context.PC + 4;
+				//context.Registers[ rd ].Value = context.PC + 4;
 				//context.PC.Value = rs;
-				return GenerationResult.Branch;
+				return GenerationResult.Jump;
 			}
 
 			public static GenerationResult J( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				bool theEnd = ( context.LastBranchTarget <= address );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -1553,11 +1628,13 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				//context.PC.Value = ( code & 0x03FFFFFF ) << 2;
 				//targetPc = ( getpc() & 0xF0000000 ) | ( target << 2 );
-				return GenerationResult.Branch;
+				return GenerationResult.Jump;
 			}
 
 			public static GenerationResult JAL( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				bool theEnd = ( context.LastBranchTarget <= address );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -1577,25 +1654,30 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				//context.Registers[ 31 ].Value = context.PC + 4;
 				//context.PC.Value = ( code & 0x03FFFFFF ) << 2;
 				//targetPc = ( getpc() & 0xF0000000 ) | ( target << 2 );
-				return GenerationResult.Branch;
+				return GenerationResult.Jump;
 			}
 
 			public static GenerationResult BEQ( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
 					context.ReadRegisters[ rt ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					EmitLoadRegister( context, rt );
-					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
+					context.ILGen.Emit( OpCodes.Bne_Un_S, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -1608,21 +1690,26 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BEQL( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
 					context.ReadRegisters[ rt ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+					
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					EmitLoadRegister( context, rt );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br, l2 );
@@ -1641,20 +1728,25 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BNE( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
 					context.ReadRegisters[ rt ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+					
 					Label l1 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					EmitLoadRegister( context, rt );
 					context.ILGen.Emit( OpCodes.Beq, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -1667,34 +1759,26 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BNEL( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
 					context.ReadRegisters[ rt ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+					
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
-
-					//context.ILGen.Emit( OpCodes.Ldstr, "{0}" );
-					//EmitLoadRegister( context, rs );
-					//context.ILGen.Emit( OpCodes.Box, typeof( Int32 ) );
-					//context.ILGen.Emit( OpCodes.Call, context.StringFormat1 );
-					//context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
-
-					//context.ILGen.Emit( OpCodes.Ldstr, "{0}" );
-					//EmitLoadRegister( context, rt );
-					//context.ILGen.Emit( OpCodes.Box, typeof( Int32 ) );
-					//context.ILGen.Emit( OpCodes.Call, context.StringFormat1 );
-					//context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
-
 					EmitLoadRegister( context, rs );
 					EmitLoadRegister( context, rt );
 					context.ILGen.Emit( OpCodes.Beq, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br, l2 );
@@ -1713,19 +1797,24 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BLEZ( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+					
 					Label l1 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Bgt, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -1737,20 +1826,25 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BLEZL( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Bgt, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br, l2 );
@@ -1768,19 +1862,24 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BGTZ( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Ble, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -1792,20 +1891,25 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BGTZL( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Ble, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br, l2 );
@@ -1823,14 +1927,21 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BLTZ( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				int rs = ( int )( ( code >> 31 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					//context.ILGen.Emit( OpCodes.Ldc_I4_0 );
@@ -1839,8 +1950,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -1852,14 +1961,21 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BGEZ( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				int rs = ( int )( ( code >> 31 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
 					//context.ILGen.Emit( OpCodes.Ldc_I4_0 );
@@ -1868,8 +1984,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -1881,14 +1995,21 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BLTZL( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				int rs = ( int )( ( code >> 31 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
@@ -1898,8 +2019,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br, l2 );
@@ -1917,14 +2036,21 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BGEZL( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				int rs = ( int )( ( code >> 31 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
@@ -1934,8 +2060,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br, l2 );
@@ -1953,15 +2077,22 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BLTZAL( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				int rs = ( int )( ( code >> 31 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
 					context.WriteRegisters[ 31 ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
 					EmitStoreRegister( context, 31 );
@@ -1972,8 +2103,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -1988,15 +2117,22 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BGEZAL( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				int rs = ( int )( ( code >> 31 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
 					context.WriteRegisters[ 31 ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
 					EmitStoreRegister( context, 31 );
@@ -2007,8 +2143,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -2023,15 +2157,22 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BLTZALL( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				int rs = ( int )( ( code >> 31 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
 					context.WriteRegisters[ 31 ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
 					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
@@ -2043,8 +2184,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br, l2 );
@@ -2065,15 +2204,22 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			public static GenerationResult BGEZALL( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm )
 			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
 				int rs = ( int )( ( code >> 31 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
 					context.ReadRegisters[ rs ] = true;
 					context.WriteRegisters[ 31 ] = true;
+					DefineBranchTarget( context, target );
 				}
 				else if( pass == 1 )
 				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
 					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
@@ -2085,8 +2231,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( address + AddressOffset ) + ( ( int )( short )imm << 2 ) );
-					context.ILGen.Emit( OpCodes.Stloc_2 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br, l2 );
