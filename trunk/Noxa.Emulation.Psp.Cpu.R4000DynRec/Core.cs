@@ -54,6 +54,9 @@ namespace Noxa.Emulation.Psp.Cpu
 		internal bool DelayNop;
 		internal int InterruptState;
 
+		// Used for tracking instruction counts inside of blocks
+		internal int BlockCounter;
+
 		public string Name
 		{
 			get

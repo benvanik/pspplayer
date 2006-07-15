@@ -68,16 +68,7 @@ int R4000Cpu::ExecuteBlock()
 		address = core->TranslateAddress( address );
 		bool delayNop = core->DelayNop;
 
-		_debug = true;
-		if( address == 0x8900350 )
-		{
-			_debug = true;
-		}
-		//if( address == 0x08901594 )
-		//	Debugger::Break();
-		//if( address == 0x089044a4 )
-		//	Debugger::Break();
-
+#if DEBUG
 		if( _debug == true )
 		{
 			String^ s = String::Format( "0={0:X8} 1={1:X8} 2={2:X8} 3={3:X8} 4={4:X8} 5={5:X8} 6={6:X8} 7={7:X8} 8={8:X8} 9={9:X8} 10={10:X8} 11={11:X8} 12={12:X8} 13={13:X8} 14={14:X8} 15={15:X8} 16={16:X8} 17={17:X8} 18={18:X8} 19={19:X8} 20={20:X8} 21={21:X8} 22={22:X8} 23={23:X8} 24={24:X8} 25={25:X8} 26={26:X8} 27={27:X8} 28={28:X8} 29={29:X8} 30={30:X8} 31={31:X8}",
@@ -87,6 +78,7 @@ int R4000Cpu::ExecuteBlock()
 				core->Registers[ 30 ], core->Registers[ 31 ] );
 			Debug::WriteLine( s );
 		}
+#endif
 
 		// Fetch
 		int instruction;

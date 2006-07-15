@@ -1,6 +1,9 @@
 //#define VERBOSEEMIT
 //#define REGISTEREMIT
 #define STATS
+// note that instruction count will be wrong without this, but it's slow
+#define ACCURATESTATS
+#define STATSDIALOG
 
 using System;
 using System.Collections.Generic;
@@ -278,12 +281,15 @@ namespace Noxa.Emulation.Psp.Cpu
 					_stats.CodeCacheHits++;
 
 				_stats.CodeBlocksExecuted++;
-				_stats.InstructionsExecuted += block.InstructionCount;
 #endif
 
 				block.ExecutionCount++;
 
 				//Debug.WriteLine( string.Format( "{0:X8}", block.Address ) );
+
+#if ACCURATESTATS
+				_core0.BlockCounter = 0;
+#endif
 
 				int ret = block.Pointer( _core0, _memory, _core0.Registers, _syscalls );
 				if( ( ret == 0 ) &&
@@ -292,7 +298,17 @@ namespace Noxa.Emulation.Psp.Cpu
 					// Need to manually update PC
 					_core0.Pc += 4 * block.InstructionCount;
 				}
+
+#if STATS
+				_stats.InstructionsExecuted += _core0.BlockCounter;
+#endif
+
+#if ACCURATESTATS
+				count += _core0.BlockCounter;
+#else
 				count += block.InstructionCount;
+#endif
+
 #if DEBUG
 				//if( _debug == true )
 				//	Debug.WriteLine( " -- " );
@@ -336,21 +352,18 @@ namespace Noxa.Emulation.Psp.Cpu
 			sb.AppendFormat( "\nLB:{0}, LH:{1}, LW:{2}, SB:{3}, SH:{4}, SW:{5}",
 				CoreInstructions.Memory.LBC, CoreInstructions.Memory.LHC, CoreInstructions.Memory.LWC,
 				CoreInstructions.Memory.SBC, CoreInstructions.Memory.SHC, CoreInstructions.Memory.SWC );
-			if( true )
-			{
-				System.Windows.Forms.MessageBox.Show( sb.ToString() );
-			}
-			else
-			{
-				Debug.WriteLine( sb.ToString() );
-			}
+#if STATSDIALOG
+			System.Windows.Forms.MessageBox.Show( sb.ToString() );
+#else
+			Debug.WriteLine( sb.ToString() );
+#endif
 #endif
 		}
 
 		/// <summary>
 		/// Maximum number of instructions before bailing.
 		/// </summary>
-		protected const int MaximumCodeLength = 100;
+		protected const int MaximumCodeLength = 200;
 
 		private Type[] _methodParams = new Type[] { typeof( Core ), typeof( Memory ), typeof( int[] ), typeof( BiosFunction[] ) };
 
@@ -400,6 +413,16 @@ namespace Noxa.Emulation.Psp.Cpu
 
 					if( ( pass == 1 ) && ( _debug == true ) )
 						EmitRegisterPrint( ilgen );
+
+#if ACCURATESTATS
+					if( pass == 1 )
+					{
+						ilgen.Emit( OpCodes.Ldloc_S, ( byte )LocalBlockCounter );
+						ilgen.Emit( OpCodes.Ldc_I4_1 );
+						ilgen.Emit( OpCodes.Add );
+						ilgen.Emit( OpCodes.Stloc_S, ( byte )LocalBlockCounter );
+					}
+#endif
 
 					Label nullDelaySkip = default( Label );
 					if( pass == 1 )
@@ -524,6 +547,7 @@ namespace Noxa.Emulation.Psp.Cpu
 						{
 							// Failed to generate - we break ASAP!
 							Debug.WriteLine( string.Format( "GenerateBlock: failed to generate IL for [0x{0:X8}] {1:X8}", address, code ) );
+							Debugger.Break();
 							break;
 						}
 					}
@@ -718,6 +742,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		public const int LocalPC = 2;			// DO NOT CHANGE
 		public const int LocalPCValid = 3;		// DO NOT CHANGE
 		public const int LocalNullifyDelay = 4;	// DO NOT CHANGE
+		public const int LocalBlockCounter = 5;
 
 		protected static void GeneratePreamble( GenerationContext context )
 		{
@@ -731,6 +756,11 @@ namespace Noxa.Emulation.Psp.Cpu
 				ilgen.DeclareLocal( typeof( int ) );
 				ilgen.DeclareLocal( typeof( int ) );
 			}
+#if ACCURATESTATS
+			ilgen.DeclareLocal( typeof( int ) );
+			ilgen.Emit( OpCodes.Ldc_I4_0 );
+			ilgen.Emit( OpCodes.Stloc_S, ( byte )LocalBlockCounter );
+#endif
 
 			if( context.UpdatePc == true )
 			{
@@ -748,6 +778,12 @@ namespace Noxa.Emulation.Psp.Cpu
 		protected static void GenerateTail( GenerationContext context )
 		{
 			ILGenerator ilgen = context.ILGen;
+
+#if ACCURATESTATS
+			ilgen.Emit( OpCodes.Ldarg_0 );
+			ilgen.Emit( OpCodes.Ldloc_S, ( byte )LocalBlockCounter );
+			ilgen.Emit( OpCodes.Stfld, context.Core0BlockCounter );
+#endif
 
 			// Note that in the case of a syscall we ignore what we've done to the PC!
 			if( ( context.UpdatePc == true ) &&

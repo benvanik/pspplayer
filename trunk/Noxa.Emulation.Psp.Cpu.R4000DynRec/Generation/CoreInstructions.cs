@@ -63,6 +63,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			instrs[ 39 ] = new GenerateInstructionR( Arithmetic.NOR );
 			instrs[ 42 ] = new GenerateInstructionR( Arithmetic.SLT );
 			instrs[ 43 ] = new GenerateInstructionR( Arithmetic.SLTU );
+			instrs[ 44 ] = new GenerateInstructionR( Arithmetic.MAX );
 			instrs[ 45 ] = new GenerateInstructionR( Arithmetic.MIN );
 
 			return instrs;
@@ -352,7 +353,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		public static void EmitDirectMemoryWrite( GenerationContext context )
 		{
 			// If the address is within main memory bounds, we do a direct read on it
-			// If it's not, pass to the nromal one
+			// If it's not, pass to the normal one
 			// Stack: Memory / Address / Value
 
 			Label l1 = context.ILGen.DefineLabel();
@@ -1133,8 +1134,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
-					//Debug.WriteLine( "would have done MIN, but instead just completely ignored :)" );
-					//return GenerationResult.Success;
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
 					EmitLoadRegister( context, rs );
@@ -1148,6 +1147,36 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					EmitStoreRegister( context, rd );
 					context.ILGen.MarkLabel( l2 );
 					//if( reg( rt ) >= reg( rs ) )
+					//    storereg( rd, rs );
+					//else
+					//    storereg( rd, rt );
+				}
+				return GenerationResult.Success;
+			}
+
+			public static GenerationResult MAX( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+			{
+				if( pass == 0 )
+				{
+					context.ReadRegisters[ rs ] = true;
+					context.ReadRegisters[ rt ] = true;
+					context.WriteRegisters[ rd ] = true;
+				}
+				else if( pass == 1 )
+				{
+					Label l1 = context.ILGen.DefineLabel();
+					Label l2 = context.ILGen.DefineLabel();
+					EmitLoadRegister( context, rs );
+					EmitLoadRegister( context, rt );
+					context.ILGen.Emit( OpCodes.Bgt, l1 );
+					EmitLoadRegister( context, rt );
+					EmitStoreRegister( context, rd );
+					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.MarkLabel( l1 );
+					EmitLoadRegister( context, rs );
+					EmitStoreRegister( context, rd );
+					context.ILGen.MarkLabel( l2 );
+					//if( reg( rt ) <= reg( rs ) )
 					//    storereg( rd, rs );
 					//else
 					//    storereg( rd, rt );
