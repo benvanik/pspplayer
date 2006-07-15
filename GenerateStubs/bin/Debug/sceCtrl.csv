@@ -1,0 +1,11 @@
+,NID,Return,Function,Params
+1,0x6a2774f3,int,sceCtrlSetSamplingCycle,int cycle
+2,0x02baad91,int,sceCtrlGetSamplingCycle,int *pcycle
+3,0x1f4011e6,int,sceCtrlSetSamplingMode,int mode
+4,0xda6b76a1,int,sceCtrlGetSamplingMode,int *pmode
+5,0x3a622550,,sceCtrlPeekBufferPositive,
+6,0xc152080a,,sceCtrlPeekBufferNegative,
+7,0x1f803938,int,sceCtrlReadBufferPositive,"SceCtrlData *pad_data,int count"
+8,0x60b81f86,,sceCtrlReadBufferNegative,
+9,0xb1d0e5cd,,sceCtrlPeekLatch,
+10,0x0b588501,,sceCtrlReadLatch,

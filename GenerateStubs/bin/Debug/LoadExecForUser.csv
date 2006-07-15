@@ -1,0 +1,5 @@
+,NID,Return,Function,Params
+1,0xbd2f1094,int,sceKernelLoadExec,"const char *file,struct SceKernelLoadExecParam *param"
+2,0x2ac9954b,,sceKernelExitGameWithStatus,
+3,0x05572a5f,void,sceKernelExitGame,void
+4,0x4ac57943,int,sceKernelRegisterExitCallback,int cbid

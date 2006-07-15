@@ -1,0 +1,37 @@
+,NID,Return,Function,Params
+1,0x3251ea56,int,sceIoPollAsync,"SceUID fd,long long *res"
+2,0xe23eec33,int,sceIoWaitAsync,"SceUID fd,long long *res"
+3,0x35dbd746,int,sceIoWaitAsyncCB,"SceUID fd,long long *res"
+4,0xcb05f8d6,int,sceIoGetAsyncStat,"SceUID fd,int poll,long long *res"
+5,0xb293727f,int,sceIoChangeAsyncPriority,"SceUID fd,int pri"
+6,0xa12a0514,int,sceIoSetAsyncCallback,"SceUID fd,SceUID cb,void *argp"
+7,0x810c4bc3,int,sceIoClose,SceUID fd
+8,0xff5940b6,int,sceIoCloseAsync,SceUID fd
+9,0x109f50bc,SceUID,sceIoOpen,"const char *file,int flags,SceMode mode"
+10,0x89aa9906,SceUID,sceIoOpenAsync,"const char *file,int flags,SceMode mode"
+11,0x6a638d83,int,sceIoRead,"SceUID fd,void *data,SceSize size"
+12,0xa0b5a7c2,int,sceIoReadAsync,"SceUID fd,void *data,SceSize size"
+13,0x42ec03ac,int,sceIoWrite,"SceUID fd,const void *data,SceSize size"
+14,0x0facab19,int,sceIoWriteAsync,"SceUID fd,const void *data,SceSize size"
+15,0x27eb27b8,SceOff,sceIoLseek,"SceUID fd,SceOff offset,int whence"
+16,0x71b19e77,int,sceIoLseekAsync,"SceUID fd,SceOff offset,int whence"
+17,0x68963324,int,sceIoLseek32,"SceUID fd,int offset,int whence"
+18,0x1b385d8f,int,sceIoLseek32Async,"SceUID fd,int offset,int whence"
+19,0x63632449,int,sceIoIoctl,"SceUID fd,unsigned int cmd,void *indata,int inlen,void *outdata,int outlen"
+20,0xe95a012b,int,sceIoIoctlAsync,"SceUID fd,unsigned int cmd,void *indata,int inlen,void *outdata,int outlen"
+21,0xb29ddf9c,SceUID,sceIoDopen,const char *dirname
+22,0xe3eb004c,int,sceIoDread,"SceUID fd,SceIoDirent *dir"
+23,0xeb092469,int,sceIoDclose,SceUID fd
+24,0xf27a9c51,int,sceIoRemove,const char *file
+25,0x06a70004,int,sceIoMkdir,"const char *,SceMode mode"
+26,0x1117c65f,int,sceIoRmdir,const char *path
+27,0x55f4717d,int,sceIoChdir,const char *path
+28,0xab96437f,int,sceIoSync,"const char *device,unsigned int unk"
+29,0xace946e8,int,sceIoGetstat,"const char *file,SceIoStat *stat"
+30,0xb8a740f4,int,sceIoChstat,"const char *file,SceIoStat *stat,int bits"
+31,0x779103a0,int,sceIoRename,"const char *oldname,const char *newname"
+32,0x54f5fb11,int,sceIoDevctl,"const char *dev,unsigned int cmd,void *indata,int inlen,void *outdata,int outlen"
+33,0x08bd7374,int,sceIoGetDevType,SceUID fd
+34,0xb2a628c1,int,sceIoAssign,"const char *dev2,const char *dev3,const char *mode,int unk1,void *unk1,long unk2"
+35,0x6d08a871,int,sceIoUnassign,const char *dev
+36,0xe8bc6571,int,sceIoCancel,SceUID fd
