@@ -1,4 +1,5 @@
-#define VERBOSEEMIT
+//#define VERBOSEEMIT
+//#define REGISTEREMIT
 #define STATS
 
 using System;
@@ -35,7 +36,7 @@ namespace Noxa.Emulation.Psp.Cpu
 #if STATS
 		protected PerformanceTimer _timer;
 		protected double _timeSinceLastIpsPrint;
-		protected bool _debug = false;
+		protected bool _debug = true;
 
 		protected struct RuntimeStatistics
 		{
@@ -45,6 +46,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 			public int BreaksFromLength;
 			public int BreaksFromBranches;
+			public int BreaksFromJumps;
 			public int BreaksFromSyscalls;
 
 			public int AverageRegistersUsed;
@@ -352,15 +354,6 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		private Type[] _methodParams = new Type[] { typeof( Core ), typeof( Memory ), typeof( int[] ), typeof( BiosFunction[] ) };
 
-		private void F( ILGenerator ilgen, int n )
-		{
-			ilgen.Emit( OpCodes.Ldloc_0 );
-			ilgen.Emit( OpCodes.Ldc_I4, n );
-			CoreInstructions.EmitLoadRegister( _context, n );
-			ilgen.Emit( OpCodes.Box, typeof( Int32 ) );
-			ilgen.Emit( OpCodes.Stelem_Ref );
-		}
-
 		/// <summary>
 		/// Generate and cache a codeblock starting from the given address.
 		/// </summary>
@@ -383,7 +376,11 @@ namespace Noxa.Emulation.Psp.Cpu
 			ILGenerator ilgen = method.GetILGenerator();
 
 			_context.Reset( ilgen, startAddress );
+			
+			Debug.WriteLine( string.Format( "Starting block at 0x{0:X8}", startAddress ) );
 
+			bool jumpDelay = false;
+			GenerationResult lastResult = GenerationResult.Success;
 			for( int pass = 0; pass <= 1; pass++ )
 			{
 				// Only have the information to generate the preamble on pass 1
@@ -393,35 +390,51 @@ namespace Noxa.Emulation.Psp.Cpu
 					GeneratePreamble( _context );
 				}
 
+				_context.InDelay = false;
 				bool breakOut = false;
 				bool checkNullDelay = false;
 				int address = startAddress;
 				for( int n = 0; n < MaximumCodeLength; n++ )
 				{
-					//if( address == 0x089044a4 )
-					//	Debugger.Break();
 					GenerationResult result = GenerationResult.Invalid;
 
 					if( ( pass == 1 ) && ( _debug == true ) )
+						EmitRegisterPrint( ilgen );
+
+					Label nullDelaySkip = default( Label );
+					if( pass == 1 )
 					{
-						//ilgen.Emit( OpCodes.Ldstr, "0={0:X8} 1={1:X8} 2={2:X8} 3={3:X8} 4={4:X8} 5={5:X8} 6={6:X8} 7={7:X8} 8={8:X8} 9={9:X8} 10={10:X8} 11={11:X8} 12={12:X8} 13={13:X8} 14={14:X8} 15={15:X8} 16={16:X8} 17={17:X8} 18={18:X8} 19={19:X8} 20={20:X8} 21={21:X8} 22={22:X8} 23={23:X8} 24={24:X8} 25={25:X8} 26={26:X8} 27={27:X8} 28={28:X8} 29={29:X8} 30={30:X8} 31={31:X8}" );
-						//ilgen.Emit( OpCodes.Ldc_I4, 32 );
-						//ilgen.Emit( OpCodes.Newarr, typeof( object ) );
-						//ilgen.Emit( OpCodes.Stloc_0 );
-						//for( int r = 0; r < 32; r++ )
-						//    F( ilgen, r );
-						//ilgen.Emit( OpCodes.Ldloc_0 );
-						//ilgen.Emit( OpCodes.Call, typeof( String ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object[] ) } ) );
-						//ilgen.Emit( OpCodes.Call, _context.DebugWriteLine );
+						nullDelaySkip = ilgen.DefineLabel();
+						if( checkNullDelay == true )
+						{
+							ilgen.Emit( OpCodes.Ldloc_S, ( byte )LocalNullifyDelay );
+							ilgen.Emit( OpCodes.Brtrue, nullDelaySkip );
+						}
 					}
 
-					Label nullDelaySkip = ilgen.DefineLabel();
-					if( checkNullDelay == true )
+					if( pass == 0 )
 					{
-						ilgen.Emit( OpCodes.Ldloc_S, ( byte )LocalNullifyDelay );
-						ilgen.Emit( OpCodes.Brtrue, nullDelaySkip );
+						// We need to mark labels asap as pass 2 could have back branches
+						if( _context.BranchLabels.ContainsKey( address ) == true )
+						{
+							LabelMarker lm = _context.BranchLabels[ address ];
+							Debug.WriteLine( string.Format( "Marking label for branch target {0:X8}", address ) );
+							lm.Found = true;
+						}
+					}
+					else if( pass == 1 )
+					{
+						// Note that it shouldn't be possible to be here if we
+						// are in a delay slot, hence the branch being above
+						if( _context.BranchLabels.ContainsKey( address ) == true )
+						{
+							LabelMarker lm = _context.BranchLabels[ address ];
+							Debug.WriteLine( string.Format( "Marking label for branch target {0:X8}", address ) );
+							ilgen.MarkLabel( lm.Label );
+						}
 					}
 
+					bool inDelay = _context.InDelay;
 					uint code = ( uint )_memory.ReadWord( address );
 
 					if( code != 0 )
@@ -439,13 +452,11 @@ namespace Noxa.Emulation.Psp.Cpu
 									byte shamt = ( byte )( ( code >> 6 ) & 0x1F );
 
 									GenerateInstructionR instr = CoreInstructions.TableR[ function ];
-#if VERBOSEEMIT
 									if( pass == 1 )
 									{
 										EmitDebugInfo( _context, address, code, instr.Method.Name,
 											string.Format( "rs:{0} rt:{1} rd:{2} shamt:{3}", rs, rt, rd, shamt ) );
 									}
-#endif
 									result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, shamt, function );
 								}
 								break;
@@ -455,13 +466,11 @@ namespace Noxa.Emulation.Psp.Cpu
 									uint rt = ( code >> 16 ) & 0x1F;
 
 									GenerateInstructionJ instr = CoreInstructions.TableJ[ rt ];
-#if VERBOSEEMIT
 									if( pass == 1 )
 									{
 										EmitDebugInfo( _context, address, code, instr.Method.Name,
 											string.Format( "imm:{0}", imm ) );
 									}
-#endif
 									result = instr( _context, pass, address + 4, code, ( byte )opcode, imm );
 								}
 								break;
@@ -470,14 +479,28 @@ namespace Noxa.Emulation.Psp.Cpu
 									byte function = ( byte )( code & 0x3F );
 
 									GenerateInstructionCop0 instr = CoreInstructions.TableCop0[ function ];
-#if VERBOSEEMIT
 									if( pass == 1 )
 									{
 										EmitDebugInfo( _context, address, code, instr.Method.Name,
 											string.Format( "func:{0}", function ) );
 									}
-#endif
 									result = instr( _context, pass, address + 4, code, function );
+								}
+								break;
+							case 31: // SPECIAL3 type
+								{
+									byte rt = ( byte )( ( code >> 16 ) & 0x1F );
+									byte rd = ( byte )( ( code >> 11 ) & 0x1F );
+									byte function = ( byte )( ( code >> 6 ) & 0x1F );
+									uint bshfl = code & 0x3F;
+
+									GenerateInstructionSpecial3 instr = CoreInstructions.TableSpecial3[ function ];
+									if( pass == 1 )
+									{
+										EmitDebugInfo( _context, address, code, instr.Method.Name,
+											string.Format( "func:{0}", function ) );
+									}
+									result = instr( _context, pass, address + 4, code, rt, rd, function, ( ushort )bshfl );
 								}
 								break;
 							default: // Common I type
@@ -487,13 +510,11 @@ namespace Noxa.Emulation.Psp.Cpu
 									ushort imm = ( ushort )( code & 0xFFFF );
 
 									GenerateInstructionI instr = CoreInstructions.TableI[ opcode ];
-#if VERBOSEEMIT
 									if( pass == 1 )
 									{
 										EmitDebugInfo( _context, address, code, instr.Method.Name,
 											string.Format( "rs:{0} rt:{1} imm:{2}", rs, rt, ( int )( short )imm ) );
 									}
-#endif
 									result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, imm );
 								}
 								break;
@@ -508,18 +529,24 @@ namespace Noxa.Emulation.Psp.Cpu
 					}
 					else
 					{
-#if VERBOSEEMIT
 						if( pass == 1 )
 							EmitDebugInfo( _context, address, code, "NOP", "" );
-#endif
 					}
 
-					Label omfg = ilgen.DefineLabel();
-					ilgen.Emit( OpCodes.Br, omfg );
-					ilgen.MarkLabel( nullDelaySkip );
+					// This will print out NOP's when we are in a null delay slot
 					if( pass == 1 )
-						EmitDebugInfo( _context, address, 0x0, "NOP", "" );
-					ilgen.MarkLabel( omfg );
+					{
+						if( checkNullDelay == true )
+						{
+							Label omfg = ilgen.DefineLabel();
+							ilgen.Emit( OpCodes.Br, omfg );
+							ilgen.MarkLabel( nullDelaySkip );
+							EmitDebugInfo( _context, address, 0x0, "NOP", "" );
+							ilgen.Emit( OpCodes.Ldc_I4_0 );
+							ilgen.Emit( OpCodes.Stloc_S, ( byte )LocalNullifyDelay );
+							ilgen.MarkLabel( omfg );
+						}
+					}
 
 					if( pass == 0 )
 					{
@@ -529,20 +556,101 @@ namespace Noxa.Emulation.Psp.Cpu
 
 					address += 4;
 
+					// Branch check/delay handling
+					if( pass == 1 )
+					{
+						// Have to use local inDelay because the last instruction could have been the one to set it
+						// Could also be in a jump delay, which only happens on non-breakout jumps
+						if( jumpDelay == true )
+						{
+							Debug.WriteLine( "Marking jump delay tail" );
+							GenerateTail( _context );
+
+							_context.InDelay = false;
+							jumpDelay = false;
+						}
+						else if( inDelay == true )
+						{
+							if( _context.IsBranchLocal( _context.BranchTarget.Address ) == true )
+							{
+								Label noBranch = ilgen.DefineLabel();
+								ilgen.Emit( OpCodes.Ldloc_3 );
+								ilgen.Emit( OpCodes.Ldc_I4_0 );
+								ilgen.Emit( OpCodes.Beq_S, noBranch );
+								ilgen.Emit( OpCodes.Ldc_I4_0 );
+								ilgen.Emit( OpCodes.Stloc_3 );
+								ilgen.Emit( OpCodes.Br, _context.BranchTarget.Label );
+								ilgen.MarkLabel( noBranch );
+
+								_context.InDelay = false;
+								_context.BranchTarget = null;
+							}
+							else
+							{
+								Debug.WriteLine( string.Format( "Aborting block early because branch target {0:X8} not found", _context.BranchTarget.Address ) );
+								Debug.Assert( _context.BranchTarget.Address != 0 );
+
+								Label noBranch = ilgen.DefineLabel();
+								ilgen.Emit( OpCodes.Ldloc_3 );
+								ilgen.Emit( OpCodes.Ldc_I4_0 );
+								ilgen.Emit( OpCodes.Beq_S, noBranch );
+								ilgen.Emit( OpCodes.Ldc_I4_1 );
+								ilgen.Emit( OpCodes.Stloc_3 );
+								ilgen.Emit( OpCodes.Ldc_I4, _context.BranchTarget.Address );
+								ilgen.Emit( OpCodes.Stloc_2 );
+								
+								// This is an early exit
+								GenerateTail( _context );
+								ilgen.Emit( OpCodes.Ret );
+
+								ilgen.MarkLabel( noBranch );
+
+								_context.InDelay = false;
+								_context.BranchTarget = null;
+							}
+						}
+					}
+
 					// Syscalls always exit
 					if( result == GenerationResult.Syscall )
+					{
+						lastResult = result;
 						break;
+					}
 
 					// This is so that we can handle delay slots
 					if( breakOut == true )
 						break;
 					if( result == GenerationResult.Branch )
-						breakOut = true;
+					{
+						_context.InDelay = true;
+						lastResult = result;
+					}
+					if( result == GenerationResult.Jump )
+					{
+						// This is tricky - if lastTargetPc > currentPc, don't break out
+						if( _context.LastBranchTarget <= address )
+						{
+							Debug.WriteLine( string.Format( "Jump breakout at {0:X8}", address ) );
+							breakOut = true;
+							lastResult = result;
+						}
+						else
+						{
+							Debug.WriteLine( string.Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _context.LastBranchTarget ) );
+							if( pass == 1 )
+							{
+								jumpDelay = true;
+								_context.InDelay = true;
+							}
+						}
+					}
 					if( result == GenerationResult.BranchAndNullifyDelay )
 					{
-						breakOut = true;
+						_context.InDelay = true;
 						if( pass == 1 )
 							checkNullDelay = true;
+						lastResult = result;
 					}
 				}
 
@@ -554,9 +662,10 @@ namespace Noxa.Emulation.Psp.Cpu
 			block.DynamicMethod = method;
 #endif
 
-			block.EndsOnSyscall = _context.UseSyscalls;
+			block.EndsOnSyscall = ( lastResult == GenerationResult.Syscall );
 			block.InstructionCount = _context.InstructionCount;
 
+			
 			block.Pointer = ( DynamicCodeDelegate )method.CreateDelegate( typeof( DynamicCodeDelegate ) );
 			_codeCache.Add( block );
 
@@ -568,12 +677,22 @@ namespace Noxa.Emulation.Psp.Cpu
 				genTime = 0.000001;
 			_stats.AverageGenerationTime += genTime;
 
-			if( _context.UseSyscalls == true )
-				_stats.BreaksFromSyscalls++;
-			else if( _context.InstructionCount >= MaximumCodeLength )
-				_stats.BreaksFromLength++;
-			else
-				_stats.BreaksFromBranches++;
+			switch( lastResult )
+			{
+				case GenerationResult.Success:
+					_stats.BreaksFromLength++;
+					break;
+				case GenerationResult.Syscall:
+					_stats.BreaksFromSyscalls++;
+					break;
+				case GenerationResult.Branch:
+				case GenerationResult.BranchAndNullifyDelay:
+					_stats.BreaksFromBranches++;
+					break;
+				case GenerationResult.Jump:
+					_stats.BreaksFromJumps++;
+					break;
+			}
 			_stats.AverageCodeBlockLength += _context.InstructionCount;
 			if( _context.InstructionCount > _stats.LargestCodeBlockLength )
 				_stats.LargestCodeBlockLength = _context.InstructionCount;
@@ -665,6 +784,30 @@ namespace Noxa.Emulation.Psp.Cpu
 
 			context.ILGen.Emit( OpCodes.Ldstr, line );
 			context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+		}
+
+		[Conditional( "REGISTEREMIT" )]
+		protected void EmitRegisterPrint( ILGenerator ilgen )
+		{
+			ilgen.Emit( OpCodes.Ldstr, "0={0:X8} 1={1:X8} 2={2:X8} 3={3:X8} 4={4:X8} 5={5:X8} 6={6:X8} 7={7:X8} 8={8:X8} 9={9:X8} 10={10:X8} 11={11:X8} 12={12:X8} 13={13:X8} 14={14:X8} 15={15:X8} 16={16:X8} 17={17:X8} 18={18:X8} 19={19:X8} 20={20:X8} 21={21:X8} 22={22:X8} 23={23:X8} 24={24:X8} 25={25:X8} 26={26:X8} 27={27:X8} 28={28:X8} 29={29:X8} 30={30:X8} 31={31:X8}" );
+			ilgen.Emit( OpCodes.Ldc_I4, 32 );
+			ilgen.Emit( OpCodes.Newarr, typeof( object ) );
+			ilgen.Emit( OpCodes.Stloc_0 );
+			for( int r = 0; r < 32; r++ )
+				EmitRegister( ilgen, r );
+			ilgen.Emit( OpCodes.Ldloc_0 );
+			ilgen.Emit( OpCodes.Call, typeof( String ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object[] ) } ) );
+			ilgen.Emit( OpCodes.Call, _context.DebugWriteLine );
+		}
+
+		[Conditional( "REGISTEREMIT" )]
+		private void EmitRegister( ILGenerator ilgen, int n )
+		{
+			ilgen.Emit( OpCodes.Ldloc_0 );
+			ilgen.Emit( OpCodes.Ldc_I4, n );
+			CoreInstructions.EmitLoadRegister( _context, n );
+			ilgen.Emit( OpCodes.Box, typeof( Int32 ) );
+			ilgen.Emit( OpCodes.Stelem_Ref );
 		}
 
 		public void Cleanup()

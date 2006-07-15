@@ -11,10 +11,32 @@ DynRec overview:
 	generate( t, i )
 
 Optimization:
-don't break blocks on branches, only on jumps
-even jumps could be simulated in a way that would eliminate the
-entire overhead of the system (have inlined instructions to fetch
-the next code block, etc)
+do a simple analysis in pass 1 that finds the last branch target,
+and assume the jump immedietly following that is the end of the method.
+ex:
+  add $0, $0, $0
+  beq $0, $0, foo
+  nop
+ foo:
+  sub $0, $0, $0
+  beq $0, $0, bar
+  nop
+  jr $31				<-- cannot be the method exit as there is a target after it
+  nop
+ bar:					<-- know that this is the last branch target
+  jr $31				<-- has to be it
+  nop
+
 -
 in pass 1, define labels and add to hash table in pc/label pairs
-in pass 2, mark labels
+	also keep track of the last branch target - at jumps, if
+	the current pc < the last branch target, continue on
+in pass 2, mark labels and branch
+for early breakout branches (when branch target is not found within
+the current block), need to check PC against block start and endaddress,
+doing it the nice way isn't really possible without a 3rd pass
+
+Further optimization:
+bring code block loading and calling in to the generated blocks
+(using tail.call) to avoid the master loop - would need to ensure
+that preamble and cleanup code are still inserted (are they even needed?)

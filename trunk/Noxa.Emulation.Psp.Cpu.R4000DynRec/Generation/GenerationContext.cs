@@ -14,17 +14,29 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		Invalid,
 		Syscall,
 
-		/// <summary>
-		/// Branch or jump; this means that after the next instruction (delay slot) the block should end.
-		/// </summary>
 		Branch,
-		BranchAndNullifyDelay
+		BranchAndNullifyDelay,
+
+		Jump
+	}
+
+	class LabelMarker
+	{
+		public Label Label;
+		public bool Found;
+		public int Address;
+
+		public LabelMarker( int address )
+		{
+			Address = address;
+		}
 	}
 
 	delegate GenerationResult GenerateInstructionR( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function );
 	delegate GenerationResult GenerateInstructionI( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm );
 	delegate GenerationResult GenerateInstructionJ( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm );
 	delegate GenerationResult GenerateInstructionCop0( GenerationContext context, int pass, int address, uint code, byte function );
+	delegate GenerationResult GenerateInstructionSpecial3( GenerationContext context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl );
 
 	class GenerationContext
 	{
@@ -49,6 +61,13 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		// Map of register to local variable index, already offset by RegisterBase
 		public int[] Registers = new int[ 32 ];
 		public int RegisterCount;
+
+		public Dictionary<int, LabelMarker> BranchLabels = new Dictionary<int, LabelMarker>( 25 );
+		public int LastBranchTarget;
+
+		// If InDelay == true and BranchTarget != null, after the delay we branch if local 3 == 1
+		public bool InDelay;
+		public LabelMarker BranchTarget;
 
 		public int TempBase;
 
@@ -105,6 +124,10 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				Registers[ n ] = -1;
 			}
 
+			BranchLabels.Clear();
+			LastBranchTarget = 0;
+			BranchTarget = null;
+
 			RegisterCount = 0;
 			TempBase = 0;
 		}
@@ -143,6 +166,18 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			}
 
 			TempBase = registerBase + RegisterCount;
+
+			// All labels should be defined at this point so that pass 2 can get some data
+			foreach( KeyValuePair<int, LabelMarker> pair in BranchLabels )
+			{
+				pair.Value.Label = ILGen.DefineLabel();
+			}
+		}
+
+		public bool IsBranchLocal( int address )
+		{
+			return ( address >= StartAddress ) &&
+				( address <= EndAddress );
 		}
 	}
 }
