@@ -56,6 +56,7 @@
     <Compile Include="Modules\ModuleMgrForUser.cs" />
     <Compile Include="Modules\SysMemUserForUser.cs" />
     <Compile Include="Modules\ThreadManForUser.cs" />
+    <Compile Include="Modules\UtilsForUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
