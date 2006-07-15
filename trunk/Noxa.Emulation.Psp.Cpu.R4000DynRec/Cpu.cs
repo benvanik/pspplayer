@@ -390,7 +390,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 			_context.Reset( ilgen, startAddress );
 			
-			Debug.WriteLine( string.Format( "Starting block at 0x{0:X8}", startAddress ) );
+			//Debug.WriteLine( string.Format( "Starting block at 0x{0:X8}", startAddress ) );
 
 			bool jumpDelay = false;
 			GenerationResult lastResult = GenerationResult.Success;
@@ -441,7 +441,7 @@ namespace Noxa.Emulation.Psp.Cpu
 						if( _context.BranchLabels.ContainsKey( address ) == true )
 						{
 							LabelMarker lm = _context.BranchLabels[ address ];
-							Debug.WriteLine( string.Format( "Marking label for branch target {0:X8}", address ) );
+							//Debug.WriteLine( string.Format( "Marking label for branch target {0:X8}", address ) );
 							lm.Found = true;
 						}
 					}
@@ -452,7 +452,7 @@ namespace Noxa.Emulation.Psp.Cpu
 						if( _context.BranchLabels.ContainsKey( address ) == true )
 						{
 							LabelMarker lm = _context.BranchLabels[ address ];
-							Debug.WriteLine( string.Format( "Marking label for branch target {0:X8}", address ) );
+							//Debug.WriteLine( string.Format( "Marking label for branch target {0:X8}", address ) );
 							ilgen.MarkLabel( lm.Label );
 						}
 					}
@@ -587,7 +587,7 @@ namespace Noxa.Emulation.Psp.Cpu
 						// Could also be in a jump delay, which only happens on non-breakout jumps
 						if( jumpDelay == true )
 						{
-							Debug.WriteLine( "Marking jump delay tail" );
+							//Debug.WriteLine( "Marking jump delay tail" );
 							GenerateTail( _context );
 
 							_context.InDelay = false;
@@ -611,7 +611,7 @@ namespace Noxa.Emulation.Psp.Cpu
 							}
 							else
 							{
-								Debug.WriteLine( string.Format( "Aborting block early because branch target {0:X8} not found", _context.BranchTarget.Address ) );
+								//Debug.WriteLine( string.Format( "Aborting block early because branch target {0:X8} not found", _context.BranchTarget.Address ) );
 								Debug.Assert( _context.BranchTarget.Address != 0 );
 
 								Label noBranch = ilgen.DefineLabel();
@@ -655,13 +655,13 @@ namespace Noxa.Emulation.Psp.Cpu
 						// This is tricky - if lastTargetPc > currentPc, don't break out
 						if( _context.LastBranchTarget <= address )
 						{
-							Debug.WriteLine( string.Format( "Jump breakout at {0:X8}", address ) );
+							//Debug.WriteLine( string.Format( "Jump breakout at {0:X8}", address ) );
 							breakOut = true;
 							lastResult = result;
 						}
 						else
 						{
-							Debug.WriteLine( string.Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _context.LastBranchTarget ) );
+							//Debug.WriteLine( string.Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _context.LastBranchTarget ) );
 							if( pass == 1 )
 							{
 								jumpDelay = true;
