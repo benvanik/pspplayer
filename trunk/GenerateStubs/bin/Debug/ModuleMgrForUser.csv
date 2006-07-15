@@ -1,0 +1,11 @@
+,NID,Return,Function,Params
+1,0xb7f46618,SceUID,sceKernelLoadModuleByID,"SceUID fid,int flags,SceKernelLMOption *option"
+2,0x977de386,SceUID,sceKernelLoadModule,"const char *path,int flags,SceKernelLMOption *option"
+3,0x710f61b5,SceUID,sceKernelLoadModuleMs,"const char *path,int flags,SceKernelLMOption *option"
+4,0xf9275d98,SceUID,sceKernelLoadModuleBufferUsbWlan,"SceSize bufsize,void *buf,int flags,SceKernelLMOption *option"
+5,0x50f0c1ec,int,sceKernelStartModule,"SceUID modid,SceSize argsize,void *argp,int *status,SceKernelSMOption *option"
+6,0xd1ff982a,int,sceKernelStopModule,"SceUID modid,SceSize argsize,void *argp,int *status,SceKernelSMOption *option"
+7,0x2e0911aa,int,sceKernelUnloadModule,SceUID modid
+8,0xd675ebb8,int,sceKernelSelfStopUnloadModule,"int unknown,SceSize argsize,void *argp"
+9,0xcc1d3699,int,sceKernelStopUnloadSelfModule,"SceSize argsize,void *argp,int *status,SceKernelSMOption *option"
+10,0x748cbed9,int,sceKernelQueryModuleInfo,"SceUID modid,SceKernelModuleInfo *info"

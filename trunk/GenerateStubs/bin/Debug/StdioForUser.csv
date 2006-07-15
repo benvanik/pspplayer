@@ -1,0 +1,10 @@
+,NID,Return,Function,Params
+1,0x3054d478,,sceKernelStdioRead,
+2,0x0cbb0571,,sceKernelStdioLseek,
+3,0xa46785c9,,sceKernelStdioSendChar,
+4,0xa3b931db,,sceKernelStdioWrite,
+5,0x9d061c19,,sceKernelStdioClose,
+6,0x924aba61,,sceKernelStdioOpen,
+8,0x172d316e,SceUID,sceKernelStdin,void
+9,0xa6bab2e9,SceUID,sceKernelStdout,void
+11,0xf78ba90a,SceUID,sceKernelStderr,void
