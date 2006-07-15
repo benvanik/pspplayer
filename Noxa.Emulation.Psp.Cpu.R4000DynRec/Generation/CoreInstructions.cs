@@ -405,7 +405,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		{
 			if( context.BranchLabels.ContainsKey( target ) == false )
 			{
-				Debug.WriteLine( string.Format( "Defining branch target {0:X8}", target ) );
+				//Debug.WriteLine( string.Format( "Defining branch target {0:X8}", target ) );
 				LabelMarker lm = new LabelMarker( target );
 				context.BranchLabels.Add( target, lm );
 			}
@@ -2311,8 +2311,11 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 					if( biosFunction.IsImplemented == false )
 					{
-						Debug.WriteLine( string.Format( "DynRec: NID 0x{0:X8} {1} is not implemented",
-							biosFunction.NID, biosFunction.Name ) );
+						if( pass == 0 )
+						{
+							Debug.WriteLine( string.Format( "DynRec: NID 0x{0:X8} {1} is not implemented",
+								biosFunction.NID, biosFunction.Name ) );
+						}
 					}
 				}
 				else
@@ -2321,7 +2324,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					hasReturn = false;
 					paramCount = 0;
 
-					Debug.WriteLine( "DynRec: unregistered syscall attempt" );
+					if( pass == 0 )
+						Debug.WriteLine( "DynRec: unregistered syscall attempt" );
 				}
 
 				if( pass == 0 )
