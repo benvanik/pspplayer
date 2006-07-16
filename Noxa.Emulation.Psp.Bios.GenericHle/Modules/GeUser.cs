@@ -280,9 +280,10 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				_video = _hle.Emulator.Video;
 
 			DisplayList list = _video.FindDisplayList( a0 );
-			Debug.Assert( list != null );
+
+			// List could have already been processed
 			if( list == null )
-				return -1;
+				return 0;
 
 			if( list.Ready == false )
 			{

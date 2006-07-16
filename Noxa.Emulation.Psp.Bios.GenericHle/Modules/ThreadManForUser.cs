@@ -778,7 +778,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 		#endregion
 
-		#region Events/Callbacks
+		#region Callbacks
 
 		[BiosStub( 0x6e9ea350, "_sceKernelReturnFromCallback", false, 0 )]
 		[BiosStubIncomplete]
@@ -1027,7 +1027,6 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		#region Events
 
 		[BiosStub( 0x55c20a00, "sceKernelCreateEventFlag", true, 4 )]
-		[BiosStubIncomplete]
 		public int sceKernelCreateEventFlag( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = const char *name
@@ -1035,26 +1034,46 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			// a2 = int bits
 			// a3 = int unk3
 
-			// int
-			return 0;
+			KernelEvent ev = new KernelEvent();
+			ev.HandleType = KernelHandleType.Event;
+			ev.Uid = _kernel.AllocateUid();
+			ev.Name = Kernel.ReadString( memory, a0 );
+			ev.BitMask = a2;
+
+			_kernel.AddHandle( ev );
+
+			// SceUID
+			return ev.Uid;
 		}
 
 		[BiosStub( 0xef9e4c70, "sceKernelDeleteEventFlag", true, 1 )]
-		[BiosStubIncomplete]
 		public int sceKernelDeleteEventFlag( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = int evid
+
+			KernelHandle ev = _kernel.FindHandle( a0 );
+			if( ( ev == null ) ||
+				( ev.HandleType != KernelHandleType.Event ) )
+				return -1;
+
+			_kernel.RemoveHandle( ev );
 
 			// int
 			return 0;
 		}
 
 		[BiosStub( 0x1fb15a32, "sceKernelSetEventFlag", true, 2 )]
-		[BiosStubIncomplete]
 		public int sceKernelSetEventFlag( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = int evid
 			// a1 = u32 bits
+
+			KernelEvent ev = _kernel.FindHandle( a0 ) as KernelEvent;
+			if( ev == null )
+				return -1;
+
+			ev.BitMask = a1;
+			_kernel.SignalEvent( ev );
 
 			// int
 			return 0;
@@ -1068,7 +1087,6 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		}
 
 		[BiosStub( 0x402fcf22, "sceKernelWaitEventFlag", true, 5 )]
-		[BiosStubIncomplete]
 		public int sceKernelWaitEventFlag( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = int evid
@@ -1077,6 +1095,21 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			// a3 = u32 *outBits
 			// sp[0] = void *arg
 			int a4 = memory.ReadWord( sp + 0 );
+
+			KernelEvent ev = _kernel.FindHandle( a0 ) as KernelEvent;
+			if( ev == null )
+				return -1;
+
+			if( a2 == 0 )
+			{
+				// Immediate
+				memory.WriteWord( a3, 4, ev.BitMask );
+			}
+			else
+			{
+				KernelThread thread = _kernel.ActiveThread;
+				_kernel.WaitThreadOnEvent( thread, ev, a1, a3 );
+			}
 
 			// int
 			return 0;
@@ -1098,6 +1131,12 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			// a2 = u32 wait
 			// a3 = u32 *outBits
 
+			KernelEvent ev = _kernel.FindHandle( a0 ) as KernelEvent;
+			if( ev == null )
+				return -1;
+
+			// This should be really similar to waiteventflag
+
 			// int
 			return 0;
 		}
@@ -1115,6 +1154,10 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		{
 			// a0 = SceUID event
 			// a1 = SceKernelEventFlagInfo *status
+
+			KernelEvent ev = _kernel.FindHandle( a0 ) as KernelEvent;
+			if( ev == null )
+				return -1;
 
 			// int
 			return 0;
