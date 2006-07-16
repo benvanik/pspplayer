@@ -35,6 +35,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 
 		protected Dictionary<int, KernelHandle> _handles = new Dictionary<int, KernelHandle>();
 		protected Dictionary<KernelCallbackName, KernelCallback> _callbacks = new Dictionary<KernelCallbackName, KernelCallback>();
+		protected List<KernelThread> _threadsWaitingOnEvents = new List<KernelThread>();
 
 		protected int _lastUid = 0;
 
@@ -145,6 +146,40 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 			}
 		}
 
+		public void WaitThreadOnEvent( KernelThread thread, KernelEvent ev, int bitMask, int outAddress )
+		{
+			thread.Wait( ev, bitMask, outAddress );
+			thread.CanHandleCallbacks = true;
+			_threadsWaitingOnEvents.Add( thread );
+
+			this.ContextSwitch();
+		}
+
+		public void SignalEvent( KernelEvent ev )
+		{
+			bool needsSwitch = false;
+			for( int n = 0; n < _threadsWaitingOnEvents.Count; n++ )
+			{
+				KernelThread thread = _threadsWaitingOnEvents[ n ];
+				if( thread.WaitEvent == ev )
+				{
+					// Check for a match somehow
+					if( ( thread.WaitId & ev.BitMask ) != 0 )
+					{
+						thread.State = KernelThreadState.Ready;
+
+						// Need to obey output param
+						if( thread.OutAddress != 0x0 )
+							_hle.Emulator.Cpu.Memory.WriteWord( thread.OutAddress, 4, ev.BitMask );
+						
+						needsSwitch = true;
+					}
+				}
+			}
+			if( needsSwitch == true )
+				this.ContextSwitch();
+		}
+
 		private int ThreadPriorityComparer( KernelThread a, KernelThread b )
 		{
 			if( a.Priority < b.Priority )
@@ -204,6 +239,9 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 									// Thread died, wake
 									threads[ n ].State = KernelThreadState.Ready;
 								}
+								break;
+							case KernelThreadWait.Event:
+								// Waiting on WaitEvent for bitmask in WaitId
 								break;
 						}
 						// If we didn't wake, skip

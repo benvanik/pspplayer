@@ -23,7 +23,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 		MemoryBlock,
 		Callback,
 		Semaphore,
-		GuCallback
+		GuCallback,
+		Event
 	}
 
 	class KernelHandle
@@ -97,7 +98,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 	{
 		ThreadEnd,
 		Delay,
-		Sleep
+		Sleep,
+		Event,
 	}
 
 	class KernelThread : KernelHandle
@@ -124,6 +126,10 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 		public KernelThreadWait WaitType;
 		public int WaitId;
 		public int WaitTimeout;
+		public KernelEvent WaitEvent;
+
+		// Helps with wait states that may need output
+		public int OutAddress;
 
 		// Thread options?
 
@@ -161,6 +167,15 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 			State = KernelThreadState.Killed;
 			ExitCode = code;
 			StackBlock.Partition.Free( StackBlock );
+		}
+
+		public void Wait( KernelEvent ev, int bitMask, int outAddress )
+		{
+			State = KernelThreadState.Waiting;
+			WaitType = KernelThreadWait.Event;
+			WaitEvent = ev;
+			WaitId = bitMask;
+			OutAddress = outAddress;
 		}
 	}
 
@@ -480,6 +495,16 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 		public int CommonAddress;
 		public int NotifyCount;
 		public int NotifyArguments;
+	}
+
+	#endregion
+
+	#region Events
+
+	class KernelEvent : KernelHandle
+	{
+		public string Name;
+		public int BitMask;
 	}
 
 	#endregion
