@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Noxa.Emulation.Psp.Video
 {
-	public enum VideoCommand
+	public enum VideoCommand : byte
 	{
 		NOP = 0x00,
 		VADDR = 0x01, // Vertex List (BASE)
@@ -275,11 +276,10 @@ namespace Noxa.Emulation.Psp.Video
 			{
 				unsafe
 				{
-					fixed( int* iptr = &Argument )
-					{
-						float* fptr = ( float* )iptr;
-						return *fptr;
-					}
+					int arg = Argument << 8;
+					int* iptr = &arg;
+					float* fptr = ( float* )iptr;
+					return *fptr;
 				}
 			}
 		}
@@ -297,7 +297,7 @@ namespace Noxa.Emulation.Psp.Video
 			{
 				float* fptr = &argument;
 				int* iptr = ( int* )fptr;
-				Argument = *iptr;
+				Argument = *iptr >> 8;
 			}
 		}
 
@@ -306,5 +306,15 @@ namespace Noxa.Emulation.Psp.Video
 			Command = ( VideoCommand )( code >> 24 );
 			Argument = ( int )( code & 0xFFFFFF );
 		}
+	}
+
+	public class DisplayList
+	{
+		public int ID;
+		public VideoPacket[] Packets;
+		public bool Ready;
+		public object KernelData;
+		public int CallbackId;
+		public int Argument;
 	}
 }

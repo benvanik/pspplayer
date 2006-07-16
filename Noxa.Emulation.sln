@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Video.Direct3D", "Noxa.Emulation.Psp.Video.Direct3D\Noxa.Emulation.Psp.Video.Direct3D.vcproj", "{A2A7CE7D-F158-4C82-A16B-C9815502D83F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp", "Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj", "{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Audio.DirectSound", "Noxa.Emulation.Psp.Audio.DirectSound\Noxa.Emulation.Psp.Audio.DirectSound.csproj", "{77003BA1-5A2F-4EDC-95F1-897E9A8C6031}"
@@ -47,14 +45,6 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A2A7CE7D-F158-4C82-A16B-C9815502D83F}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{A2A7CE7D-F158-4C82-A16B-C9815502D83F}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{A2A7CE7D-F158-4C82-A16B-C9815502D83F}.Debug|Win32.ActiveCfg = Debug|Win32
-		{A2A7CE7D-F158-4C82-A16B-C9815502D83F}.Debug|Win32.Build.0 = Debug|Win32
-		{A2A7CE7D-F158-4C82-A16B-C9815502D83F}.Release|Any CPU.ActiveCfg = Release|Win32
-		{A2A7CE7D-F158-4C82-A16B-C9815502D83F}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{A2A7CE7D-F158-4C82-A16B-C9815502D83F}.Release|Win32.ActiveCfg = Release|Win32
-		{A2A7CE7D-F158-4C82-A16B-C9815502D83F}.Release|Win32.Build.0 = Release|Win32
 		{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

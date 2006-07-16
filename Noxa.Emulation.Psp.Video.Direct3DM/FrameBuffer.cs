@@ -249,11 +249,6 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 					ptr += ( ( address - 0x04000000 ) >> 1 ); // div by 2 because we are incrementing by half words instead of bytes
 					*ptr = us;
 				}
-
-				if( value != 0 )
-				{
-					int x = 6;
-				}
 			}
 		}
 
