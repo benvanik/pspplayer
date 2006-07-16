@@ -29,6 +29,13 @@ namespace Noxa.Emulation.Psp.Video
 			get;
 		}
 
+		DisplayList FindDisplayList( int displayListId );
+		bool Enqueue( DisplayList displayList, bool immediate );
+		void Abort( int displayListId );
+		void Sync( DisplayList displayList );
+
+		void Sync();
+
 		void Suspend();
 		bool Resume();
 	}

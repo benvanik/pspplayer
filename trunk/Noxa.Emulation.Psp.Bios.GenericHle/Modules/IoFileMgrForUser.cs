@@ -266,17 +266,17 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			if( ( a1 & 0x0800 ) != 0 )
 			{
 				// Exclusive O_EXCL
-				int x = 1;
+				//int x = 1;
 			}
 			if( ( a1 & 0x8000 ) != 0 )
 			{
 				// Non-blocking O_NOWAIT
-				int x = 1;
+				//int x = 1;
 			}
 			if( ( a1 & 0x0004 ) != 0 )
 			{
 				// ? O_NBLOCK
-				int x = 1;
+				//int x = 1;
 			}
 
 			Stream stream = file.Open( fileMode, fileAccess );

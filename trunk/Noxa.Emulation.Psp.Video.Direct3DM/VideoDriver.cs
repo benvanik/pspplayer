@@ -30,6 +30,9 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		protected AutoResetEvent _vblankSync;
 		protected uint _vcount;
 
+		protected List<DisplayList> _lists;
+		protected AutoResetEvent _listSync;
+
 		public VideoDriver( IEmulationInstance emulator, ComponentParameters parameters )
 		{
 			Debug.Assert( emulator != null );
@@ -43,6 +46,9 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			// Latch our frame buffer into the memory system
 			_frameBuffer = new FrameBuffer( this );
 			_emulator.Cpu.Memory.RegisterSegment( _frameBuffer );
+
+			_listSync = new AutoResetEvent( false );
+			_lists = new List<DisplayList>( 5 );
 		}
 
 		public ComponentParameters Parameters
@@ -157,6 +163,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			_threadSync = null;
 		}
 
+		#region Device Management
+
 		private bool CreateDevice()
 		{
 			_presentParams = new PresentParameters();
@@ -214,6 +222,10 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			}
 		}
 
+		#endregion
+
+		#region Render Loop
+
 		private void VideoThread()
 		{
 			try
@@ -235,6 +247,34 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						_sprite.Begin( SpriteFlags.None );
 						_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
 						_sprite.End();
+
+						// Display list processing
+						List<DisplayList> toProcess = new List<DisplayList>( 5 );
+						lock( _lists )
+						{
+							bool hasElements = _lists.Count > 0;
+
+							for( int n = 0; n < _lists.Count; n++ )
+							{
+								DisplayList list = _lists[ n ];
+								lock( list )
+								{
+									if( list.Ready == false )
+										break;
+
+									toProcess.Add( list );
+								}
+							}
+
+							_lists.RemoveRange( 0, toProcess.Count );
+
+							if( hasElements == true )
+								_listSync.Set();
+						}
+
+						// Process lists
+						for( int n = 0; n < toProcess.Count; n++ )
+							Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", toProcess[ n ].Packets.Length ) );
 
 						_device.EndScene();
 						try
@@ -260,5 +300,68 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			{
 			}
 		}
+
+		#endregion
+
+		#region Display Lists
+
+		public DisplayList FindDisplayList( int displayListId )
+		{
+			lock( _lists )
+			{
+				for( int n = 0; n < _lists.Count; n++ )
+				{
+					if( _lists[ n ].ID == displayListId )
+						return _lists[ n ];
+				}
+			}
+
+			return null;
+		}
+
+		public bool Enqueue( DisplayList displayList, bool immediate )
+		{
+			lock( _lists )
+			{
+				int id = 0;
+				for( int n = 0; n < _lists.Count; n++ )
+				{
+					if( _lists[ n ].ID > id )
+						id = _lists[ n ].ID;
+				}
+
+				displayList.ID = id;
+
+				if( immediate == true )
+					_lists.Insert( 0, displayList );
+				else
+					_lists.Add( displayList );
+			}
+
+			return true;
+		}
+
+		public void Abort( int displayListId )
+		{
+			lock( _lists )
+			{
+				DisplayList list = FindDisplayList( displayListId );
+				if( list == null )
+					return;
+
+				_lists.Remove( list );
+			}
+		}
+
+		public void Sync( DisplayList displayList )
+		{
+		}
+
+		public void Sync()
+		{
+			_listSync.WaitOne();
+		}
+
+		#endregion
 	}
 }

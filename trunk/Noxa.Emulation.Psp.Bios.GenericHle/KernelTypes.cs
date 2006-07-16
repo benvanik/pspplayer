@@ -22,7 +22,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 		File,
 		MemoryBlock,
 		Callback,
-		Semaphore
+		Semaphore,
+		GuCallback
 	}
 
 	class KernelHandle
