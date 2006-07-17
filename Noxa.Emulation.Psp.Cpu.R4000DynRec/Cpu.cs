@@ -462,85 +462,96 @@ namespace Noxa.Emulation.Psp.Cpu
 
 					if( code != 0 )
 					{
-						// Decode instruction
-						uint opcode = code >> 26 ;
-						switch( opcode )
+						uint opcode = ( code >> 26 ) & 0x3F;
+						bool isCop = ( opcode == 0x10 ) || ( opcode == 0x11 ) || ( opcode == 0x12 );
+
+						if( isCop == false )
 						{
-							case 0: // R type
-								{
-									byte function = ( byte )( code & 0x3F );
-									byte rs = ( byte )( ( code >> 21 ) & 0x1F );
-									byte rt = ( byte )( ( code >> 16 ) & 0x1F );
-									byte rd = ( byte )( ( code >> 11 ) & 0x1F );
-									byte shamt = ( byte )( ( code >> 6 ) & 0x1F );
-
-									GenerateInstructionR instr = CoreInstructions.TableR[ function ];
-									if( pass == 1 )
+							switch( opcode )
+							{
+								case 0: // R type
 									{
-										EmitDebugInfo( _context, address, code, instr.Method.Name,
-											string.Format( "rs:{0} rt:{1} rd:{2} shamt:{3}", rs, rt, rd, shamt ) );
-									}
-									result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, shamt, function );
-								}
-								break;
-							case 1: // J type
-								{
-									uint imm = code & 0x03FFFFFF;
-									uint rt = ( code >> 16 ) & 0x1F;
+										byte function = ( byte )( code & 0x3F );
+										byte rs = ( byte )( ( code >> 21 ) & 0x1F );
+										byte rt = ( byte )( ( code >> 16 ) & 0x1F );
+										byte rd = ( byte )( ( code >> 11 ) & 0x1F );
+										byte shamt = ( byte )( ( code >> 6 ) & 0x1F );
 
-									GenerateInstructionJ instr = CoreInstructions.TableJ[ rt ];
-									if( pass == 1 )
-									{
-										EmitDebugInfo( _context, address, code, instr.Method.Name,
-											string.Format( "imm:{0}", imm ) );
+										GenerateInstructionR instr = CoreInstructions.TableR[ function ];
+										if( pass == 1 )
+										{
+											EmitDebugInfo( _context, address, code, instr.Method.Name,
+												string.Format( "rs:{0} rt:{1} rd:{2} shamt:{3}", rs, rt, rd, shamt ) );
+										}
+										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, shamt, function );
 									}
-									result = instr( _context, pass, address + 4, code, ( byte )opcode, imm );
-								}
-								break;
-							case 16: // COP0 type
-								{
-									byte function = ( byte )( code & 0x3F );
+									break;
+								case 1: // J type
+									{
+										uint imm = code & 0x03FFFFFF;
+										uint rt = ( code >> 16 ) & 0x1F;
 
-									GenerateInstructionCop0 instr = CoreInstructions.TableCop0[ function ];
-									if( pass == 1 )
-									{
-										EmitDebugInfo( _context, address, code, instr.Method.Name,
-											string.Format( "func:{0}", function ) );
+										GenerateInstructionJ instr = CoreInstructions.TableJ[ rt ];
+										if( pass == 1 )
+										{
+											EmitDebugInfo( _context, address, code, instr.Method.Name,
+												string.Format( "imm:{0}", imm ) );
+										}
+										result = instr( _context, pass, address + 4, code, ( byte )opcode, imm );
 									}
-									result = instr( _context, pass, address + 4, code, function );
-								}
-								break;
-							case 31: // SPECIAL3 type
-								{
-									byte rt = ( byte )( ( code >> 16 ) & 0x1F );
-									byte rd = ( byte )( ( code >> 11 ) & 0x1F );
-									byte function = ( byte )( ( code >> 6 ) & 0x1F );
-									uint bshfl = code & 0x3F;
+									break;
+								case 0x1C: // Allegrex special type (follows R convention)
+									{
+										byte function = ( byte )( code & 0x3F );
+										byte rs = ( byte )( ( code >> 21 ) & 0x1F );
+										byte rt = ( byte )( ( code >> 16 ) & 0x1F );
+										byte rd = ( byte )( ( code >> 11 ) & 0x1F );
 
-									GenerateInstructionSpecial3 instr = CoreInstructions.TableSpecial3[ function ];
-									if( pass == 1 )
-									{
-										EmitDebugInfo( _context, address, code, instr.Method.Name,
-											string.Format( "func:{0}", function ) );
+										GenerateInstructionR instr = CoreInstructions.TableAllegrex[ function ];
+										if( pass == 1 )
+										{
+											EmitDebugInfo( _context, address, code, instr.Method.Name,
+												string.Format( "rs:{0} rt:{1} rd:{2}", rs, rt, rd ) );
+										}
+										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, 0, function );
 									}
-									result = instr( _context, pass, address + 4, code, rt, rd, function, ( ushort )bshfl );
-								}
-								break;
-							default: // Common I type
-								{
-									byte rs = ( byte )( ( code >> 21 ) & 0x1F );
-									byte rt = ( byte )( ( code >> 16 ) & 0x1F );
-									ushort imm = ( ushort )( code & 0xFFFF );
+									break;
+								case 31: // SPECIAL3 type
+									{
+										byte rt = ( byte )( ( code >> 16 ) & 0x1F );
+										byte rd = ( byte )( ( code >> 11 ) & 0x1F );
+										byte function = ( byte )( ( code >> 6 ) & 0x1F );
+										uint bshfl = code & 0x3F;
 
-									GenerateInstructionI instr = CoreInstructions.TableI[ opcode ];
-									if( pass == 1 )
-									{
-										EmitDebugInfo( _context, address, code, instr.Method.Name,
-											string.Format( "rs:{0} rt:{1} imm:{2}", rs, rt, ( int )( short )imm ) );
+										GenerateInstructionSpecial3 instr = CoreInstructions.TableSpecial3[ function ];
+										if( pass == 1 )
+										{
+											EmitDebugInfo( _context, address, code, instr.Method.Name,
+												string.Format( "func:{0}", function ) );
+										}
+										result = instr( _context, pass, address + 4, code, rt, rd, function, ( ushort )bshfl );
 									}
-									result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, imm );
-								}
-								break;
+									break;
+								default: // Common I type
+									{
+										byte rs = ( byte )( ( code >> 21 ) & 0x1F );
+										byte rt = ( byte )( ( code >> 16 ) & 0x1F );
+										ushort imm = ( ushort )( code & 0xFFFF );
+
+										GenerateInstructionI instr = CoreInstructions.TableI[ opcode ];
+										if( pass == 1 )
+										{
+											EmitDebugInfo( _context, address, code, instr.Method.Name,
+												string.Format( "rs:{0} rt:{1} imm:{2}", rs, rt, ( int )( short )imm ) );
+										}
+										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, imm );
+									}
+									break;
+							}
+						}
+						else
+						{
+							result = CoreInstructions.Cop.HandleInstruction( _context, pass, address + 4, code );
 						}
 
 						if( result == GenerationResult.Invalid )
@@ -742,7 +753,12 @@ namespace Noxa.Emulation.Psp.Cpu
 		public const int LocalPC = 2;			// DO NOT CHANGE
 		public const int LocalPCValid = 3;		// DO NOT CHANGE
 		public const int LocalNullifyDelay = 4;	// DO NOT CHANGE
-		public const int LocalBlockCounter = 5;
+		public const int LocalTempF = 5;
+		public const int LocalTempF2 = 6;
+		public const int LocalTempL = 7;
+#if ACCURATESTATS
+		public const int LocalBlockCounter = 8;	// Must always be last
+#endif
 
 		protected static void GeneratePreamble( GenerationContext context )
 		{
@@ -756,6 +772,9 @@ namespace Noxa.Emulation.Psp.Cpu
 				ilgen.DeclareLocal( typeof( int ) );
 				ilgen.DeclareLocal( typeof( int ) );
 			}
+			ilgen.DeclareLocal( typeof( double ) );
+			ilgen.DeclareLocal( typeof( double ) );
+			ilgen.DeclareLocal( typeof( long ) );
 #if ACCURATESTATS
 			ilgen.DeclareLocal( typeof( int ) );
 			ilgen.Emit( OpCodes.Ldc_I4_0 );
@@ -808,7 +827,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		}
 
 		[Conditional( "VERBOSEEMIT" )]
-		protected void EmitDebugInfo( GenerationContext context, int address, uint code, string name, string args )
+		internal void EmitDebugInfo( GenerationContext context, int address, uint code, string name, string args )
 		{
 			if( _debug == false )
 				return;

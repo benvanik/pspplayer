@@ -54,6 +54,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		{
 			public List<VideoPacket> Packets;
 			public int StallAddress;
+			public int Base;
 		}
 
 		[BiosStub( 0x1f6752ad, "sceGeEdramGetSize", true, 0 )]
@@ -115,25 +116,49 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		protected void ReadPackets( IMemory memory, int pointer, List<VideoPacket> list, int stallAddress )
+		protected bool ReadPackets( IMemory memory, int pointer, List<VideoPacket> list, int stallAddress, DisplayListData dld )
 		{
 			if( stallAddress == 0x0 )
 				stallAddress = int.MaxValue;
 
+			// Have to remove caching shit
+			pointer = pointer & 0x3FFFFFFF;
+			stallAddress = stallAddress & 0x3FFFFFFF;
+
 			while( pointer < stallAddress )
 			{
 				int code = memory.ReadWord( pointer );
-				VideoPacket packet = new VideoPacket( code );
+				VideoPacket packet = new VideoPacket( code, dld.Base );
 				list.Add( packet );
 
 				pointer += 4;
 
-				// Stop conditions totally guessed from sceGuFinish
-				if( ( packet.Command == VideoCommand.END ) ||
-					( packet.Command == VideoCommand.FINISH ) ||
-					( packet.Command == VideoCommand.Unknown0x11 ) )
-					break;
+				switch( packet.Command )
+				{
+					case VideoCommand.BASE:
+						dld.Base = packet.Argument << 8;
+						break;
+
+					case VideoCommand.JUMP:
+						pointer = packet.Argument | dld.Base;
+						break;
+
+						// These are not yet implemented
+					case VideoCommand.CALL:
+					case VideoCommand.RET:
+					case VideoCommand.BJUMP:
+						Debugger.Break();
+						break;
+
+					// What I think are the stop conditions
+					case VideoCommand.FINISH:
+					case VideoCommand.END:
+					case VideoCommand.Unknown0x11:
+						return true;
+				}
 			}
+
+			return false;
 		}
 
 		[BiosStub( 0xab49e76a, "sceGeListEnQueue", true, 4 )]
@@ -157,7 +182,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 				// Read all now
 				List<VideoPacket> packets = new List<VideoPacket>( 256 );
-				ReadPackets( memory, a0, packets, 0 );
+				bool done = ReadPackets( memory, a0, packets, 0, new DisplayListData() );
+				Debug.Assert( done == true );
 				list.Packets = packets.ToArray();
 			}
 			else
@@ -169,7 +195,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				list.Ready = false;
 
 				// Rest will follow
-				ReadPackets( memory, a0, dld.Packets, a1 );
+				bool done = ReadPackets( memory, a0, dld.Packets, a1, dld );
+				Debug.Assert( done == false );
 
 				_outstandingLists.Add( list );
 			}
@@ -204,7 +231,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 				// Read all now
 				List<VideoPacket> packets = new List<VideoPacket>( 256 );
-				ReadPackets( memory, a0, packets, 0 );
+				bool done = ReadPackets( memory, a0, packets, 0, new DisplayListData() );
+				Debug.Assert( done == true );
 				list.Packets = packets.ToArray();
 			}
 			else
@@ -216,7 +244,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				list.Ready = false;
 
 				// Rest will follow
-				ReadPackets( memory, a0, dld.Packets, a1 );
+				bool done = ReadPackets( memory, a0, dld.Packets, a1, dld );
+				Debug.Assert( done == false );
 
 				_outstandingLists.Add( list );
 			}
@@ -263,7 +292,20 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				DisplayListData dld = list.KernelData as DisplayListData;
 				int oldStallAddress = dld.StallAddress;
 				dld.StallAddress = a1;
-				ReadPackets( memory, oldStallAddress, dld.Packets, dld.StallAddress );
+				bool done = ReadPackets( memory, oldStallAddress, dld.Packets, dld.StallAddress, dld );
+				if( done == true )
+				{
+					lock( list )
+					{
+						list.Packets = dld.Packets.ToArray();
+						list.Ready = true;
+					}
+
+					_outstandingLists.Remove( list );
+					list.KernelData = null;
+
+					_video.Sync( list );
+				}
 			}
 
 			// int
@@ -289,7 +331,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			{
 				DisplayListData dld = list.KernelData as DisplayListData;
 				int oldStallAddress = dld.StallAddress;
-				ReadPackets( memory, oldStallAddress, dld.Packets, 0x0 );
+				bool done = ReadPackets( memory, oldStallAddress, dld.Packets, 0x0, dld );
+				Debug.Assert( done == true );
 				lock( list )
 				{
 					list.Packets = dld.Packets.ToArray();
@@ -316,6 +359,27 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 			// Don't know how to handle the others - check sceGuSync.c in sdk
 			Debug.Assert( a0 == 0 );
+
+			// This is a full sync, so finish everything
+			for( int n = 0; n < _outstandingLists.Count; n++ )
+			{
+				DisplayList list = _outstandingLists[ n ];
+				if( list.Ready == false )
+				{
+					DisplayListData dld = list.KernelData as DisplayListData;
+					int oldStallAddress = dld.StallAddress;
+					bool done = ReadPackets( memory, oldStallAddress, dld.Packets, 0x0, dld );
+					Debug.Assert( done == true );
+					lock( list )
+					{
+						list.Packets = dld.Packets.ToArray();
+						list.Ready = true;
+					}
+
+					_outstandingLists.Remove( list );
+					list.KernelData = null;
+				}
+			}
 
 			_video.Sync();
 

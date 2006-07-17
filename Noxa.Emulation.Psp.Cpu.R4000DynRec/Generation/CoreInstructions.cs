@@ -13,7 +13,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		public static GenerateInstructionR[] TableR = SetupTableR();
 		public static GenerateInstructionI[] TableI = SetupTableI();
 		public static GenerateInstructionJ[] TableJ = SetupTableJ();
-		public static GenerateInstructionCop0[] TableCop0 = SetupTableCop0();
+		public static GenerateInstructionR[] TableAllegrex = SetupTableAllegrex();
 		public static GenerateInstructionSpecial3[] TableSpecial3 = SetupTableSpecial3();
 
 		// void c( core0, memory, generalRegisters[], syscallList[] )
@@ -116,9 +116,11 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			instrs[ 46 ] = new GenerateInstructionI( Memory.SWR );
 			instrs[ 47 ] = new GenerateInstructionI( Memory.CACHE );
 			instrs[ 48 ] = new GenerateInstructionI( Memory.LL );
-			instrs[ 50 ] = new GenerateInstructionI( Memory.LWC2 );
+			instrs[ 49 ] = new GenerateInstructionI( Memory.LWCz );
+			instrs[ 50 ] = new GenerateInstructionI( Memory.LWCz );
 			instrs[ 56 ] = new GenerateInstructionI( Memory.SC );
-			instrs[ 58 ] = new GenerateInstructionI( Memory.SWC2 );
+			instrs[ 57 ] = new GenerateInstructionI( Memory.LWCz );
+			instrs[ 58 ] = new GenerateInstructionI( Memory.SWCz );
 
 			return instrs;
 		}
@@ -144,16 +146,18 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			return instrs;
 		}
 
-		private static GenerateInstructionCop0[] SetupTableCop0()
+		private static GenerateInstructionR[] SetupTableAllegrex()
 		{
-			GenerateInstructionCop0[] instrs = new GenerateInstructionCop0[ 64 ];
+			GenerateInstructionR[] instrs = new GenerateInstructionR[ 64 ];
 
 			// Populate table
-			GenerateInstructionCop0 unk = new GenerateInstructionCop0( UnknownCop0 );
+			GenerateInstructionR unk = new GenerateInstructionR( UnknownR );
 			for( int n = 0; n < instrs.Length; n++ )
 				instrs[ n ] = unk;
 
-			instrs[ 0 ] = new GenerateInstructionCop0( Cop0.MTFC0 );
+			instrs[ 0 ] = new GenerateInstructionR( Special.HALT );
+			instrs[ 0x24 ] = new GenerateInstructionR( Special.MFIC );
+			instrs[ 0x26 ] = new GenerateInstructionR( Special.MTIC );
 
 			return instrs;
 		}
@@ -192,11 +196,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			return GenerationResult.Invalid;
 		}
 
-		public static GenerationResult UnknownCop0( GenerationContext context, int pass, int address, uint code, byte function )
-		{
-			return GenerationResult.Invalid;
-		}
-
 		public static GenerationResult UnknownSpecial3( GenerationContext context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
 		{
 			return GenerationResult.Invalid;
@@ -206,6 +205,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 		public static void EmitLoadRegister( GenerationContext context, int reg )
 		{
+			Debug.Assert( ( reg >= 0 ) && ( reg <= 31 ) );
+
 			if( reg != 0 )
 			{
 				//int map = context.Registers[ reg ];
@@ -220,6 +221,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 		public static void EmitLoadRegister( GenerationContext context, int reg, int mask )
 		{
+			Debug.Assert( ( reg >= 0 ) && ( reg <= 31 ) );
+
 			if( reg != 0 )
 			{
 				//int map = context.Registers[ reg ];
@@ -237,6 +240,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 		public static void EmitStoreRegister( GenerationContext context, int reg )
 		{
+			Debug.Assert( ( reg >= 0 ) && ( reg <= 31 ) );
+
 			if( reg != 0 )
 			{
 				//int map = context.Registers[ reg ];
@@ -249,6 +254,88 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			}
 			else
 				context.ILGen.Emit( OpCodes.Pop );
+		}
+
+		public static void EmitLoadCopRegister( GenerationContext context, int cop, int reg )
+		{
+			Debug.Assert( ( reg >= 0 ) && ( reg <= 31 ) );
+
+			switch( cop )
+			{
+				case 0:
+					{
+						// Cop1 stuff not done
+						Debug.Assert( false );
+					}
+					break;
+				case 1:
+					{
+						context.ILGen.Emit( OpCodes.Ldarg_0 );
+						context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp1 );
+						context.ILGen.Emit( OpCodes.Ldfld, context.Cp1Registers );
+
+						context.ILGen.Emit( OpCodes.Ldc_I4, ( int )reg );
+						context.ILGen.Emit( OpCodes.Ldelem_R8 );
+						context.ILGen.Emit( OpCodes.Conv_R4 );
+					}
+					break;
+				case 2:
+					{
+						// Cop2 not implemented
+						Debug.Assert( false );
+					}
+					break;
+			}
+		}
+
+		public static void EmitStoreCopRegister( GenerationContext context, int cop, int reg )
+		{
+			Debug.Assert( ( reg >= 0 ) && ( reg <= 31 ) );
+
+			switch( cop )
+			{
+				case 0:
+					{
+						// Cop1 stuff not done
+						Debug.Assert( false );
+					}
+					break;
+				case 1:
+					{
+						context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
+
+						context.ILGen.Emit( OpCodes.Ldarg_0 );
+						context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp1 );
+						context.ILGen.Emit( OpCodes.Ldfld, context.Cp1Registers );
+
+						context.ILGen.Emit( OpCodes.Ldc_I4, ( int )reg );
+						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF );
+						context.ILGen.Emit( OpCodes.Stelem_R8 );
+					}
+					break;
+				case 2:
+					{
+						// Cop2 not implemented
+						Debug.Assert( false );
+					}
+					break;
+			}
+		}
+
+		public static void EmitLoadCopConditionBit( GenerationContext context, int cop )
+		{
+			context.ILGen.Emit( OpCodes.Ldarg_0 );
+			context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp0 );
+			context.ILGen.Emit( OpCodes.Call, context.Cp1ConditionBitGet );
+		}
+
+		public static void EmitStoreCopConditionBit( GenerationContext context, int cop )
+		{
+			context.ILGen.Emit( OpCodes.Stloc_0 );
+			context.ILGen.Emit( OpCodes.Ldarg_0 );
+			context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp0 );
+			context.ILGen.Emit( OpCodes.Ldloc_0 );
+			context.ILGen.Emit( OpCodes.Call, context.Cp1ConditionBitSet );
 		}
 
 		public static void EmitAddressTranslation( GenerationContext context )
@@ -295,7 +382,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			context.ILGen.Emit( OpCodes.Ldloc_0 );
 			context.ILGen.Emit( OpCodes.Ldelema, typeof( byte ) );
 			context.ILGen.Emit( OpCodes.Ldind_I4 );
-			context.ILGen.Emit( OpCodes.Br, l3 );
+			context.ILGen.Emit( OpCodes.Br_S, l3 );
 
 			context.ILGen.MarkLabel( l1 );
 			context.ILGen.Emit( OpCodes.Pop );
@@ -336,7 +423,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			context.ILGen.Emit( OpCodes.Ldfld, context.MemoryMainBuffer );
 			context.ILGen.Emit( OpCodes.Ldloc_0 );
 			context.ILGen.Emit( OpCodes.Ldelem_U1 );
-			context.ILGen.Emit( OpCodes.Br, l3 );
+			context.ILGen.Emit( OpCodes.Br_S, l3 );
 
 			context.ILGen.MarkLabel( l1 );
 			context.ILGen.Emit( OpCodes.Pop );
@@ -381,7 +468,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			context.ILGen.Emit( OpCodes.Ldelema, typeof( byte ) );
 			context.ILGen.Emit( OpCodes.Ldloc_1 );
 			context.ILGen.Emit( OpCodes.Stind_I4 );
-			context.ILGen.Emit( OpCodes.Br, l3 );
+			context.ILGen.Emit( OpCodes.Br_S, l3 );
 
 			context.ILGen.MarkLabel( l1 );
 			context.ILGen.Emit( OpCodes.Pop );
@@ -411,6 +498,43 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			}
 			if( context.LastBranchTarget < target )
 				context.LastBranchTarget = target;
+		}
+
+		public static void EmitWordToSingle( GenerationContext context )
+		{
+			context.ILGen.Emit( OpCodes.Stloc_0 );
+			context.ILGen.Emit( OpCodes.Ldloca_S, 0 );
+			// Is this needed?
+			context.ILGen.Emit( OpCodes.Conv_U );
+			context.ILGen.Emit( OpCodes.Ldind_R4 );
+			context.ILGen.Emit( OpCodes.Conv_R8 );
+		}
+
+		public static void EmitSingleToWord( GenerationContext context )
+		{
+			context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
+			context.ILGen.Emit( OpCodes.Ldloca_S, ( byte )Cpu.LocalTempF );
+			// Is this needed?
+			context.ILGen.Emit( OpCodes.Conv_U );
+			context.ILGen.Emit( OpCodes.Ldind_I4 );
+		}
+
+		public static void EmitDoubleWordToDouble( GenerationContext context )
+		{
+			context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempL );
+			context.ILGen.Emit( OpCodes.Ldloca_S, ( byte )Cpu.LocalTempL );
+			// Is this needed?
+			context.ILGen.Emit( OpCodes.Conv_U );
+			context.ILGen.Emit( OpCodes.Ldind_R8 );
+		}
+
+		public static void EmitDoubleToDoubleWord( GenerationContext context )
+		{
+			context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
+			context.ILGen.Emit( OpCodes.Ldloca_S, ( byte )Cpu.LocalTempF );
+			// Is this needed?
+			context.ILGen.Emit( OpCodes.Conv_U );
+			context.ILGen.Emit( OpCodes.Ldind_I8 );
 		}
 
 		#region Arithmetic
@@ -1141,7 +1265,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Blt, l1 );
 					EmitLoadRegister( context, rt );
 					EmitStoreRegister( context, rd );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					EmitLoadRegister( context, rs );
 					EmitStoreRegister( context, rd );
@@ -1171,7 +1295,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Bgt, l1 );
 					EmitLoadRegister( context, rt );
 					EmitStoreRegister( context, rd );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					EmitLoadRegister( context, rs );
 					EmitStoreRegister( context, rd );
@@ -1561,11 +1685,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				return GenerationResult.Invalid;
 			}
 
-			public static GenerationResult LWC2( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
-			{
-				return GenerationResult.Invalid;
-			}
-
 			public static GenerationResult SC( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
 				//case B8(0111000):		// sc rt, offset(base)   599
@@ -1581,9 +1700,61 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				return GenerationResult.Invalid;
 			}
 
-			public static GenerationResult SWC2( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			public static GenerationResult LWCz( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 			{
-				return GenerationResult.Invalid;
+				byte cop = ( byte )( opcode & 0x3 );
+
+				if( pass == 0 )
+				{
+					context.ReadRegisters[ rs ] = true;
+					context.UseMemory = true;
+				}
+				else if( pass == 1 )
+				{
+					context.ILGen.Emit( OpCodes.Ldarg_1 );
+
+					EmitLoadRegister( context, rs );
+					context.ILGen.Emit( OpCodes.Ldc_I4, ( int )( short )imm );
+					context.ILGen.Emit( OpCodes.Add );
+					EmitAddressTranslation( context );
+
+					EmitDirectMemoryRead( context );
+
+					if( opcode == 1 )
+						EmitWordToSingle( context );
+
+					EmitStoreCopRegister( context, cop, rt );
+				}
+				return GenerationResult.Success;
+			}
+
+			public static GenerationResult SWCz( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				byte cop = ( byte )( opcode & 0x3 );
+
+				if( pass == 0 )
+				{
+					context.ReadRegisters[ rs ] = true;
+					context.ReadRegisters[ rt ] = true;
+					context.UseMemory = true;
+				}
+				else if( pass == 1 )
+				{
+					context.ILGen.Emit( OpCodes.Ldarg_1 );
+
+					EmitLoadRegister( context, rs );
+					context.ILGen.Emit( OpCodes.Ldc_I4, ( int )( short )imm );
+					context.ILGen.Emit( OpCodes.Add );
+					EmitAddressTranslation( context );
+
+					EmitLoadCopRegister( context, cop, rt );
+
+					if( opcode == 1 )
+						EmitSingleToWord( context );
+
+					EmitDirectMemoryWrite( context );
+				}
+				return GenerationResult.Success;
 			}
 		}
 		#endregion
@@ -1741,7 +1912,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
@@ -1810,7 +1981,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Beq, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
@@ -1876,7 +2047,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Bgt, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
@@ -1941,7 +2112,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Ble, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
@@ -2050,7 +2221,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
@@ -2091,7 +2262,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
@@ -2215,7 +2386,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
@@ -2262,7 +2433,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
-					context.ILGen.Emit( OpCodes.Br, l2 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
 					context.ILGen.MarkLabel( l1 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
@@ -2511,28 +2682,458 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				return GenerationResult.Invalid;
 			}
+
+			// TODO: Allegrex halt
+			public static GenerationResult HALT( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+			{
+				if( pass == 0 )
+				{
+				}
+				else if( pass == 1 )
+				{
+				}
+				return GenerationResult.Success;
+			}
+
+			// TODO: Allegrex mfic
+			public static GenerationResult MFIC( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+			{
+				if( pass == 0 )
+				{
+				}
+				else if( pass == 1 )
+				{
+				}
+				return GenerationResult.Success;
+			}
+
+			// TODO: Allegrex mtic
+			public static GenerationResult MTIC( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+			{
+				if( pass == 0 )
+				{
+				}
+				else if( pass == 1 )
+				{
+				}
+				return GenerationResult.Success;
+			}
 		}
 
 		#endregion
 
-		#region Cop0
+		#region Cop
 
-		public static class Cop0
+		public static class Cop
 		{
-			public static GenerationResult MTFC0( GenerationContext context, int pass, int address, uint code, byte function )
-			{
-				//bool moveTo = ( code & 0x800000 ) != 0;
-				//long rd = ( code >> 11 ) & 0x1F;
-				//long rt = ( code >> 16 ) & 0x1F;
-				//Register rrd = context.Cop0Registers[ rd ];
-				//Register rrt = context.Registers[ rt ];
+			public const int AddressOffset = 0;
 
-				//if( moveTo == true )
-				//    rrd.Value = rrt.Value;
-				//else
-				//    rrt.Value = rrd.Value;
+			public static GenerationResult HandleInstruction( GenerationContext context, int pass, int address, uint code )
+			{
+				uint copop = code >> 28;
+				byte cop = ( byte )( ( code >> 26 ) & 0x3 ); // cop0, cop1, or cop2
+				byte rs = ( byte )( ( code >> 21 ) & 0x1F );
+				byte rt = ( byte )( ( code >> 16 ) & 0x1F );
+				byte rd = ( byte )( ( code >> 11 ) & 0x1F );
+				ushort imm = ( ushort )( code & 0xFFFF );
+
+				// rs = bc sub-opcode
+				// rt = branch condition
+
+				switch( copop )
+				{
+					case 0x4:
+						if( ( ( code >> 25 ) & 0x1 ) == 1 )	// COPz
+						{
+							uint cofun = code & 0x1FFFFFF;
+
+							if( cop == 1 )
+							{
+								byte fmt = ( byte )( ( cofun >> 21 ) & 0x1F );
+								// 0 = S = single binary fp
+								// 1 = D = double binary fp
+								// 4 = W = single 32 binary fixed point
+								// 5 = L = longword 64 binary fixed point
+								byte ft = rt; // source 2
+								byte fs = rd; // source 1
+								byte fd = ( byte )( ( code >> 6 ) & 0x1F ); // dest
+								byte func = ( byte )( code & 0x3F );
+
+								GenerateInstructionFpu instr = FpuInstructions.TableFpu[ func ];
+								if( pass == 1 )
+								{
+									context.Cpu.EmitDebugInfo( context, address, code, instr.Method.Name,
+										string.Format( "fmt:{0} fs:{1} ft:{2} fd:{3}", fmt, fs, ft, fd ) );
+								}
+								return instr( context, pass, address + 4, code, fmt, fs, ft, fd, func );
+							}
+							else
+							{
+								Debug.WriteLine( string.Format( "Cpu: attempted COP{0} function {1:X8}", cop, cofun ) );
+								return GenerationResult.Invalid;
+							}
+						}
+						else
+						{
+							switch( rs )
+							{
+								case 0x00:			// mfcz rt, rd
+									return Cop.MFCz( context, pass, address, code, cop, rd, rt, imm );
+								case 0x04:			// mtcz rt, rd
+									return Cop.MTCz( context, pass, address, code, cop, rd, rt, imm );
+								case 0x02:			// cfcz rt, rd
+									return Cop.CFCz( context, pass, address, code, cop, rd, rt, imm );
+								case 0x06:			// ctcz rt, rd
+									return Cop.CTCz( context, pass, address, code, cop, rd, rt, imm );
+								case 0x08:
+									{
+										int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
+										switch( rt )
+										{
+											case 0x0:		// BCzF
+												//targetPcValid = ( condition == false );
+												{
+													if( pass == 0 )
+													{
+														context.UpdatePc = true;
+														DefineBranchTarget( context, target );
+													}
+													else if( pass == 1 )
+													{
+														LabelMarker targetLabel = context.BranchLabels[ target ];
+														//Debug.Assert( targetLabel != default( Label ) );
+														context.BranchTarget = targetLabel;
+
+														Label l1 = context.ILGen.DefineLabel();
+														EmitLoadCopConditionBit( context, cop );
+														context.ILGen.Emit( OpCodes.Brtrue_S, l1 );
+														context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+														context.ILGen.Emit( OpCodes.Stloc_3 );
+														context.ILGen.MarkLabel( l1 );
+													}
+												}
+												return GenerationResult.Branch;
+											case 0x2:		// BCzFL
+												//targetPcValid = ( condition == false );
+												//nullifyDelay = !targetPcValid;
+												{
+													if( pass == 0 )
+													{
+														context.UpdatePc = true;
+														DefineBranchTarget( context, target );
+													}
+													else if( pass == 1 )
+													{
+														LabelMarker targetLabel = context.BranchLabels[ target ];
+														//Debug.Assert( targetLabel != default( Label ) );
+														context.BranchTarget = targetLabel;
+
+														Label l1 = context.ILGen.DefineLabel();
+														Label l2 = context.ILGen.DefineLabel();
+														EmitLoadCopConditionBit( context, cop );
+														context.ILGen.Emit( OpCodes.Brtrue_S, l1 );
+														context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+														context.ILGen.Emit( OpCodes.Stloc_3 );
+														context.ILGen.Emit( OpCodes.Br_S, l2 );
+														context.ILGen.MarkLabel( l1 );
+														context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+														context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
+														context.ILGen.MarkLabel( l2 );
+													}
+												}
+												return GenerationResult.BranchAndNullifyDelay;
+											case 0x1:		// BCzT
+												//targetPcValid = condition;
+												{
+													if( pass == 0 )
+													{
+														context.UpdatePc = true;
+														DefineBranchTarget( context, target );
+													}
+													else if( pass == 1 )
+													{
+														LabelMarker targetLabel = context.BranchLabels[ target ];
+														//Debug.Assert( targetLabel != default( Label ) );
+														context.BranchTarget = targetLabel;
+
+														Label l1 = context.ILGen.DefineLabel();
+														EmitLoadCopConditionBit( context, cop );
+														context.ILGen.Emit( OpCodes.Brfalse_S, l1 );
+														context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+														context.ILGen.Emit( OpCodes.Stloc_3 );
+														context.ILGen.MarkLabel( l1 );
+													}
+												}
+												return GenerationResult.Branch;
+											case 0x3:		// BCzTL
+												//targetPcValid = condition;
+												//nullifyDelay = !targetPcValid;
+												{
+													if( pass == 0 )
+													{
+														context.UpdatePc = true;
+														DefineBranchTarget( context, target );
+													}
+													else if( pass == 1 )
+													{
+														LabelMarker targetLabel = context.BranchLabels[ target ];
+														//Debug.Assert( targetLabel != default( Label ) );
+														context.BranchTarget = targetLabel;
+
+														Label l1 = context.ILGen.DefineLabel();
+														Label l2 = context.ILGen.DefineLabel();
+														EmitLoadCopConditionBit( context, cop );
+														context.ILGen.Emit( OpCodes.Brfalse_S, l1 );
+														context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+														context.ILGen.Emit( OpCodes.Stloc_3 );
+														context.ILGen.Emit( OpCodes.Br_S, l2 );
+														context.ILGen.MarkLabel( l1 );
+														context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+														context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
+														context.ILGen.MarkLabel( l2 );
+													}
+												}
+												return GenerationResult.BranchAndNullifyDelay;
+										}
+
+										if( cop == 1 )
+										{
+											// Hand off to COP1 to do it's thing
+											//_cp1->Process( instruction );
+											Debug.Assert( false );
+											return GenerationResult.Invalid;
+										}
+									}
+									return GenerationResult.Invalid;
+							}
+						}
+						return GenerationResult.Invalid;
+				}
 
 				return GenerationResult.Invalid;
+			}
+
+			public static GenerationResult BCzF( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
+				return GenerationResult.Invalid;
+
+				if( pass == 0 )
+				{
+					context.UpdatePc = true;
+					context.ReadRegisters[ rs ] = true;
+					context.ReadRegisters[ rt ] = true;
+					DefineBranchTarget( context, target );
+				}
+				else if( pass == 1 )
+				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
+					Label l1 = context.ILGen.DefineLabel();
+					EmitLoadRegister( context, rs );
+					EmitLoadRegister( context, rt );
+					context.ILGen.Emit( OpCodes.Bne_Un_S, l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Stloc_3 );
+					context.ILGen.MarkLabel( l1 );
+				}
+				//-4
+				//if( rs.Value == rt.Value )
+				//	context.PC.Value = context.PC + ( imm << 2 );
+				return GenerationResult.Branch;
+			}
+
+			public static GenerationResult BCzFL( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
+				return GenerationResult.Invalid;
+
+				if( pass == 0 )
+				{
+					context.UpdatePc = true;
+					context.ReadRegisters[ rs ] = true;
+					context.ReadRegisters[ rt ] = true;
+					DefineBranchTarget( context, target );
+				}
+				else if( pass == 1 )
+				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
+					Label l1 = context.ILGen.DefineLabel();
+					Label l2 = context.ILGen.DefineLabel();
+					EmitLoadRegister( context, rs );
+					EmitLoadRegister( context, rt );
+					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Stloc_3 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
+					context.ILGen.MarkLabel( l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
+					context.ILGen.MarkLabel( l2 );
+				}
+				//-4
+				//if( rs.Value == rt.Value )
+				//	context.PC.Value = context.PC + ( imm << 2 );
+				//else
+				//	null = true;
+				return GenerationResult.BranchAndNullifyDelay;
+			}
+
+			public static GenerationResult BCzT( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
+				return GenerationResult.Invalid;
+
+				if( pass == 0 )
+				{
+					context.UpdatePc = true;
+					context.ReadRegisters[ rs ] = true;
+					context.ReadRegisters[ rt ] = true;
+					DefineBranchTarget( context, target );
+				}
+				else if( pass == 1 )
+				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
+					Label l1 = context.ILGen.DefineLabel();
+					EmitLoadRegister( context, rs );
+					EmitLoadRegister( context, rt );
+					context.ILGen.Emit( OpCodes.Bne_Un_S, l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Stloc_3 );
+					context.ILGen.MarkLabel( l1 );
+				}
+				//-4
+				//if( rs.Value == rt.Value )
+				//	context.PC.Value = context.PC + ( imm << 2 );
+				return GenerationResult.Branch;
+			}
+
+			public static GenerationResult BCzTL( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
+
+				return GenerationResult.Invalid;
+
+				if( pass == 0 )
+				{
+					context.UpdatePc = true;
+					context.ReadRegisters[ rs ] = true;
+					context.ReadRegisters[ rt ] = true;
+					DefineBranchTarget( context, target );
+				}
+				else if( pass == 1 )
+				{
+					LabelMarker targetLabel = context.BranchLabels[ target ];
+					//Debug.Assert( targetLabel != default( Label ) );
+					context.BranchTarget = targetLabel;
+
+					Label l1 = context.ILGen.DefineLabel();
+					Label l2 = context.ILGen.DefineLabel();
+					EmitLoadRegister( context, rs );
+					EmitLoadRegister( context, rt );
+					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Stloc_3 );
+					context.ILGen.Emit( OpCodes.Br_S, l2 );
+					context.ILGen.MarkLabel( l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalNullifyDelay );
+					context.ILGen.MarkLabel( l2 );
+				}
+				//-4
+				//if( rs.Value == rt.Value )
+				//	context.PC.Value = context.PC + ( imm << 2 );
+				//else
+				//	null = true;
+				return GenerationResult.BranchAndNullifyDelay;
+			}
+
+			public static GenerationResult MFCz( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				if( pass == 0 )
+				{
+					context.WriteRegisters[ rt ] = true;
+				}
+				else if( pass == 1 )
+				{
+					EmitLoadCopRegister( context, opcode, rs );
+
+					if( opcode == 1 )
+						EmitSingleToWord( context );
+
+					EmitStoreRegister( context, rt );
+				}
+				return GenerationResult.Success;
+			}
+
+			public static GenerationResult MTCz( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				if( pass == 0 )
+				{
+					context.ReadRegisters[ rs ] = true;
+				}
+				else if( pass == 1 )
+				{
+					EmitLoadRegister( context, rs );
+
+					if( opcode == 1 )
+						EmitWordToSingle( context );
+					
+					EmitStoreCopRegister( context, opcode, rt );
+				}
+				return GenerationResult.Success;
+			}
+
+			public static GenerationResult CFCz( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				return GenerationResult.Invalid;
+
+				//if( pass == 0 )
+				//{
+				//    context.ReadRegisters[ rs ] = true;
+				//    context.WriteRegisters[ rt ] = true;
+				//}
+				//else if( pass == 1 )
+				//{
+				//    EmitLoadRegister( context, rs );
+				//    context.ILGen.Emit( OpCodes.Ldc_I4, ( int )( uint )imm );
+				//    context.ILGen.Emit( OpCodes.And );
+				//    EmitStoreRegister( context, rt );
+				//    //rt.Value = rs & imm;
+				//}
+				//return GenerationResult.Success;
+			}
+
+			public static GenerationResult CTCz( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+			{
+				return GenerationResult.Invalid;
+
+				//if( pass == 0 )
+				//{
+				//    context.ReadRegisters[ rs ] = true;
+				//    context.WriteRegisters[ rt ] = true;
+				//}
+				//else if( pass == 1 )
+				//{
+				//    EmitLoadRegister( context, rs );
+				//    context.ILGen.Emit( OpCodes.Ldc_I4, ( int )( uint )imm );
+				//    context.ILGen.Emit( OpCodes.And );
+				//    EmitStoreRegister( context, rt );
+				//    //rt.Value = rs & imm;
+				//}
+				//return GenerationResult.Success;
 			}
 		}
 

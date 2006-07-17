@@ -131,6 +131,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				Debug.WriteLine( "VideoDriver: video mode change" );
 
 				_currentProps = _props.Clone() as DisplayProperties;
+				_props.HasChanged = false;
+				_currentProps.HasChanged = false;
 
 				_frameBuffer.Reset();
 			}
@@ -242,11 +244,14 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							_frameBuffer.Copy();
 						}
 
-						Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
-						SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
-						_sprite.Begin( SpriteFlags.None );
-						_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
-						_sprite.End();
+						if( _currentProps != null )
+						{
+							Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
+							SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
+							_sprite.Begin( SpriteFlags.None );
+							_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
+							_sprite.End();
+						}
 
 						// Display list processing
 						List<DisplayList> toProcess = new List<DisplayList>( 5 );
