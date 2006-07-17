@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace Noxa.Emulation.Psp.Video.Direct3DM
 {
-	class VideoDriver : IVideoDriver
+	partial class VideoDriver : IVideoDriver
 	{
 		protected ComponentParameters _params;
 		protected IEmulationInstance _emulator;
@@ -152,6 +152,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				_thread = null;
 			}
 
+			CleanupContext();
+
 			if( _sprite != null )
 				_sprite.Dispose();
 			_sprite = null;
@@ -199,6 +201,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				return false;
 
 			_sprite = new Sprite( _device );
+
+			InitializeContext();
 
 			_shutdown = false;
 			_threadSync = new AutoResetEvent( true );
@@ -279,7 +283,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 						// Process lists
 						for( int n = 0; n < toProcess.Count; n++ )
-							Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", toProcess[ n ].Packets.Length ) );
+							ParseList( toProcess[ n ] );
 
 						_device.EndScene();
 						try
