@@ -37,6 +37,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 	delegate GenerationResult GenerateInstructionJ( GenerationContext context, int pass, int address, uint code, byte opcode, uint imm );
 	delegate GenerationResult GenerateInstructionCop0( GenerationContext context, int pass, int address, uint code, byte function );
 	delegate GenerationResult GenerateInstructionSpecial3( GenerationContext context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl );
+	delegate GenerationResult GenerateInstructionFpu( GenerationContext context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function );
 
 	class GenerationContext
 	{
@@ -78,6 +79,12 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		public FieldInfo Core0Lo;
 		public FieldInfo Core0LL;
 		public FieldInfo Core0BlockCounter;
+		public FieldInfo Core0Cp0;
+		public FieldInfo Core0Cp1;
+		public FieldInfo Core0Cp2;
+		public FieldInfo Cp1Registers;
+		public MethodInfo Cp1ConditionBitGet;
+		public MethodInfo Cp1ConditionBitSet;
 		public FieldInfo MemoryMainBuffer;
 		public MethodInfo MemoryReadWord;
 		public MethodInfo MemoryWriteWord;
@@ -95,6 +102,13 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			Core0Lo = typeof( Core ).GetField( "Lo", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0LL = typeof( Core ).GetField( "LL", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0BlockCounter = typeof( Core ).GetField( "BlockCounter", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
+			Core0Cp0 = typeof( Core ).GetField( "Cp0", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
+			Core0Cp1 = typeof( Core ).GetField( "Cp1", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
+			Core0Cp2 = typeof( Core ).GetField( "Cp2", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
+
+			Cp1Registers = typeof( Coprocessor1 ).GetField( "Registers", BindingFlags.Public | BindingFlags.GetField | BindingFlags.Instance );
+			Cp1ConditionBitGet = typeof( Coprocessor1 ).GetMethod( "get_ConditionBit" );
+			Cp1ConditionBitSet = typeof( Coprocessor1 ).GetMethod( "set_ConditionBit" );
 
 			MemoryMainBuffer = typeof( Memory ).GetField( "_mainMemory", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			MemoryReadWord = typeof( Memory ).GetMethod( "ReadWord" );

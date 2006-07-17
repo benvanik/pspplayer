@@ -167,6 +167,7 @@ namespace Noxa.Emulation.Psp.Video
 			clone.SyncMode = _syncMode;
 			clone.BufferAddress = _bufferAddress;
 			clone.BufferSize = _bufferSize;
+			clone.HasChanged = false;
 			return clone;
 		}
 	}

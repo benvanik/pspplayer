@@ -190,7 +190,9 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		[BiosStub( 0x984c27e7, "sceDisplayWaitVblankStart", true, 0 )]
 		public int sceDisplayWaitVblankStart( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
-			_hle.Emulator.Video.Vblank.WaitOne( 1000, false );
+			IVideoDriver video = _hle.Emulator.Video;
+			if( video.Vblank != null )
+				video.Vblank.WaitOne( 1000, false );
 
 			// int
 			return 0;

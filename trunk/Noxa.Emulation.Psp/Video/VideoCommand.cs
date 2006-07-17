@@ -301,10 +301,25 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
-		public VideoPacket( int code )
+		public VideoPacket( int code, int baseAddress )
 		{
 			Command = ( VideoCommand )( code >> 24 );
 			Argument = ( int )( code & 0xFFFFFF );
+
+			switch( Command )
+			{
+				case VideoCommand.VADDR:
+				case VideoCommand.IADDR:
+				case VideoCommand.OFFSETADDR:
+				case VideoCommand.ORIGINADDR:
+					Argument = Argument | baseAddress;
+					break;
+			}
+		}
+
+		public override string ToString()
+		{
+			return string.Format( "{0} 0x{1:X8} ({2})", Command, ( uint )Argument, ArgumentF );
 		}
 	}
 
