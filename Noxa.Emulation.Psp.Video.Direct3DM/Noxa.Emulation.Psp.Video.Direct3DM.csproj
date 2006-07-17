@@ -48,6 +48,7 @@
     <Compile Include="Direct3DMVideo.cs" />
     <Compile Include="FrameBuffer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VideoDriver.CommandParser.cs" />
     <Compile Include="VideoDriver.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,6 +64,11 @@
       <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
       <Name>Noxa.Utilities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\cygwin\home\noxa\newtoolchain\pspsdk\src\gu\doc\commands.txt">
+      <Link>commands.txt</Link>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
