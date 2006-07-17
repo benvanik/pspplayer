@@ -99,7 +99,19 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public byte[] ReadBytes( int address, int count )
 		{
-			throw new NotImplementedException();
+			if( ( address >= 0x08000000 ) && ( address < 0x9FFFFFF ) )
+			{
+				address -= 0x08000000;
+				byte[] buffer = new byte[ count ];
+				Array.Copy( _mainMemory, address, buffer, 0, count );
+				return buffer;
+			}
+			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+				throw new NotImplementedException();
+			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+				throw new NotImplementedException();
+			else
+				return null;
 		}
 
 		public int ReadStream( int address, System.IO.Stream destination, int count )
