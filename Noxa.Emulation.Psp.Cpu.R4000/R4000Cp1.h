@@ -47,6 +47,8 @@ namespace Noxa {
 						: R4000Coprocessor( core )
 					{
 						Registers = gcnew array<double>( 32 );
+
+						this->Clear();
 					}
 
 					property int Control;
@@ -149,7 +151,7 @@ namespace Noxa {
 						}
 					}
 
-					void Process( int instruction )
+					bool Process( int instruction )
 					{
 						// Should be on core
 						// BC1F 665
@@ -327,12 +329,15 @@ namespace Noxa {
 							else
 							{
 								__int64 d = BitConverter::DoubleToInt64Bits( fdd );
-								double d0 = BitConverter::Int64BitsToDouble( d >> 32 );
+								double d0 = BitConverter::Int64BitsToDouble( ( ( unsigned __int64 )d ) >> 32 );
 								double d1 = BitConverter::Int64BitsToDouble( d & 0xFFFFFFFF );
 								Registers[ fd + 1 ] = d0;
 								Registers[ fd ] = d1;
 							}
 						}
+
+						// TODO: Verify something was actually done
+						return true;
 					}
 
 				protected:

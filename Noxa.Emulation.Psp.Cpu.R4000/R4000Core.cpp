@@ -111,6 +111,8 @@ void R4000Core::Context::set( Object^ value )
 #define storereg( r, value ) Registers[ r ] = ( r == 0 ) ? 0 : value;
 #define copreg( cop, r ) _cops[ cop ][ r ]
 #define storecopreg( cop, r, value ) _cops[ cop ][ r ] = value;
+#define copregf( cop, r ) (float)( (R4000Cp1 ^)_cops[ cop ] )->Registers[ r ]
+#define storecopregf( cop, r, value ) ( (R4000Cp1 ^)_cops[ cop ] )->Registers[ r ] = value;
 #define copcreg( cop, r ) _cops[ cop ]->GetControlRegister( r )
 #define storecopcreg( cop, r, value ) _cops[ cop ]->SetControlRegister( r, value )
 #define storelink( offset ) Registers[ 31 ] = Pc + offset;
@@ -133,6 +135,15 @@ void R4000Core::Context::set( Object^ value )
 #define setic( v ) InterruptState = v;
 #define trap( code ) /* do something? */
 
+#define convf( v ) *((float *) &v)
+#define convi( v ) *((int *) &v)
+
+#ifdef _DEBUG
+#define valid() validInstruction = true;
+#else
+#define valid() /* nothing */
+#endif
+
 // empty statement
 #pragma warning(disable:4390)
 
@@ -144,13 +155,21 @@ bool R4000Core::Process( int instruction )
 	bool nullifyDelay = false;
 	bool incrementPc = true;
 
+#ifdef _DEBUG
+	bool validInstruction = false;
+#endif
+
 	// NOP
 	if( instruction == 0 )
+	{
+		valid();
 		goto postOp;
+	}
 
-	// Might as well - compiler should optimize this and it leads to cleaner code!
-	//if( instruction == 0x04a000c2 )
+	//if( getpc() == 0x89004bc )
 	//	Debugger::Break();
+
+	// Cleaner code, but slower code
 	int op = ( instruction >> 26 ) & 0x3F;
 	int rs = ( instruction >> 21 ) & 0x1F;
 	int rt = ( instruction >> 16 ) & 0x1F;
@@ -167,18 +186,13 @@ bool R4000Core::Process( int instruction )
 	// if we don't need to
 	bool isCop = ( op == 0x10 ) || ( op == 0x11 ) || ( op == 0x12 );
 
-	//if( ( instruction == 0x50400002 ) ||
-	//	( getpc() == 0x8900150 ) )
-	//{
-		//int foo = 239405;
-	//}
-
 	BiosFunction^ function;
 	
 	int t;
 	int u;
 	int v;
 	int w;
+	float f;
 	__int64 z;
 	unsigned tt;
 	unsigned vv;
@@ -216,138 +230,138 @@ bool R4000Core::Process( int instruction )
 				}
 				incrementPc = false;
 				continueBlock = false;
-				break;
+				valid(); break;
 			case B8(0001111):	// sync
 				// 629 not needed?
-				break;
+				valid(); break;
 			case B8(0001101):	// break code
 				// TODO: would switch to exception handler
 				// code
-				break;
+				valid(); break;
 
 			case B8(0100000):	// add rd, rs, rt
 			case B8(0100001):	// addu
 				storereg( rd, reg( rs ) + reg( rt ) );
-				break;
+				valid(); break;
 			case B8(0100100):	// and rd, rs, rt
 				storereg( rd, reg( rs ) & reg( rt ) );
-				break;
+				valid(); break;
 			case B8(0011010):	// div rs, rt
 				t = reg( rs );
 				v = reg( rt );
 				storelo( t / v );
 				storehi( t % v );
-				break;
+				valid(); break;
 			case B8(0011011):	// divu rs, rt
 				tt = reg( rs );
 				vv = reg( rt );
 				storelo( (int)( tt / vv ) );
 				storehi( (int)( tt % vv ) );
-				break;
+				valid(); break;
 			case B8(0010000):	// mfhi rd
 				storereg( rd, gethi() );
-				break;
+				valid(); break;
 			case B8(0010010):	// mflo rd
 				storereg( rd, getlo() );
-				break;
+				valid(); break;
 			case B8(0010001):	// mthi rs
 				storehi( reg( rs ) );
-				break;
+				valid(); break;
 			case B8(0010011):	// mtlo rs
 				storelo( reg( rs ) );
-				break;
+				valid(); break;
 			case B8(0011000):	// mult rs, rt
 				z = (__int64)reg( rs ) * (__int64)reg( rt );
 				storehi( (int)( z >> 32 ) );
 				storelo( (int)( z & 0xFFFFFFFF ) );
-				break;
+				valid(); break;
 			case B8(0011001):	// multu rs, rt
 				zz = (unsigned __int64)reg( rs ) * (unsigned  __int64)reg( rt );
 				storehi( (int)( zz >> 32 ) );
 				storelo( (int)( zz & 0xFFFFFFFF ) );
-				break;
+				valid(); break;
 			case B8(0100111):	// nor rd, rs, rt
 				storereg( rd, ~( reg( rs ) | reg( rt ) ) );
-				break;
+				valid(); break;
 			case B8(0100101):	// or rd, rs, rt
 				storereg( rd, reg( rs ) | reg( rt ) );
-				break;
+				valid(); break;
 			case B8(0000000):	// sll rd, rt, sa
 				// this could be nop
 				storereg( rd, reg( rt ) << sa );
-				break;
+				valid(); break;
 			case B8(0000100):	// sllv rd, rt, rs
 				storereg( rd, reg( rt ) << ( reg( rs ) & B8(011111) ) );
-				break;
+				valid(); break;
 			case B8(0101010):	// slt rd, rs, rt
 				storereg( rd, ( reg( rs ) < reg( rt ) ) ? 1 : 0 );
-				break;
+				valid(); break;
 			case B8(0101011):	// sltu rd, rs, rt
 				storereg( rd, ( (unsigned)reg( rs ) < (unsigned)reg( rt ) ) ? 1 : 0 );
-				break;
+				valid(); break;
 			case B8(0000011):	// sra rd, rt, sa
 				storereg( rd, reg( rt ) >> sa );
-				break;
+				valid(); break;
 			case B8(0000111):	// srav rd, rt, rs
 				storereg( rd, reg( rt ) >> ( reg( rs ) & B8(011111) ) );
-				break;
+				valid(); break;
 			case B8(0000010):	// srl rd, rt, sa
 				storereg( rd, (int)((unsigned)reg( rt ) >> sa ) );
-				break;
+				valid(); break;
 			case B8(0000110):	// srlv rd, rt, rs
 				storereg( rd, (int)((unsigned)reg( rt ) >> ( reg( rs ) & B8(011111) ) ) );
-				break;
+				valid(); break;
 			case B8(0100010):	// sub rd, rs, rt
 			case B8(0100011):	// subu rd, rs, rt
 				storereg( rd, reg( rs ) - reg( rt ) );
-				break;
+				valid(); break;
 			case B8(0100110):	// xor rd, rs, rt
 				storereg( rd, reg( rs ) ^ reg( rt ) );
-				break;
+				valid(); break;
 
 			case B8(0001001):	// jalr rd, rs (rd can be ommitted, defaults to 31)
 				storereg( rd, getpc() + DELAYWORDS * 4 );
 				targetPc = reg( rs );
 				targetPcValid = true;
-				break;
+				valid(); break;
 			case B8(0001000):	// jr rs
 				targetPc = reg( rs );
 				targetPcValid = true;
-				break;
+				valid(); break;
 
 			case B8(0001011):	// movn rd, rs, rt
 				if( reg( rt ) != 0 )
 					storereg( rd, reg( rs ) );
-				break;
+				valid(); break;
 			case B8(0001010):	// movz rd, rs, rt
 				if( reg( rt ) == 0 )
 					storereg( rd, reg( rs ) );
-				break;
+				valid(); break;
 
 			case B8(0110100):	// teq rs, rt
 				if( reg( rs ) == reg( rt ) )
 					trap( code & B16(01111111111) );
-				break;
+				valid(); break;
 			case B8(0110000):	// tge rs, rt
 				if( reg( rs ) >= reg( rt ) )
 					trap( code & B16(01111111111) );
-				break;
+				valid(); break;
 			case B8(0110001):	// tgeu rs, rt
 				if( (unsigned)reg( rs ) >= (unsigned)reg( rt ) )
 					trap( code & B16(01111111111) );
-				break;
+				valid(); break;
 			case B8(0110010):	// tlt rs, rt
 				if( reg( rs ) < reg( rt ) )
 					trap( code & B16(01111111111) );
-				break;
+				valid(); break;
 			case B8(0110011):	// tltu rs, rt
 				if( (unsigned)reg( rs ) < (unsigned)reg( rt ) )
 					trap( code & B16(01111111111) );
-				break;
+				valid(); break;
 			case B8(0110110):	// tne rs, rt
 				if( reg( rs ) != reg( rt ) )
 					trap( code & B16(01111111111) );
-				break;
+				valid(); break;
 			}
 			break;
 
@@ -358,72 +372,72 @@ bool R4000Core::Process( int instruction )
 			case B8(000000):	// bltz rs, imm
 				if( reg( rs ) >> 31 == 1 )
 					targetPcValid = true;
-				break;
+				valid(); break;
 			case B8(010000):	// bltzal rs, imm
 				storelink( DELAYWORDS * 4 );
 				if( reg( rs ) >> 31 == 1 )
 					targetPcValid = true;
-				break;
+				valid(); break;
 			case B8(010010):	// bltzall rs, imm
 				storelink( DELAYWORDS * 4 );
 				if( reg( rs ) >> 31 == 1 )
 					targetPcValid = true;
 				else
 					nullifyDelay = true;
-				break;
+				valid(); break;
 			case B8(000010):	// bltzl rs, imm
 				if( reg( rs ) >> 31 == 1 )
 					targetPcValid = true;
 				else
 					nullifyDelay = true;
-				break;
+				valid(); break;
 			case B8(000001):	// bgez rs, imm
 				if( reg( rs ) >> 31 == 0 )
 					targetPcValid = true;
-				break;
+				valid(); break;
 			case B8(010001):	// bgezal rs, imm
 				storelink( DELAYWORDS * 4 );
 				if( reg( rs ) >> 31 == 0 )
 					targetPcValid = true;
-				break;
+				valid(); break;
 			case B8(010011):	// bgezall rs, imm
 				storelink( DELAYWORDS * 4 );
 				if( reg( rs ) >> 31 == 0 )
 					targetPcValid = true;
 				else
 					nullifyDelay = true;
-				break;
+				valid(); break;
 			case B8(000011):	// bgezl rs, imm
 				if( reg( rs ) >> 31 == 0 )
 					targetPcValid = true;
 				else
 					nullifyDelay = true;
-				break;
+				valid(); break;
 
 			case B8(001100):	// teqi rs, imm
 				if( reg( rs ) == signextend16( imm ) )
 					trap( 0 );
-				break;
+				valid(); break;
 			case B8(001000):	// tgei rs, imm
 				if( reg( rs ) >= signextend16( imm ) )
 					trap( 0 );
-				break;
+				valid(); break;
 			case B8(001001):	// tgeiu rs, imm
 				if( (unsigned)reg( rs ) >= (unsigned)signextend16( imm ) )
 					trap( 0 );
-				break;
+				valid(); break;
 			case B8(001010):	// tlti rs, imm
 				if( reg( rs ) < signextend16( imm ) )
 					trap( 0 );
-				break;
+				valid(); break;
 			case B8(001011):	// tltiu rs, imm
 				if( (unsigned)reg( rs ) < (unsigned)signextend16( imm ) )
 					trap( 0 );
-				break;
+				valid(); break;
 			case B8(001110):	// tnei rs, imm
 				if( reg( rs ) != signextend16( imm ) )
 					trap( 0 );
-				break;
+				valid(); break;
 			}
 
 			break;
@@ -433,42 +447,42 @@ bool R4000Core::Process( int instruction )
 			{
 			case B8(0):			// halt
 				// TODO: halt to wait for interrupt
-				break;
+				valid(); break;
 			case B8(0100100):	// mfic rt, rd (rd = 0)
 				storereg( rt, getic() );
-				break;
+				valid(); break;
 			case B8(0100110):	// mtic rt, rd (rd = 0)
 				setic( reg( rt ) );
-				break;
+				valid(); break;
 			}
 			break;
 
 		case B8(0000010):		// j target
 			targetPc = ( getpc() & 0xF0000000 ) | ( target << 2 );
 			targetPcValid = true;
-			break;
+			valid(); break;
 		case B8(0000011):		// jal target
 			storelink( DELAYWORDS * 4 );
 			targetPc = ( getpc() & 0xF0000000 ) | ( target << 2 );
 			targetPcValid = true;
-			break;
+			valid(); break;
 		
 		case B8(0000100):		// beq rs, rt, imm
 			if( reg( rs ) == reg( rt ) )
 				targetPcValid = true;
-			break;
+			valid(); break;
 		case B8(0010100):		// beql rs, rt, imm
 			if( reg( rs ) == reg( rt ) )
 				targetPcValid = true;
 			else
 				nullifyDelay = true;
-			break;
+			valid(); break;
 		case B8(0000111):		// bgtz rs, imm
 			t = reg( rs );
 			if( ( ( t >> 31 ) == 0 ) &&
 				( t != 0 ) )
 				targetPcValid = true;
-			break;
+			valid(); break;
 		case B8(0010111):		// bgtzl rs, imm
 			t = reg( rs );
 			if( ( ( t >> 31 ) == 0 ) &&
@@ -476,13 +490,13 @@ bool R4000Core::Process( int instruction )
 				targetPcValid = true;
 			else
 				nullifyDelay = true;
-			break;
+			valid(); break;
 		case B8(0000110):		// blez rs, imm
 			t = reg( rs );
 			if( ( ( ( t >> 31 ) & 0x1 ) == 1 ) ||
 				( t == 0 ) )
 				targetPcValid = true;
-			break;
+			valid(); break;
 		case B8(0010110):		// blezl rs, imm
 			t = reg( rs );
 			if( ( ( ( t >> 31 ) & 0x1 ) == 1 ) ||
@@ -490,66 +504,66 @@ bool R4000Core::Process( int instruction )
 				targetPcValid = true;
 			else
 				nullifyDelay = true;
-			break;
+			valid(); break;
 		case B8(0000101):		// bne rs, rt, imm
 			if( reg( rs ) != reg( rt ) )
 				targetPcValid = true;
-			break;
+			valid(); break;
 		case B8(0010101):		// bnel rs, rt, imm
 			if( reg( rs ) != reg( rt ) )
 				targetPcValid = true;
 			else
 				nullifyDelay = true;
-			break;
+			valid(); break;
 
 		case B8(0001000):		// addi rt, rs, imm
 		case B8(0001001):		// addiu
 			storereg( rt, reg( rs ) + signextend16( imm ) );
-			break;
+			valid(); break;
 		case B8(0001100):		// andi rt, rs, imm
 			storereg( rt, reg( rs ) & zeroextend( imm ) );
-			break;
+			valid(); break;
 		case B8(0001101):		// ori rt, rs, imm
 			storereg( rt, reg( rs ) | zeroextend( imm ) );
-			break;
+			valid(); break;
 		case B8(0001010):		// slti rt, rs, imm
 			storereg( rt, ( reg( rs ) < signextend16( imm ) ) ? 1 : 0 );
-			break;
+			valid(); break;
 		case B8(0001011):		// sltiu rt, rs, imm
 			storereg( rt, ( (unsigned)reg( rs ) < (unsigned)signextend16( imm ) ) ? 1 : 0 );
-			break;
+			valid(); break;
 		case B8(0001110):		// xori rt, rs, imm
 			storereg( rt, reg( rs ) ^ zeroextend( imm ) );
-			break;
+			valid(); break;
 
 		case B8(0100000):		// lb rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = loadword( t ) & 0xFF;
 			storereg( rt, signextend8( v ) );
-			break;
+			valid(); break;
 		case B8(0100100):		// lbu rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = loadword( t ) & 0xFF;
 			storereg( rt, v );
-			break;
+			valid(); break;
 		case B8(0100001):		// lh rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = loadword( t ) & 0xFFFF;
 			storereg( rt, signextend16( v ) );
-			break;
+			valid(); break;
 		case B8(0100101):		// lhu rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = loadword( t ) & 0xFFFF;
 			storereg( rt, v );
-			break;
+			valid(); break;
 		case B8(0001111):		// lui rt, imm
 			storereg( rt, imm << 16 );
-			break;
+			valid(); break;
 		case B8(0100011):		// lw rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = loadword( t );
 			storereg( rt, v );
-			break;
+			valid(); break;
 		case B8(0100010):		// lwl rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = loadword( t );
@@ -559,7 +573,7 @@ bool R4000Core::Process( int instruction )
 			t = reg( rt ) & u;
 			storereg( rt, t | v );
 			// TODO: ensure lwl right
-			break;
+			valid(); break;
 		case B8(0100110):		// lwr rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = loadword( t );
@@ -570,22 +584,22 @@ bool R4000Core::Process( int instruction )
 			t = reg( rt ) & u;
 			storereg( rt, t | v );
 			// TODO: ensure lwr right
-			break;
+			valid(); break;
 		case B8(0101000):		// sb rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = reg( rt );
 			storeword( t, 1, v & 0xFF );
-			break;
+			valid(); break;
 		case B8(0101001):		// sh rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = reg( rt );
 			storeword( t, 2, v & 0xFFFF );
-			break;
+			valid(); break;
 		case B8(0101011):		// sw rt, offset(base)
 			t = signextend16( imm ) + reg( rs );
 			v = reg( rt );
 			storeword( t, 4, v );
-			break;
+			valid(); break;
 		case B8(0101010):		// swl rt, offset(base)
 			w = t = signextend16( imm ) + reg( rs );
 			v = reg( rt );
@@ -595,7 +609,7 @@ bool R4000Core::Process( int instruction )
 			t = loadword( t & 0xFFFFFFFC ) & u;
 			storeword( w, 4, t | v );
 			// TODO: ensure swl right
-			break;
+			valid(); break;
 		case B8(0101110):		// swr rt, offset(base)
 			w = t = signextend16( imm ) + reg( rs );
 			v = reg( rt );
@@ -606,13 +620,27 @@ bool R4000Core::Process( int instruction )
 			t = loadword( t & 0xFFFFFFFC ) & u;
 			storeword( w, 4, t | v );
 			// TODO: ensure swr right
-			break;
+			valid(); break;
+		case B8(0110001):				// lwcz rt, offset(base)
+			t = signextend16( imm ) + reg( rs );
+			v = loadword( t );
+			f = convf( v );
+			storecopregf( 1, rt, f );
+			// TODO: LWCz 568
+			valid(); break;
+		case B8(0111001):				// swcz rt, offset(base)
+			t = signextend16( imm ) + reg( rs );
+			f = copregf( 1, rt );
+			storeword( t, 4, convi( f ) );
+			// TODO: SWCz 621
+			valid(); break;
+
 		case B8(0110000):		// ll rt, offset(base)   562
 			t = signextend16( imm ) + reg( rs );
 			v = loadword( t );
 			storereg( rt, v );
 			setll( 1 );
-			break;
+			valid(); break;
 		case B8(0111000):		// sc rt, offset(base)   599
 			t = signextend16( imm ) + reg( rs );
 			if( getll() == true )
@@ -622,13 +650,15 @@ bool R4000Core::Process( int instruction )
 			}
 			else
 				storereg( rt, 0 );
-			break;
+			valid(); break;
 
 			// LDCz 553 ?
 			// SDCz 599 ?
 
 			// Ignored instructions (but still valid)
 		case B8(0101111):		// cache
+			valid(); break;
+
 		default:
 			break;
 		}
@@ -642,26 +672,15 @@ bool R4000Core::Process( int instruction )
 
 		switch( copop )
 		{
-		case B8(01100):				// lwcz rt, offset(base)
-			t = signextend16( imm ) + reg( rs );
-			v = loadword( t );
-			storecopreg( cop, rt, v );
-			// TODO: LWCz 568
-			break;
-		case B8(01110):				// swcz rt, offset(base)
-			t = signextend16( imm ) + reg( rs );
-			storeword( t, 4, copreg( cop, rt ) );
-			// TODO: SWCz 621
-			break;
 		case B8(00100):
 
-			if( ( ( instruction >> 25 ) & 0x1 ) == 1 )	// COPz
-			{
-				int cofun = instruction & 0x1FFFFFF;
+			//if( ( ( instruction >> 25 ) & 0x1 ) == 1 )	// COPz
+			//{
+			//	int cofun = instruction & 0x1FFFFFF;
 				// TODO: cop operation (appendix b)
 				// eret - 544
-			}
-			else
+			//}
+			//else
 			{
 				bool condition = getcopconditionbit( cop );
 				bool handled = false;
@@ -674,43 +693,48 @@ bool R4000Core::Process( int instruction )
 					case B8(000000):		// BCzF
 						targetPcValid = ( condition == false );
 						handled = true;
-						break;
+						valid(); break;
 					case B8(000010):		// BCzFL
 						targetPcValid = ( condition == false );
 						nullifyDelay = !targetPcValid;
 						handled = true;
-						break;
+						valid(); break;
 					case B8(000001):		// BCzT
 						targetPcValid = condition;
 						handled = true;
-						break;
+						valid(); break;
 					case B8(000011):		// BCzTL
 						targetPcValid = condition;
 						nullifyDelay = !targetPcValid;
 						handled = true;
-						break;
-					}
-					if( handled == false )
-					{
-						if( cop == 1 )
-						{
-							// Hand off to COP1 to do it's thing
-							_cp1->Process( instruction );
-						}
+						valid(); break;
 					}
 					break;
 				case B8(000000):			// mfcz rt, rd
 					storereg( rt, copreg( cop, rd ) );
-					break;
+					valid(); break;
 				case B8(000100):			// mtcz rt, rd
 					storecopreg( cop, rd, reg( rt ) );
-					break;
+					valid(); break;
 				case B8(000010):			// cfcz rt, rd
 					storereg( rt, copcreg( cop, rd ) );
-					break;
+					valid(); break;
 				case B8(000110):			// ctcz rt, rd
 					storecopcreg( cop, rd, reg( rt ) );
-					break;
+					valid(); break;
+				}
+
+				if( handled == false )
+				{
+					if( cop == 1 )
+					{
+						// Hand off to COP1 to do it's thing
+						bool instrValid = _cp1->Process( instruction );
+#ifdef _DEBUG
+						if( instrValid == true )
+							valid();
+#endif
+					}
 				}
 			}
 			break;
@@ -718,6 +742,10 @@ bool R4000Core::Process( int instruction )
 	}
 
 postOp:
+
+#ifdef _DEBUG
+	Debug::Assert( validInstruction == true );
+#endif
 
 	if( targetPcValid == true )
 	{
