@@ -1,15 +1,18 @@
+//#define XMB
+
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
+using System.Threading;
+
 using Noxa.Emulation.Psp.Audio;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Video;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Threading;
 using Noxa.Emulation.Psp.IO;
-using System.IO;
 using Noxa.Emulation.Psp.IO.Input;
 
 namespace Noxa.Emulation.Psp.Player
@@ -19,7 +22,11 @@ namespace Noxa.Emulation.Psp.Player
 		protected Host _host;
 		protected EmulationParameters _params;
 
-		protected CrossMediaBar.Manager _cmb;
+#if XMB
+		protected CrossMediaBar.Manager _xmb;
+#else
+		protected GamePicker.PickerDialog _picker;
+#endif
 
 		protected List<IComponentInstance> _instances = new List<IComponentInstance>();
 		protected IAudioDriver _audio;
@@ -144,7 +151,10 @@ namespace Noxa.Emulation.Psp.Player
 				_instances.Add( ( IComponentInstance )_video );
 			}
 
-			_cmb = new CrossMediaBar.Manager( this, _host.Player.Handle, _host.Player.ControlHandle );
+#if XMB
+			_xmb = new CrossMediaBar.Manager( this, _host.Player.Handle, _host.Player.ControlHandle );
+#else
+#endif
 			
 			// Create thread
 			_thread = new Thread( new ThreadStart( this.RuntimeThread ) );
@@ -173,9 +183,12 @@ namespace Noxa.Emulation.Psp.Player
 			}
 			_thread = null;
 
-			// Destroy CMB
-			_cmb.Cleanup();
-			_cmb = null;
+#if XMB
+			// Destroy XMB
+			_xmb.Cleanup();
+			_xmb = null;
+#else
+#endif
 
 			// Destroy all the components
 			foreach( IComponentInstance component in _instances )
@@ -280,25 +293,42 @@ namespace Noxa.Emulation.Psp.Player
 		{
 		}
 
-		public void SwitchToCmb()
+		public delegate void DummyDelegate();
+
+		public void SwitchToXmb()
 		{
-			_video.Cleanup();
-			_cmb.Enable();
 			Debug.WriteLine( "Instance: switching to CMB" );
+			_video.Cleanup();
+#if XMB
+			_xmb.Enable();
+#else
+			DummyDelegate del = delegate()
+			{
+				_picker = new Noxa.Emulation.Psp.Player.GamePicker.PickerDialog( this );
+				if( _picker.ShowDialog( _host.Player ) == System.Windows.Forms.DialogResult.OK )
+				{
+				}
+				_picker = null;
+			};
+			_host.Player.Invoke( del );
+#endif
 		}
 
 		public void SwitchToGame( Games.GameInformation game )
 		{
-			_cmb.Disable();
-			_bios.Kernel.Game = game;
 			Debug.WriteLine( "Instance: switching to game " + game.Parameters.Title );
+#if XMB
+			_xmb.Disable();
+#else
+#endif
+			_bios.Kernel.Game = game;
 		}
 
 		private void RuntimeThread()
 		{
 			try
 			{
-				this.SwitchToCmb();
+				this.SwitchToXmb();
 
 				while( _shutDown == false )
 				{
@@ -316,16 +346,23 @@ namespace Noxa.Emulation.Psp.Player
 						case InstanceState.Running:
 							if( _bios.Kernel.Game == null )
 							{
-								if( _cmb.IsEnabled == false )
+#if XMB
+								if( _xmb.IsEnabled == false )
+#else
+#endif
 								{
 									_cpu.PrintStatistics();
 									Debug.WriteLine( "Instance: kernel game ended" );
-									this.SwitchToCmb();
+									this.SwitchToXmb();
 								}
 
-								// Run CMB if not game set
-								_cmb.Update();
+								// Run XMB if not game set
+#if XMB
+								_xmb.Update();
 								Thread.Sleep( 10 );
+#else
+								Thread.Sleep( 100 );
+#endif
 							}
 							else
 							{
