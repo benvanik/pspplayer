@@ -1,4 +1,4 @@
-//#define XMB
+#define XMB
 
 using System;
 using System.Collections.Generic;

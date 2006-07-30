@@ -202,6 +202,11 @@ void Memory::Save( String^ fileName )
 	}
 }
 
+unsigned int Memory::GetMemoryHash( int address, int count, unsigned int prime )
+{
+	throw gcnew System::NotImplementedException();
+}
+
 void Memory::DumpMainMemory( String^ fileName )
 {
 	IMemorySegment^ seg = this->FindSegment( "Main Memory" );

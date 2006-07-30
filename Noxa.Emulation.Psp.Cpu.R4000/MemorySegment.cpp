@@ -188,3 +188,8 @@ void MemorySegment::Save( String^ fileName )
 		stream->Close();
 	}
 }
+
+unsigned int MemorySegment::GetMemoryHash( int address, int count, unsigned int prime )
+{
+	throw gcnew System::NotImplementedException();
+}
