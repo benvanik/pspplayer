@@ -18,7 +18,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get
 			{
-				return "Managed DynRec CPU";
+				return "DynaRec CPU";
 			}
 		}
 

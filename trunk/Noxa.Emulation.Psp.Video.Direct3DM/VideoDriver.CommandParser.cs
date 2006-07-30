@@ -219,6 +219,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 					case VideoCommand.WMS:
 					case VideoCommand.TMS:
 						// Are these needed?
+						_context.MatrixIndex = 0;
 						break;
 					case VideoCommand.PROJ: // 4x4
 						_context.MatrixTemp[ _context.MatrixIndex++ ] = packet.ArgumentF;
@@ -324,14 +325,14 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			return size;
 		}
 
-		protected VertexBuffer BuildVertexBuffer( VertexTypes vertexType, byte[] buffer )
-		{
+		//protected VertexBuffer BuildVertexBuffer( VertexTypes vertexType, byte[] buffer )
+		//{
 			//VertexBuffer buffer = new VertexBuffer( _device, stride * vertexCount, Usage.WriteOnly, format, Pool.Managed, new EventHandler( VertexBufferCreated ) );
-		}
+		//}
 
-		protected void VertexBufferCreated( object sender, EventArgs e )
-		{
-		}
+		//protected void VertexBufferCreated( object sender, EventArgs e )
+		//{
+		//}
 
 		protected Matrix BuildMatrix3x4( float[] values )
 		{
@@ -339,15 +340,15 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			m.M11 = values[ 0 ];
 			m.M12 = values[ 1 ];
 			m.M13 = values[ 2 ];
-			m.M14 = values[ 3 ];
-			m.M21 = values[ 4 ];
-			m.M22 = values[ 5 ];
-			m.M23 = values[ 6 ];
-			m.M24 = values[ 7 ];
-			m.M31 = values[ 8 ];
-			m.M32 = values[ 9 ];
-			m.M33 = values[ 10 ];
-			m.M34 = values[ 11 ];
+			m.M21 = values[ 3 ];
+			m.M22 = values[ 4 ];
+			m.M23 = values[ 5 ];
+			m.M31 = values[ 6 ];
+			m.M32 = values[ 7 ];
+			m.M33 = values[ 8 ];
+			m.M41 = values[ 9 ];
+			m.M42 = values[ 10 ];
+			m.M43 = values[ 11 ];
 			return m;
 		}
 

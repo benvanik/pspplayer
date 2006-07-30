@@ -39,7 +39,7 @@ namespace Noxa.Emulation.Psp.Cpu
 #if STATS
 		protected PerformanceTimer _timer;
 		protected double _timeSinceLastIpsPrint;
-		protected bool _debug = true;
+		protected bool _debug = false;
 
 		protected struct RuntimeStatistics
 		{
@@ -257,7 +257,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			{
 				int address = _core0.Pc;
 				address = _core0.TranslateAddress( address );
-				if( address == 0x8900350 )
+				if( address == 0x89005fc )
 					_debug = true;
 				//if( address == 0x089004D0 )
 				//	_debug = true;
@@ -285,7 +285,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 				block.ExecutionCount++;
 
-				//Debug.WriteLine( string.Format( "{0:X8}", block.Address ) );
+				//Debug.WriteLine( string.Format( "Running block 0x{0:X8}", block.Address ) );
 
 #if ACCURATESTATS
 				_core0.BlockCounter = 0;
@@ -390,7 +390,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 			_context.Reset( ilgen, startAddress );
 			
-			//Debug.WriteLine( string.Format( "Starting block at 0x{0:X8}", startAddress ) );
+			Debug.WriteLine( string.Format( "Starting generate for block at 0x{0:X8}", startAddress ) );
 
 			bool jumpDelay = false;
 			GenerationResult lastResult = GenerationResult.Success;
@@ -412,7 +412,10 @@ namespace Noxa.Emulation.Psp.Cpu
 					GenerationResult result = GenerationResult.Invalid;
 
 					if( ( pass == 1 ) && ( _debug == true ) )
+					{
+						//Debug.WriteLine( string.Format( "generating instr at 0x{0:X8}", address ) );
 						EmitRegisterPrint( ilgen );
+					}
 
 #if ACCURATESTATS
 					if( pass == 1 )
@@ -523,7 +526,13 @@ namespace Noxa.Emulation.Psp.Cpu
 										byte function = ( byte )( ( code >> 6 ) & 0x1F );
 										uint bshfl = code & 0x3F;
 
-										GenerateInstructionSpecial3 instr = CoreInstructions.TableSpecial3[ function ];
+										// Annoying....
+										GenerateInstructionSpecial3 instr;
+										if( ( bshfl == 0x0 ) ||
+											( bshfl == 0x4 ) )
+											instr = CoreInstructions.TableSpecial3[ bshfl ];
+										else
+											instr = CoreInstructions.TableSpecial3[ function ];
 										if( pass == 1 )
 										{
 											EmitDebugInfo( _context, address, code, instr.Method.Name,
@@ -699,7 +708,6 @@ namespace Noxa.Emulation.Psp.Cpu
 
 			block.EndsOnSyscall = ( lastResult == GenerationResult.Syscall );
 			block.InstructionCount = _context.InstructionCount;
-
 			
 			block.Pointer = ( DynamicCodeDelegate )method.CreateDelegate( typeof( DynamicCodeDelegate ) );
 			_codeCache.Add( block );
@@ -753,11 +761,12 @@ namespace Noxa.Emulation.Psp.Cpu
 		public const int LocalPC = 2;			// DO NOT CHANGE
 		public const int LocalPCValid = 3;		// DO NOT CHANGE
 		public const int LocalNullifyDelay = 4;	// DO NOT CHANGE
-		public const int LocalTempF = 5;
-		public const int LocalTempF2 = 6;
-		public const int LocalTempL = 7;
+		public const int LocalTempD1 = 5;
+		public const int LocalTempD2 = 6;
+		public const int LocalTempF = 7;
+		public const int LocalTempL = 8;
 #if ACCURATESTATS
-		public const int LocalBlockCounter = 8;	// Must always be last
+		public const int LocalBlockCounter = 9;	// Must always be last
 #endif
 
 		protected static void GeneratePreamble( GenerationContext context )
@@ -772,8 +781,9 @@ namespace Noxa.Emulation.Psp.Cpu
 				ilgen.DeclareLocal( typeof( int ) );
 				ilgen.DeclareLocal( typeof( int ) );
 			}
-			ilgen.DeclareLocal( typeof( double ) );
-			ilgen.DeclareLocal( typeof( double ) );
+			ilgen.DeclareLocal( typeof( float ) );
+			ilgen.DeclareLocal( typeof( float ) );
+			ilgen.DeclareLocal( typeof( float ) );
 			ilgen.DeclareLocal( typeof( long ) );
 #if ACCURATESTATS
 			ilgen.DeclareLocal( typeof( int ) );
@@ -832,10 +842,10 @@ namespace Noxa.Emulation.Psp.Cpu
 			if( _debug == false )
 				return;
 
-			//string line = string.Format( "[0x{0:X8}] {1:X8} {2:8} {3}",
-			//	address, code, name, args );
-			string line = string.Format( "0x{0:X8}: {1:X8}",
-				address, code );
+			string line = string.Format( "[0x{0:X8}] {1:X8} {2:8} {3}",
+				address, code, name, args );
+			//string line = string.Format( "0x{0:X8}: {1:X8}",
+			//	address, code );
 
 			context.ILGen.Emit( OpCodes.Ldstr, line );
 			context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
