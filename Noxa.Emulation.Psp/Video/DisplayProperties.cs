@@ -137,8 +137,6 @@ namespace Noxa.Emulation.Psp.Video
 			}
 			set
 			{
-				if( _bufferAddress != value )
-					_hasChanged = true;
 				_bufferAddress = value;
 			}
 		}
