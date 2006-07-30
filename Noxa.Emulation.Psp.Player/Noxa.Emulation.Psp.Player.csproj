@@ -67,6 +67,18 @@
     <Compile Include="CrossMediaBar\SoundManager.cs" />
     <Compile Include="CrossMediaBar\UmdBarGroup.cs" />
     <Compile Include="CrossMediaBar\VideoManager.cs" />
+    <Compile Include="GamePicker\GameEntry.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GamePicker\GameEntry.Designer.cs">
+      <DependentUpon>GameEntry.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GamePicker\PickerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GamePicker\PickerDialog.Designer.cs">
+      <DependentUpon>PickerDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Host.cs" />
     <Compile Include="Instance.cs" />
     <Compile Include="Configuration\Options.cs">
@@ -90,6 +102,14 @@
     <EmbeddedResource Include="Configuration\Options.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GamePicker\GameEntry.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>GameEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GamePicker\PickerDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>PickerDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Player.resx">
       <SubType>Designer</SubType>
@@ -139,6 +159,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\InvalidIcon.png" />
+    <Content Include="Resources\AddIcon.png" />
+    <Content Include="Resources\ClearIcon.png" />
     <Content Include="Resources\IconBackground.png" />
     <Content Include="Resources\MemoryStickIcon.png" />
     <Content Include="Resources\psp.ico" />
@@ -150,8 +172,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\PspShake.png" />
+    <None Include="Resources\RemoveIcon.png" />
     <Content Include="Resources\SelectedMemoryStickIcon.png" />
     <Content Include="Resources\SelectedUmdIcon.png" />
+    <None Include="Resources\SmallUmdIcon.png" />
+    <None Include="Resources\SmallMemoryStickIcon.png" />
     <Content Include="Resources\StartIcon.png" />
     <Content Include="Resources\PauseIcon.png" />
     <Content Include="Resources\RestartIcon.png" />

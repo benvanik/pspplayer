@@ -60,6 +60,20 @@ namespace Noxa.Emulation.Psp.Player.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap AddIcon {
+            get {
+                object obj = ResourceManager.GetObject("AddIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap ClearIcon {
+            get {
+                object obj = ResourceManager.GetObject("ClearIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static byte[] IconBackground {
             get {
                 object obj = ResourceManager.GetObject("IconBackground", resourceCulture);
@@ -116,6 +130,13 @@ namespace Noxa.Emulation.Psp.Player.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap RemoveIcon {
+            get {
+                object obj = ResourceManager.GetObject("RemoveIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap RestartIcon {
             get {
                 object obj = ResourceManager.GetObject("RestartIcon", resourceCulture);
@@ -134,6 +155,20 @@ namespace Noxa.Emulation.Psp.Player.Properties {
             get {
                 object obj = ResourceManager.GetObject("SelectedUmdIcon", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap SmallMemoryStickIcon {
+            get {
+                object obj = ResourceManager.GetObject("SmallMemoryStickIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap SmallUmdIcon {
+            get {
+                object obj = ResourceManager.GetObject("SmallUmdIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
