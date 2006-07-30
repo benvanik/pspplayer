@@ -154,8 +154,9 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			//_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( ( float )Math.PI / 3.0f, 480.0f / 272.0f, 0.1f, 1000.0f );
 			// 75 deg -> rad = 1.30899694 (1 degrees = 0.0174532925 radians)
 			_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( 1.3089969f, 16.0f / 9.0f, 0.5f, 1000.0f );
-			_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 0, 0, 3 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
-			//_device.Transform.World = Matrix.RotationZ( Environment.TickCount % 360 );
+			//_device.Transform.Projection = _context.ProjectionMatrix;
+			_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 0, 0, 7 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
+			//_device.Transform.World = Matrix.RotationY( ( float )( Environment.TickCount / 10 ) % 3.14f );
 			//_device.Transform.World = Matrix.Translation( 0, 2, 0 );
 			_device.Transform.World = Matrix.Identity;
 			
@@ -332,7 +333,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							_context.MatrixIndex = 0;
 							_context.WorldMatrix = BuildMatrix3x4( _context.MatrixTemp );
-							//_device.Transform.World = _context.WorldMatrix;
+							_device.Transform.World = _context.WorldMatrix;
 						}
 						break;
 					case VideoCommand.TMATRIX: // 3x4
@@ -466,6 +467,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			m.M41 = values[ 9 ];
 			m.M42 = values[ 10 ];
 			m.M43 = values[ 11 ];
+			m.M44 = 1.0f;
 			return m;
 		}
 
