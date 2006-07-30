@@ -141,6 +141,25 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				else if( pass == 1 )
 				{
 					EmitLoadRegisters( context, fs, ft, fmt );
+
+					//context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD2 );
+					//context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD1 );
+
+					//context.ILGen.Emit( OpCodes.Ldstr, string.Format( "{0:X8}: add {{0}}+{{1}}={{2}}", address - 4 ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
+					//context.ILGen.Emit( OpCodes.Add );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Call, typeof( string ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object ), typeof( object ), typeof( object ) } ) );
+					//context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
+
 					context.ILGen.Emit( OpCodes.Add );
 					EmitStoreRegister( context, fd, fmt );
 				}
@@ -169,6 +188,25 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				else if( pass == 1 )
 				{
 					EmitLoadRegisters( context, fs, ft, fmt );
+					
+					//context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD2 );
+					//context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD1 );
+
+					//context.ILGen.Emit( OpCodes.Ldstr, string.Format( "{0:X8}: mul {{0}}x{{1}}={{2}}", address - 4 ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
+					//context.ILGen.Emit( OpCodes.Mul );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Call, typeof( string ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object ), typeof( object ), typeof( object ) } ) );
+					//context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
+
 					context.ILGen.Emit( OpCodes.Mul );
 					EmitStoreRegister( context, fd, fmt );
 				}

@@ -1798,6 +1798,14 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					if( cop == 1 )
 						EmitWordToSingle( context );
 
+					//context.ILGen.Emit( OpCodes.Dup );
+					//context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Ldstr, string.Format( "{0:X8}: lwcz {{0}}", address - 4 ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Call, context.StringFormat1 );
+					//context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+
 					EmitStoreCopRegister( context, cop, rt );
 				}
 				return GenerationResult.Success;
@@ -1823,6 +1831,14 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					EmitAddressTranslation( context );
 
 					EmitLoadCopRegister( context, cop, rt );
+
+					//context.ILGen.Emit( OpCodes.Dup );
+					//context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Ldstr, string.Format( "{0:X8}: swcz {{0}}", address - 4 ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Call, context.StringFormat1 );
+					//context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
 
 					if( cop == 1 )
 						EmitSingleToWord( context );
@@ -3034,12 +3050,22 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
-					EmitLoadRegister( context, rs );
+					EmitLoadRegister( context, rt );
 
 					if( opcode == 1 )
 						EmitWordToSingle( context );
+
+					//context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD1 );
+
+					//context.ILGen.Emit( OpCodes.Ldstr, string.Format( "{0:X8}: mtcz {{0}}", address - 4 ) );
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					//context.ILGen.Emit( OpCodes.Box, typeof( float ) );
+					//context.ILGen.Emit( OpCodes.Call, context.StringFormat1 );
+					//context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+
+					//context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
 					
-					EmitStoreCopRegister( context, opcode, rt );
+					EmitStoreCopRegister( context, opcode, rs );
 				}
 				return GenerationResult.Success;
 			}
