@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection.Emit;
+using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp.Cpu.Generation
 {
@@ -66,32 +67,14 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp1 );
 				context.ILGen.Emit( OpCodes.Ldfld, context.Cp1Registers );
 				context.ILGen.Emit( OpCodes.Ldc_I4, ( int )reg );
-				context.ILGen.Emit( OpCodes.Ldelem_R8 );
+				context.ILGen.Emit( OpCodes.Ldelem_R4 );
+
+				//if( fmt == 4 )
+				//	context.ILGen.Emit( OpCodes.Conv_I4 );
 			}
 			else
 			{
-				context.ILGen.Emit( OpCodes.Ldarg_0 );
-				context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp1 );
-				context.ILGen.Emit( OpCodes.Ldfld, context.Cp1Registers );
-				context.ILGen.Emit( OpCodes.Ldc_I4, ( int )reg );
-				context.ILGen.Emit( OpCodes.Ldelem_R8 );
-				CoreInstructions.EmitSingleToWord( context );
-				context.ILGen.Emit( OpCodes.Conv_I8 );
-
-				context.ILGen.Emit( OpCodes.Ldarg_0 );
-				context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp1 );
-				context.ILGen.Emit( OpCodes.Ldfld, context.Cp1Registers );
-				context.ILGen.Emit( OpCodes.Ldc_I4, ( int )reg + 1 );
-				context.ILGen.Emit( OpCodes.Ldelem_R8 );
-				CoreInstructions.EmitSingleToWord( context );
-				context.ILGen.Emit( OpCodes.Conv_I8 );
-
-				// Now have reg, reg+1, both in binary
-				context.ILGen.Emit( OpCodes.Shl, 32 );
-				context.ILGen.Emit( OpCodes.Or );
-
-				// Now have a single I8 that needs to be a double
-				CoreInstructions.EmitDoubleWordToDouble( context );
+				Debug.Assert( false );
 			}
 		}
 
@@ -106,41 +89,22 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		{
 			if( ( fmt == 0 ) || ( fmt == 4 ) )
 			{
-				context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
+				if( fmt == 4 )
+				{
+					context.ILGen.Emit( OpCodes.Conv_I4 );
+					context.ILGen.Emit( OpCodes.Conv_R4 );
+				}
+				context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD1 );
 				context.ILGen.Emit( OpCodes.Ldarg_0 );
 				context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp1 );
 				context.ILGen.Emit( OpCodes.Ldfld, context.Cp1Registers );
 				context.ILGen.Emit( OpCodes.Ldc_I4, ( int )reg );
-				context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF );
-				context.ILGen.Emit( OpCodes.Stelem_R8 );
+				context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+				context.ILGen.Emit( OpCodes.Stelem_R4 );
 			}
 			else
 			{
-				CoreInstructions.EmitDoubleToDoubleWord( context );
-				context.ILGen.Emit( OpCodes.Dup );
-
-				context.ILGen.Emit( OpCodes.Ldc_I8, ( long )0x00000000FFFFFFFF );
-				context.ILGen.Emit( OpCodes.And );
-				CoreInstructions.EmitWordToSingle( context );
-				context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
-
-				context.ILGen.Emit( OpCodes.Ldarg_0 );
-				context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp1 );
-				context.ILGen.Emit( OpCodes.Ldfld, context.Cp1Registers );
-				context.ILGen.Emit( OpCodes.Ldc_I4, ( int )reg );
-				context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF );
-				context.ILGen.Emit( OpCodes.Stelem_R8 );
-
-				context.ILGen.Emit( OpCodes.Shr, 32 );
-				CoreInstructions.EmitWordToSingle( context );
-				context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
-
-				context.ILGen.Emit( OpCodes.Ldarg_0 );
-				context.ILGen.Emit( OpCodes.Ldfld, context.Core0Cp1 );
-				context.ILGen.Emit( OpCodes.Ldfld, context.Cp1Registers );
-				context.ILGen.Emit( OpCodes.Ldc_I4, ( int )reg + 1 );
-				context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF );
-				context.ILGen.Emit( OpCodes.Stelem_R8 );
+				Debug.Assert( false );
 			}
 		}
 
@@ -151,21 +115,19 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			else if( targetFmt == 0 )
 			{
 				context.ILGen.Emit( OpCodes.Conv_R4 );
-				context.ILGen.Emit( OpCodes.Conv_R8 );
 			}
 			else if( targetFmt == 1 )
 			{
-				context.ILGen.Emit( OpCodes.Conv_R8 );
+				Debug.Assert( false );
 			}
 			else if( targetFmt == 4 )
 			{
 				context.ILGen.Emit( OpCodes.Conv_I4 );
-				context.ILGen.Emit( OpCodes.Conv_R8 );
+				context.ILGen.Emit( OpCodes.Conv_R4 );
 			}
 			else if( targetFmt == 5 )
 			{
-				context.ILGen.Emit( OpCodes.Conv_I8 );
-				context.ILGen.Emit( OpCodes.Conv_R8 );
+				Debug.Assert( false );
 			}
 		}
 
@@ -289,15 +251,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
-					EmitLoadRegister( context, fs, fmt );
-
-					context.ILGen.Emit( OpCodes.Ldc_I4, ( int )MidpointRounding.ToEven );
-					context.ILGen.Emit( OpCodes.Call, typeof( Math ).GetMethod( "Round" ) );
-
-					EmitConvertFormat( context, fmt, 5 );
-					EmitStoreRegister( context, fd, 5 );
 				}
-				return GenerationResult.Success;
+				return GenerationResult.Invalid;
 			}
 
 			public static GenerationResult TRUNCL( GenerationContext context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function )
@@ -307,14 +262,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
-					EmitLoadRegister( context, fs, fmt );
-
-					context.ILGen.Emit( OpCodes.Call, typeof( Math ).GetMethod( "Truncate" ) );
-
-					EmitConvertFormat( context, fmt, 5 );
-					EmitStoreRegister( context, fd, 5 );
 				}
-				return GenerationResult.Success;
+				return GenerationResult.Invalid;
 			}
 
 			public static GenerationResult CEILL( GenerationContext context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function )
@@ -324,14 +273,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
-					EmitLoadRegister( context, fs, fmt );
-
-					context.ILGen.Emit( OpCodes.Call, typeof( Math ).GetMethod( "Ceiling" ) );
-
-					EmitConvertFormat( context, fmt, 5 );
-					EmitStoreRegister( context, fd, 5 );
 				}
-				return GenerationResult.Success;
+				return GenerationResult.Invalid;
 			}
 
 			public static GenerationResult FLOORL( GenerationContext context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function )
@@ -341,14 +284,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
-					EmitLoadRegister( context, fs, fmt );
-
-					context.ILGen.Emit( OpCodes.Call, typeof( Math ).GetMethod( "Floor" ) );
-
-					EmitConvertFormat( context, fmt, 5 );
-					EmitStoreRegister( context, fd, 5 );
 				}
-				return GenerationResult.Success;
+				return GenerationResult.Invalid;
 			}
 
 			public static GenerationResult ROUNDW( GenerationContext context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function )
@@ -360,8 +297,10 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				{
 					EmitLoadRegister( context, fs, fmt );
 
+					context.ILGen.Emit( OpCodes.Conv_R8 );
 					context.ILGen.Emit( OpCodes.Ldc_I4, ( int )MidpointRounding.ToEven );
 					context.ILGen.Emit( OpCodes.Call, typeof( Math ).GetMethod( "Round" ) );
+					context.ILGen.Emit( OpCodes.Conv_R4 );
 
 					EmitConvertFormat( context, fmt, 4 );
 					EmitStoreRegister( context, fd, 4 );
@@ -378,7 +317,9 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				{
 					EmitLoadRegister( context, fs, fmt );
 
+					context.ILGen.Emit( OpCodes.Conv_R8 );
 					context.ILGen.Emit( OpCodes.Call, typeof( Math ).GetMethod( "Truncate", new Type[] { typeof( double ) } ) );
+					context.ILGen.Emit( OpCodes.Conv_R4 );
 
 					EmitConvertFormat( context, fmt, 4 );
 					EmitStoreRegister( context, fd, 4 );
@@ -395,8 +336,10 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				{
 					EmitLoadRegister( context, fs, fmt );
 
+					context.ILGen.Emit( OpCodes.Conv_R8 );
 					context.ILGen.Emit( OpCodes.Call, typeof( Math ).GetMethod( "Ceiling" ) );
-
+					context.ILGen.Emit( OpCodes.Conv_R4 );
+					
 					EmitConvertFormat( context, fmt, 4 );
 					EmitStoreRegister( context, fd, 4 );
 				}
@@ -412,7 +355,9 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				{
 					EmitLoadRegister( context, fs, fmt );
 
+					context.ILGen.Emit( OpCodes.Conv_R8 );
 					context.ILGen.Emit( OpCodes.Call, typeof( Math ).GetMethod( "Floor" ) );
+					context.ILGen.Emit( OpCodes.Conv_R4 );
 
 					EmitConvertFormat( context, fmt, 4 );
 					EmitStoreRegister( context, fd, 4 );
@@ -441,11 +386,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
-					EmitLoadRegister( context, fs, fmt );
-					EmitConvertFormat( context, fmt, 1 );
-					EmitStoreRegister( context, fd, 1 );
 				}
-				return GenerationResult.Success;
+				return GenerationResult.Invalid;
 			}
 
 			public static GenerationResult CVTW( GenerationContext context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function )
@@ -469,11 +411,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
-					EmitLoadRegister( context, fs, fmt );
-					EmitConvertFormat( context, fmt, 5 );
-					EmitStoreRegister( context, fd, 5 );
 				}
-				return GenerationResult.Success;
+				return GenerationResult.Invalid;
 			}
 		}
 
@@ -490,9 +429,9 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 					EmitLoadRegisters( context, fs, ft, fmt );
 
-					// fs in F, ft in F2
-					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF2 );
-					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
+					// fs in D1, ft in D2
+					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD2 );
+					context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempD1 );
 
 					uint fc = ( code >> 4 ) & 0x03;
 					uint cond = code & 0x0F;
@@ -504,11 +443,11 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					Label done = context.ILGen.DefineLabel();
 
 					// NAN (less = false, equal = false, unordered = true)
-					context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF );
-					context.ILGen.Emit( OpCodes.Call, typeof( double ).GetMethod( "IsNaN" ) );
+					context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+					context.ILGen.Emit( OpCodes.Call, typeof( float ).GetMethod( "IsNaN" ) );
 					context.ILGen.Emit( OpCodes.Brfalse_S, notNaN );
-					context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF2 );
-					context.ILGen.Emit( OpCodes.Call, typeof( double ).GetMethod( "IsNaN" ) );
+					context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
+					context.ILGen.Emit( OpCodes.Call, typeof( float ).GetMethod( "IsNaN" ) );
 					context.ILGen.Emit( OpCodes.Brfalse_S, notNaN );
 
 					// Calculate condition bit
@@ -524,18 +463,19 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					// Normal (less = fs < ft, equal = fs == ft, unordered = false)
 					if( lessBit == true )
 					{
-						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF );
-						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF2 );
+						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
 						context.ILGen.Emit( OpCodes.Clt );
 					}
 					if( equalBit == true )
 					{
-						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF );
-						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempF2 );
+						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD1 );
+						context.ILGen.Emit( OpCodes.Ldloc_S, ( byte )Cpu.LocalTempD2 );
 						context.ILGen.Emit( OpCodes.Ceq );
 					}
 					if( ( lessBit == true ) && ( equalBit == true ) )
 						context.ILGen.Emit( OpCodes.Or );
+					Debug.Assert( ( lessBit == true ) || ( equalBit == true ) );
 					context.ILGen.Emit( OpCodes.Conv_U1 );
 
 					context.ILGen.MarkLabel( done );

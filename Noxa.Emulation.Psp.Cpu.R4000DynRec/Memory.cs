@@ -121,6 +121,8 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public void WriteWord( int address, int width, int value )
 		{
+			Debug.Assert( address > 0x20 );
+
 			if( ( address >= 0x08000000 ) && ( address < 0x9FFFFFF ) )
 			{
 				address -= 0x08000000;

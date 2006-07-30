@@ -28,13 +28,13 @@ namespace Noxa.Emulation.Psp.Cpu
 	{
 		public uint ControlRegister;
 		public uint Implementation;
-		public double[] Registers;
+		public float[] Registers;
 
 		#region Internal context
 
 		private class Cp1Context
 		{
-			public double[] GeneralRegisters;
+			public float[] GeneralRegisters;
 			public uint ControlRegister;
 		}
 
@@ -42,7 +42,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public Coprocessor1()
 		{
-			Registers = new double[ 32 ];
+			Registers = new float[ 32 ];
 		}
 
 		public object Context
@@ -51,21 +51,21 @@ namespace Noxa.Emulation.Psp.Cpu
 			{
 				Cp1Context context = new Cp1Context();
 				context.ControlRegister = ControlRegister;
-				context.GeneralRegisters = ( double[] )Registers.Clone();
+				context.GeneralRegisters = ( float[] )Registers.Clone();
 				return context;
 			}
 			set
 			{
 				Cp1Context context = ( Cp1Context )value;
 				ControlRegister = context.ControlRegister;
-				Registers = ( double[] )context.GeneralRegisters.Clone();
+				Registers = ( float[] )context.GeneralRegisters.Clone();
 			}
 		}
 
 		public virtual void Clear()
 		{
 			for( int n = 0; n < Registers.Length; n++ )
-				Registers[ n ] = 0.0;
+				Registers[ n ] = 0.0f;
 
 			Implementation = ( ( 0x05 ) << 8 ) | 0x10; // 10 = 0001.0000
 			
@@ -80,6 +80,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get
 			{
+				// TODO: optimize - no reason to have a control register!
 				return ( ( ControlRegister & 0x01000000 ) >> 24 ) == 1 ? true : false;
 			}
 			set
@@ -94,6 +95,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get
 			{
+				// TODO: optimize - no reason to have a control register!
 				return ( ( ControlRegister & 0x00800000 ) >> 23 ) == 1 ? true : false;
 			}
 			set
@@ -106,6 +108,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public void SetCauseBits( FpuFlags flags )
 		{
+			// TODO: optimize - no reason to have a control register!
 			uint value = ( uint )flags;
 			ControlRegister &= 0xFFFC0FFF;
 			ControlRegister |= value << 12;
@@ -113,6 +116,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public void SetEnableBits( FpuFlags flags)
 		{
+			// TODO: optimize - no reason to have a control register!
 			uint value = ( uint )flags;
 			value &= 0x1F;
 			ControlRegister &= 0xFFFFF07F;
@@ -121,6 +125,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public void SetFlagBits( FpuFlags flags )
 		{
+			// TODO: optimize - no reason to have a control register!
 			uint value = ( uint )flags;
 			value &= 0x1F;
 			ControlRegister &= 0xFFFFFF83;
@@ -131,6 +136,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get
 			{
+				// TODO: optimize - no reason to have a control register!
 				return ( FpuRoundingMode )( ControlRegister & 0x00000003 );
 			}
 			set
