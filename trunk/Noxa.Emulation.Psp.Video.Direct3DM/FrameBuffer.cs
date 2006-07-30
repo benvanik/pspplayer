@@ -287,6 +287,11 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			throw new Exception( "The method or operation is not implemented." );
 		}
 
+		public uint GetMemoryHash( int address, int count, uint prime )
+		{
+			throw new Exception( "The method or operation is not implemented." );
+		}
+
 		#endregion
 	}
 }

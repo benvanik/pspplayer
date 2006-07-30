@@ -116,7 +116,20 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public int ReadStream( int address, System.IO.Stream destination, int count )
 		{
-			throw new NotImplementedException();
+			if( ( address >= 0x08000000 ) && ( address < 0x9FFFFFF ) )
+			{
+				address -= 0x08000000;
+				long pos = destination.Position;
+				destination.Write( _mainMemory, address, count );
+				destination.Position = pos;
+				return count;
+			}
+			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+				throw new NotImplementedException();
+			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+				throw new NotImplementedException();
+			else
+				return 0;
 		}
 
 		public void WriteWord( int address, int width, int value )
@@ -261,6 +274,26 @@ namespace Noxa.Emulation.Psp.Cpu
 		public void Save( string fileName )
 		{
 			throw new NotImplementedException();
+		}
+
+		public uint GetMemoryHash( int address, int count, uint prime )
+		{
+			if( ( address >= 0x08000000 ) && ( address < 0x9FFFFFF ) )
+			{
+				address -= 0x08000000;
+
+				uint hash;
+				int n;
+				for( hash = ( uint )count, n = 0; n < count; ++n )
+					hash = hash + _mainMemory[ address + n ];
+				return hash % prime;
+			}
+			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+				throw new NotImplementedException();
+			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+				throw new NotImplementedException();
+			else
+				throw new NotSupportedException();
 		}
 
 		public void DumpMainMemory( string fileName )

@@ -179,15 +179,18 @@ namespace Noxa.Emulation.Psp.IO.Input.DirectInput
 
 		public void Cleanup()
 		{
-			try
+			if( _device != null )
 			{
-				_device.Unacquire();
+				try
+				{
+					_device.Unacquire();
+				}
+				catch
+				{
+				}
+				_device.Dispose();
+				_device = null;
 			}
-			catch
-			{
-			}
-			_device.Dispose();
-			_device = null;
 		}
 	}
 }

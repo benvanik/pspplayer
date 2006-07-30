@@ -96,6 +96,9 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 	class VideoContext
 	{
+		public MemoryStream MemoryBuffer = new MemoryStream( 1024 * 100 );
+		public BinaryReader MemoryReader;
+
 		public uint FrameBufferPointer;
 		public int FrameBufferWidth;
 
@@ -128,6 +131,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		protected void InitializeContext()
 		{
 			_context = new VideoContext();
+			_context.MemoryReader = new BinaryReader( _context.MemoryBuffer );
 		}
 
 		protected void CleanupContext()
@@ -137,6 +141,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		protected void ParseList( DisplayList list )
 		{
+			IMemory memory = _emulator.Cpu.Memory;
+
 			Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", list.Packets.Length ) );
 
 			_device.RenderState.CullMode = Cull.None;
@@ -252,21 +258,21 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 								int vertexSize = 16;
 								Debug.WriteLine( string.Format( "PRIM: {0} vertices of type {1} ({2} prims) in format 0x{3:X8} ({4}B/vertex)", vertexCount, primitiveType, primitiveCount, ( uint )_context.VertexType, vertexSize ) );
 
-								// TODO: Optimize cpu->ge memory reads
-								IMemory memory = _emulator.Cpu.Memory;
-								byte[] bytes = memory.ReadBytes( _context.VertexBufferAddress, vertexCount * vertexSize );
+								uint hash = memory.GetMemoryHash( _context.VertexBufferAddress, vertexCount * vertexSize, VideoContext.MaximumCachedVertexBuffers );
 
 								VertexBuffer vb = null;
-								uint hash = AdditiveHash( bytes, VideoContext.MaximumCachedVertexBuffers );
 								if( _context.CachedVertexBuffers.ContainsKey( hash ) == true )
 								{
 									vb = _context.CachedVertexBuffers[ hash ];
 								}
 								else
 								{
+									// TODO: Optimize cpu->ge memory reads
+									memory.ReadStream( _context.VertexBufferAddress, _context.MemoryBuffer, vertexCount * vertexSize );
+
 									// Need to convert bytes to some kind of D3D vertex listing
 									PositionColored[] verts = new PositionColored[ vertexCount ];
-									using( BinaryReader reader = new BinaryReader( new MemoryStream( bytes, false ) ) )
+									BinaryReader reader = _context.MemoryReader;
 									{
 										for( int m = 0; m < vertexCount; m++ )
 										{
@@ -282,6 +288,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 												x, y, z, c );
 										}
 									}
+									_context.MemoryBuffer.Position = 0;
 
 									vb = this.BuildVertexBuffer( primitiveType, verts );
 									_context.CachedVertexBuffers.Add( hash, vb );
@@ -482,15 +489,6 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			m.M43 = values[ 14 ];
 			m.M44 = values[ 15 ];
 			return m;
-		}
-
-		protected static uint AdditiveHash( byte[] buffer, uint prime )
-		{
-			uint hash;
-			int n;
-			for( hash = ( uint )buffer.Length, n = 0; n < buffer.Length; ++n )
-				hash = hash + buffer[ n ];
-			return hash % prime;
 		}
 
 		#endregion

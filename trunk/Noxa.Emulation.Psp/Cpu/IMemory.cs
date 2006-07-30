@@ -24,6 +24,8 @@ namespace Noxa.Emulation.Psp.Cpu
 		void Load( string fileName );
 		void Save( Stream stream );
 		void Save( string fileName );
+
+		uint GetMemoryHash( int address, int count, uint prime );
 	}
 
 	public enum MemoryType
@@ -70,5 +72,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		void Load( string fileName );
 		void Save( Stream stream );
 		void Save( string fileName );
+
+		uint GetMemoryHash( int address, int count, uint prime );
 	}
 }

@@ -74,6 +74,8 @@ namespace Noxa {
 					virtual void Load( String^ fileName );
 					virtual void Save( Stream^ stream );
 					virtual void Save( String^ fileName );
+
+					virtual unsigned int GetMemoryHash( int address, int count, unsigned int prime );
 				};
 			}
 		}
