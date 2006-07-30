@@ -240,22 +240,22 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				{
 					lock( this )
 					{
-						//_device.Clear( ClearFlags.Target, Color.Red, 0, 0 );
+						_device.Clear( ClearFlags.Target, Color.Red, 0, 0 );
 						_device.BeginScene();
 
-						lock( _frameBuffer )
-						{
-							_frameBuffer.Copy();
-						}
+						//lock( _frameBuffer )
+						//{
+						//    _frameBuffer.Copy();
+						//}
 
-						if( _currentProps != null )
-						{
-							Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
-							SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
-							_sprite.Begin( SpriteFlags.None );
-							_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
-							_sprite.End();
-						}
+						//if( _currentProps != null )
+						//{
+						//    Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
+						//    SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
+						//    _sprite.Begin( SpriteFlags.None );
+						//    _sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
+						//    _sprite.End();
+						//}
 
 						// Display list processing
 						List<DisplayList> toProcess = new List<DisplayList>( 5 );

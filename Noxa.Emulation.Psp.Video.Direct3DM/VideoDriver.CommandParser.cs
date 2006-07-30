@@ -5,6 +5,10 @@ using System.Diagnostics;
 using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using Noxa.Emulation.Psp.Cpu;
+using System.IO;
+using Microsoft.DirectX.Generic;
+using Microsoft.DirectX.Direct3D.CustomVertex;
+using System.Drawing;
 
 namespace Noxa.Emulation.Psp.Video.Direct3DM
 {
@@ -92,6 +96,9 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 	class VideoContext
 	{
+		public uint FrameBufferPointer;
+		public int FrameBufferWidth;
+
 		public Matrix WorldMatrix;
 		public Matrix ViewMatrix;
 		public Matrix ProjectionMatrix;
@@ -107,6 +114,11 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		public bool VerticesTransformed;
 		public int MorphingVertexCount;
 		public int SkinningWeightCount;
+
+		public uint Temp;
+
+		public const uint MaximumCachedVertexBuffers = 4703;
+		public Dictionary<uint, VertexBuffer> CachedVertexBuffers = new Dictionary<uint, VertexBuffer>( ( int )MaximumCachedVertexBuffers );
 	}
 
 	partial class VideoDriver
@@ -127,6 +139,20 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		{
 			Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", list.Packets.Length ) );
 
+			_device.RenderState.CullMode = Cull.None;
+			_device.RenderState.Lighting = false;
+			_device.RenderState.AlphaBlendEnable = false;
+
+			//_device.Transform.Projection = Matrix.PerspectiveLeftHanded( 480, 272, 0.1f, 40.0f );
+			//sceGumPerspective( 75.0f, 16.0f / 9.0f, 0.5f, 1000.0f );
+			//_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( ( float )Math.PI / 3.0f, 480.0f / 272.0f, 0.1f, 1000.0f );
+			// 75 deg -> rad = 1.30899694 (1 degrees = 0.0174532925 radians)
+			_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( 1.3089969f, 16.0f / 9.0f, 0.5f, 1000.0f );
+			_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 0, 0, 3 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
+			//_device.Transform.World = Matrix.RotationZ( Environment.TickCount % 360 );
+			//_device.Transform.World = Matrix.Translation( 0, 2, 0 );
+			_device.Transform.World = Matrix.Identity;
+			
 			for( int n = 0; n < list.Packets.Length; n++ )
 			{
 				VideoPacket packet = list.Packets[ n ];
@@ -156,6 +182,15 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 					case VideoCommand.CLEAR:
 						break;
 
+					case VideoCommand.FBP:
+						_context.Temp = ( uint )packet.Argument;
+						break;
+					case VideoCommand.FBW:
+						// BUG: Not sure this is correct - pointer seems to go nowhere
+						_context.FrameBufferPointer = _context.Temp | ( ( ( uint )packet.Argument & 0x00FF0000 ) << 8 );
+						_context.FrameBufferWidth = ( packet.Argument & 0x0000FFFF );
+						break;
+
 					case VideoCommand.VTYPE:
 						int type = packet.Argument;
 						_context.VerticesTransformed = ( type >> 23 ) == 0;
@@ -170,47 +205,92 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						_context.IndexBufferAddress = packet.Argument;
 						break;
 					case VideoCommand.PRIM:
-						int vertexCount = packet.Argument & 0xFFFF;
-						PrimitiveType primitiveType = PrimitiveType.LineList;
-						bool areSprites = false;
-						switch( ( packet.Argument >> 16 ) & 0x3 )
 						{
-							case 0x0: // Points
-								primitiveType = PrimitiveType.PointList;
-								break;
-							case 0x1: // Lines
-								primitiveType = PrimitiveType.LineList;
-								break;
-							case 0x2: // Line strips
-								primitiveType = PrimitiveType.LineStrip;
-								break;
-							case 0x3: // Triangles
-								primitiveType = PrimitiveType.TriangleList;
-								break;
-							case 0x4: // Triangle strips
-								primitiveType = PrimitiveType.TriangleStrip;
-								break;
-							case 0x5: // Triangle fans
-								primitiveType = PrimitiveType.TriangleFan;
-								break;
-							case 0x6: // Sprites (2D rectangles)
-								areSprites = true;
-								break;
-						}
-						if( areSprites == true )
-						{
-							// TODO: Sprite support
-							Debugger.Break();
-						}
-						else
-						{
-							// Read all vertices
-							int vertexSize = DetermineVertexSize( _context.VertexType );
-							Debug.WriteLine( string.Format( "PRIM: {0} vertices of type {1} in format 0x{2:X8} ({3}B/vertex)", vertexCount, primitiveType, ( uint )_context.VertexType, vertexSize ) );
+							int vertexCount = packet.Argument & 0xFFFF;
+							PrimitiveType primitiveType = PrimitiveType.LineList;
+							bool areSprites = false;
+							int primitiveCount = 0;
+							switch( ( packet.Argument >> 16 ) & 0x7 )
+							{
+								case 0x0: // Points
+									primitiveType = PrimitiveType.PointList;
+									primitiveCount = vertexCount;
+									break;
+								case 0x1: // Lines
+									primitiveType = PrimitiveType.LineList;
+									primitiveCount = vertexCount / 2;
+									break;
+								case 0x2: // Line strips
+									primitiveType = PrimitiveType.LineStrip;
+									primitiveCount = vertexCount - 1;
+									break;
+								case 0x3: // Triangles
+									primitiveType = PrimitiveType.TriangleList;
+									primitiveCount = vertexCount / 3;
+									break;
+								case 0x4: // Triangle strips
+									primitiveType = PrimitiveType.TriangleStrip;
+									primitiveCount = vertexCount - 2;
+									break;
+								case 0x5: // Triangle fans
+									primitiveType = PrimitiveType.TriangleFan;
+									primitiveCount = vertexCount - 2;
+									break;
+								case 0x6: // Sprites (2D rectangles)
+									areSprites = true;
+									break;
+							}
+							if( areSprites == true )
+							{
+								// TODO: Sprite support
+								//Debugger.Break();
+							}
+							else
+							{
+								// Read all vertices
+								//int vertexSize = DetermineVertexSize( _context.VertexType );
+								int vertexSize = 16;
+								Debug.WriteLine( string.Format( "PRIM: {0} vertices of type {1} ({2} prims) in format 0x{3:X8} ({4}B/vertex)", vertexCount, primitiveType, primitiveCount, ( uint )_context.VertexType, vertexSize ) );
 
-							// TODO: Optimize cpu->ge memory reads
-							IMemory memory = _emulator.Cpu.Memory;
-							byte[] bytes = memory.ReadBytes( _context.VertexBufferAddress, vertexCount * vertexSize );
+								// TODO: Optimize cpu->ge memory reads
+								IMemory memory = _emulator.Cpu.Memory;
+								byte[] bytes = memory.ReadBytes( _context.VertexBufferAddress, vertexCount * vertexSize );
+
+								VertexBuffer vb = null;
+								uint hash = AdditiveHash( bytes, VideoContext.MaximumCachedVertexBuffers );
+								if( _context.CachedVertexBuffers.ContainsKey( hash ) == true )
+								{
+									vb = _context.CachedVertexBuffers[ hash ];
+								}
+								else
+								{
+									// Need to convert bytes to some kind of D3D vertex listing
+									PositionColored[] verts = new PositionColored[ vertexCount ];
+									using( BinaryReader reader = new BinaryReader( new MemoryStream( bytes, false ) ) )
+									{
+										for( int m = 0; m < vertexCount; m++ )
+										{
+											// 4 bytes color
+											int c = reader.ReadInt32();
+
+											// 3 float xyz
+											float x = reader.ReadSingle();
+											float y = reader.ReadSingle();
+											float z = reader.ReadSingle();
+
+											verts[ m ] = new PositionColored(
+												x, y, z, c );
+										}
+									}
+
+									vb = this.BuildVertexBuffer( primitiveType, verts );
+									_context.CachedVertexBuffers.Add( hash, vb );
+								}
+
+								_device.VertexFormat = PositionColored.Format;
+								_device.SetStreamSource( 0, vb, 0, PositionColored.StrideSize );
+								_device.DrawPrimitives( primitiveType, 0, primitiveCount );
+							}
 						}
 						break;
 
@@ -227,6 +307,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							_context.MatrixIndex = 0;
 							_context.ProjectionMatrix = BuildMatrix4x4( _context.MatrixTemp );
+							//_device.Transform.Projection = _context.ProjectionMatrix;
 						}
 						break;
 					case VideoCommand.VIEW: // 3x4
@@ -235,6 +316,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							_context.MatrixIndex = 0;
 							_context.ViewMatrix = BuildMatrix3x4( _context.MatrixTemp );
+							//_device.Transform.View = _context.ViewMatrix;
 						}
 						break;
 					case VideoCommand.WORLD: // 3x4
@@ -243,6 +325,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							_context.MatrixIndex = 0;
 							_context.WorldMatrix = BuildMatrix3x4( _context.MatrixTemp );
+							//_device.Transform.World = _context.WorldMatrix;
 						}
 						break;
 					case VideoCommand.TMATRIX: // 3x4
@@ -251,6 +334,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							_context.MatrixIndex = 0;
 							_context.TextureMatrix = BuildMatrix3x4( _context.MatrixTemp );
+							//_device.Transform.Texture0 = _context.TextureMatrix;
 						}
 						break;
 
@@ -269,6 +353,40 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			}
 		}
 
+		private PositionColored[] _tempVerts;
+
+		protected VertexBuffer BuildVertexBuffer( PrimitiveType primitiveType, PositionColored[] vertices )
+		{
+			_tempVerts = vertices;
+			int stride = PositionColored.StrideSize;
+			VertexFormats format = PositionColored.Format;
+			VertexBuffer buffer = new VertexBuffer( _device, stride * vertices.Length, Usage.None, format, Pool.Default, new EventHandler( VertexBufferCreated ) );
+			return buffer;
+		}
+
+		protected void VertexBufferCreated( object sender, EventArgs e )
+		{
+			try
+			{
+				VertexBuffer buffer = sender as VertexBuffer;
+				Debug.Assert( buffer != null );
+				Debug.Assert( _tempVerts != null );
+				Debug.Assert( _tempVerts.Length > 0 );
+
+				using( GraphicsBuffer<PositionColored> gb = buffer.Lock<PositionColored>( 0, _tempVerts.Length, LockFlags.Discard ) )
+				{
+					gb.Write( _tempVerts );
+					buffer.Unlock();
+				}
+			}
+			catch
+			{
+				throw;
+			}
+		}
+
+		#region Helpers
+
 		protected int DetermineVertexSize( VertexTypes vertexType )
 		{
 			int size = 0;
@@ -277,7 +395,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			if( positionMask == VertexTypes.PositionFixed8 )
 				size += 1 + 1 + 1;
 			else if( positionMask == VertexTypes.PositionFixed16 )
-				size += 2 + 2 + 2;
+				//size += 2 + 2 + 2;
+				size += 4 + 4 + 4;
 			else if( positionMask == VertexTypes.PositionFloat )
 				size += 4 + 4 + 4;
 
@@ -325,15 +444,6 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			return size;
 		}
 
-		//protected VertexBuffer BuildVertexBuffer( VertexTypes vertexType, byte[] buffer )
-		//{
-			//VertexBuffer buffer = new VertexBuffer( _device, stride * vertexCount, Usage.WriteOnly, format, Pool.Managed, new EventHandler( VertexBufferCreated ) );
-		//}
-
-		//protected void VertexBufferCreated( object sender, EventArgs e )
-		//{
-		//}
-
 		protected Matrix BuildMatrix3x4( float[] values )
 		{
 			Matrix m = new Matrix();
@@ -373,5 +483,16 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			m.M44 = values[ 15 ];
 			return m;
 		}
+
+		protected static uint AdditiveHash( byte[] buffer, uint prime )
+		{
+			uint hash;
+			int n;
+			for( hash = ( uint )buffer.Length, n = 0; n < buffer.Length; ++n )
+				hash = hash + buffer[ n ];
+			return hash % prime;
+		}
+
+		#endregion
 	}
 }
