@@ -105,10 +105,12 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			_hle.Emulator.Video.Suspend();
 
 			DisplayProperties props = _hle.Emulator.Video.Properties;
-			props.BufferAddress = ( uint )a0;
+			props.BufferAddress = ( uint )( a0 & 0x0FFFFFFF );
 			props.BufferSize = ( uint )a1;
 			props.PixelFormat = ( PixelFormat )a2;
 			props.SyncMode = ( BufferSyncMode )a3;
+
+			//Debug.WriteLine( string.Format( "fb addr set to {0:X8}", a0 ) );
 
 			_hle.Emulator.Video.Resume();
 			

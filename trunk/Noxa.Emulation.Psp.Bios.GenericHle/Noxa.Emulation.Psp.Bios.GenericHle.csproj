@@ -48,6 +48,7 @@
     <Compile Include="Modules\GeUser.cs" />
     <Compile Include="Modules\LoadExecForUser.cs" />
     <Compile Include="Modules\Power.cs" />
+    <Compile Include="Modules\Rtc.cs" />
     <Compile Include="Modules\SuspendForUser.cs" />
     <Compile Include="Modules\StdioForUser.cs" />
     <Compile Include="Modules\IoFileMgrForUser.cs" />

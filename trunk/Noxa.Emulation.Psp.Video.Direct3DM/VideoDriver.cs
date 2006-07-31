@@ -172,7 +172,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		private bool CreateDevice()
 		{
 			_presentParams = new PresentParameters();
-			_presentParams.PresentationInterval = PresentInterval.One;
+			_presentParams.PresentationInterval = PresentInterval.Immediate;
 			_presentParams.PresentFlag = PresentFlag.LockableBackBuffer;
 			_presentParams.SwapEffect = SwapEffect.Flip;
 			_presentParams.IsWindowed = true;
@@ -240,29 +240,30 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				{
 					lock( this )
 					{
-						_device.Clear( ClearFlags.Target, Color.Red, 0, 0 );
+						//_device.Clear( ClearFlags.Target, Color.Red, 0, 0 );
 						_device.BeginScene();
 
-						//lock( _frameBuffer )
-						//{
-						//    _frameBuffer.Copy();
-						//}
+						lock( _frameBuffer )
+						{
+							_frameBuffer.Copy();
+						}
 
-						//if( _currentProps != null )
-						//{
-						//    Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
-						//    SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
-						//    _sprite.Begin( SpriteFlags.None );
-						//    _sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
-						//    _sprite.End();
-						//}
+						if( _currentProps != null )
+						{
+							Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
+							SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
+							_sprite.Begin( SpriteFlags.None );
+							_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
+							_sprite.End();
+						}
 
 						// Display list processing
 						List<DisplayList> toProcess = new List<DisplayList>( 5 );
+						bool hasElements = _lists.Count > 0;
+						if( hasElements == true )
+							_listSync.WaitOne();
 						lock( _lists )
 						{
-							bool hasElements = _lists.Count > 0;
-
 							for( int n = 0; n < _lists.Count; n++ )
 							{
 								DisplayList list = _lists[ n ];
@@ -276,9 +277,6 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							}
 
 							_lists.RemoveRange( 0, toProcess.Count );
-
-							if( hasElements == true )
-								_listSync.Set();
 						}
 
 						// Process lists
@@ -368,7 +366,13 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		public void Sync()
 		{
-			_listSync.WaitOne();
+			// This means that everything we have in there is ready to draw
+			// We could wait on _listSync, but that slows everything down
+			// This is really a frame-skip option
+			_listSync.Set();
+			//Debug.WriteLine( string.Format( "Would Sync(), {0} outstanding lists", _lists.Count ) );
+			//lock( _lists )
+			//	_lists.Clear();
 		}
 
 		#endregion
