@@ -1,3 +1,5 @@
+//#define DEBUGPATTERN
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,10 +15,13 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 {
 	class FrameBuffer : IMemorySegment
 	{
+		// Framebuffer memory actually has 3 banks, I think (0x1FFFFF / 0x88000 = 3)
+		// May be set by the software to go to any of them
+
 		protected VideoDriver _driver;
 		protected Texture _texture;
 		protected Rectangle _rect;
-		protected IntPtr _buffer;
+		protected IntPtr[] _buffers;
 		protected bool _isHalfWord;
 
 		public FrameBuffer( VideoDriver driver )
@@ -68,13 +73,16 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 					_texture.Dispose();
 				_texture = null;
 
-				if( _buffer != null )
-					Marshal.FreeHGlobal( _buffer );
+				if( _buffers != null )
+				{
+					for( int n = 0; n < _buffers.Length; n++ )
+						Marshal.FreeHGlobal( _buffers[ n ] );
+					_buffers = null;
+				}
 
 				if( _driver.Device == null )
 				{
 					_texture = null;
-					_buffer = IntPtr.Zero;
 					return;
 				}
 
@@ -94,25 +102,40 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				PixelFormat pixelFormat = _driver.Properties.PixelFormat;
 				_isHalfWord = ( pixelFormat == PixelFormat.Rgb565 ) || ( pixelFormat == PixelFormat.Rgba5551 ) || ( pixelFormat == PixelFormat.Rgba4444 );
 
-				_buffer = Marshal.AllocHGlobal( 512 * 272 * 4 );
-				unsafe
+				_buffers = new IntPtr[ 3 ];
+				for( int n = 0; n < _buffers.Length; n++ )
+					_buffers[ n ] = Marshal.AllocHGlobal( 512 * 272 * 4 );
+
+				// Ideally we wouldn't have to do this
+				for( int n = 0; n < _buffers.Length; n++ )
 				{
-					if( _isHalfWord == false )
+					unsafe
 					{
-						uint* ptr = ( uint* )_buffer.ToPointer();
-						for( int n = 0; n < 512 * 272; n++ )
+						if( _isHalfWord == false )
 						{
-							*ptr = 0xFF4488CC;
-							ptr++;
+							uint* ptr = ( uint* )_buffers[ n ].ToPointer();
+							for( int m = 0; m < 512 * 272; m++ )
+							{
+#if DEBUGPATTERN
+								*ptr = 0xFF4488CC;
+#else
+								*ptr = 0xFF000000;
+#endif
+								ptr++;
+							}
 						}
-					}
-					else
-					{
-						ushort* ptr = ( ushort* )_buffer.ToPointer();
-						for( int n = 0; n < 512 * 272; n++ )
+						else
 						{
-							*ptr = 0xFFFF;
-							ptr++;
+							ushort* ptr = ( ushort* )_buffers[ n ].ToPointer();
+							for( int m = 0; m < 512 * 272; m++ )
+							{
+#if DEBUGPATTERN
+								*ptr = 0xFFFF;
+#else
+								*ptr = 0x0000;
+#endif
+								ptr++;
+							}
 						}
 					}
 				}
@@ -125,6 +148,10 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		public void Copy()
 		{
+			int currentBuffer = ( ( int )_driver.Properties.BufferAddress - 0x04000000 ) / 0x88000;
+			if( currentBuffer < 0 )
+				currentBuffer = 0;
+
 			GraphicsBuffer<int> buffer;
 			try
 			{
@@ -140,7 +167,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			unsafe
 			{
 				void* dvptr = buffer.DataBufferPointer;
-				void* svptr = _buffer.ToPointer();
+				void* svptr = _buffers[ currentBuffer ].ToPointer();
 
 				if( _isHalfWord == false )
 				{
@@ -229,13 +256,16 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		{
 			unsafe
 			{
-				void* vptr = _buffer.ToPointer();
+				address -= 0x04000000;
+
+				int currentBuffer = address / 0x88000;
+				void* vptr = _buffers[ currentBuffer ].ToPointer();
 
 				if( _isHalfWord == false )
 				{
 					uint uv = ( uint )value;
 					uint* ptr = ( uint* )vptr;
-					ptr += ( ( address - 0x04000000 ) >> 2 ); // div by 4 because we are incrementing by words instead of bytes
+					ptr += ( ( address - 0x88000 * currentBuffer ) >> 2 ); // div by 4 because we are incrementing by words instead of bytes
 					
 					// Comes at us in RGBA, need ARGB
 					uint ut = ( uv >> 8 ) | ( ( uv & 0xFF ) << 24 );
@@ -246,7 +276,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				{
 					ushort us = ( ushort )value;
 					ushort* ptr = ( ushort* )vptr;
-					ptr += ( ( address - 0x04000000 ) >> 1 ); // div by 2 because we are incrementing by half words instead of bytes
+					ptr += ( ( address - 0x88000 * currentBuffer ) >> 1 ); // div by 2 because we are incrementing by half words instead of bytes
 					*ptr = us;
 				}
 			}

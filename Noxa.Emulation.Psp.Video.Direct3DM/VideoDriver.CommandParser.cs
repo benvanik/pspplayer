@@ -143,9 +143,9 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		{
 			IMemory memory = _emulator.Cpu.Memory;
 
-			Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", list.Packets.Length ) );
+			//Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", list.Packets.Length ) );
 
-			_device.RenderState.CullMode = Cull.None;
+			_device.RenderState.CullMode = Cull.Clockwise;
 			_device.RenderState.Lighting = false;
 			_device.RenderState.AlphaBlendEnable = false;
 
@@ -155,7 +155,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			// 75 deg -> rad = 1.30899694 (1 degrees = 0.0174532925 radians)
 			_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( 1.3089969f, 16.0f / 9.0f, 0.5f, 1000.0f );
 			//_device.Transform.Projection = _context.ProjectionMatrix;
-			_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 0, 0, 7 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
+			_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 7, 7, 7 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
 			//_device.Transform.World = Matrix.RotationY( ( float )( Environment.TickCount / 10 ) % 3.14f );
 			//_device.Transform.World = Matrix.Translation( 0, 2, 0 );
 			_device.Transform.World = Matrix.Identity;
@@ -251,13 +251,14 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							{
 								// TODO: Sprite support
 								//Debugger.Break();
+								//Debug.WriteLine( string.Format( "PRIM: {0} vertices for sprites - not supported", vertexCount ) );
 							}
 							else
 							{
 								// Read all vertices
 								//int vertexSize = DetermineVertexSize( _context.VertexType );
 								int vertexSize = 16;
-								Debug.WriteLine( string.Format( "PRIM: {0} vertices of type {1} ({2} prims) in format 0x{3:X8} ({4}B/vertex)", vertexCount, primitiveType, primitiveCount, ( uint )_context.VertexType, vertexSize ) );
+								//Debug.WriteLine( string.Format( "PRIM: {0} vertices of type {1} ({2} prims) in format 0x{3:X8} ({4}B/vertex)", vertexCount, primitiveType, primitiveCount, ( uint )_context.VertexType, vertexSize ) );
 
 								uint hash = memory.GetMemoryHash( _context.VertexBufferAddress, vertexCount * vertexSize, VideoContext.MaximumCachedVertexBuffers );
 
