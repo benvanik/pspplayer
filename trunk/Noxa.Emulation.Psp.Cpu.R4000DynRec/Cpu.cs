@@ -1,7 +1,7 @@
 //#define GENTRACE
-//#define VERBOSEEMIT
+#define VERBOSEEMIT
 //#define REGISTEREMIT
-//#define STATS
+#define STATS
 #if STATS
 // note that instruction count will be wrong without this, but it's slow
 #define ACCURATESTATS

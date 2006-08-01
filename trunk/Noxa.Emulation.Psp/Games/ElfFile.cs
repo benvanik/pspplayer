@@ -582,8 +582,10 @@ namespace Noxa.Emulation.Psp.Games
 			}
 		}
 
-		public void Load( Stream stream, IEmulationInstance emulator, uint baseAddress )
+		public ElfLoadResult Load( Stream stream, IEmulationInstance emulator, uint baseAddress )
 		{
+			ElfLoadResult result = new ElfLoadResult();
+
 			// Relocate only if we need to
 			if( _needsRelocation == false )
 				baseAddress = 0;
@@ -620,16 +622,21 @@ namespace Noxa.Emulation.Psp.Games
 			}
 
 			BinaryReader reader = new BinaryReader( stream );
-			this.FixupStubs( reader, emulator.Cpu, memory, emulator.Bios );
+			result.StubFailures = this.FixupStubs( reader, emulator.Cpu, memory, emulator.Bios, baseAddress );
+
+			result.Successful = true;
+			return result;
 		}
 
-		protected void FixupStubs( BinaryReader reader, ICpu cpu, IMemory memory, IBios bios )
+		protected List<StubFailure> FixupStubs( BinaryReader reader, ICpu cpu, IMemory memory, IBios bios, uint baseAddress )
 		{
+			List<StubFailure> failures = new List<StubFailure>();
+
 			ElfSection sceModuleInfo = _sectionLookup[ ".rodata.sceModuleInfo" ];
 			reader.BaseStream.Seek( sceModuleInfo.ElfOffset, SeekOrigin.Begin );
 			ModuleInfo moduleInfo = new ModuleInfo( reader );
 
-			_globalPointer = moduleInfo.Gp;
+			_globalPointer = baseAddress + moduleInfo.Gp;
 
 			ElfSection libEnt = _sectionLookup[ ".lib.ent.top" ];
 			ElfSection libEntBottom = _sectionLookup[ ".lib.ent.btm" ];
@@ -648,7 +655,7 @@ namespace Noxa.Emulation.Psp.Games
 				reader.BaseStream.Seek( libStub.ElfOffset + 4 + ( n * 20 ), SeekOrigin.Begin );
 				StubMetadata sm = new StubMetadata( reader );
 
-				int address = ( int )sm.StringAddress;
+				int address = ( int )( baseAddress + sm.StringAddress );
 				StringBuilder sb = new StringBuilder();
 				while( true )
 				{
@@ -659,31 +666,45 @@ namespace Noxa.Emulation.Psp.Games
 					address++;
 				}
 				string moduleName = sb.ToString();
+				bool moduleFound = ( bios.FindModule( moduleName ) != null );
 
-				address = ( int )sm.NidAddress;
+				address = ( int )( baseAddress + sm.NidAddress );
 				for( int m = 0; m < sm.StubSize; m++ )
 				{
 					uint nid = ( uint )memory.ReadWord( address );
 
-					BiosFunction function = bios.FindFunction( nid );
-					if( function != null )
+					if( moduleFound == true )
 					{
-						int syscall = cpu.RegisterSyscall( nid );
-						uint instruction = ( uint )( ( syscall << 6 ) | 0xC );
+						BiosFunction function = bios.FindFunction( nid );
+						if( function != null )
+						{
+							int syscall = cpu.RegisterSyscall( nid );
+							uint instruction = ( uint )( ( syscall << 6 ) | 0xC );
 
-						int syscallAddress = ( int )sm.SyscallAddress + m * 8;
-						memory.WriteWord( syscallAddress + 4, 4, ( int )instruction );
+							int syscallAddress = ( int )( baseAddress + sm.SyscallAddress ) + m * 8;
+							memory.WriteWord( syscallAddress + 4, 4, ( int )instruction );
 
-						Debug.WriteLine( string.Format( "FixupStubs: 0x{1:X8} found and patched at 0x{2:X8} -> 0x{3:X8} {0}::{4} {5}", moduleName, nid, syscallAddress, syscall, function.Name, ( function.IsImplemented == true ) ? "" : "(NI)" ) );
+							Debug.WriteLine( string.Format( "FixupStubs: 0x{1:X8} found and patched at 0x{2:X8} -> 0x{3:X8} {0}::{4} {5}", moduleName, nid, syscallAddress, syscall, function.Name, ( function.IsImplemented == true ) ? "" : "(NI)" ) );
+							if( function.IsImplemented == false )
+								failures.Add( StubFailure.NidNotImplemented( moduleName, nid, function ) );
+						}
+						else
+						{
+							Debug.WriteLine( string.Format( "FixupStubs: {0} 0x{1:X8} not found (nid not present)", moduleName, nid ) );
+							failures.Add( StubFailure.NidNotFound( moduleName, nid ) );
+						}
 					}
 					else
 					{
-						Debug.WriteLine( string.Format( "FixupStubs: {0} 0x{1:X8} not found", moduleName, nid ) );
+						Debug.WriteLine( string.Format( "FixupStubs: {0} 0x{1:X8} not found (module not present)", moduleName, nid ) );
+						failures.Add( StubFailure.ModuleNotFound( moduleName, nid ) );
 					}
 
 					address += 4;
 				}
 			}
+
+			return failures;
 		}
 
 		protected static string ReadString( BinaryReader reader )
@@ -697,6 +718,55 @@ namespace Noxa.Emulation.Psp.Games
 				sb.Append( c );
 			}
 			return sb.ToString();
+		}
+	}
+
+	public class ElfLoadResult
+	{
+		public bool Successful;
+		public List<StubFailure> StubFailures;
+	}
+
+	public enum StubFailureType
+	{
+		ModuleNotFound,
+		NidNotFound,
+		NidNotImplemented
+	}
+
+	public class StubFailure
+	{
+		public StubFailureType FailureType;
+		public string ModuleName;
+		public uint Nid;
+		public BiosFunction Function;
+
+		public static StubFailure ModuleNotFound( string moduleName, uint nid )
+		{
+			StubFailure ret = new StubFailure();
+			ret.FailureType = StubFailureType.ModuleNotFound;
+			ret.ModuleName = moduleName;
+			ret.Nid = nid;
+			return ret;
+		}
+
+		public static StubFailure NidNotFound( string moduleName, uint nid )
+		{
+			StubFailure ret = new StubFailure();
+			ret.FailureType = StubFailureType.NidNotFound;
+			ret.ModuleName = moduleName;
+			ret.Nid = nid;
+			return ret;
+		}
+
+		public static StubFailure NidNotImplemented( string moduleName, uint nid, BiosFunction function )
+		{
+			StubFailure ret = new StubFailure();
+			ret.FailureType = StubFailureType.NidNotImplemented;
+			ret.ModuleName = moduleName;
+			ret.Nid = nid;
+			ret.Function = function;
+			return ret;
 		}
 	}
 }

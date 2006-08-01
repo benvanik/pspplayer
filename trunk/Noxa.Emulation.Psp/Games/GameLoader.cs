@@ -8,6 +8,8 @@ using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.IO;
 using System.Diagnostics;
+using System.Xml;
+using System.Text.RegularExpressions;
 
 namespace Noxa.Emulation.Psp.Games
 {
@@ -73,11 +75,69 @@ namespace Noxa.Emulation.Psp.Games
 
 			uint baseAddress = 0x08900000;
 
-			elf.Load( bootStream, instance, baseAddress );
+			ElfLoadResult result = elf.Load( bootStream, instance, baseAddress );
+//#if DEBUG
+			if( result.StubFailures.Count > 0 )
+			{
+				XmlDocument doc = new XmlDocument();
+				doc.AppendChild( doc.CreateXmlDeclaration( "1.0", null, "yes" ) );
+				XmlElement root = doc.CreateElement( "elfLoadResult" );
+				XmlElement gameRoot = doc.CreateElement( "game" );
+				gameRoot.SetAttribute( "type", game.GameType.ToString() );
+				if( game.UniqueID != null )
+					gameRoot.SetAttribute( "uniqueId", game.UniqueID );
+				gameRoot.SetAttribute( "path", EscapeFilePath( game.Folder.AbsolutePath ) );
+				{
+					XmlElement sfoRoot = doc.CreateElement( "parameters" );
+					if( game.Parameters.Title != null )
+						sfoRoot.SetAttribute( "title", game.Parameters.Title );
+					if( game.Parameters.SystemVersion != new Version() )
+						sfoRoot.SetAttribute( "systemVersion", game.Parameters.SystemVersion.ToString() );
+					if( game.Parameters.GameVersion != new Version() )
+						sfoRoot.SetAttribute( "gameVersion", game.Parameters.GameVersion.ToString() );
+					if( game.Parameters.DiscID != null )
+						sfoRoot.SetAttribute( "discId", game.Parameters.DiscID );
+					if( game.Parameters.Region >= 0 )
+						sfoRoot.SetAttribute( "region", game.Parameters.Region.ToString( "X" ) );
+					if( game.Parameters.Language != null )
+						sfoRoot.SetAttribute( "language", game.Parameters.Language );
+					sfoRoot.SetAttribute( "category", game.Parameters.Category.ToString() );
+					gameRoot.AppendChild( sfoRoot );
+				}
+				root.AppendChild( gameRoot );
+				foreach( StubFailure failure in result.StubFailures )
+				{
+					XmlElement failureRoot = doc.CreateElement( "failure" );
+					failureRoot.SetAttribute( "type", failure.FailureType.ToString() );
+					failureRoot.SetAttribute( "module", failure.ModuleName );
+					failureRoot.SetAttribute( "nid", string.Format( "{0:X8}", failure.Nid ) );
+
+					if( failure.Function != null )
+					{
+						XmlElement functionRoot = doc.CreateElement( "function" );
+						functionRoot.SetAttribute( "name", failure.Function.Name );
+						functionRoot.SetAttribute( "isImplemented", failure.Function.IsImplemented.ToString() );
+						failureRoot.AppendChild( functionRoot );
+					}
+
+					root.AppendChild( failureRoot );
+				}
+				doc.AppendChild( root );
+
+				string fileName;
+				if( game.GameType == GameType.Eboot )
+					fileName = string.Format( "ElfLoadResult-Eboot-{0}.xml", game.Parameters.Title );
+				else
+					fileName = string.Format( "ElfLoadResult-{0}.xml", game.Parameters.DiscID );
+				using( FileStream stream = File.Open( fileName, FileMode.Create ) )
+					doc.Save( stream );
+			}
+//#endif
 
 			// TODO: Move this elsewhere?
 			instance.Cpu[ 0 ].ProgramCounter = ( int )elf.InitAddress;
 			instance.Cpu[ 0 ].GeneralRegisters[ 28 ] = ( int )elf.GlobalPointer;
+			instance.Cpu[ 0 ].GeneralRegisters[ 29 ] = 0x087FFFFF;
 			instance.Cpu[ 0 ].GeneralRegisters[ 31 ] = ( int )elf.EntryAddress;
 
 			entryAddress = elf.EntryAddress;
@@ -85,6 +145,11 @@ namespace Noxa.Emulation.Psp.Games
 			upperBounds = elf.UpperAddress;
 
 			return true;
+		}
+
+		private static string EscapeFilePath( string path )
+		{
+			return path.Replace( "&", "&amp;" ).Replace( "'", "&apos;" );
 		}
 
 		public GameInformation[] FindGames( IEmulationInstance instance )
@@ -139,8 +204,8 @@ namespace Noxa.Emulation.Psp.Games
 					gameParams = ReadSfo( pdbStream );
 
 				// Only accept games
-				if( ( gameParams.Category != SfoReader.MemoryStickGameCategory ) &&
-					( gameParams.Category != SfoReader.UmdGameCategory ) )
+				if( ( gameParams.Category != GameCategory.MemoryStickGame ) &&
+					( gameParams.Category != GameCategory.UmdGame ) )
 					return null;
 
 				Stream icon = null;
@@ -176,8 +241,8 @@ namespace Noxa.Emulation.Psp.Games
 				gameParams = ReadSfo( stream );
 
 			// Only accept games
-			if( ( gameParams.Category != SfoReader.MemoryStickGameCategory ) &&
-				( gameParams.Category != SfoReader.UmdGameCategory ) )
+			if( ( gameParams.Category != GameCategory.MemoryStickGame ) &&
+				( gameParams.Category != GameCategory.UmdGame ) )
 				return null;
 
 			Stream icon = null;
@@ -200,7 +265,34 @@ namespace Noxa.Emulation.Psp.Games
 			if( reader[ "TITLE" ] != null )
 				gp.Title = reader[ "TITLE" ].Data as string;
 			if( reader[ "CATEGORY" ] != null )
-				gp.Category = reader[ "CATEGORY" ].Data as string;
+			{
+				string categoryString = reader[ "CATEGORY" ].Data as string;
+				switch( categoryString )
+				{
+					case "WG":
+						gp.Category = GameCategory.WlanGame;
+						break;
+					case "MS":
+						gp.Category = GameCategory.SaveGame;
+						break;
+					case "UG":
+						gp.Category = GameCategory.UmdGame;
+						break;
+					case "UV":
+						gp.Category = GameCategory.UmdVideo;
+						break;
+					case "UA":
+						gp.Category = GameCategory.UmdAudio;
+						break;
+					case "UC":
+						gp.Category = GameCategory.CleaningDisc;
+						break;
+					case "MG":
+					default:
+						gp.Category = GameCategory.MemoryStickGame;
+						break;
+				}
+			}
 			if( reader[ "DISC_ID" ] != null )
 				gp.DiscID = reader[ "DISC_ID" ].Data as string;
 			if( reader[ "DISC_VERSION" ] != null )
@@ -209,6 +301,8 @@ namespace Noxa.Emulation.Psp.Games
 				gp.SystemVersion = new Version( reader[ "PSP_SYSTEM_VER" ].Data as string );
 			if( reader[ "REGION" ] != null )
 				gp.Region = ( int )reader[ "REGION" ].Data;
+			if( reader[ "LANGUAGE" ] != null )
+				gp.Language = reader[ "LANGUAGE" ].Data as string;
 			
 			return gp;
 		}
