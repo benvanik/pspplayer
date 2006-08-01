@@ -145,19 +145,18 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 			//Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", list.Packets.Length ) );
 
-			_device.RenderState.CullMode = Cull.Clockwise;
+			_device.RenderState.CullMode = Cull.None;
 			_device.RenderState.Lighting = false;
 			_device.RenderState.AlphaBlendEnable = false;
 
 			//_device.Transform.Projection = Matrix.PerspectiveLeftHanded( 480, 272, 0.1f, 40.0f );
 			//sceGumPerspective( 75.0f, 16.0f / 9.0f, 0.5f, 1000.0f );
-			//_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( ( float )Math.PI / 3.0f, 480.0f / 272.0f, 0.1f, 1000.0f );
+			_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( ( float )Math.PI / 3.0f, 480.0f / 272.0f, 0.1f, 1000.0f );
 			// 75 deg -> rad = 1.30899694 (1 degrees = 0.0174532925 radians)
-			_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( 1.3089969f, 16.0f / 9.0f, 0.5f, 1000.0f );
+			//_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( 1.3089969f, 16.0f / 9.0f, 0.5f, 1000.0f );
 			//_device.Transform.Projection = _context.ProjectionMatrix;
-			_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 7, 7, 7 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
-			//_device.Transform.World = Matrix.RotationY( ( float )( Environment.TickCount / 10 ) % 3.14f );
-			//_device.Transform.World = Matrix.Translation( 0, 2, 0 );
+			_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 0, 0, 1 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
+			//_device.Transform.View = Matrix.Identity;
 			_device.Transform.World = Matrix.Identity;
 			
 			for( int n = 0; n < list.Packets.Length; n++ )
@@ -172,7 +171,6 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 					//case VideoCommand.LTE2:
 					//case VideoCommand.LTE3:
 					//case VideoCommand.CPE:
-					//case VideoCommand.BCE:
 					//case VideoCommand.TME:
 					//case VideoCommand.FGE:
 					//case VideoCommand.DTE:
@@ -180,13 +178,71 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 					//case VideoCommand.ATE:
 					//case VideoCommand.ZTE:
 					//case VideoCommand.STE:
-					//case VideoCommand.AAE:
 					//case VideoCommand.PCE:
 					//case VideoCommand.CTE:
 					//case VideoCommand.LOE:
 					//    break;
 
 					case VideoCommand.CLEAR:
+						break;
+
+					case VideoCommand.SHADE:
+						// 0 = flat, 1 = shaded
+						if( packet.Argument == 0 )
+							_device.RenderState.ShadeMode = ShadeMode.Flat;
+						else
+							_device.RenderState.ShadeMode = ShadeMode.Gouraud;
+						break;
+					case VideoCommand.BCE:
+						_device.RenderState.CullMode = ( packet.Argument == 0 ? Cull.None : _device.RenderState.CullMode );
+						break;
+					case VideoCommand.FFACE:
+						// 0 = clockwise visible, 1 = counter-clockwise visible
+						if( packet.Argument == 0 )
+							_device.RenderState.CullMode = Cull.CounterClockwise;
+						else
+							_device.RenderState.CullMode = Cull.Clockwise;
+						break;
+					case VideoCommand.AAE:
+						// Anti-aliasing is ignored - controlled by the video driver properties
+						break;
+
+					case VideoCommand.FGE:
+						_device.RenderState.FogEnable = ( packet.Argument == 1 );
+						break;
+					case VideoCommand.FCOL:
+						{
+							int color = ( packet.Argument & 0x0000FF00 ) | unchecked( ( int )0xFF000000 );
+							color |= ( ( packet.Argument & 0x00FF0000 ) >> 16 );
+							color |= ( ( packet.Argument & 0x000000FF ) << 16 );
+							_device.RenderState.FogColorValue = color;
+						}
+						break;
+					case VideoCommand.FDIST:
+						_device.RenderState.FogStart = packet.ArgumentF;
+						break;
+					case VideoCommand.FFAR:
+						_device.RenderState.FogEnd = packet.ArgumentF;
+						break;
+
+					case VideoCommand.ALA:
+						{
+							int ambient = _device.RenderState.AmbientValue;
+							ambient &= 0x00FFFFFF;
+							ambient |= packet.Argument << 24;
+							_device.RenderState.AmbientValue = ambient;
+						}
+						break;
+					case VideoCommand.ALC:
+						{
+							// Ambient color in BGR format - need to flip
+							int ambient = _device.RenderState.AmbientValue;
+							ambient &= unchecked( ( int )0xFF000000 );
+							ambient |= ( ( packet.Argument & 0x00FF0000 ) >> 16 );
+							ambient |= ( packet.Argument & 0x0000FF00 );
+							ambient |= ( ( packet.Argument & 0x000000FF ) << 16 );
+							_device.RenderState.AmbientValue = ambient;
+						}
 						break;
 
 					case VideoCommand.FBP:
@@ -272,14 +328,16 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 									// TODO: Optimize cpu->ge memory reads
 									memory.ReadStream( _context.VertexBufferAddress, _context.MemoryBuffer, vertexCount * vertexSize );
 
+									// TODO: Don't use a fucking BinaryReader, you noob ^_^
 									// Need to convert bytes to some kind of D3D vertex listing
 									PositionColored[] verts = new PositionColored[ vertexCount ];
 									BinaryReader reader = _context.MemoryReader;
 									{
 										for( int m = 0; m < vertexCount; m++ )
 										{
-											// 4 bytes color
+											// 4 bytes color - need to swizzle cause in AABBGGRR format
 											int c = reader.ReadInt32();
+											c = ( c & unchecked( ( int )0xFF00FF00 ) ) | ( ( c & 0x00FF0000 ) >> 16 ) | ( ( c & 0x000000FF ) << 16 );
 
 											// 3 float xyz
 											float x = reader.ReadSingle();
@@ -316,7 +374,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							_context.MatrixIndex = 0;
 							_context.ProjectionMatrix = BuildMatrix4x4( _context.MatrixTemp );
-							//_device.Transform.Projection = _context.ProjectionMatrix;
+							_device.Transform.Projection = _context.ProjectionMatrix;
 						}
 						break;
 					case VideoCommand.VIEW: // 3x4
@@ -325,7 +383,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							_context.MatrixIndex = 0;
 							_context.ViewMatrix = BuildMatrix3x4( _context.MatrixTemp );
-							//_device.Transform.View = _context.ViewMatrix;
+							_device.Transform.View = _context.ViewMatrix;
 						}
 						break;
 					case VideoCommand.WORLD: // 3x4

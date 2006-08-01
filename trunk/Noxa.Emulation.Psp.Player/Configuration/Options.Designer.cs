@@ -30,7 +30,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager( typeof( Options ) );
 			this.whidbeyTabControl1 = new Noxa.Utilities.Controls.WhidbeyTabControl();
-			this.whidbeyTabPage1 = ( ( Noxa.Utilities.Controls.WhidbeyTabPage )( new Noxa.Utilities.Controls.WhidbeyTabPage() ) );
+			this.whidbeyTabPage1 = new Noxa.Utilities.Controls.WhidbeyTabPage();
 			this.networkLinkLabel = new System.Windows.Forms.LinkLabel();
 			this.inputLinkLabel = new System.Windows.Forms.LinkLabel();
 			this.gameMediaLinkLabel = new System.Windows.Forms.LinkLabel();
@@ -202,7 +202,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 			// 
 			// graphicalHeader7
 			// 
-			this.graphicalHeader7.Location = new System.Drawing.Point( 310, 176 );
+			this.graphicalHeader7.Location = new System.Drawing.Point( 304, 176 );
 			this.graphicalHeader7.Name = "graphicalHeader7";
 			this.graphicalHeader7.Size = new System.Drawing.Size( 293, 22 );
 			this.graphicalHeader7.TabIndex = 32;
@@ -230,7 +230,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 			// 
 			// graphicalHeader8
 			// 
-			this.graphicalHeader8.Location = new System.Drawing.Point( 310, 262 );
+			this.graphicalHeader8.Location = new System.Drawing.Point( 304, 262 );
 			this.graphicalHeader8.Name = "graphicalHeader8";
 			this.graphicalHeader8.Size = new System.Drawing.Size( 293, 22 );
 			this.graphicalHeader8.TabIndex = 25;
