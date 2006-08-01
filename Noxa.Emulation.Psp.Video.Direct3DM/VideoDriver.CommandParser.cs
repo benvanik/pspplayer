@@ -114,6 +114,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		public int IndexBufferAddress;
 
 		public VertexTypes VertexType;
+		public int VertexTypeValue;
 		public bool VerticesTransformed;
 		public int MorphingVertexCount;
 		public int SkinningWeightCount;
@@ -122,6 +123,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		public const uint MaximumCachedVertexBuffers = 4703;
 		public Dictionary<uint, VertexBuffer> CachedVertexBuffers = new Dictionary<uint, VertexBuffer>( ( int )MaximumCachedVertexBuffers );
+		public Dictionary<int, int> VertexTypeSizes = new Dictionary<int, int>( 128 );
 	}
 
 	partial class VideoDriver
@@ -260,6 +262,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						_context.SkinningWeightCount = ( type >> 14 ) & 0x3;
 						_context.MorphingVertexCount = ( type >> 18 ) & 0x3;
 						_context.VertexType = ( VertexTypes )( type & 0x1FFF );
+						_context.VertexTypeValue = type & 0x1FFF;
 						break;
 					case VideoCommand.VADDR:
 						_context.VertexBufferAddress = packet.Argument;
@@ -311,8 +314,17 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							}
 							else
 							{
-								//int vertexSize = DetermineVertexSize( _context.VertexType );
-								int vertexSize = 16;
+								// This could be optimized somehow
+								int vertexSize;
+								if( _context.VertexTypeSizes.ContainsKey( _context.VertexTypeValue ) == true )
+									vertexSize = _context.VertexTypeSizes[ _context.VertexTypeValue ];
+								else
+								{
+									//vertexSize = DetermineVertexSize( _context.VertexType );
+									vertexSize = 16;
+									_context.VertexTypeSizes.Add( _context.VertexTypeValue, vertexSize );
+								}
+
 								//Debug.WriteLine( string.Format( "PRIM: {0} vertices of type {1} ({2} prims) in format 0x{3:X8} ({4}B/vertex)", vertexCount, primitiveType, primitiveCount, ( uint )_context.VertexType, vertexSize ) );
 
 								// Get

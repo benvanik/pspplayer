@@ -2626,18 +2626,18 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				}
 				else if( pass == 1 )
 				{
+					// It's important that we save what we think is the current PC
+					// If we had an UpdatePc, it means a branch has updated it before us
+					// and we need to save it - otherwise, save the PC following us
+					context.ILGen.Emit( OpCodes.Ldarg_0 );
+					if( context.UpdatePc == true )
+						context.ILGen.Emit( OpCodes.Ldloc_2 );
+					else
+						context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
+					context.ILGen.Emit( OpCodes.Stfld, context.Core0Pc );
+
 					if( willCall == true )
 					{
-						// It's important that we save what we think is the current PC
-						// If we had an UpdatePc, it means a branch has updated it before us
-						// and we need to save it - otherwise, save the PC following us
-						context.ILGen.Emit( OpCodes.Ldarg_0 );
-						if( context.UpdatePc == true )
-							context.ILGen.Emit( OpCodes.Ldloc_2 );
-						else
-							context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
-						context.ILGen.Emit( OpCodes.Stfld, context.Core0Pc );
-
 						// Lame, but we need the object this gets called on and
 						// there is no way to communicate what we know now to the final IL
 						//context.Cpu._syscalls[ syscall ].Target.Target;

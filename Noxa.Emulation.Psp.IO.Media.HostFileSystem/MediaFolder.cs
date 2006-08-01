@@ -306,7 +306,8 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 
 				// Possible we are the root
 				if( _parent == null )
-					return Path.Combine( _device.HostPath, _info.Name );
+					//return Path.Combine( _device.HostPath, _info.Name );
+					return _device.HostPath;
 				else
 					return Path.Combine( _parent.AbsolutePath, _info.Name );
 			}

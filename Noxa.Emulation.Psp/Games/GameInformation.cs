@@ -13,14 +13,26 @@ namespace Noxa.Emulation.Psp.Games
 		UmdGame
 	}
 
+	public enum GameCategory
+	{
+		WlanGame,			// WG
+		SaveGame,			// MS
+		MemoryStickGame,	// MG
+		UmdGame,			// UG
+		UmdVideo,			// UV
+		UmdAudio,			// UA
+		CleaningDisc		// UC
+	}
+	
 	public class GameParameters
 	{
-		public string Category = "MG"; // No clue what this is ^_^
-		public int Region = 0;
+		public GameCategory Category = GameCategory.MemoryStickGame;
+		public int Region = -1;
 		public string Title = "Unknown";
 		public string DiscID = null;
 		public Version GameVersion = new Version();
 		public Version SystemVersion = new Version();
+		public string Language = null;
 	}
 
 	public class GameInformation

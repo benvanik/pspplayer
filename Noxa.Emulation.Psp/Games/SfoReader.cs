@@ -24,10 +24,6 @@ namespace Noxa.Emulation.Psp.Games
 			public object Data;
 		}
 
-		public const string MemoryStickSaveGameCategory = "MS";
-		public const string MemoryStickGameCategory = "MG";
-		public const string UmdGameCategory = "UG";
-
 		public SfoReader( Stream stream )
 		{
 			BinaryReader reader = new BinaryReader( stream );
