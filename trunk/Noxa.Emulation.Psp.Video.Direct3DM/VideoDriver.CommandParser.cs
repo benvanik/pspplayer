@@ -151,11 +151,11 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 			//_device.Transform.Projection = Matrix.PerspectiveLeftHanded( 480, 272, 0.1f, 40.0f );
 			//sceGumPerspective( 75.0f, 16.0f / 9.0f, 0.5f, 1000.0f );
-			_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( ( float )Math.PI / 3.0f, 480.0f / 272.0f, 0.1f, 1000.0f );
+			//_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( ( float )Math.PI / 3.0f, 480.0f / 272.0f, 0.1f, 1000.0f );
 			// 75 deg -> rad = 1.30899694 (1 degrees = 0.0174532925 radians)
 			//_device.Transform.Projection = Matrix.PerspectiveFieldOfViewLeftHanded( 1.3089969f, 16.0f / 9.0f, 0.5f, 1000.0f );
 			//_device.Transform.Projection = _context.ProjectionMatrix;
-			_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 0, 0, 1 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
+			//_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 0, 0, 1 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
 			//_device.Transform.View = Matrix.Identity;
 			_device.Transform.World = Matrix.Identity;
 			
@@ -311,11 +311,11 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							}
 							else
 							{
-								// Read all vertices
 								//int vertexSize = DetermineVertexSize( _context.VertexType );
 								int vertexSize = 16;
 								//Debug.WriteLine( string.Format( "PRIM: {0} vertices of type {1} ({2} prims) in format 0x{3:X8} ({4}B/vertex)", vertexCount, primitiveType, primitiveCount, ( uint )_context.VertexType, vertexSize ) );
 
+								// Get
 								uint hash = memory.GetMemoryHash( _context.VertexBufferAddress, vertexCount * vertexSize, VideoContext.MaximumCachedVertexBuffers );
 
 								VertexBuffer vb = null;
@@ -401,7 +401,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							_context.MatrixIndex = 0;
 							_context.TextureMatrix = BuildMatrix3x4( _context.MatrixTemp );
-							//_device.Transform.Texture0 = _context.TextureMatrix;
+							_device.Transform.Texture0 = _context.TextureMatrix;
 						}
 						break;
 
