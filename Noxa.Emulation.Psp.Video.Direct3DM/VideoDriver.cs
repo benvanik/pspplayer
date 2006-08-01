@@ -49,6 +49,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 			_listSync = new AutoResetEvent( false );
 			_lists = new List<DisplayList>( 5 );
+
+			_vblankSync = new AutoResetEvent( false );
 		}
 
 		public ComponentParameters Parameters
@@ -172,7 +174,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		private bool CreateDevice()
 		{
 			_presentParams = new PresentParameters();
-			_presentParams.PresentationInterval = PresentInterval.Immediate;
+			_presentParams.PresentationInterval = PresentInterval.One;
 			_presentParams.PresentFlag = PresentFlag.LockableBackBuffer;
 			_presentParams.SwapEffect = SwapEffect.Flip;
 			_presentParams.IsWindowed = true;

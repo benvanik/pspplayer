@@ -1,4 +1,5 @@
-//#define VERBOSEEMIT
+//#define GENTRACE
+#define VERBOSEEMIT
 //#define REGISTEREMIT
 #define STATS
 // note that instruction count will be wrong without this, but it's slow
@@ -36,10 +37,13 @@ namespace Noxa.Emulation.Psp.Cpu
 		internal int _lastSyscall;
 		internal BiosFunction[] _syscalls;
 
+#if DEBUG
+		protected bool _debug = false;
+#endif
+
 #if STATS
 		protected PerformanceTimer _timer;
 		protected double _timeSinceLastIpsPrint;
-		protected bool _debug = false;
 
 		protected struct RuntimeStatistics
 		{
@@ -257,8 +261,8 @@ namespace Noxa.Emulation.Psp.Cpu
 			{
 				int address = _core0.Pc;
 				address = _core0.TranslateAddress( address );
-				if( address == 0x89005fc )
-					_debug = true;
+				//if( address == 0x89005fc )
+				//	_debug = true;
 				//if( address == 0x089004D0 )
 				//	_debug = true;
 				//if( address == 0x8900350 )
@@ -390,7 +394,9 @@ namespace Noxa.Emulation.Psp.Cpu
 
 			_context.Reset( ilgen, startAddress );
 			
+#if GENTRACE
 			Debug.WriteLine( string.Format( "Starting generate for block at 0x{0:X8}", startAddress ) );
+#endif
 
 			bool jumpDelay = false;
 			GenerationResult lastResult = GenerationResult.Success;
@@ -411,11 +417,13 @@ namespace Noxa.Emulation.Psp.Cpu
 				{
 					GenerationResult result = GenerationResult.Invalid;
 
+#if DEBUG
 					if( ( pass == 1 ) && ( _debug == true ) )
 					{
 						//Debug.WriteLine( string.Format( "generating instr at 0x{0:X8}", address ) );
 						EmitRegisterPrint( ilgen );
 					}
+#endif
 
 #if ACCURATESTATS
 					if( pass == 1 )
@@ -839,8 +847,10 @@ namespace Noxa.Emulation.Psp.Cpu
 		[Conditional( "VERBOSEEMIT" )]
 		internal void EmitDebugInfo( GenerationContext context, int address, uint code, string name, string args )
 		{
+#if DEBUG
 			if( _debug == false )
 				return;
+#endif
 
 			string line = string.Format( "[0x{0:X8}] {1:X8} {2:8} {3}",
 				address, code, name, args );
