@@ -1,3 +1,5 @@
+//#define CACHESMALLFILES
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,10 +10,12 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 {
 	class MediaFile : IMediaFile
 	{
+#if CACHESMALLFILES
 		/// <summary>
 		/// Files under this size will be cached in their own memory streams.
 		/// </summary>
-		public const int MaximumCachableStreamSize = 4 * 1024 * 1024;
+		public const int MaximumCachableFileSize = 4 * 1024 * 1024;
+#endif
 
 		protected UmdDevice _device;
 		protected MediaFolder _parent;
@@ -73,11 +77,11 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 			if( access != MediaFileAccess.Read )
 				return null;
 
-			Stream stream = _device.OpenStream();
-			stream.Seek( _position, SeekOrigin.Begin );
+			Stream stream = _device.OpenStream( _position, _length );
 
 			// If the file is under 2mb, load it in to memory
-			if( _length < MaximumCachableStreamSize )
+#if CACHESMALLFILES
+			if( _length < MaximumCachableFileSize )
 			{
 				byte[] buffer = new byte[ _length ];
 				stream.Read( buffer, 0, buffer.Length );
@@ -89,6 +93,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 
 				return memoryStream;
 			}
+#endif
 
 			return stream;
 		}
