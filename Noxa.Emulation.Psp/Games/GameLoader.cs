@@ -227,16 +227,11 @@ namespace Noxa.Emulation.Psp.Games
 			//[4 alpha country code]-[4 digit game id]|16 digit binhex|0001|G
 			// Get code from SFO
 			string uniqueId;
-			using( Stream stream = umdData.OpenRead() )
+			using( StreamReader reader = new StreamReader( umdData.OpenRead() ) )
 			{
-				byte[] buffer = new byte[ umdData.Length ];
-				stream.Read( buffer, 0, ( int )umdData.Length );
-				using( StreamReader reader = new StreamReader( new MemoryStream( buffer, false ) ) )
-				{
-					string line = reader.ReadToEnd().Trim();
-					string[] ps = line.Split( '|' );
-					uniqueId = ps[ 1 ];
-				}
+				string line = reader.ReadToEnd().Trim();
+				string[] ps = line.Split( '|' );
+				uniqueId = ps[ 1 ];
 			}
 
 			IMediaFile sfoData = folder.FindFile( @"PSP_GAME\PARAM.SFO" );

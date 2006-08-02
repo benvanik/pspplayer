@@ -52,6 +52,7 @@
       <DependentUpon>MediaConfiguration.cs</DependentUpon>
     </Compile>
     <Compile Include="IsoFileSystem.cs" />
+    <Compile Include="IsoStream.cs" />
     <Compile Include="MediaFile.cs" />
     <Compile Include="MediaFolder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

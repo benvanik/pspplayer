@@ -137,9 +137,12 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 			_root = null;
 		}
 
-		internal Stream OpenStream()
+		internal Stream OpenStream( long position, long length )
 		{
-			return File.Open( _hostPath, FileMode.Open, FileAccess.Read, FileShare.Read );
+			Stream fileStream = File.Open( _hostPath, FileMode.Open, FileAccess.Read, FileShare.Read );
+			fileStream.Position = position;
+
+			return new IsoStream( fileStream, position, length );
 		}
 	}
 }
