@@ -207,6 +207,8 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			{
 				if( _device.IsReadOnly == true )
 					return false;
+				if( destination.Device.IsReadOnly == true )
+					return false;
 
 				this.Refresh();
 
@@ -227,7 +229,7 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 
 		public bool CopyTo( IMediaFolder destination )
 		{
-			if( _device.IsReadOnly == true )
+			if( destination.Device.IsReadOnly == true )
 				return false;
 
 			// TODO: File copy

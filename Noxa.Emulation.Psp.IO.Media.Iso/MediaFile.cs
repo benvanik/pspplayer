@@ -2,46 +2,105 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp.IO.Media.Iso
 {
 	class MediaFile : IMediaFile
 	{
-		public long Length
+		/// <summary>
+		/// Files under this size will be cached in their own memory streams.
+		/// </summary>
+		public const int MaximumCachableStreamSize = 4 * 1024 * 1024;
+
+		protected UmdDevice _device;
+		protected MediaFolder _parent;
+		protected string _name;
+		protected MediaItemAttributes _attributes;
+		protected DateTime _timestamp;
+		protected long _position;
+		protected long _length;
+
+		internal MediaFile( UmdDevice device, MediaFolder parent, string name, MediaItemAttributes attributes, DateTime timestamp, long position, long length )
 		{
-			get
-			{
-				throw new Exception( "The method or operation is not implemented." );
-			}
+			Debug.Assert( device != null );
+			Debug.Assert( parent != null );
+			Debug.Assert( name != null );
+			Debug.Assert( name.Length > 0 );
+
+			_device = device;
+			_parent = parent;
+
+			_name = name;
+			_attributes = attributes;
+			_timestamp = timestamp;
+			_position = position;
+			_length = length;
+
+			// Add to parent
+			if( _parent != null )
+				_parent.AddItemInternal( this );
 		}
 
 		public IMediaDevice Device
 		{
 			get
 			{
-				return null;
+				return _device;
+			}
+		}
+
+		public long Length
+		{
+			get
+			{
+				return _length;
 			}
 		}
 
 		public Stream OpenRead()
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			return this.Open( MediaFileMode.Normal, MediaFileAccess.Read );
 		}
 
 		public Stream Open( MediaFileMode mode, MediaFileAccess access )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			Debug.Assert( mode == MediaFileMode.Normal );
+			if( mode != MediaFileMode.Normal )
+				return null;
+
+			Debug.Assert( access == MediaFileAccess.Read );
+			if( access != MediaFileAccess.Read )
+				return null;
+
+			Stream stream = _device.OpenStream();
+			stream.Seek( _position, SeekOrigin.Begin );
+
+			// If the file is under 2mb, load it in to memory
+			if( _length < MaximumCachableStreamSize )
+			{
+				byte[] buffer = new byte[ _length ];
+				stream.Read( buffer, 0, buffer.Length );
+
+				MemoryStream memoryStream = new MemoryStream( buffer, false );
+
+				stream.Dispose();
+				stream = null;
+
+				return memoryStream;
+			}
+
+			return stream;
 		}
 
 		public string Name
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _name;
 			}
 			set
 			{
-				throw new Exception( "The method or operation is not implemented." );
 			}
 		}
 
@@ -49,7 +108,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _parent;
 			}
 		}
 
@@ -57,7 +116,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return Path.Combine( _parent.AbsolutePath, _name );
 			}
 		}
 
@@ -65,11 +124,10 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _attributes;
 			}
 			set
 			{
-				throw new Exception( "The method or operation is not implemented." );
 			}
 		}
 
@@ -77,11 +135,10 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _timestamp;
 			}
 			set
 			{
-				throw new Exception( "The method or operation is not implemented." );
 			}
 		}
 
@@ -89,11 +146,10 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _timestamp;
 			}
 			set
 			{
-				throw new Exception( "The method or operation is not implemented." );
 			}
 		}
 
@@ -101,11 +157,10 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return DateTime.Now;
 			}
 			set
 			{
-				throw new Exception( "The method or operation is not implemented." );
 			}
 		}
 
@@ -113,23 +168,27 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				// TODO: Support symbolic links - maybe?
+				return false;
 			}
 		}
 
 		public bool MoveTo( IMediaFolder destination )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			return false;
 		}
 
 		public bool CopyTo( IMediaFolder destination )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			if( destination.Device.IsReadOnly == true )
+				return false;
+
+			// TODO: File copy
+			throw new NotImplementedException();
 		}
 
 		public void Delete()
 		{
-			throw new Exception( "The method or operation is not implemented." );
 		}
 	}
 }

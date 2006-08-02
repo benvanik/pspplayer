@@ -31,7 +31,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso.Configuration
 			this.label2 = new System.Windows.Forms.Label();
 			this.pathTextBox = new System.Windows.Forms.TextBox();
 			this.browseButton = new System.Windows.Forms.Button();
-			this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
 			this.panel.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -71,9 +71,12 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso.Configuration
 			this.browseButton.UseVisualStyleBackColor = true;
 			this.browseButton.Click += new System.EventHandler( this.BrowseButtonClick );
 			// 
-			// folderBrowserDialog
+			// openFileDialog
 			// 
-			this.folderBrowserDialog.Description = "Select a root folder for the device.";
+			this.openFileDialog.Filter = "Image files|*.iso|All files|*.*";
+			this.openFileDialog.RestoreDirectory = true;
+			this.openFileDialog.SupportMultiDottedExtensions = true;
+			this.openFileDialog.Title = "Open Image";
 			// 
 			// MediaConfiguration
 			// 
@@ -91,7 +94,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso.Configuration
 		private System.Windows.Forms.Button browseButton;
 		private System.Windows.Forms.TextBox pathTextBox;
 		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+		private System.Windows.Forms.OpenFileDialog openFileDialog;
 
 	}
 }

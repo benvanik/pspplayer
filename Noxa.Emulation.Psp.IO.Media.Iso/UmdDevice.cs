@@ -6,26 +6,61 @@ using System.IO;
 
 namespace Noxa.Emulation.Psp.IO.Media.Iso
 {
-	class UmdDevice : IMediaDevice
+	partial class UmdDevice : IMediaDevice
 	{
 		protected IEmulationInstance _emulator;
-		protected string _path;
+		protected ComponentParameters _parameters;
+		protected string _description;
+		protected MediaState _state;
+		protected string _hostPath;
+		protected long _capacity;
 
-		public UmdDevice( IEmulationInstance emulator, string path )
+		protected MediaFolder _root;
+
+		public UmdDevice( IEmulationInstance emulator, ComponentParameters parameters, string hostPath )
 		{
 			Debug.Assert( emulator != null );
-			Debug.Assert( path != null );
-			Debug.Assert( File.Exists( path ) == true );
+			Debug.Assert( parameters != null );
+			Debug.Assert( hostPath != null );
+			Debug.Assert( File.Exists( hostPath ) == true );
 
 			_emulator = emulator;
-			_path = path;
+			_parameters = parameters;
+			_hostPath = hostPath;
+
+			FileInfo fi = new FileInfo( hostPath );
+			_capacity = fi.Length;
+
+			_root = ParseIsoFileSystem( hostPath );
+			Debug.Assert( _root != null );
+			_root.CalculateSize();
+			
+			// Would be nice to do something with this that was official-like (serial number?)
+			_description = string.Format( "UMD ({0}MB)",
+				_capacity / 1024 / 1024 );
+		}
+
+		public ComponentParameters Parameters
+		{
+			get
+			{
+				return _parameters;
+			}
+		}
+
+		public IEmulationInstance Emulator
+		{
+			get
+			{
+				return _emulator;
+			}
 		}
 
 		public string Description
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _description;
 			}
 		}
 
@@ -33,7 +68,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				return MediaState.Present;
+				return _state;
 			}
 		}
 
@@ -57,7 +92,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _hostPath;
 			}
 		}
 
@@ -65,7 +100,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _root;
 			}
 		}
 
@@ -73,7 +108,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return _capacity;
 			}
 		}
 
@@ -81,39 +116,30 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		{
 			get
 			{
-				throw new Exception( "The method or operation is not implemented." );
+				return 0;
 			}
 		}
 
 		public void Refresh()
 		{
-			throw new Exception( "The method or operation is not implemented." );
 		}
 
 		public void Eject()
 		{
-			throw new Exception( "The method or operation is not implemented." );
-		}
-
-		public ComponentParameters Parameters
-		{
-			get
-			{
-				throw new Exception( "The method or operation is not implemented." );
-			}
-		}
-
-		public IEmulationInstance Emulator
-		{
-			get
-			{
-				throw new Exception( "The method or operation is not implemented." );
-			}
+			if( _state == MediaState.Present )
+				_state = MediaState.Ejected;
+			else
+				_state = MediaState.Present;
 		}
 
 		public void Cleanup()
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			_root = null;
+		}
+
+		internal Stream OpenStream()
+		{
+			return File.Open( _hostPath, FileMode.Open, FileAccess.Read, FileShare.Read );
 		}
 	}
 }
