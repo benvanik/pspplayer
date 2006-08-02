@@ -6,7 +6,7 @@ using Noxa.Emulation.Psp.IO.Media.Iso.Configuration;
 
 namespace Noxa.Emulation.Psp.IO.Media.Iso
 {
-	class IsoFileSystem : IComponent
+	public class IsoFileSystem : IComponent
 	{
 		public ComponentType Type
 		{
@@ -97,7 +97,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 				return null;
 			}
 
-			return new UmdDevice( emulator, path );
+			return new UmdDevice( emulator, parameters, path );
 		}
 	}
 }

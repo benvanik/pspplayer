@@ -245,6 +245,8 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 		{
 			if( _device.IsReadOnly == true )
 				return false;
+			if( destination.Device.IsReadOnly == true )
+				return false;
 
 			IMediaItem item = this[ name ];
 			if( item == null )
@@ -254,7 +256,7 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 
 		public bool CopyItem( string name, IMediaFolder destination )
 		{
-			if( _device.IsReadOnly == true )
+			if( destination.Device.IsReadOnly == true )
 				return false;
 
 			IMediaItem item = this[ name ];
@@ -307,7 +309,7 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 				// Possible we are the root
 				if( _parent == null )
 					//return Path.Combine( _device.HostPath, _info.Name );
-					return _device.HostPath;
+					return "";
 				else
 					return Path.Combine( _parent.AbsolutePath, _info.Name );
 			}
@@ -401,6 +403,8 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			{
 				if( _device.IsReadOnly == true )
 					return false;
+				if( destination.Device.IsReadOnly == true )
+					return false;
 
 				this.Refresh();
 
@@ -421,7 +425,7 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 
 		public bool CopyTo( IMediaFolder destination )
 		{
-			if( _device.IsReadOnly == true )
+			if( destination.Device.IsReadOnly == true )
 				return false;
 
 			// TODO: Folder copy

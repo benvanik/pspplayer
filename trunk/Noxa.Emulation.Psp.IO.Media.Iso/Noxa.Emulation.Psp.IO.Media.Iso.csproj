@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,6 +35,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -54,6 +56,7 @@
     <Compile Include="MediaFolder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UmdDevice.cs" />
+    <Compile Include="UmdDevice.FileSystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">

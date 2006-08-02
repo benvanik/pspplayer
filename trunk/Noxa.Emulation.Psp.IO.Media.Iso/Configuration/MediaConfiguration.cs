@@ -39,9 +39,9 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso.Configuration
 
 		private void BrowseButtonClick( object sender, EventArgs e )
 		{
-			if( this.folderBrowserDialog.ShowDialog( this ) == DialogResult.OK )
+			if( this.openFileDialog.ShowDialog( this ) == DialogResult.OK )
 			{
-				string path = this.folderBrowserDialog.SelectedPath;
+				string path = this.openFileDialog.FileName;
 				this.pathTextBox.Text = path;
 			}
 		}
