@@ -9,6 +9,15 @@ using Noxa.Emulation.Psp.Bios;
 
 namespace Noxa.Emulation.Psp.Games
 {
+	// Unfortunately when it comes to relocating elf files, there is very little info besides the data structures
+	// Had to go to the source to figure things out :(
+	// Also a thing to keep in mind is that the prx files (what games are) are different than normal elfs (what
+	// pspsdk usually spits out) - basically the same, but different types, sections and such.
+
+	// Helpful links:
+	// http://www.sco.com/developers/devspecs/mipsabi.pdf
+	// http://glide.stanford.edu/lxr/source/arch/mips/kernel/module-elf32.c?v=linux-2.6.10#L189
+
 	class ElfFile
 	{
 		protected ElfType _programType;
@@ -21,6 +30,7 @@ namespace Noxa.Emulation.Psp.Games
 
 		protected List<ElfSection> _sections = new List<ElfSection>();
 		protected List<ElfSection> _allocSections = new List<ElfSection>();
+		protected List<ElfSection> _relocSections = new List<ElfSection>();
 		protected Dictionary<string, ElfSection> _sectionLookup = new Dictionary<string, ElfSection>();
 
 		List<ElfSymbol> _symbols = new List<ElfSymbol>();
@@ -452,7 +462,7 @@ namespace Noxa.Emulation.Psp.Games
 
 			_programType = ( ElfType )ehdr.Type;
 			_entryAddress = ehdr.Entry;
-
+			
 			reader.BaseStream.Seek( ehdr.Phoff, SeekOrigin.Begin );
 			List<NativeElfPhdr> phdrs = new List<NativeElfPhdr>();
 			for( int n = 0; n < ehdr.Phnum; n++ )
@@ -479,6 +489,12 @@ namespace Noxa.Emulation.Psp.Games
 				_sections.Add( section );
 				if( ( section.Flags & ElfSectionFlags.Alloc ) == ElfSectionFlags.Alloc )
 					_allocSections.Add( section );
+
+				if( ( ( _programType == ElfType.Executable ) &&
+						( section.SectionType == ElfSectionType.Relocation ) ) ||
+						( ( _programType == ElfType.Prx ) &&
+						( section.SectionType == ElfSectionType.PrxReloc ) ) )
+					_relocSections.Add( section );
 			}
 
 			uint nameBase = _sections[ ehdr.Shstrndx ].ElfOffset;
@@ -501,7 +517,7 @@ namespace Noxa.Emulation.Psp.Games
 			}
 
 			_initAddress = _sectionLookup[ ".init" ].Address;
-
+			
 			if( _sectionLookup.ContainsKey( ".symtab" ) == true )
 			{
 				ElfSection symtab = _sectionLookup[ ".symtab" ];
@@ -522,63 +538,296 @@ namespace Noxa.Emulation.Psp.Games
 					symbol.Name = ReadString( reader );
 
 					_symbols.Add( symbol );
+
+					if( symbol.Index != ElfAbsoluteSymbol )
+					{
+						ElfSection symbolParent = _sections[ ( int )symbol.Index ];
+						List<ElfSymbol> syms;
+						if( _symbolLookup.ContainsKey( symbolParent ) == true )
+							syms = _symbolLookup[ symbolParent ];
+						else
+						{
+							syms = new List<ElfSymbol>();
+							_symbolLookup.Add( symbolParent, syms );
+						}
+						syms.Add( symbol );
+					}
 				}
 			}
 
-			foreach( ElfSection section in _sections )
-			{
-				if( section.SectionType != ElfSectionType.Relocation )
-					continue;
-				for( int n = 0; n < section.Length / 8; n++ )
-				{
-					reader.BaseStream.Seek( section.ElfOffset + ( 8 * n ), SeekOrigin.Begin );
-					NativeElfRel rel = new NativeElfRel( reader );
+			//foreach( ElfSection section in _sections )
+			//{
+			//    if( ( _programType == ElfType.Executable ) &&
+			//        ( section.SectionType != ElfSectionType.Relocation ) )
+			//        continue;
+			//    if( ( _programType == ElfType.Prx ) &&
+			//        ( section.SectionType != ElfSectionType.PrxReloc ) )
+			//        continue;
+			//    for( int n = 0; n < section.Length / 8; n++ )
+			//    {
+			//        reader.BaseStream.Seek( section.ElfOffset + ( 8 * n ), SeekOrigin.Begin );
+			//        NativeElfRel rel = new NativeElfRel( reader );
 
-					ElfRelocation relocation = new ElfRelocation();
-					relocation.Section = section;
-					relocation.Offset = rel.Offset;
-					relocation.Symbol = rel.Info >> 8;
-					relocation.RelocationType = ( ElfRelocationType )( byte )( rel.Info & 0xFF );
+			//        ElfRelocation relocation = new ElfRelocation();
+			//        relocation.Section = section;
+			//        relocation.Offset = rel.Offset;
+			//        relocation.BaseAddress = ( rel.Info >> 16 ) & 0xFF;
+			//        relocation.Symbol = rel.Info >> 8;
+			//        relocation.RelocationType = ( ElfRelocationType )( byte )( rel.Info & 0xFF );
 					
-					_relocations.Add( relocation );
-				}
-			}
+			//        _relocations.Add( relocation );
+			//    }
+			//}
 
 			return true;
 		}
 
+		protected Dictionary<ElfSection, List<ElfSymbol>> _symbolLookup = new Dictionary<ElfSection, List<ElfSymbol>>();
+
 		protected ElfSymbol FindSymbol( ElfSection section, uint symbolIndex )
 		{
 			return _symbols[ ( int )symbolIndex ];
+			//return _symbolLookup[ section ][ ( int )symbolIndex ];
 		}
 
-		protected void FixRelocation( IMemory memory, ElfRelocation relocation, uint baseAddress )
+//        protected void FixRelocation( BinaryReader reader, IMemory memory, ElfRelocation relocation, uint baseAddress )
+//        {
+//            uint target;
+//            ElfSection realSection = _sections[ ( int )relocation.BaseAddress ];
+//            if( realSection.Address != 0 )
+//            {
+//                target = realSection.Address + relocation.Offset;
+//            }
+//            else
+//            {
+//                target = relocation.Section.Reference.Address + relocation.Offset;
+//            }
+//            //uint target = baseAddress + relocation.Section.ElfOffset + relocation.Offset;
+
+//            /*
+//216                 sym = (Elf32_Sym *)sechdrs[symindex].sh_addr
+//217                         + ELF32_R_SYM(r_info);
+//218                 if (!sym->st_value) {
+//219                         printk(KERN_WARNING "%s: Unknown symbol %s\n",
+//220                                me->name, strtab + sym->st_name);
+//221                         return -ENOENT;
+//222                 }
+//223 
+//224                 v = sym->st_value;
+//*/
+
+//            ElfSymbol symbol = this.FindSymbol( relocation.Section, relocation.Symbol );
+//            if( symbol == null )
+//                return;
+
+//            uint symbolValue = symbol.Value;
+//            if( symbol.Index != ElfUnknownSymbol )
+//            {
+//                ElfSection symbolRef = _sections[ ( int )symbol.Index ];
+//                uint symbolAddress = symbolRef.Address + relocation.Symbol;
+//                // Hacky!
+//                byte[] buffer = memory.ReadBytes( ( int )symbolAddress, 24 );
+//                using( BinaryReader myReader = new BinaryReader( new MemoryStream( buffer, false ) ) )
+//                {
+//                    NativeElfSym nes = new NativeElfSym( reader );
+//                    symbolValue += symbolRef.Address;
+//                }
+//            }
+//            else
+//            {
+//                symbolValue = relocation.Section.Reference.Address;
+//            }
+
+//            // = relocation.Section.Reference.Address + symbol.Value;
+
+//            Debug.WriteLine( string.Format( "Relocating 0x{0:X8} referencing symbol {1} ({2})", target, symbol.Name, symbol.SymbolType.ToString() ) );
+
+//            if( symbol.SymbolType == ElfSymbolType.Function )
+//                Debugger.Break();
+
+//            //if( relocation.Symbol == ElfAbsoluteSymbol )
+//            //	return;
+//            //if( relocation.Symbol == ElfUnknownSymbol )
+//            //	return;
+
+//            // AHL = (AHI << 16) + (short)ALO
+//            // S = symbol value OR if local original sh_addr - final sh_addr
+//            // GP = final gp value
+//            // P = relocation offset
+//            uint pointer = ( uint )memory.ReadWord( ( int )target );
+//            uint temp;
+//            switch( relocation.RelocationType )
+//            {
+//                case ElfRelocationType.Mips32:
+//                    pointer = symbolValue;
+//                    break;
+//                case ElfRelocationType.Mips26:
+//                    // ((A << 2) | S) >> 2
+//                    temp = pointer & 0x03FFFFFF;
+//                    temp = ( temp << 2 ) | symbolValue;
+//                    pointer = ( pointer & 0xFC000000 ) | ( temp >> 2 ); // Should this be + instead of |? Docs say |, but I don't trust them...
+//                    break;
+//                case ElfRelocationType.Hi16:
+//                    {
+//                        HiReloc hiReloc = new HiReloc();
+//                        hiReloc.Address = target;
+//                        hiReloc.Value = symbolValue;
+//                        _hiRelocs.Add( hiReloc );
+//                    }
+//                    return;
+//                case ElfRelocationType.Lo16:
+//                    // AHL + S
+//                    uint vallo = ( ( pointer & 0x0000FFFF ) ^ 0x00008000 ) - 0x00008000;
+//                    if( _hiRelocs.Count > 0 )
+//                    {
+//                        HiReloc hiReloc = _hiRelocs[ _hiRelocs.Count - 1 ];
+//                        _hiRelocs.RemoveAt( _hiRelocs.Count - 1 );
+
+//                        Debug.Assert( hiReloc.Value == symbolValue );
+
+//                        uint pointer2 = ( uint )memory.ReadWord( ( int )hiReloc.Address );
+//                        temp = ( ( pointer2 & 0x0000FFFF ) << 16 ) + vallo;
+//                        temp += symbolValue;
+
+//                        temp = ( ( temp >> 16 ) + ( ( ( temp & 0x00008000 ) != 0 ) ? ( uint )1 : ( uint )0 ) ) & 0x0000FFFF;
+
+//                        uint originalPointer2 = pointer2;
+//                        pointer2 = ( pointer2 & 0xFFFF0000 ) | temp;
+//                        Debug.WriteLine( string.Format( "patching hi 0x{0:X8} from {1:X8} to {2:X8} (temp: {3:X8})", hiReloc.Address, originalPointer2, pointer2, temp ) );
+//                        memory.WriteWord( ( int )hiReloc.Address, 4, ( int )pointer2 );
+//                    }
+//                    temp = symbolValue + vallo;
+//                    uint originalPointer = pointer;
+//                    pointer = ( pointer & 0xFFFF0000 ) | ( temp & 0x0000FFFF );
+//                    Debug.WriteLine( string.Format( "patching lo 0x{0:X8} from {1:X8} to {2:X8} (temp: {3:X8})", target, originalPointer, pointer, temp ) );
+//                    break;
+//                default:
+//                    // Unsupported
+//                    break;
+//            }
+//            memory.WriteWord( ( int )target, 4, ( int )pointer );
+//        }
+
+		protected struct HiReloc
 		{
-			uint target = baseAddress + relocation.Section.ElfOffset + relocation.Offset;
+			public uint Address;
+			public uint Value;
+		}
+		
+		protected void ApplyRelocations( BinaryReader reader, IMemory memory, ElfSection section, uint baseAddress )
+		{
+			List<HiReloc> hiRelocs = new List<HiReloc>();
 
-			if( relocation.Symbol == ElfAbsoluteSymbol )
+			ElfSection linked = section.Reference;
+			if( ( linked.Flags & ElfSectionFlags.Alloc ) != ElfSectionFlags.Alloc )
 				return;
-			if( relocation.Symbol == ElfUnknownSymbol )
-				return;
 
-			ElfSymbol symbol = this.FindSymbol( relocation.Section.Reference, relocation.Symbol );
-			if( symbol == null )
-				return;
+			Debug.WriteLine( string.Format( "Relocating section {0} using {1}, {2} relocations total", linked.Name, section.Name, section.Length / 8 ) );
 
-			uint symbolValue = symbol.Value + relocation.Section.ElfOffset;
-
-			uint pointer = ( uint )memory.ReadWord( ( int )target );
-			switch( relocation.RelocationType )
+			for( int n = 0; n < section.Length / 8; n++ )
 			{
-				case ElfRelocationType.Mips16:
-					pointer = pointer + symbolValue;
-					break;
-				case ElfRelocationType.Mips32:
-					pointer = pointer + symbolValue - ( uint )target;
-					break;
-				default:
-					// Unsupported
-					break;
+				reader.BaseStream.Seek( section.ElfOffset + ( 8 * n ), SeekOrigin.Begin );
+				NativeElfRel rel = new NativeElfRel( reader );
+
+				ElfRelocation relocation = new ElfRelocation();
+				//relocation.Section = section;
+				relocation.Offset = rel.Offset;
+				relocation.BaseAddress = ( rel.Info >> 16 ) & 0xFF;
+				relocation.Symbol = ( rel.Info >> 8 ) & 0xFF;
+				relocation.RelocationType = ( ElfRelocationType )( byte )( rel.Info & 0xFF );
+
+				ElfSection offsetBase = _sections[ ( int )relocation.Symbol ];
+				ElfSection addressBase = _sections[ ( int )relocation.BaseAddress ];
+
+				// !!! This should really use the referenced sections address, but it doesn't seem to
+				//uint pointer = linked.Address + relocation.Offset;
+				uint pointer = relocation.Offset;
+				if( offsetBase.Address == 0 )
+					pointer += baseAddress;
+				else
+				{
+					pointer += offsetBase.Address;
+					//Debugger.Break();
+				}
+
+				ElfSymbol symbol = _symbols[ ( int )relocation.Symbol ];
+				uint symbolValue = symbol.Value;
+				if( symbolValue == 0 )
+				{
+					//symbolValue = linked.Address;
+				}
+				else
+				{
+					int x = 5;
+				}
+				// !!! This could be bogus
+				if( addressBase.Address == 0 )
+					symbolValue += baseAddress;
+				else
+					symbolValue += addressBase.Address;
+
+				uint value = ( uint )memory.ReadWord( ( int )pointer );
+
+				Debug.WriteLine( string.Format( " Relocation pointer 0x{0:X8} (elf {1:X8}), value {2:X8}, type {3}, existing memory value {4:X8}",
+					pointer, relocation.Offset, symbolValue, relocation.RelocationType, value ) );
+
+				bool writeMemory = false;
+				switch( relocation.RelocationType )
+				{
+					case ElfRelocationType.None:
+						break;
+					case ElfRelocationType.Mips32:
+						value += symbolValue;
+						writeMemory = true;
+						break;
+					case ElfRelocationType.Mips26:
+						Debug.Assert( symbolValue % 4 == 0 );
+						value = ( uint )( ( value & ~0x03FFFFFF ) | ( ( value + ( symbolValue >> 2 ) ) & 0x03FFFFFF ) );
+						writeMemory = true;
+						break;
+					case ElfRelocationType.Hi16:
+						{
+							HiReloc hiReloc = new HiReloc();
+							hiReloc.Address = pointer;
+							hiReloc.Value = symbolValue;
+							hiRelocs.Add( hiReloc );
+						}
+						break;
+					case ElfRelocationType.Lo16:
+						{
+							uint vallo = ( ( value & 0x0000FFFF ) ^ 0x00008000 ) - 0x00008000;
+							while( hiRelocs.Count > 0 )
+							{
+								HiReloc hiReloc = hiRelocs[ hiRelocs.Count - 1 ];
+								hiRelocs.RemoveAt( hiRelocs.Count - 1 );
+
+								Debug.Assert( hiReloc.Value == symbolValue );
+
+								uint value2 = ( uint )memory.ReadWord( ( int )hiReloc.Address );
+								uint temp = ( ( value2 & 0x0000FFFF ) << 16 ) + vallo;
+								temp += symbolValue;
+
+								temp = ( ( temp >> 16 ) + ( ( ( temp & 0x00008000 ) != 0 ) ? ( uint )1 : ( uint )0 ) ) & 0x0000FFFF;
+
+								value2 = ( uint )( ( value2 & ~0x0000FFFF ) | temp );
+
+								Debug.WriteLine( string.Format( "   Updating memory at 0x{0:X8} to {1:X8} (from previous HI16)", hiReloc.Address, value2 ) );
+								memory.WriteWord( ( int )hiReloc.Address, 4, ( int )value2 );
+							}
+							value = ( uint )( ( value & ~0x0000FFFF ) | ( ( symbolValue + vallo ) & 0x0000FFFF ) );
+						}
+						writeMemory = true;
+						break;
+					default:
+						// Unsupported type
+						Debugger.Break();
+						break;
+				}
+				if( writeMemory == true )
+				{
+					Debug.WriteLine( string.Format( "   Updating memory at 0x{0:X8} to {1:X8}", pointer, value ) );
+					memory.WriteWord( ( int )pointer, 4, ( int )value );
+				}
 			}
 		}
 
@@ -590,12 +839,16 @@ namespace Noxa.Emulation.Psp.Games
 			if( _needsRelocation == false )
 				baseAddress = 0;
 
+			_entryAddress += baseAddress;
+			_initAddress += baseAddress;
+
 			IMemory memory = emulator.Cpu.Memory;
 
 			foreach( ElfSection section in _allocSections )
 			{
 				uint address = baseAddress + section.Address;
 
+				section.Address = address;
 				if( section.SectionType == ElfSectionType.NoBits )
 				{
 					// Write zeros?
@@ -613,15 +866,42 @@ namespace Noxa.Emulation.Psp.Games
 				}
 			}
 
+			BinaryReader reader = new BinaryReader( stream );
+
+			ElfSection sceModuleInfo = _sectionLookup[ ".rodata.sceModuleInfo" ];
+			reader.BaseStream.Seek( sceModuleInfo.ElfOffset, SeekOrigin.Begin );
+			ModuleInfo moduleInfo = new ModuleInfo( reader );
+
+			_globalPointer = baseAddress + moduleInfo.Gp;
+
+			// Not sure if this is needed - the header seems to give an ok address
+			//if( _programType == ElfType.Prx )
+			//{
+			//    ElfSection sceResident = _sectionLookup[ ".rodata.sceResident" ];
+			//    reader.BaseStream.Seek( sceResident.ElfOffset, SeekOrigin.Begin );
+			//    // 2 magic words
+			//    reader.BaseStream.Seek( 8, SeekOrigin.Current );
+			//    _entryAddress = reader.ReadUInt32();
+			//}
+
 			if( _needsRelocation == true )
 			{
-				foreach( ElfRelocation relocation in _relocations )
+				//foreach( ElfRelocation relocation in _relocations )
+				//{
+				//    this.FixRelocation( reader, memory, relocation, baseAddress );
+				//}
+				foreach( ElfSection section in _relocSections )
 				{
-					this.FixRelocation( memory, relocation, baseAddress );
+					if( section.Reference.Name == ".data" )
+					{
+						Debug.WriteLine( "Skipping .data section during relocation" );
+						continue;
+					}
+
+					this.ApplyRelocations( reader, memory, section, baseAddress );
 				}
 			}
 
-			BinaryReader reader = new BinaryReader( stream );
 			result.StubFailures = this.FixupStubs( reader, emulator.Cpu, memory, emulator.Bios, baseAddress );
 
 			result.Successful = true;
@@ -631,12 +911,6 @@ namespace Noxa.Emulation.Psp.Games
 		protected List<StubFailure> FixupStubs( BinaryReader reader, ICpu cpu, IMemory memory, IBios bios, uint baseAddress )
 		{
 			List<StubFailure> failures = new List<StubFailure>();
-
-			ElfSection sceModuleInfo = _sectionLookup[ ".rodata.sceModuleInfo" ];
-			reader.BaseStream.Seek( sceModuleInfo.ElfOffset, SeekOrigin.Begin );
-			ModuleInfo moduleInfo = new ModuleInfo( reader );
-
-			_globalPointer = baseAddress + moduleInfo.Gp;
 
 			ElfSection libEnt = _sectionLookup[ ".lib.ent.top" ];
 			ElfSection libEntBottom = _sectionLookup[ ".lib.ent.btm" ];

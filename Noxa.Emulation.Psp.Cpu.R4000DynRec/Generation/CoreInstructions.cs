@@ -2220,7 +2220,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			{
 				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
 
-				int rs = ( int )( ( code >> 31 ) & 0x1F );
+				int rs = ( int )( ( code >> 21 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -2254,7 +2254,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			{
 				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
 
-				int rs = ( int )( ( code >> 31 ) & 0x1F );
+				int rs = ( int )( ( code >> 21 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -2288,7 +2288,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			{
 				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
 
-				int rs = ( int )( ( code >> 31 ) & 0x1F );
+				int rs = ( int )( ( code >> 21 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -2329,7 +2329,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			{
 				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
 
-				int rs = ( int )( ( code >> 31 ) & 0x1F );
+				int rs = ( int )( ( code >> 21 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -2370,7 +2370,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			{
 				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
 
-				int rs = ( int )( ( code >> 31 ) & 0x1F );
+				int rs = ( int )( ( code >> 21 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -2410,7 +2410,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			{
 				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
 
-				int rs = ( int )( ( code >> 31 ) & 0x1F );
+				int rs = ( int )( ( code >> 21 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -2450,7 +2450,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			{
 				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
 
-				int rs = ( int )( ( code >> 31 ) & 0x1F );
+				int rs = ( int )( ( code >> 21 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
@@ -2497,7 +2497,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			{
 				int target = ( address + AddressOffset ) + ( ( int )( short )imm << 2 );
 
-				int rs = ( int )( ( code >> 31 ) & 0x1F );
+				int rs = ( int )( ( code >> 21 ) & 0x1F );
 				if( pass == 0 )
 				{
 					context.UpdatePc = true;
