@@ -6,10 +6,14 @@ using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using System.IO;
 using System.Drawing;
-using Noxa.Emulation.Psp.Player.CrossMediaBar.Helpers;
-using DirectShowLib;
 using System.Runtime.InteropServices;
 using System.Threading;
+
+#if USEVIDEO
+using DirectShowLib;
+using Noxa.Emulation.Psp.Player.CrossMediaBar.Helpers;
+#endif
+
 namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 {
 	abstract class VideoResource
@@ -185,8 +189,10 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 		public VideoResource CreateVideoResource( byte[] videoBytes )
 		{
 			VideoRenderer r = new VideoRenderer();
+#if USEVIDEO
 			r.VideoBytesSource = videoBytes;
 			_resources.Add( r );
+#endif
 			return r;
 		}
 
@@ -220,6 +226,7 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 
 		internal class VideoRenderer : VideoResource
 		{
+#if USEVIDEO
 			public Vmr9Allocator Allocator;
 			public Sprite Sprite;
 			public Texture Texture;
@@ -420,6 +427,23 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 						return false;
 				}
 			}
+#else
+			public override void Draw( float x, float y, float width, float height )
+			{
+			}
+
+			public override void Cleanup()
+			{
+			}
+
+			public override void Enable( Device device, Sprite sprite, Dictionary<System.Drawing.Font, Microsoft.DirectX.Direct3D.Font> fonts )
+			{
+			}
+
+			public override void Disable()
+			{
+			}
+#endif
 		}
 
 		internal class ImageRenderer : VideoResource

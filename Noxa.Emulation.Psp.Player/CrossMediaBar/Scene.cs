@@ -79,10 +79,12 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 			}
 			_background = _manager.Video.CreateImageResource( new MemoryStream( bytes, 0, bytes.Length, false, false ) );
 
+#if USEVIDEO
 			bytes = Properties.Resources.PspBoot;
 			_bootVideo = _manager.Video.CreateVideoResource( bytes );
 			_bootVideo.Width = 480;
 			_bootVideo.Height = 272;
+#endif
 
 			_repeats.Add( PadButtons.Circle, 0.0 );
 			_repeats.Add( PadButtons.Cross, 0.0 );
@@ -297,7 +299,9 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 						_bootTime = 0.0;
 						_booting = true;
 
+#if USEVIDEO
 						( _bootVideo as Noxa.Emulation.Psp.Player.CrossMediaBar.VideoManager.VideoRenderer ).Play();
+#endif
 					}
 					else
 					{
@@ -357,6 +361,7 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 				if( CheckEndVideo() == true )
 					return;
 
+#if USEVIDEO
 				while( ( _bootVideo as VideoManager.VideoRenderer ).FrameWaiting.WaitOne( 150, false ) == false )
 				{
 					_bootTime += 0.100;
@@ -365,6 +370,7 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 				}
 
 				_bootVideo.Draw( 0.0f, 0.0f );
+#endif
 			}
 		}
 
