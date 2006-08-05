@@ -248,6 +248,10 @@ namespace Noxa.Emulation.Psp.Player
 			_state = InstanceState.Ended;
 			_stateChangeEvent.Set();
 			this.OnStateChanged();
+
+			_cpu.PrintStatistics();
+
+			this.Destroy();
 		}
 
 		public void Pause()
@@ -284,7 +288,7 @@ namespace Noxa.Emulation.Psp.Player
 			if( _isCreated == false )
 				return;
 
-			this.Destroy();
+			this.Stop();
 			this.Create();
 			this.Start();
 		}
@@ -297,7 +301,7 @@ namespace Noxa.Emulation.Psp.Player
 
 		public void SwitchToXmb()
 		{
-			Debug.WriteLine( "Instance: switching to CMB" );
+			Debug.WriteLine( "Instance: switching to XMB" );
 			_video.Cleanup();
 #if XMB
 			_xmb.Enable();

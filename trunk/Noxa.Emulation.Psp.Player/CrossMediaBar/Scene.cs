@@ -308,7 +308,7 @@ namespace Noxa.Emulation.Psp.Player.CrossMediaBar
 				}
 				else if( refreshAction == true )
 				{
-					Debug.WriteLine( "CMB: Refreshing game listing" );
+					Debug.WriteLine( "XMB: Refreshing game listing" );
 
 					foreach( IIODriver driver in _manager.Emulator.IO )
 					{

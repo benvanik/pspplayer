@@ -136,6 +136,7 @@ namespace Noxa.Emulation.Psp.Games
 
 			// TODO: Move this elsewhere?
 			instance.Cpu[ 0 ].ProgramCounter = ( int )elf.InitAddress;
+			instance.Cpu[ 0 ].GeneralRegisters[ 26 ] = 0x09FBFF00; //0x08380000;
 			instance.Cpu[ 0 ].GeneralRegisters[ 28 ] = ( int )elf.GlobalPointer;
 			instance.Cpu[ 0 ].GeneralRegisters[ 29 ] = 0x087FFFFF;
 			instance.Cpu[ 0 ].GeneralRegisters[ 31 ] = ( int )elf.EntryAddress;
