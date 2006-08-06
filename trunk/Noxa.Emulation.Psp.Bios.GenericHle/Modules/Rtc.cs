@@ -82,7 +82,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		}
 
 		[BiosStub( 0x029ca3b3, "sceRtc_0x029CA3B3", false, 0 )]
-	
+		[BiosStubIncomplete]
 		public int Unknown1( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			return 0;
