@@ -48,11 +48,19 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 		private void Options_Load( object sender, EventArgs e )
 		{
 			List<string> paths = new List<string>();
-			string playerPath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
+			string playerPath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location ).ToLowerInvariant();
+			if( playerPath[ playerPath.Length - 1 ] != '\\' )
+				playerPath += '\\';
 			paths.Add( playerPath );
-			paths.Add( Path.Combine( playerPath, "Plugins" ) );
+			paths.Add( Path.Combine( playerPath, "plugins" ) );
 			foreach( string path in Properties.Settings.Default.PluginSearchPaths )
-				paths.Add( path );
+			{
+				string lowerPath = path.ToLowerInvariant();
+				if( lowerPath[ lowerPath.Length - 1 ] != '\\' )
+					lowerPath += '\\';
+				if( paths.Contains( lowerPath ) == false )
+					paths.Add( lowerPath );
+			}
 
 			// Get all types
 			List<Type> types = FindComponents( paths.ToArray() );
