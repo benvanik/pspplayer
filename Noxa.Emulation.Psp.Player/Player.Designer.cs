@@ -33,6 +33,12 @@ namespace Noxa.Emulation.Psp.Player
 			this.pauseToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.stopToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.restartToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			this.sizeToolStripSplitButton = new System.Windows.Forms.ToolStripSplitButton();
+			this.originalPSPDimensionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.twoXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.threeXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.fullscreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.configureToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.renderSurface = new System.Windows.Forms.Panel();
@@ -49,6 +55,8 @@ namespace Noxa.Emulation.Psp.Player
             this.pauseToolStripButton,
             this.stopToolStripButton,
             this.restartToolStripButton,
+            this.toolStripSeparator2,
+            this.sizeToolStripSplitButton,
             this.toolStripSeparator1,
             this.configureToolStripButton} );
 			this.toolStrip1.Location = new System.Drawing.Point( 0, 0 );
@@ -64,6 +72,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.startToolStripButton.Name = "startToolStripButton";
 			this.startToolStripButton.Size = new System.Drawing.Size( 51, 22 );
 			this.startToolStripButton.Text = "Start";
+			this.startToolStripButton.ToolTipText = "Start the emulator";
 			this.startToolStripButton.Click += new System.EventHandler( this.startToolStripButton_Click );
 			// 
 			// pauseToolStripButton
@@ -94,7 +103,60 @@ namespace Noxa.Emulation.Psp.Player
 			this.restartToolStripButton.Name = "restartToolStripButton";
 			this.restartToolStripButton.Size = new System.Drawing.Size( 23, 22 );
 			this.restartToolStripButton.Text = "Restart";
+			this.restartToolStripButton.ToolTipText = "Restart the emulator";
 			this.restartToolStripButton.Click += new System.EventHandler( this.restartToolStripButton_Click );
+			// 
+			// toolStripSeparator2
+			// 
+			this.toolStripSeparator2.Name = "toolStripSeparator2";
+			this.toolStripSeparator2.Size = new System.Drawing.Size( 6, 25 );
+			// 
+			// sizeToolStripSplitButton
+			// 
+			this.sizeToolStripSplitButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.sizeToolStripSplitButton.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.originalPSPDimensionsToolStripMenuItem,
+            this.twoXToolStripMenuItem,
+            this.threeXToolStripMenuItem,
+            this.fullscreenToolStripMenuItem} );
+			this.sizeToolStripSplitButton.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.ResizeIcon;
+			this.sizeToolStripSplitButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.sizeToolStripSplitButton.Name = "sizeToolStripSplitButton";
+			this.sizeToolStripSplitButton.Size = new System.Drawing.Size( 32, 22 );
+			this.sizeToolStripSplitButton.ToolTipText = "Resize the display";
+			this.sizeToolStripSplitButton.ButtonClick += new System.EventHandler( this.sizeToolStripSplitButton_ButtonClick );
+			// 
+			// originalPSPDimensionsToolStripMenuItem
+			// 
+			this.originalPSPDimensionsToolStripMenuItem.Name = "originalPSPDimensionsToolStripMenuItem";
+			this.originalPSPDimensionsToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.D1 ) ) );
+			this.originalPSPDimensionsToolStripMenuItem.Size = new System.Drawing.Size( 221, 22 );
+			this.originalPSPDimensionsToolStripMenuItem.Text = "&Original PSP Dimensions";
+			this.originalPSPDimensionsToolStripMenuItem.Click += new System.EventHandler( this.originalPSPDimensionsToolStripMenuItem_Click );
+			// 
+			// twoXToolStripMenuItem
+			// 
+			this.twoXToolStripMenuItem.Name = "twoXToolStripMenuItem";
+			this.twoXToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.D2 ) ) );
+			this.twoXToolStripMenuItem.Size = new System.Drawing.Size( 221, 22 );
+			this.twoXToolStripMenuItem.Text = "2X";
+			this.twoXToolStripMenuItem.Click += new System.EventHandler( this.twoXToolStripMenuItem_Click );
+			// 
+			// threeXToolStripMenuItem
+			// 
+			this.threeXToolStripMenuItem.Name = "threeXToolStripMenuItem";
+			this.threeXToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.D3 ) ) );
+			this.threeXToolStripMenuItem.Size = new System.Drawing.Size( 221, 22 );
+			this.threeXToolStripMenuItem.Text = "3X";
+			this.threeXToolStripMenuItem.Click += new System.EventHandler( this.threeXToolStripMenuItem_Click );
+			// 
+			// fullscreenToolStripMenuItem
+			// 
+			this.fullscreenToolStripMenuItem.Name = "fullscreenToolStripMenuItem";
+			this.fullscreenToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F ) ) );
+			this.fullscreenToolStripMenuItem.Size = new System.Drawing.Size( 221, 22 );
+			this.fullscreenToolStripMenuItem.Text = "&Fullscreen";
+			this.fullscreenToolStripMenuItem.Click += new System.EventHandler( this.fullscreenToolStripMenuItem_Click );
 			// 
 			// toolStripSeparator1
 			// 
@@ -108,6 +170,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.configureToolStripButton.Name = "configureToolStripButton";
 			this.configureToolStripButton.Size = new System.Drawing.Size( 74, 22 );
 			this.configureToolStripButton.Text = "Configure";
+			this.configureToolStripButton.ToolTipText = "Configure components";
 			this.configureToolStripButton.Click += new System.EventHandler( this.configureToolStripButton_Click );
 			// 
 			// renderSurface
@@ -164,6 +227,12 @@ namespace Noxa.Emulation.Psp.Player
 		private System.Windows.Forms.ToolStripButton restartToolStripButton;
 		private System.Windows.Forms.Panel renderSurface;
 		private System.Windows.Forms.PictureBox splashPicture;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+		private System.Windows.Forms.ToolStripSplitButton sizeToolStripSplitButton;
+		private System.Windows.Forms.ToolStripMenuItem originalPSPDimensionsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem twoXToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem threeXToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem fullscreenToolStripMenuItem;
 	}
 }
 
