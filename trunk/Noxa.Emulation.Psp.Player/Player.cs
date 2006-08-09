@@ -9,9 +9,18 @@ using Noxa.Emulation.Psp.Player.Configuration;
 
 namespace Noxa.Emulation.Psp.Player
 {
+	enum DisplaySize
+	{
+		Original,
+		TwoX,
+		ThreeX,
+		Fullscreen
+	}
+
 	partial class Player : Form
 	{
 		protected Host _host;
+		protected DisplaySize _displaySize;
 
 		public Player()
 		{
@@ -37,6 +46,9 @@ namespace Noxa.Emulation.Psp.Player
 		private void Player_Load( object sender, EventArgs e )
 		{
 			CurrentInstance_StateChanged( null, EventArgs.Empty );
+
+			DisplaySize defaultSize = ( DisplaySize )Enum.Parse( typeof( DisplaySize ), Properties.Settings.Default.PlayerDisplaySize );
+			this.SwitchToDisplaySize( DisplaySize.Original );
 		}
 
 		private delegate void DummyDelegate();
@@ -156,5 +168,84 @@ namespace Noxa.Emulation.Psp.Player
 				_host.Save();
 			}
 		}
+
+		#region Display Size
+
+		private void sizeToolStripSplitButton_ButtonClick( object sender, EventArgs e )
+		{
+			switch( _displaySize )
+			{
+				case DisplaySize.Original:
+					this.SwitchToDisplaySize( DisplaySize.TwoX );
+					break;
+				case DisplaySize.TwoX:
+					this.SwitchToDisplaySize( DisplaySize.ThreeX );
+					break;
+				case DisplaySize.ThreeX:
+					this.SwitchToDisplaySize( DisplaySize.Fullscreen );
+					break;
+				case DisplaySize.Fullscreen:
+					this.SwitchToDisplaySize( DisplaySize.Original );
+					break;
+			}
+		}
+
+		private void originalPSPDimensionsToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.SwitchToDisplaySize( DisplaySize.Original );
+		}
+
+		private void twoXToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.SwitchToDisplaySize( DisplaySize.TwoX );
+		}
+
+		private void threeXToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.SwitchToDisplaySize( DisplaySize.ThreeX );
+		}
+
+		private void fullscreenToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.SwitchToDisplaySize( DisplaySize.Fullscreen );
+		}
+
+		public void SwitchToDisplaySize( DisplaySize newSize )
+		{
+			if( newSize == _displaySize )
+				return;
+
+			this.originalPSPDimensionsToolStripMenuItem.Checked = ( newSize == DisplaySize.Original );
+			this.twoXToolStripMenuItem.Checked = ( newSize == DisplaySize.TwoX );
+			this.threeXToolStripMenuItem.Checked = ( newSize == DisplaySize.ThreeX );
+			this.fullscreenToolStripMenuItem.Checked = ( newSize == DisplaySize.Fullscreen );
+
+			int widthPadding = 8;
+			int heightPadding = 59;
+
+			this.WindowState = FormWindowState.Normal;
+			switch( newSize )
+			{
+				case DisplaySize.Original:
+					this.Size = new Size( 480 + widthPadding, 272 + heightPadding );
+					break;
+				case DisplaySize.TwoX:
+					this.Size = new Size( ( 480 * 2 ) + widthPadding, ( 272 * 2 ) + heightPadding );
+					break;
+				case DisplaySize.ThreeX:
+					this.Size = new Size( ( 480 * 3 ) + widthPadding, ( 272 * 3 ) + heightPadding );
+					break;
+				case DisplaySize.Fullscreen:
+					this.WindowState = FormWindowState.Maximized;
+					break;
+			}
+
+			_displaySize = newSize;
+
+			Properties.Settings.Default.PlayerDisplaySize = _displaySize.ToString();
+			Properties.Settings.Default.Save();
+		}
+
+		#endregion
 	}
 }

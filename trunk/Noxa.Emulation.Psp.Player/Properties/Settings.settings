@@ -8,5 +8,8 @@
     <Setting Name="ComponentSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="PlayerDisplaySize" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Original</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

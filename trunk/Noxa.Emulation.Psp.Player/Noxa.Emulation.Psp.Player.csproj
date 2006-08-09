@@ -169,6 +169,7 @@
     </None>
     <None Include="Resources\PspShake.png" />
     <None Include="Resources\RemoveIcon.png" />
+    <Content Include="Resources\ResizeIcon.png" />
     <Content Include="Resources\SelectedMemoryStickIcon.png" />
     <Content Include="Resources\SelectedUmdIcon.png" />
     <None Include="Resources\SmallUmdIcon.png" />
