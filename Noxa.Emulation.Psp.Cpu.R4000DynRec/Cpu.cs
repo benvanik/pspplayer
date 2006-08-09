@@ -263,8 +263,10 @@ namespace Noxa.Emulation.Psp.Cpu
 			{
 				int address = _core0.Pc;
 				address = _core0.TranslateAddress( address );
-				if( address == 0x08900128 )
-					_debug = true;
+				//if( address == 0x08900128 )
+				//	_debug = true;
+				//if( address == 0x08924928 )
+				//	_debug = true;
 				//if( address == 0x89005fc )
 				//	_debug = true;
 				//if( address == 0x089004D0 )
@@ -373,7 +375,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// <summary>
 		/// Maximum number of instructions before bailing.
 		/// </summary>
-		protected const int MaximumCodeLength = 200;
+		protected const int MaximumCodeLength = 600;
 
 		private Type[] _methodParams = new Type[] { typeof( Core ), typeof( Memory ), typeof( int[] ), typeof( BiosFunction[] ) };
 

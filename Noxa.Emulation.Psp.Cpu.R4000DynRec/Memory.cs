@@ -1,3 +1,7 @@
+// All failed addresses will be or'ed with 0x08000000 and tried again
+// This is used for testing because one or two games does something weird and I can't figure it out
+//#define HACK
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -61,6 +65,8 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public int ReadWord( int address )
 		{
+			top:
+			Debug.WriteLine( string.Format( "RW @ 0x{0:X8}", address ) );
 			if( ( address >= 0x08000000 ) && ( address < 0x9FFFFFF ) )
 			{
 				address -= 0x08000000;
@@ -94,7 +100,15 @@ namespace Noxa.Emulation.Psp.Cpu
 				}
 			}
 			else
+			{
+#if HACK
+				address |= 0x08000000;
+				goto top;
+#else
+				Debugger.Break();
 				return 0;
+#endif
+			}
 		}
 
 		public byte[] ReadBytes( int address, int count )
@@ -134,6 +148,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public void WriteWord( int address, int width, int value )
 		{
+			top:
 			Debug.Assert( address > 0x20 );
 
 			if( ( address >= 0x08000000 ) && ( address < 0x9FFFFFF ) )
@@ -214,7 +229,14 @@ namespace Noxa.Emulation.Psp.Cpu
 				}
 			}
 			else
+			{
+#if HACK
+				address |= 0x08000000;
+				goto top;
+#else
 				Debugger.Break();
+#endif
+			}
 
 			//if( this->MemoryChanged != nullptr )
 			//this->MemoryChanged( this, address, width, value );

@@ -348,7 +348,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			// This is here to check for crazy kernel addresses or other things
 			// - technically we shouldn't have to do this (on a real PSP they
 			// would cause crashes), but the pspdev stuff sometimes does weird
-			// things
+			// things - except for uncached reads/writes, etc
 
 			//if( ( address & 0x80000000 ) != 0 )
 			//    address = address & 0x7FFFFFFF;
@@ -382,6 +382,14 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			context.ILGen.Emit( OpCodes.Ldc_I4, 0x08000000 );
 			context.ILGen.Emit( OpCodes.Sub );
 			context.ILGen.Emit( OpCodes.Stloc_0 );
+
+			//context.ILGen.Emit( OpCodes.Ldstr, "read inline 0x{0:X8}" );
+			//context.ILGen.Emit( OpCodes.Ldloc_0 );
+			//context.ILGen.Emit( OpCodes.Ldc_I4, 0x08000000 );
+			//context.ILGen.Emit( OpCodes.Add );
+			//context.ILGen.Emit( OpCodes.Box, typeof( int ) );
+			//context.ILGen.Emit( OpCodes.Call, context.StringFormat1 );
+			//context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
 
 			context.ILGen.Emit( OpCodes.Ldfld, context.MemoryMainBuffer );
 			context.ILGen.Emit( OpCodes.Ldloc_0 );
