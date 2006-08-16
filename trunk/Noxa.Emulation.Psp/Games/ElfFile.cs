@@ -516,7 +516,11 @@ namespace Noxa.Emulation.Psp.Games
 					_sectionLookup.Add( section.Name, section );
 			}
 
-			_initAddress = _sectionLookup[ ".init" ].Address;
+			// Not sure if this is important
+			if( _sectionLookup.ContainsKey( ".init" ) == true )
+				_initAddress = _sectionLookup[ ".init" ].Address;
+			else
+				_initAddress = 0x0;
 			
 			if( _sectionLookup.ContainsKey( ".symtab" ) == true )
 			{
@@ -750,6 +754,13 @@ namespace Noxa.Emulation.Psp.Games
 					//Debugger.Break();
 				}
 
+				// Happens sometime
+				if( _symbols.Count == 0 )
+				{
+					Debug.WriteLine( "Unable to relocate symbol; symbol table is empty - possibly no .symtab section?" );
+					return;
+				}
+
 				ElfSymbol symbol = _symbols[ ( int )relocation.Symbol ];
 				uint symbolValue = symbol.Value;
 				if( symbolValue == 0 )
@@ -768,8 +779,8 @@ namespace Noxa.Emulation.Psp.Games
 
 				uint value = ( uint )memory.ReadWord( ( int )pointer );
 
-				Debug.WriteLine( string.Format( " Relocation pointer 0x{0:X8} (elf {1:X8}), value {2:X8}, type {3}, existing memory value {4:X8}",
-					pointer, relocation.Offset, symbolValue, relocation.RelocationType, value ) );
+				//Debug.WriteLine( string.Format( " Relocation pointer 0x{0:X8} (elf {1:X8}), value {2:X8}, type {3}, existing memory value {4:X8}",
+				//	pointer, relocation.Offset, symbolValue, relocation.RelocationType, value ) );
 
 				bool writeMemory = false;
 				switch( relocation.RelocationType )
@@ -811,7 +822,7 @@ namespace Noxa.Emulation.Psp.Games
 
 								value2 = ( uint )( ( value2 & ~0x0000FFFF ) | temp );
 
-								Debug.WriteLine( string.Format( "   Updating memory at 0x{0:X8} to {1:X8} (from previous HI16)", hiReloc.Address, value2 ) );
+								//Debug.WriteLine( string.Format( "   Updating memory at 0x{0:X8} to {1:X8} (from previous HI16)", hiReloc.Address, value2 ) );
 								memory.WriteWord( ( int )hiReloc.Address, 4, ( int )value2 );
 							}
 							value = ( uint )( ( value & ~0x0000FFFF ) | ( ( symbolValue + vallo ) & 0x0000FFFF ) );
@@ -825,7 +836,7 @@ namespace Noxa.Emulation.Psp.Games
 				}
 				if( writeMemory == true )
 				{
-					Debug.WriteLine( string.Format( "   Updating memory at 0x{0:X8} to {1:X8}", pointer, value ) );
+					//Debug.WriteLine( string.Format( "   Updating memory at 0x{0:X8} to {1:X8}", pointer, value ) );
 					memory.WriteWord( ( int )pointer, 4, ( int )value );
 				}
 			}

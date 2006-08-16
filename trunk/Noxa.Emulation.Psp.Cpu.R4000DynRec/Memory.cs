@@ -66,7 +66,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		public int ReadWord( int address )
 		{
 			top:
-			Debug.WriteLine( string.Format( "RW @ 0x{0:X8}", address ) );
+			//Debug.WriteLine( string.Format( "RW @ 0x{0:X8}", address ) );
 			if( ( address >= 0x08000000 ) && ( address < 0x9FFFFFF ) )
 			{
 				address -= 0x08000000;

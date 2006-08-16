@@ -51,6 +51,8 @@
     <Compile Include="Coprocessor2.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Cpu.cs" />
+    <Compile Include="Cpu.Execution.cs" />
+    <Compile Include="Cpu.Generation.cs" />
     <Compile Include="Generation\CoreInstructions.cs" />
     <Compile Include="Generation\FpuInstructions.cs" />
     <Compile Include="Generation\GenerationContext.cs" />

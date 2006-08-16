@@ -1,0 +1,6 @@
+,NID,Return,Function,Params
+1,0x092968f4,unsigned int,sceKernelCpuSuspendIntr,void
+2,0x5f10d406,void,sceKernelCpuResumeIntr,unsigned int flags
+3,0x3b84732d,void,sceKernelCpuResumeIntrWithSync,unsigned int flags
+4,0x47a0b729,int,sceKernelIsCpuIntrSuspended,unsigned int flags
+5,0xb55249d2,int,sceKernelIsCpuIntrEnable,void
