@@ -1,0 +1,10 @@
+,NID,Return,Function,Params
+1,0xeee43f47,,sceKernelRegisterUserSpaceIntrStack,
+2,0xca04a2b9,int,sceKernelRegisterSubIntrHandler,"int intno,int no,void *handler,void *arg"
+3,0xd61e6961,int,sceKernelReleaseSubIntrHandler,"int intno,int no"
+4,0xfb8e22ec,int,sceKernelEnableSubIntr,"int intno,int no"
+5,0x8a389411,int,sceKernelDisableSubIntr,"int intno,int no"
+6,0x5cb5a78b,,sceKernelSuspendSubIntr,
+7,0x7860e0dc,,sceKernelResumeSubIntr,
+8,0xfc4374b8,,sceKernelIsSubInterruptOccurred,
+9,0xd2e8363f,,QueryIntrHandlerInfo,

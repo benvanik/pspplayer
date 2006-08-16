@@ -1,0 +1,15 @@
+,NID,Return,Function,Params
+1,0xc6183d47,int,sceUmdActivate,"int unit,const char *drive"
+2,0xe83742ba,,sceUmdDeactivate,
+3,0x8ef08fce,int,sceUmdWaitDriveStat,int stat
+4,0x56202973,,sceUmdWaitDriveStatWithTimer,
+5,0x4a9e5e29,,sceUmdWaitDriveStatCB,
+6,0xaee7404d,int,sceUmdRegisterUMDCallBack,int cbid
+7,0x6b4a146c,,sceUmdGetDriveStat,
+8,0x6af9b50a,,,
+9,0x20628e6f,,sceUmdGetErrorStat,
+10,0x340b7686,,sceUmdGetDiscInfo,
+11,0xbd2bde07,,sceUmdUnRegisterUMDCallBack,
+12,0x46ebb729,int,sceUmdCheckMedium,int a
+13,0x87533940,,,
+14,0xcbe9f02a,,,

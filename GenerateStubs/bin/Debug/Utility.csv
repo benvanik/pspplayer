@@ -1,0 +1,50 @@
+,NID,Return,Function,Params
+1,0xc492f751,,sceUtilityGameSharingInitStart,
+2,0xefc6f80f,,sceUtilityGameSharingShutdownStart,
+3,0x7853182d,,sceUtilityGameSharingUpdate,
+4,0x946963f3,,sceUtilityGameSharingGetStatus,
+5,0x3ad50ae7,,sceNetplayDialogInitStart,
+6,0xbc6b6296,,sceNetplayDialogShutdownStart,
+7,0x417bed54,,sceNetplayDialogUpdate,
+8,0xb6cee597,,sceNetplayDialogGetStatus,
+9,0x4db1e739,int,sceUtilityNetconfInitStart,pspUtilityNetconfData *data
+10,0xf88155f6,int,sceUtilityNetconfShutdownStart,void
+11,0x91e70e35,int,sceUtilityNetconfUpdate,int unknown
+12,0x6332aa39,int,sceUtilityNetconfGetStatus,void
+13,0x50c4cd57,int,sceUtilitySavedataInitStart,SceUtilitySavedataParam *params
+14,0x9790b33c,int,sceUtilitySavedataShutdownStart,void
+15,0xd4b95ffb,void,sceUtilitySavedataUpdate,int unknown
+16,0x8874dbe0,int,sceUtilitySavedataGetStatus,void
+17,0x2995d020,,,
+18,0xb62a4061,,,
+19,0xed0fad38,,,
+20,0x88bc7406,,,
+21,0x2ad8e239,int,sceUtilityMsgDialogInitStart,SceUtilityMsgDialogParams *params
+22,0x67af3428,void,sceUtilityMsgDialogShutdownStart,void
+23,0x95fc253b,void,sceUtilityMsgDialogUpdate,int n
+24,0x9a1c91d7,int,sceUtilityMsgDialogGetStatus,void
+25,0xf6269b82,int,sceUtilityOskInitStart,SceUtilityOskParams *params
+26,0x3dfaeba9,int,sceUtilityOskShutdownStart,void
+27,0x4b85c861,int,sceUtilityOskUpdate,int n
+28,0xf3f76017,int,sceUtilityOskGetStatus,void
+29,0x45c18506,int,sceUtilitySetSystemParamInt,"int id,int value"
+30,0xdde5389d,,,
+31,0x41e30674,int,sceUtilitySetSystemParamString,"int id,const char *str"
+32,0x149a7895,,,
+33,0xa5da2406,int,sceUtilityGetSystemParamInt,"int id,int *value"
+34,0x4a833ba4,,,
+35,0x34b78343,int,sceUtilityGetSystemParamString,"int id,char *str,int len"
+36,0xa50e5b30,,,
+37,0x5eee6548,int,sceUtilityCheckNetParam,int id
+38,0x943cba46,,,
+39,0x434d4b3a,int,sceUtilityGetNetParam,"int conf,int param,netData *data"
+40,0x0f3eeaac,,,
+41,0x147f7c85,,,
+42,0x16a1a8d8,,,
+43,0xcdc3aa41,,,
+44,0xf5ce1134,,,
+45,0x05afb9e4,,,
+46,0xbda7d894,,,
+47,0x4fed24d8,,,
+48,0x1579a159,,,
+49,0x64d50c56,,,

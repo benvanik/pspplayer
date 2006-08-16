@@ -1,6 +1,6 @@
-#define GENTRACE
-#define VERBOSEEMIT
-#define REGISTEREMIT
+//#define GENTRACE
+//#define VERBOSEEMIT
+//#define REGISTEREMIT
 #define STATS
 #if STATS
 // note that instruction count will be wrong without this, but it's slow
@@ -21,7 +21,7 @@ using System.Threading;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
-	class Cpu : ICpu
+	partial class Cpu : ICpu
 	{
 		public const int DefaultBlockCount = 5000;
 
