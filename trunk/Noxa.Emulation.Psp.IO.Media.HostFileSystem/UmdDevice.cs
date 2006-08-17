@@ -28,26 +28,10 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 
 			_emulator = emulator;
 			_parameters = parameters;
-			_hostPath = hostPath;
-
-			DirectoryInfo info = new DirectoryInfo( hostPath );
-			_root = new MediaFolder( this, null, info );
 
 			_capacity = capacity;
-			long used = _root.Cache();
-			_available = _capacity - used;
-			if( _available < 0 )
-			{
-				// User gave a capacity that is too small for the size, fix it up
-				while( _capacity < used )
-					_capacity *= 2;
-				Debug.WriteLine( string.Format( "UmdDevice: user gave capacity {0} but {1} is used; changing capacity to {2}",
-					capacity, used, _capacity ) );
-			}
 
-			// Would be nice to do something with this that was official-like (serial number?)
-			_description = string.Format( "UMD ({0}MB)",
-				_capacity / 1024 / 1024 );
+			this.Load( hostPath );
 		}
 
 		public ComponentParameters Parameters
@@ -63,6 +47,14 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			get
 			{
 				return _emulator;
+			}
+		}
+
+		public Type Factory
+		{
+			get
+			{
+				return typeof( GameHostFileSystem );
 			}
 		}
 
@@ -137,6 +129,31 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			{
 				return _available;
 			}
+		}
+
+		public bool Load( string path )
+		{
+			_hostPath = path;
+
+			DirectoryInfo info = new DirectoryInfo( path );
+			_root = new MediaFolder( this, null, info );
+
+			long used = _root.Cache();
+			_available = _capacity - used;
+			if( _available < 0 )
+			{
+				// User gave a capacity that is too small for the size, fix it up
+				while( _capacity < used )
+					_capacity *= 2;
+				Debug.WriteLine( string.Format( "UmdDevice: user gave capacity {0} but {1} is used; changing capacity to {2}",
+					_capacity, used, _capacity ) );
+			}
+
+			// Would be nice to do something with this that was official-like (serial number?)
+			_description = string.Format( "UMD ({0}MB)",
+				_capacity / 1024 / 1024 );
+
+			return true;
 		}
 
 		public void Refresh()

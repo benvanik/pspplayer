@@ -69,6 +69,14 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			}
 		}
 
+		public Type Factory
+		{
+			get
+			{
+				return typeof( UserHostFileSystem );
+			}
+		}
+
 		public string Description
 		{
 			get

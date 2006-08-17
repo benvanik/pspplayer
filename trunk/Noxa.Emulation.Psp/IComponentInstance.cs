@@ -16,6 +16,11 @@ namespace Noxa.Emulation.Psp
 			get;
 		}
 
+		Type Factory
+		{
+			get;
+		}
+
 		void Cleanup();
 	}
 }

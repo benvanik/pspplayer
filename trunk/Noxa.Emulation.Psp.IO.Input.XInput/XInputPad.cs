@@ -43,6 +43,14 @@ namespace Noxa.Emulation.Psp.IO.Input.XInput
 			}
 		}
 
+		public Type Factory
+		{
+			get
+			{
+				return typeof( XInputDriver );
+			}
+		}
+
 		public event EventHandler Connected;
 		public event EventHandler Disconnected;
 

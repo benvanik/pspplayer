@@ -57,5 +57,28 @@ namespace Noxa.Emulation.Psp.Player.Properties {
                 this["PlayerDisplaySize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection RecentGames {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["RecentGames"]));
+            }
+            set {
+                this["RecentGames"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string LastPlayedGame {
+            get {
+                return ((string)(this["LastPlayedGame"]));
+            }
+            set {
+                this["LastPlayedGame"] = value;
+            }
+        }
     }
 }

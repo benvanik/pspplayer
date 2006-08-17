@@ -188,6 +188,12 @@ namespace Noxa.Emulation.Psp.Games
 			return infos.ToArray();
 		}
 
+		public GameInformation FindGame( IUmdDevice device )
+		{
+			GameInformation info = this.GetUmdGameInformation( device );
+			return info;
+		}
+
 		#region Information
 
 		private GameInformation GetEbootGameInformation( IMediaFolder folder )

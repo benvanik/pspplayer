@@ -18,5 +18,7 @@ namespace Noxa.Emulation.Psp.IO.Media
 		{
 			get;
 		}
+
+		bool Load( string path );
 	}
 }
