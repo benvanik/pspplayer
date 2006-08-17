@@ -717,6 +717,14 @@ namespace Noxa.Emulation.Psp.Games
 			public uint Address;
 			public uint Value;
 		}
+
+		protected enum RelocationOffset
+		{
+			Text = 0,
+			Data = 1
+		}
+
+		protected const uint RelocationRelativeData = 0x100;
 		
 		protected void ApplyRelocations( BinaryReader reader, IMemory memory, ElfSection section, uint baseAddress )
 		{
@@ -727,6 +735,11 @@ namespace Noxa.Emulation.Psp.Games
 				return;
 
 			Debug.WriteLine( string.Format( "Relocating section {0} using {1}, {2} relocations total", linked.Name, section.Name, section.Length / 8 ) );
+
+			ElfSection textSection = _sectionLookup[ ".text" ];
+			ElfSection dataSection = _sectionLookup[ ".data" ];
+			Debug.Assert( textSection != null );
+			Debug.Assert( dataSection != null );
 
 			for( int n = 0; n < section.Length / 8; n++ )
 			{
@@ -740,19 +753,27 @@ namespace Noxa.Emulation.Psp.Games
 				relocation.Symbol = ( rel.Info >> 8 ) & 0xFF;
 				relocation.RelocationType = ( ElfRelocationType )( byte )( rel.Info & 0xFF );
 
-				ElfSection offsetBase = _sections[ ( int )relocation.Symbol ];
-				ElfSection addressBase = _sections[ ( int )relocation.BaseAddress ];
-
-				// !!! This should really use the referenced sections address, but it doesn't seem to
-				//uint pointer = linked.Address + relocation.Offset;
 				uint pointer = relocation.Offset;
-				if( offsetBase.Address == 0 )
-					pointer += baseAddress;
+
+				ElfSection offsetBase = null;
+				//ElfSection addressBase = null;
+				if( ( relocation.Symbol & ( uint )RelocationOffset.Data ) == ( uint )RelocationOffset.Data )
+				{
+					offsetBase = dataSection;
+					pointer += dataSection.Address;
+				}
+				//else if( relocation.BaseAddress == 0x1 )
+				//{
+				//    offsetBase = textSection;
+				//    pointer += textSection.Address;
+				//}
 				else
 				{
-					pointer += offsetBase.Address;
-					//Debugger.Break();
+					offsetBase = textSection;
+					pointer += baseAddress;
 				}
+				//ElfSection offsetBase = _sections[ ( int )relocation.Symbol ];
+				//ElfSection addressBase = _sections[ ( int )relocation.BaseAddress ];
 
 				// Happens sometime
 				if( _symbols.Count == 0 )
@@ -763,19 +784,16 @@ namespace Noxa.Emulation.Psp.Games
 
 				ElfSymbol symbol = _symbols[ ( int )relocation.Symbol ];
 				uint symbolValue = symbol.Value;
-				if( symbolValue == 0 )
-				{
-					//symbolValue = linked.Address;
-				}
-				else
-				{
-					int x = 5;
-				}
+
 				// !!! This could be bogus
-				if( addressBase.Address == 0 )
-					symbolValue += baseAddress;
+				if( ( ( rel.Info >> 8 ) & RelocationRelativeData ) == RelocationRelativeData )
+					symbolValue += dataSection.Address;
 				else
-					symbolValue += addressBase.Address;
+					symbolValue += baseAddress;
+				//if( addressBase.Address == 0 )
+				//	symbolValue += baseAddress;
+				//else
+				//	symbolValue += addressBase.Address;
 
 				uint value = ( uint )memory.ReadWord( ( int )pointer );
 
@@ -903,12 +921,6 @@ namespace Noxa.Emulation.Psp.Games
 				//}
 				foreach( ElfSection section in _relocSections )
 				{
-					if( section.Reference.Name == ".data" )
-					{
-						Debug.WriteLine( "Skipping .data section during relocation" );
-						continue;
-					}
-
 					this.ApplyRelocations( reader, memory, section, baseAddress );
 				}
 			}

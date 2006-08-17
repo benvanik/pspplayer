@@ -251,16 +251,16 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				#define	PSP_O_EXCL		0x0800
 				#define PSP_O_NOWAIT	0x8000*/
 			MediaFileMode fileMode = MediaFileMode.Normal;
-			if( ( a1 & 0x0100 ) != 0 )
+			if( ( a1 & 0x0100 ) == 0x0100 )
 				fileMode = MediaFileMode.Append;
-			if( ( a1 & 0x0400 ) != 0 )
+			if( ( a1 & 0x0400 ) == 0x0400 )
 				fileMode = MediaFileMode.Truncate;
 			MediaFileAccess fileAccess = MediaFileAccess.ReadWrite;
-			if( ( a1 & 0x0001 ) != 0 )
+			if( ( a1 & 0x0001 ) == 0x0001 )
 				fileAccess = MediaFileAccess.Read;
-			if( ( a1 & 0x0002 ) != 0 )
+			if( ( a1 & 0x0002 ) == 0x0002 )
 				fileAccess = MediaFileAccess.Write;
-			if( ( a1 & 0x0003 ) != 0 )
+			if( ( a1 & 0x0003 ) == 0x0003 )
 				fileAccess = MediaFileAccess.ReadWrite;
 
 			if( ( a1 & 0x0800 ) != 0 )
@@ -335,10 +335,12 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				return -1;
 			}
 
-			memory.ReadStream( a1, handle.Stream, a2 );
+			int length = ( int )Math.Min( a2, handle.Stream.Length - handle.Stream.Position );
+
+			memory.WriteStream( a1, handle.Stream, length );
 
 			// int
-			return 0;
+			return length;
 		}
 
 		[BiosStub( 0xa0b5a7c2, "sceIoReadAsync", true, 3 )]
@@ -374,7 +376,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				return -1;
 			}
 
-			memory.WriteStream( a1, handle.Stream, a2 );
+			memory.ReadStream( a1, handle.Stream, a2 );
 
 			// int
 			return 0;
@@ -743,23 +745,24 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			// will be absolute for full path or relative
 			string path = Kernel.ReadString( memory, a0 );
 
-			if( path[ 0 ] == '/' )
+			// Ensure the path does not exist
+			if( this.FindPath( path ) != null )
+				return 0;
+
+			if( path[ path.Length - 1 ] == '/' )
+				path = path.Substring( 0, path.Length - 1 );
+			string parentPath = path.Substring( 0, path.LastIndexOf( '/' ) );
+			string newName = path.Substring( path.LastIndexOf( '/' ) + 1 );
+
+			IMediaFolder folder = this.FindPath( parentPath ) as IMediaFolder;
+			if( folder == null )
 			{
-				if( path[ path.Length - 1 ] == '/' )
-					path = path.Substring( 0, path.Length - 1 );
-				string parentPath = path.Substring( 0, path.LastIndexOf( '/' ) );
-				string newName = path.Substring( path.LastIndexOf( '/' ) + 1 );
-
-				IMediaFolder folder = this.FindPath( parentPath ) as IMediaFolder;
-				if( folder == null )
-				{
-					Debug.WriteLine( string.Format( "sceIoMkdir: could not find path '{0}'", path ) );
-					return -1;
-				}
-
-				// TODO: something with mode
-				IMediaFolder newFolder = folder.CreateFolder( newName );
+				Debug.WriteLine( string.Format( "sceIoMkdir: could not find path '{0}'", path ) );
+				return -1;
 			}
+			
+			// TODO: something with mode
+			IMediaFolder newFolder = folder.CreateFolder( newName );
 
 			// int
 			return 0;

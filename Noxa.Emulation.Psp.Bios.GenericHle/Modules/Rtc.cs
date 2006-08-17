@@ -45,19 +45,19 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		[BiosStub( 0xc41c2853, "sceRtcGetTickResolution", true, 0 )]
 		public int sceRtcGetTickResolution( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
-			//long temp = 0;
+			long temp = 0;
 
-			//// Get timer frequency
-			//if( ( QueryPerformanceFrequency( out temp ) == false ) ||
-			//    ( temp == 0 ) )
-			//{
-			//    // Uh oh - performance counter not avail?
-			//    Debug.WriteLine( "sceRtcGetTickResolution: could not query frequency of the performance counter" );
-			//}
+			// Get timer frequency
+			if( ( QueryPerformanceFrequency( out temp ) == false ) ||
+			    ( temp == 0 ) )
+			{
+			    // Uh oh - performance counter not avail?
+			    Debug.WriteLine( "sceRtcGetTickResolution: could not query frequency of the performance counter" );
+			}
 
 			// u32 - ticks per second
-			//return ( int )( unchecked( ( uint )temp ) );
-			return unchecked( ( int )TimeSpan.TicksPerSecond );
+			return ( int )( unchecked( ( uint )temp ) );
+			//return unchecked( ( int )TimeSpan.TicksPerSecond );
 		}
 
 		[BiosStub( 0x3f7ad767, "sceRtcGetCurrentTick", true, 1 )]
@@ -65,11 +65,11 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		{
 			// a0 = u64 *tick
 
-			//long temp = 0;
-			//if( QueryPerformanceCounter( out temp ) == false )
-			//	return -1;
+			long temp = 0;
+			if( QueryPerformanceCounter( out temp ) == false )
+				return -1;
 
-			long temp = DateTime.Now.Ticks;
+			//long temp = DateTime.Now.Ticks;
 
 			int lower = unchecked( ( int )( ( ulong )0x00000000FFFFFFFF & ( ulong )temp ) );
 			int upper = unchecked( ( int )( ( ulong )temp >> 32 ) );

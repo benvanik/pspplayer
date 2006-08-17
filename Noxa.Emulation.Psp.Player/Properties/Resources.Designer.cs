@@ -137,6 +137,13 @@ namespace Noxa.Emulation.Psp.Player.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap ResizeIcon {
+            get {
+                object obj = ResourceManager.GetObject("ResizeIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap RestartIcon {
             get {
                 object obj = ResourceManager.GetObject("RestartIcon", resourceCulture);

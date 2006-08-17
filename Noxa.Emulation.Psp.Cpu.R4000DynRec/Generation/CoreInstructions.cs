@@ -1,3 +1,5 @@
+#define VERBOSESYSCALLS
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -2643,6 +2645,11 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					else
 						context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
 					context.ILGen.Emit( OpCodes.Stfld, context.Core0Pc );
+
+#if VERBOSESYSCALLS
+					context.ILGen.Emit( OpCodes.Ldstr, string.Format( "Syscall to {0}::{1} (0x{2:X8}){3}", biosFunction.Module, biosFunction.Name, biosFunction.NID, ( biosFunction.IsImplemented == true ) ? "" : " (NI)" ) );
+					context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+#endif
 
 					if( willCall == true )
 					{

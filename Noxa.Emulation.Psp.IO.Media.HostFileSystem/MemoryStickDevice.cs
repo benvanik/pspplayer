@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 {
-	class MemoryStickDevice : IMediaDevice
+	class MemoryStickDevice : IMemoryStickDevice
 	{
 		protected IEmulationInstance _emulator;
 		protected ComponentParameters _parameters;

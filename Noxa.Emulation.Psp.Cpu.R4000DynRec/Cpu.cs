@@ -1,4 +1,4 @@
-//#define GENTRACE
+#define GENTRACE
 //#define VERBOSEEMIT
 //#define REGISTEREMIT
 #define STATS
@@ -263,6 +263,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			{
 				int address = _core0.Pc;
 				address = _core0.TranslateAddress( address );
+				_debug = true;
 				//if( address == 0x08900128 )
 				//	_debug = true;
 				//if( address == 0x08924928 )

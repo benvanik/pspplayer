@@ -121,7 +121,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 			string subPath = path.Substring( slashIndex + 1 );
 
 			if( localPath.Length == 0 )
-				return this;
+				return this.Find( subPath );
 
 			if( localPath == "." )
 				return this.Find( subPath );

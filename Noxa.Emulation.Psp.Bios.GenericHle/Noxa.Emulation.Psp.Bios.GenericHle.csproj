@@ -43,10 +43,15 @@
   <ItemGroup>
     <Compile Include="GenericHleBios.cs" />
     <Compile Include="HleInstance.cs" />
+    <Compile Include="Modules\Atrac3plus.cs" />
+    <Compile Include="Modules\Audio.cs" />
     <Compile Include="Modules\Ctrl.cs" />
     <Compile Include="Modules\DisplayUser.cs" />
     <Compile Include="Modules\GeUser.cs" />
+    <Compile Include="Modules\InterruptManager.cs" />
+    <Compile Include="Modules\KernelLibrary.cs" />
     <Compile Include="Modules\LoadExecForUser.cs" />
+    <Compile Include="Modules\Mpeg.cs" />
     <Compile Include="Modules\Power.cs" />
     <Compile Include="Modules\Rtc.cs" />
     <Compile Include="Modules\SuspendForUser.cs" />
@@ -57,6 +62,8 @@
     <Compile Include="Modules\ModuleMgrForUser.cs" />
     <Compile Include="Modules\SysMemUserForUser.cs" />
     <Compile Include="Modules\ThreadManForUser.cs" />
+    <Compile Include="Modules\UmdUser.cs" />
+    <Compile Include="Modules\Utility.cs" />
     <Compile Include="Modules\UtilsForUser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -37,24 +37,32 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.Close();
 		}
 
+		public void FindRecent()
+		{
+		}
+
 		public void FindGames()
 		{
 			GameLoader loader = new GameLoader();
 			GameInformation[] games = loader.FindGames( _emulator );
 
-			this.flowLayoutPanel1.SuspendLayout();
-			this.flowLayoutPanel1.Controls.Clear();
+			this.flowLayoutPanel2.SuspendLayout();
+			this.flowLayoutPanel2.Controls.Clear();
 
 			foreach( GameInformation game in games )
 			{
+				// Ignore the mounted UMD, as it's probably bogus
+				//if( game.GameType == GameType.UmdGame )
+				//	continue;
+
 				GameEntry entry = new GameEntry( this, game );
 				entry.Click += new EventHandler( EntryClick );
 				entry.DoubleClick += new EventHandler( EntryDoubleClick );
 				entry.Width = this.flowLayoutPanel1.ClientSize.Width - 25;
-				this.flowLayoutPanel1.Controls.Add( entry );
+				this.flowLayoutPanel2.Controls.Add( entry );
 			}
 
-			this.flowLayoutPanel1.ResumeLayout( true );
+			this.flowLayoutPanel2.ResumeLayout( true );
 		}
 
 		private void EntryClick( object sender, EventArgs e )

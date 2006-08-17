@@ -114,9 +114,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 					for( int n = 0; n < devices.Count; n++ )
 					{
 						IInputDevice device = devices[ n ];
-						if( device.IsConnected == false )
-							continue;
-
+						
 						device.Poll();
 						sample.Buttons |= device.Buttons;
 						float max = ushort.MaxValue;
@@ -299,9 +297,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				}
 			}
 
-			// TODO: Ensure read/peekbuffer return is 0 (may be sample count?)
 			// int
-			return 0;
+			return samples.Count;
 		}
 
 		[BiosStub( 0x60b81f86, "sceCtrlReadBufferNegative", true, 2 )]
@@ -339,7 +336,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			}
 
 			// int
-			return 0;
+			return samples.Count;
 		}
 
 		[BiosStub( 0xb1d0e5cd, "sceCtrlPeekLatch", false, 0 )]
