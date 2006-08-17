@@ -69,6 +69,12 @@
     <Compile Include="GamePicker\GameEntry.Designer.cs">
       <DependentUpon>GameEntry.cs</DependentUpon>
     </Compile>
+    <Compile Include="GamePicker\GameListing.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="GamePicker\GameListing.Designer.cs">
+      <DependentUpon>GameListing.cs</DependentUpon>
+    </Compile>
     <Compile Include="GamePicker\PickerDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -102,6 +108,10 @@
     <EmbeddedResource Include="GamePicker\GameEntry.resx">
       <SubType>Designer</SubType>
       <DependentUpon>GameEntry.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GamePicker\GameListing.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>GameListing.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GamePicker\PickerDialog.resx">
       <SubType>Designer</SubType>

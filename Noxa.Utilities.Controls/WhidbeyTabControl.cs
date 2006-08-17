@@ -276,15 +276,17 @@ namespace Noxa.Utilities.Controls
         {
             int borderWidth;    // Only used with Selected and Hovered
 
+			// Hide the label if there is an icon
+			tab.Label.Visible = ( tab.Image == null );
+
             if( tab.State == TabState.Selected )
             {
-                Pen p_selectedBorder = new Pen( Color.FromArgb( 173, 190, 204 ), 1.0f );
-
-                // Fill background white
+				// Fill background white
 				g.FillRectangle( Brushes.White, 3, tab.ItemBounds.Top + 1, 104, tab.ItemBounds.Height - 2 );
 
 				// Draw right border
-				g.DrawLine( p_selectedBorder, tab.ItemBounds.Right - 1, tab.ItemBounds.Top + 1, tab.ItemBounds.Right - 1, tab.ItemBounds.Bottom - 1 );
+				using( Pen p_selectedBorder = new Pen( Color.FromArgb( 173, 190, 204 ), 1.0f ) )
+					g.DrawLine( p_selectedBorder, tab.ItemBounds.Right - 1, tab.ItemBounds.Top + 1, tab.ItemBounds.Right - 1, tab.ItemBounds.Bottom - 1 );
 
 				// We are selected, so width goes full
                 borderWidth = 107;
@@ -321,6 +323,16 @@ namespace Noxa.Utilities.Controls
 				g.DrawLine( p_itemBottom, 6, tab.ItemBounds.Top, 101, tab.ItemBounds.Top );
 				// Bottom line
 				g.DrawLine( Pens.White, 6, tab.ItemBounds.Bottom - 1, 101, tab.ItemBounds.Bottom - 1 );
+			}
+
+			if( tab.Image != null )
+			{
+				Rectangle rect = tab.ItemBounds;
+				int centerX = rect.X + ( rect.Width / 2 );
+				int centerY = rect.Y + ( rect.Height / 2 );
+				centerX -= ( tab.Image.Width / 2 );
+				centerY -= ( tab.Image.Height / 2 );
+				g.DrawImageUnscaled( tab.Image, centerX, centerY );
 			}
         }
 

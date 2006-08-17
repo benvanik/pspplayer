@@ -28,15 +28,18 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.gamePicture = new System.Windows.Forms.PictureBox();
 			this.infoLabel = new System.Windows.Forms.Label();
 			this.titleLabel = new System.Windows.Forms.Label();
+			this.toolTip1 = new System.Windows.Forms.ToolTip( this.components );
 			( ( System.ComponentModel.ISupportInitialize )( this.gamePicture ) ).BeginInit();
 			this.SuspendLayout();
 			// 
 			// gamePicture
 			// 
-			this.gamePicture.Location = new System.Drawing.Point( 3, 4 );
+			this.gamePicture.BackColor = System.Drawing.Color.Transparent;
+			this.gamePicture.Location = new System.Drawing.Point( 3, 3 );
 			this.gamePicture.Name = "gamePicture";
 			this.gamePicture.Size = new System.Drawing.Size( 75, 41 );
 			this.gamePicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -49,6 +52,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			// 
 			this.infoLabel.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left )
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.infoLabel.BackColor = System.Drawing.Color.Transparent;
 			this.infoLabel.Location = new System.Drawing.Point( 84, 26 );
 			this.infoLabel.Name = "infoLabel";
 			this.infoLabel.Size = new System.Drawing.Size( 171, 13 );
@@ -61,10 +65,11 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			// 
 			this.titleLabel.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left )
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.titleLabel.Font = new System.Drawing.Font( "Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
+			this.titleLabel.BackColor = System.Drawing.Color.Transparent;
+			this.titleLabel.Font = new System.Drawing.Font( "Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
 			this.titleLabel.Location = new System.Drawing.Point( 84, 6 );
 			this.titleLabel.Name = "titleLabel";
-			this.titleLabel.Size = new System.Drawing.Size( 171, 14 );
+			this.titleLabel.Size = new System.Drawing.Size( 171, 20 );
 			this.titleLabel.TabIndex = 4;
 			this.titleLabel.Text = "label1";
 			this.titleLabel.DoubleClick += new System.EventHandler( this.titleLabel_DoubleClick );
@@ -89,5 +94,6 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		private System.Windows.Forms.PictureBox gamePicture;
 		private System.Windows.Forms.Label infoLabel;
 		private System.Windows.Forms.Label titleLabel;
+		private System.Windows.Forms.ToolTip toolTip1;
 	}
 }

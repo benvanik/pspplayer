@@ -74,6 +74,14 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 			}
 		}
 
+		public Type Factory
+		{
+			get
+			{
+				return typeof( GenericHleBios );
+			}
+		}
+
 		public IKernel Kernel
 		{
 			get

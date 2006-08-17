@@ -168,6 +168,14 @@ namespace Noxa.Emulation.Psp.Cpu
 			}
 		}
 
+		public Type Factory
+		{
+			get
+			{
+				return typeof( DynRecCpu );
+			}
+		}
+
 		public ICpuCapabilities Capabilities
 		{
 			get

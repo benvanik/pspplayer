@@ -69,6 +69,14 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			}
 		}
 
+		public Type Factory
+		{
+			get
+			{
+				return typeof( Direct3DMVideo );
+			}
+		}
+
 		public DisplayProperties Properties
 		{
 			get

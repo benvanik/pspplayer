@@ -42,6 +42,14 @@ namespace Noxa.Emulation.Psp.IO.Input.DirectInput
 			}
 		}
 
+		public Type Factory
+		{
+			get
+			{
+				return typeof( DirectInputDriver );
+			}
+		}
+
 		public event EventHandler Connected;
 		public event EventHandler Disconnected;
 

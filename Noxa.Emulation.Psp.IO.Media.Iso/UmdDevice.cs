@@ -26,18 +26,8 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 
 			_emulator = emulator;
 			_parameters = parameters;
-			_hostPath = hostPath;
 
-			FileInfo fi = new FileInfo( hostPath );
-			_capacity = fi.Length;
-
-			_root = ParseIsoFileSystem( hostPath );
-			Debug.Assert( _root != null );
-			_root.CalculateSize();
-			
-			// Would be nice to do something with this that was official-like (serial number?)
-			_description = string.Format( "UMD ({0}MB)",
-				_capacity / 1024 / 1024 );
+			this.Load( hostPath );
 		}
 
 		public ComponentParameters Parameters
@@ -53,6 +43,14 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 			get
 			{
 				return _emulator;
+			}
+		}
+
+		public Type Factory
+		{
+			get
+			{
+				return typeof( IsoFileSystem );
 			}
 		}
 
@@ -127,6 +125,24 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 			{
 				return 0;
 			}
+		}
+
+		public bool Load( string path )
+		{
+			_hostPath = path;
+
+			FileInfo fi = new FileInfo( path );
+			_capacity = fi.Length;
+
+			_root = ParseIsoFileSystem( path );
+			Debug.Assert( _root != null );
+			_root.CalculateSize();
+
+			// Would be nice to do something with this that was official-like (serial number?)
+			_description = string.Format( "UMD ({0}MB)",
+				_capacity / 1024 / 1024 );
+
+			return true;
 		}
 
 		public void Refresh()

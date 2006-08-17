@@ -44,6 +44,7 @@ namespace Noxa.Emulation.Psp.Games
 		protected Stream _icon;
 		protected Stream _background;
 		protected Stream _dataPsp;
+		protected object _tag;
 
 		internal GameInformation( GameType gameType, IMediaFolder folder, GameParameters parameters, Stream icon, Stream background, string uniqueId )
 		{
@@ -112,6 +113,18 @@ namespace Noxa.Emulation.Psp.Games
 			internal set
 			{
 				_dataPsp = value;
+			}
+		}
+
+		public object Tag
+		{
+			get
+			{
+				return _tag;
+			}
+			set
+			{
+				_tag = value;
 			}
 		}
 	}

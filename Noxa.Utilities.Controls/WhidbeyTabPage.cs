@@ -51,6 +51,7 @@ namespace Noxa.Utilities.Controls
 		private		Rectangle						m_nBounds			= new Rectangle();
 		private		TabState						m_nState			= TabState.Normal;
 		private		Label							m_oLabel;
+		private		Image							m_oIcon				= null;
 		
 		private event EventHandler m_eShowing;
 		private event EventHandler m_eHiding;
@@ -207,6 +208,24 @@ namespace Noxa.Utilities.Controls
 					this.Label.Text = value;
 			}
         }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		[Browsable( true )]
+		[Bindable( true )]
+		[EditorBrowsable( EditorBrowsableState.Always )]
+		public Image Image
+		{
+			get
+			{
+				return m_oIcon;
+			}
+			set
+			{
+				m_oIcon = value;
+			}
+		}
 
 		#endregion
 
