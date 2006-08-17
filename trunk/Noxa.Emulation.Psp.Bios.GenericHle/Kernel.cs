@@ -340,7 +340,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 				}
 			}
 			_devices.Add( new KernelFileDevice( "MemoryStick", new string[] { "fatms0", "ms0", "fatms" }, true, ( msDevice != null ) ? msDevice.IsReadOnly : true, msDevice, ( msDevice != null ) ? msDevice.Root : null ) );
-			_devices.Add( new KernelFileDevice( "UMD", new string[] { "umd0", "isofs", "isofs0" }, true, true, umdDevice, ( umdDevice != null ) ? umdDevice.Root : null ) );
+			_devices.Add( new KernelFileDevice( "UMD", new string[] { "umd0", "isofs", "isofs0", "disc0" }, true, true, umdDevice, ( umdDevice != null ) ? umdDevice.Root : null ) );
 			//_devices.Add( new KernelFileDevice( "flash0", new string[] { "flash0", "flashfat", "flashfat0" }, true, false, null, null ) );
 			//_devices.Add( new KernelFileDevice( "flash1", new string[] { "flash1", "flashfat1" }, true, false, null, null ) );
 

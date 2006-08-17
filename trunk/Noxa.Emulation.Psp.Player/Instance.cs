@@ -1,4 +1,4 @@
-#define XMB
+//#define XMB
 
 using System;
 using System.Collections.Generic;
@@ -14,6 +14,7 @@ using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Video;
 using Noxa.Emulation.Psp.IO;
 using Noxa.Emulation.Psp.IO.Input;
+using Noxa.Emulation.Psp.IO.Media;
 
 namespace Noxa.Emulation.Psp.Player
 {
@@ -33,6 +34,8 @@ namespace Noxa.Emulation.Psp.Player
 		protected IBios _bios;
 		protected ICpu _cpu;
 		protected List<IIODriver> _io = new List<IIODriver>();
+		protected IUmdDevice _umd;
+		protected IMemoryStickDevice _memoryStick;
 		protected IVideoDriver _video;
 
 		protected Thread _thread;
@@ -87,6 +90,40 @@ namespace Noxa.Emulation.Psp.Player
 			get
 			{
 				return _io.AsReadOnly();
+			}
+		}
+
+		public IUmdDevice Umd
+		{
+			get
+			{
+				if( _umd == null )
+				{
+					for( int n = 0; n < _io.Count; n++ )
+					{
+						_umd = _io[ n ] as IUmdDevice;
+						if( _umd != null )
+							break;
+					}
+				}
+				return _umd;
+			}
+		}
+
+		public IMemoryStickDevice MemoryStick
+		{
+			get
+			{
+				if( _memoryStick == null )
+				{
+					for( int n = 0; n < _io.Count; n++ )
+					{
+						_memoryStick = _io[ n ] as IMemoryStickDevice;
+						if( _memoryStick != null )
+							break;
+					}
+				}
+				return _memoryStick;
 			}
 		}
 
@@ -210,9 +247,8 @@ namespace Noxa.Emulation.Psp.Player
 
 		public void Start()
 		{
-			Debug.Assert( _isCreated == true );
 			if( _isCreated == false )
-				return;
+				this.Create();
 
 			switch( _state )
 			{
@@ -312,6 +348,8 @@ namespace Noxa.Emulation.Psp.Player
 				if( _picker.ShowDialog( _host.Player ) == System.Windows.Forms.DialogResult.OK )
 				{
 				}
+				else
+					this.Stop();
 				_picker = null;
 			};
 			_host.Player.Invoke( del );

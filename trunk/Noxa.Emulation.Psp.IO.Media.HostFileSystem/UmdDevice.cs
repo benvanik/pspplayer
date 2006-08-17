@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 {
-	class UmdDevice : IMediaDevice
+	class UmdDevice : IUmdDevice
 	{
 		protected IEmulationInstance _emulator;
 		protected ComponentParameters _parameters;
@@ -87,6 +87,15 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			get
 			{
 				return MediaType.Umd;
+			}
+		}
+
+		public DiscType DiscType
+		{
+			get
+			{
+				// TODO: Support other disc types
+				return DiscType.Game;
 			}
 		}
 

@@ -45,5 +45,17 @@ namespace Noxa.Emulation.Psp.Player.Properties {
                 this["ComponentSettings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Original")]
+        public string PlayerDisplaySize {
+            get {
+                return ((string)(this["PlayerDisplaySize"]));
+            }
+            set {
+                this["PlayerDisplaySize"] = value;
+            }
+        }
     }
 }

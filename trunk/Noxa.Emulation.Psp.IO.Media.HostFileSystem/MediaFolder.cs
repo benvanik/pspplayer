@@ -157,6 +157,9 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 
 		public IMediaItem Find( string path )
 		{
+			if( path.Length == 0 )
+				return this;
+
 			int slashIndex = path.IndexOfAny( new char[] { '/', '\\' } );
 			if( slashIndex < 0 )
 			{
@@ -172,7 +175,7 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			string subPath = path.Substring( slashIndex + 1 );
 
 			if( localPath.Length == 0 )
-				return this;
+				return this.Find( subPath );
 
 			if( localPath == "." )
 				return this.Find( subPath );
@@ -216,9 +219,9 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			// TODO: Assert name is valid directory style via regex, here we just do / check
 			Debug.Assert( name.IndexOfAny( new char[] { '/', '\\' } ) < 0 );
 			
-			DirectoryInfo info = Directory.CreateDirectory( Path.Combine( this.AbsolutePath, name ) );
+			DirectoryInfo info = Directory.CreateDirectory( Path.Combine( _info.FullName, name ) );
 			
-			MediaFolder folder = new MediaFolder(_device, this, info );
+			MediaFolder folder = new MediaFolder( _device, this, info );
 			return folder;
 		}
 
@@ -231,7 +234,7 @@ namespace Noxa.Emulation.Psp.IO.Media.FileSystem
 			Debug.Assert( name.Length > 0 );
 			// TODO: Assert name is valid file style via regex, here we just do / check
 			Debug.Assert( name.IndexOfAny( new char[] { '/', '\\' } ) < 0 );
-			string path = Path.Combine( this.AbsolutePath, name );
+			string path = Path.Combine( _info.FullName, name );
 
 			FileInfo info = new FileInfo( path );
 			// This should create a 0 length file

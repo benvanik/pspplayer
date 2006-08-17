@@ -7,6 +7,7 @@ using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.IO;
 using Noxa.Emulation.Psp.Video;
 using System.Collections.ObjectModel;
+using Noxa.Emulation.Psp.IO.Media;
 
 namespace Noxa.Emulation.Psp
 {
@@ -43,6 +44,16 @@ namespace Noxa.Emulation.Psp
 		}
 
 		ReadOnlyCollection<IIODriver> IO
+		{
+			get;
+		}
+
+		IMemoryStickDevice MemoryStick
+		{
+			get;
+		}
+
+		IUmdDevice Umd
 		{
 			get;
 		}
