@@ -1,6 +1,6 @@
 #define GENTRACE
-//#define VERBOSEEMIT
-//#define REGISTEREMIT
+#define VERBOSEEMIT
+#define REGISTEREMIT
 #define STATS
 #if STATS
 // note that instruction count will be wrong without this, but it's slow
@@ -271,8 +271,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			{
 				int address = _core0.Pc;
 				address = _core0.TranslateAddress( address );
-				_debug = true;
-				//if( address == 0x08900128 )
+				//if( address == 0x08917518 )
 				//	_debug = true;
 				//if( address == 0x08924928 )
 				//	_debug = true;
@@ -544,7 +543,7 @@ namespace Noxa.Emulation.Psp.Cpu
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, 0, function );
 									}
 									break;
-								case 31: // SPECIAL3 type
+								case 0x1F: // SPECIAL3 type
 									{
 										byte rt = ( byte )( ( code >> 16 ) & 0x1F );
 										byte rd = ( byte )( ( code >> 11 ) & 0x1F );

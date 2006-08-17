@@ -1,4 +1,5 @@
 #define VERBOSESYSCALLS
+#define FASTSINGLEWORDCONVERT
 
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			instrs[ 17 ] = new GenerateInstructionR( Arithmetic.MTHI );
 			instrs[ 18 ] = new GenerateInstructionR( Arithmetic.MFLO );
 			instrs[ 19 ] = new GenerateInstructionR( Arithmetic.MTLO );
+			instrs[ 22 ] = new GenerateInstructionR( Arithmetic.CLZ );
+			instrs[ 23 ] = new GenerateInstructionR( Arithmetic.CLO );
 			instrs[ 24 ] = new GenerateInstructionR( Arithmetic.MULT );
 			instrs[ 25 ] = new GenerateInstructionR( Arithmetic.MULTU );
 			instrs[ 26 ] = new GenerateInstructionR( Arithmetic.DIV );
@@ -517,29 +520,33 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 		public static void EmitWordToSingle( GenerationContext context )
 		{
+#if FASTSINGLEWORDCONVERT
+			context.ILGen.Emit( OpCodes.Stloc_0 );
+			context.ILGen.Emit( OpCodes.Ldloca_S, 0 );
+			context.ILGen.Emit( OpCodes.Conv_U );
+			context.ILGen.Emit( OpCodes.Ldind_R4 );
+#else
 			context.ILGen.Emit( OpCodes.Conv_I4 );
 			context.ILGen.Emit( OpCodes.Call, typeof( BitConverter ).GetMethod( "GetBytes", new Type[] { typeof( int ) } ) );
 			context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 			context.ILGen.Emit( OpCodes.Call, typeof( BitConverter ).GetMethod( "ToSingle" ) );
-			
-			//context.ILGen.Emit( OpCodes.Stloc_0 );
-			//context.ILGen.Emit( OpCodes.Ldloca_S, 0 );
-			//context.ILGen.Emit( OpCodes.Conv_U );
-			//context.ILGen.Emit( OpCodes.Ldind_R4 );
+#endif
 		}
 
 		public static void EmitSingleToWord( GenerationContext context )
 		{
+#if FASTSINGLEWORDCONVERT
+			context.ILGen.Emit( OpCodes.Conv_R4 );
+			context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
+			context.ILGen.Emit( OpCodes.Ldloca_S, ( byte )Cpu.LocalTempF );
+			context.ILGen.Emit( OpCodes.Conv_U );
+			context.ILGen.Emit( OpCodes.Ldind_I4 );
+#else
 			context.ILGen.Emit( OpCodes.Conv_R4 );
 			context.ILGen.Emit( OpCodes.Call, typeof( BitConverter ).GetMethod( "GetBytes", new Type[] { typeof( float ) } ) );
 			context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 			context.ILGen.Emit( OpCodes.Call, typeof( BitConverter ).GetMethod( "ToInt32" ) );
-
-			//context.ILGen.Emit( OpCodes.Conv_R4 );
-			//context.ILGen.Emit( OpCodes.Stloc_S, ( byte )Cpu.LocalTempF );
-			//context.ILGen.Emit( OpCodes.Ldloca_S, ( byte )Cpu.LocalTempF );
-			//context.ILGen.Emit( OpCodes.Conv_U );
-			//context.ILGen.Emit( OpCodes.Ldind_I4 );
+#endif
 		}
 
 		#endregion
@@ -1425,6 +1432,132 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Or );
 
 					EmitStoreRegister( context, rt );
+				}
+				return GenerationResult.Success;
+			}
+
+			public static GenerationResult CLZ( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+			{
+				if( pass == 0 )
+				{
+					context.ReadRegisters[ rs ] = true;
+					context.WriteRegisters[ rd ] = true;
+				}
+				else if( pass == 1 )
+				{
+					EmitLoadRegister( context, rs );
+					context.ILGen.Emit( OpCodes.Stloc_0 );
+					context.ILGen.Emit( OpCodes.Ldc_I4, 31 );
+					context.ILGen.Emit( OpCodes.Stloc_1 );
+
+					Label loopStart = context.ILGen.DefineLabel();
+					Label loopEnd = context.ILGen.DefineLabel();
+					Label notFound = context.ILGen.DefineLabel();
+					Label done = context.ILGen.DefineLabel();
+
+					context.ILGen.MarkLabel( loopStart );
+
+					// if( ( rs >> n ) & 0x1 == 1 ) break;
+					context.ILGen.Emit( OpCodes.Ldloc_0 );
+					context.ILGen.Emit( OpCodes.Ldloc_1 );
+					context.ILGen.Emit( OpCodes.Shr_Un );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.And );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Beq_S, loopEnd );
+
+					// if( n == 0 ) break;
+					context.ILGen.Emit( OpCodes.Ldloc_1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
+					context.ILGen.Emit( OpCodes.Beq_S, notFound );
+
+					// n--
+					context.ILGen.Emit( OpCodes.Ldloc_1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Sub );
+					context.ILGen.Emit( OpCodes.Stloc_1 );
+
+					context.ILGen.Emit( OpCodes.Br_S, loopStart );
+
+					context.ILGen.MarkLabel( loopEnd );
+
+					// rd = 31 - n;
+					context.ILGen.Emit( OpCodes.Ldc_I4, 31 );
+					context.ILGen.Emit( OpCodes.Ldloc_1 );
+					context.ILGen.Emit( OpCodes.Sub );
+					context.ILGen.Emit( OpCodes.Br_S, done );
+
+					context.ILGen.MarkLabel( notFound );
+
+					// rd = 32;
+					context.ILGen.Emit( OpCodes.Ldc_I4, 32 );
+
+					context.ILGen.MarkLabel( done );
+
+					EmitStoreRegister( context, rd );
+				}
+				return GenerationResult.Success;
+			}
+
+			public static GenerationResult CLO( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+			{
+				if( pass == 0 )
+				{
+					context.ReadRegisters[ rs ] = true;
+					context.WriteRegisters[ rd ] = true;
+				}
+				else if( pass == 1 )
+				{
+					EmitLoadRegister( context, rs );
+					context.ILGen.Emit( OpCodes.Stloc_0 );
+					context.ILGen.Emit( OpCodes.Ldc_I4, 31 );
+					context.ILGen.Emit( OpCodes.Stloc_1 );
+
+					Label loopStart = context.ILGen.DefineLabel();
+					Label loopEnd = context.ILGen.DefineLabel();
+					Label notFound = context.ILGen.DefineLabel();
+					Label done = context.ILGen.DefineLabel();
+
+					context.ILGen.MarkLabel( loopStart );
+
+					// if( ( rs >> n ) & 0x1 == 0 ) break;
+					context.ILGen.Emit( OpCodes.Ldloc_0 );
+					context.ILGen.Emit( OpCodes.Ldloc_1 );
+					context.ILGen.Emit( OpCodes.Shr_Un );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.And );
+					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
+					context.ILGen.Emit( OpCodes.Beq_S, loopEnd );
+
+					// if( n == 0 ) break;
+					context.ILGen.Emit( OpCodes.Ldloc_1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
+					context.ILGen.Emit( OpCodes.Beq_S, notFound );
+
+					// n--
+					context.ILGen.Emit( OpCodes.Ldloc_1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
+					context.ILGen.Emit( OpCodes.Sub );
+					context.ILGen.Emit( OpCodes.Stloc_1 );
+
+					context.ILGen.Emit( OpCodes.Br_S, loopStart );
+
+					context.ILGen.MarkLabel( loopEnd );
+
+					// rd = 31 - n;
+					context.ILGen.Emit( OpCodes.Ldc_I4, 31 );
+					context.ILGen.Emit( OpCodes.Ldloc_1 );
+					context.ILGen.Emit( OpCodes.Sub );
+					context.ILGen.Emit( OpCodes.Br_S, done );
+
+					context.ILGen.MarkLabel( notFound );
+
+					// rd = 32;
+					context.ILGen.Emit( OpCodes.Ldc_I4, 32 );
+
+					context.ILGen.MarkLabel( done );
+
+					EmitStoreRegister( context, rd );
 				}
 				return GenerationResult.Success;
 			}
