@@ -31,6 +31,11 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get;
 		}
+
+		bool InternalMemorySupported
+		{
+			get;
+		}
 	}
 
 	public interface ICpu : IComponentInstance
@@ -66,6 +71,16 @@ namespace Noxa.Emulation.Psp.Cpu
 		}
 
 		IMemory Memory
+		{
+			get;
+		}
+
+		byte[] InternalMemory
+		{
+			get;
+		}
+
+		int InternalMemoryBaseAddress
 		{
 			get;
 		}

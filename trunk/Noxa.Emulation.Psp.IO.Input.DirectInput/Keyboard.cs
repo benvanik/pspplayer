@@ -119,9 +119,11 @@ namespace Noxa.Emulation.Psp.IO.Input.DirectInput
 				}
 			}
 
+			KeyboardState state = null;
 			try
 			{
 				_device.Poll();
+				state = _device.CurrentKeyboardState;
 			}
 			catch
 			{
@@ -139,47 +141,50 @@ namespace Noxa.Emulation.Psp.IO.Input.DirectInput
 				}
 			}
 
-			KeyboardState state = _device.CurrentKeyboardState;
-
 			// Keys:
 			// wsad = dpad
 			// l/r shift = l/r shoulder
 			// p;l' = tri cross squ cir
 			// z = start, x = sel, c = home
 
-			PadButtons buttons = PadButtons.None;
-			if( ( state[ Key.SemiColon ] == true ) ||
-				( state[ Key.Return ] == true ) )
-				buttons |= PadButtons.Cross;
-			if( state[ Key.Apostrophe ] == true )
-				buttons |= PadButtons.Circle;
-			if( state[ Key.L ] == true )
-				buttons |= PadButtons.Square;
-			if( state[ Key.P ] == true )
-				buttons |= PadButtons.Triangle;
-			if( state[ Key.Z ] == true )
-				buttons |= PadButtons.Start;
-			if( state[ Key.X ] == true )
-				buttons |= PadButtons.Select;
-			if( state[ Key.C ] == true )
-				buttons |= PadButtons.Home;
-			if( ( state[ Key.W ] == true ) ||
-				( state[ Key.Up ] == true ) )
-				buttons |= PadButtons.DigitalUp;
-			if( ( state[ Key.S ] == true ) ||
-				( state[ Key.Down ] == true ) )
-				buttons |= PadButtons.DigitalDown;
-			if( ( state[ Key.A ] == true ) ||
-				( state[ Key.Left ] == true ) )
-				buttons |= PadButtons.DigitalLeft;
-			if( ( state[ Key.D ] == true ) ||
-				( state[ Key.Right ] == true ) )
-				buttons |= PadButtons.DigitalRight;
-			if( state[ Key.LeftShift ] == true )
-				buttons |= PadButtons.LeftTrigger;
-			if( state[ Key.RightShift ] == true )
-				buttons |= PadButtons.RightTrigger;
-			_buttons = buttons;
+			if( state != null )
+			{
+				PadButtons buttons = PadButtons.None;
+				if( ( state[ Key.SemiColon ] == true ) ||
+					( state[ Key.Return ] == true ) )
+					buttons |= PadButtons.Cross;
+				if( state[ Key.Apostrophe ] == true )
+					buttons |= PadButtons.Circle;
+				if( state[ Key.L ] == true )
+					buttons |= PadButtons.Square;
+				if( state[ Key.P ] == true )
+					buttons |= PadButtons.Triangle;
+				if( state[ Key.Z ] == true )
+					buttons |= PadButtons.Start;
+				if( state[ Key.X ] == true )
+					buttons |= PadButtons.Select;
+				if( state[ Key.C ] == true )
+					buttons |= PadButtons.Home;
+				if( ( state[ Key.W ] == true ) ||
+					( state[ Key.Up ] == true ) )
+					buttons |= PadButtons.DigitalUp;
+				if( ( state[ Key.S ] == true ) ||
+					( state[ Key.Down ] == true ) )
+					buttons |= PadButtons.DigitalDown;
+				if( ( state[ Key.A ] == true ) ||
+					( state[ Key.Left ] == true ) )
+					buttons |= PadButtons.DigitalLeft;
+				if( ( state[ Key.D ] == true ) ||
+					( state[ Key.Right ] == true ) )
+					buttons |= PadButtons.DigitalRight;
+				if( state[ Key.LeftShift ] == true )
+					buttons |= PadButtons.LeftTrigger;
+				if( state[ Key.RightShift ] == true )
+					buttons |= PadButtons.RightTrigger;
+				_buttons = buttons;
+			}
+			else
+				_buttons = PadButtons.None;
 
 			_analogX = 0;
 			_analogY = 0;

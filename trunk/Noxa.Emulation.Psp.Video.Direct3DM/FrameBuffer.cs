@@ -51,23 +51,23 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		{
 			lock( this )
 			{
-				Format format;
-				switch( _driver.Properties.PixelFormat )
-				{
-					case PixelFormat.Rgb565:
-						format = Format.R5G6B5;
-						break;
-					case PixelFormat.Rgba4444:
-						format = Format.A4R4G4B4;
-						break;
-					case PixelFormat.Rgba5551:
-						format = Format.A1R5G5B5;
-						break;
-					case PixelFormat.Rgba8888:
-					default:
-						format = Format.A8R8G8B8;
-						break;
-				}
+				//Format format;
+				//switch( _driver.Properties.PixelFormat )
+				//{
+				//    case PixelFormat.Rgb565:
+				//        format = Format.R5G6B5;
+				//        break;
+				//    case PixelFormat.Rgba4444:
+				//        format = Format.A4R4G4B4;
+				//        break;
+				//    case PixelFormat.Rgba5551:
+				//        format = Format.A1R5G5B5;
+				//        break;
+				//    case PixelFormat.Rgba8888:
+				//    default:
+				//        format = Format.A8R8G8B8;
+				//        break;
+				//}
 
 				if( _texture != null )
 					_texture.Dispose();

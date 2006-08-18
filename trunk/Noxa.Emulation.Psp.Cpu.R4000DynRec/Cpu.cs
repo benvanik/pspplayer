@@ -148,6 +148,14 @@ namespace Noxa.Emulation.Psp.Cpu
 					return false;
 				}
 			}
+
+			public bool InternalMemorySupported
+			{
+				get
+				{
+					return true;
+				}
+			}
 		}
 
 		#endregion
@@ -233,6 +241,22 @@ namespace Noxa.Emulation.Psp.Cpu
 			get
 			{
 				return _memory;
+			}
+		}
+
+		public byte[] InternalMemory
+		{
+			get
+			{
+				return _memory._mainMemory;
+			}
+		}
+
+		public int InternalMemoryBaseAddress
+		{
+			get
+			{
+				return Psp.Cpu.Memory.MainMemoryBaseAddress;
 			}
 		}
 

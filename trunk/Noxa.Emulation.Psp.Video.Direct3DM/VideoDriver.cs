@@ -291,7 +291,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 						// Process lists
 						for( int n = 0; n < toProcess.Count; n++ )
-						    ParseList( toProcess[ n ] );
+							ParseList( toProcess[ n ] );
 
 						_device.EndScene();
 						try
