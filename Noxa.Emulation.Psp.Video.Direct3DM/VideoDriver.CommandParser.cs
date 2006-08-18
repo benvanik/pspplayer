@@ -94,6 +94,29 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		//    1: Raw Coordinates
 	}
 
+	enum TexturePixelStorage
+	{
+		BGR5650 = 0,
+		ABGR5551 = 1,
+		ABGR4444 = 2,
+		ABGR8888 = 3,
+		Indexed4 = 4,
+		Indexed8 = 5,
+		Indexed16 = 6,
+		Indexed32 = 7,
+		DXT1 = 8,
+		DXT3 = 9,
+		DXT5 = 10,
+	}
+
+	class TextureContext
+	{
+		public int Address;
+		public int LineWidth;
+		public int Width;
+		public int Height;
+	}
+
 	class VideoContext
 	{
 		public MemoryStream MemoryBuffer = new MemoryStream( 1024 * 100 );
@@ -121,8 +144,19 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		public uint Temp;
 
+		public bool TexturesValid;
+		public int MipMapLevel;
+		public bool SwizzleTextures;
+		public TexturePixelStorage TextureStorageMode;
+		public TextureContext[] Textures = new TextureContext[]{
+			new TextureContext(), new TextureContext(), new TextureContext(), new TextureContext(),
+			new TextureContext(), new TextureContext(), new TextureContext(), new TextureContext(),
+		};
+		public const uint MaximumCachedTextures = 4703;
+		public Dictionary<int, CachedTexture> CachedTextures = new Dictionary<int, CachedTexture>( ( int )MaximumCachedTextures );
+
 		public const uint MaximumCachedVertexBuffers = 4703;
-		public Dictionary<uint, VertexBuffer> CachedVertexBuffers = new Dictionary<uint, VertexBuffer>( ( int )MaximumCachedVertexBuffers );
+		public Dictionary<uint, CachedVertexBuffer> CachedVertexBuffers = new Dictionary<uint, CachedVertexBuffer>( ( int )MaximumCachedVertexBuffers );
 		public Dictionary<int, int> VertexTypeSizes = new Dictionary<int, int>( 128 );
 	}
 
@@ -144,6 +178,9 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		protected void ParseList( DisplayList list )
 		{
 			IMemory memory = _emulator.Cpu.Memory;
+			bool supportInternalMemory = _emulator.Cpu.Capabilities.InternalMemorySupported;
+			byte[] internalMemory = _emulator.Cpu.InternalMemory;
+			int internalMemoryBaseAddress = _emulator.Cpu.InternalMemoryBaseAddress;
 
 			//Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", list.Packets.Length ) );
 
@@ -159,7 +196,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			//_device.Transform.Projection = _context.ProjectionMatrix;
 			//_device.Transform.View = Matrix.LookAtLeftHanded( new Vector3( 0, 0, 1 ), Vector3.Empty, new Vector3( 0, 1, 0 ) );
 			//_device.Transform.View = Matrix.Identity;
-			_device.Transform.World = Matrix.Identity;
+			//_device.Transform.World = Matrix.Identity;
 			
 			for( int n = 0; n < list.Packets.Length; n++ )
 			{
@@ -239,11 +276,26 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						{
 							// Ambient color in BGR format - need to flip
 							int ambient = _device.RenderState.AmbientValue;
-							ambient &= unchecked( ( int )0xFF000000 );
-							ambient |= ( ( packet.Argument & 0x00FF0000 ) >> 16 );
-							ambient |= ( packet.Argument & 0x0000FF00 );
-							ambient |= ( ( packet.Argument & 0x000000FF ) << 16 );
+							ambient &= unchecked( ( int )0xFF000000 ) | ( ( packet.Argument & 0x00FF0000 ) >> 16 ) | ( packet.Argument & 0x0000FF00 ) | ( ( packet.Argument & 0x000000FF ) << 16 );
 							_device.RenderState.AmbientValue = ambient;
+						}
+						break;
+					case VideoCommand.AMA:
+						{
+							// TODO: ambient color
+							int ambient = _device.Material.Ambient.ToArgb();
+							ambient &= 0x00FFFFFF;
+							ambient |= packet.Argument << 24;
+							//_device.Material.Ambient = Color.FromArgb( ambient );
+						}
+						break;
+					case VideoCommand.AMC:
+						{
+							// TODO: ambient color
+							// Ambient color in BGR format - need to flip
+							int ambient = _device.Material.Ambient.ToArgb();
+							ambient &= unchecked( ( int )0xFF000000 ) | ( ( packet.Argument & 0x00FF0000 ) >> 16 ) | ( packet.Argument & 0x0000FF00 ) | ( ( packet.Argument & 0x000000FF ) << 16 );
+							//_device.Material.Ambient = Color.FromArgb( ambient );
 						}
 						break;
 
@@ -320,56 +372,149 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 									vertexSize = _context.VertexTypeSizes[ _context.VertexTypeValue ];
 								else
 								{
-									//vertexSize = DetermineVertexSize( _context.VertexType );
-									vertexSize = 16;
+									vertexSize = DetermineVertexSize( _context.VertexType );
 									_context.VertexTypeSizes.Add( _context.VertexTypeValue, vertexSize );
 								}
 
 								//Debug.WriteLine( string.Format( "PRIM: {0} vertices of type {1} ({2} prims) in format 0x{3:X8} ({4}B/vertex)", vertexCount, primitiveType, primitiveCount, ( uint )_context.VertexType, vertexSize ) );
 
-								// Get
-								uint hash = memory.GetMemoryHash( _context.VertexBufferAddress, vertexCount * vertexSize, VideoContext.MaximumCachedVertexBuffers );
+								int bufferLength = vertexCount * vertexSize;
 
-								VertexBuffer vb = null;
+								// Get
+								uint hash = memory.GetMemoryHash( _context.VertexBufferAddress, bufferLength, VideoContext.MaximumCachedVertexBuffers );
+
+								CachedVertexBuffer vb = null;
 								if( _context.CachedVertexBuffers.ContainsKey( hash ) == true )
 								{
 									vb = _context.CachedVertexBuffers[ hash ];
 								}
 								else
 								{
-									// TODO: Optimize cpu->ge memory reads
-									memory.ReadStream( _context.VertexBufferAddress, _context.MemoryBuffer, vertexCount * vertexSize );
-
-									// TODO: Don't use a fucking BinaryReader, you noob ^_^
-									// Need to convert bytes to some kind of D3D vertex listing
-									PositionColored[] verts = new PositionColored[ vertexCount ];
-									BinaryReader reader = _context.MemoryReader;
+									if( supportInternalMemory == true )
 									{
-										for( int m = 0; m < vertexCount; m++ )
-										{
-											// 4 bytes color - need to swizzle cause in AABBGGRR format
-											int c = reader.ReadInt32();
-											c = ( c & unchecked( ( int )0xFF00FF00 ) ) | ( ( c & 0x00FF0000 ) >> 16 ) | ( ( c & 0x000000FF ) << 16 );
+										// Use internal memory as a direct byte array (only works for main memory)
+										int offset = _context.VertexBufferAddress - internalMemoryBaseAddress;
 
-											// 3 float xyz
-											float x = reader.ReadSingle();
-											float y = reader.ReadSingle();
-											float z = reader.ReadSingle();
+										// If we are trying to read from video memory, this could be negative - need to find a way to do this!
+										Debug.Assert( offset > 0 );
 
-											verts[ m ] = new PositionColored(
-												x, y, z, c );
-										}
+										vb = this.BuildVertexBuffer( vertexCount, vertexSize, internalMemory, offset, bufferLength );
 									}
-									_context.MemoryBuffer.Position = 0;
+									else
+									{
+										// TODO: vertex buffer memory reads when the CPU doesn't support InternalMemory
+										//memory.ReadStream( _context.VertexBufferAddress, _context.MemoryBuffer, vertexCount * vertexSize );
+										Debug.Assert( false );
+										throw new NotImplementedException( "Need InternalMemory support in the CPU" );
+									}
 
-									vb = this.BuildVertexBuffer( primitiveType, verts );
-									_context.CachedVertexBuffers.Add( hash, vb );
+									Debug.Assert( vb != null );
+									if( vb != null )
+										_context.CachedVertexBuffers.Add( hash, vb );
 								}
 
-								_device.VertexFormat = PositionColored.Format;
-								_device.SetStreamSource( 0, vb, 0, PositionColored.StrideSize );
-								_device.DrawPrimitives( primitiveType, 0, primitiveCount );
+								Debug.Assert( vb != null );
+								if( vb != null )
+								{
+									this.SetTextures();
+
+									_device.VertexFormat = vb.Format;
+									_device.SetStreamSource( 0, vb.Buffer, 0, vb.StrideSize );
+									_device.DrawPrimitives( primitiveType, 0, primitiveCount );
+								}
 							}
+						}
+						break;
+
+					case VideoCommand.TMODE:
+						{
+							_context.SwizzleTextures = ( packet.Argument & 0x1 ) == 1 ? true : false;
+							_context.MipMapLevel = ( packet.Argument >> 16 ) & 0x4;
+						}
+						break;
+					case VideoCommand.TPSM:
+						{
+							_context.TextureStorageMode = ( TexturePixelStorage )packet.Argument;
+						}
+						break;
+					case VideoCommand.TEC:
+						{
+							// TODO: texture environment color
+							int color = ( packet.Argument & 0x0000FF00 ) | unchecked( ( int )0xFF000000 );
+							color |= ( ( packet.Argument & 0x00FF0000 ) >> 16 );
+							color |= ( ( packet.Argument & 0x000000FF ) << 16 );
+							//_device.Material.Diffuse = Color.FromArgb( color );
+						}
+						break;
+					case VideoCommand.TFLT:
+						{
+							// bits 0-2 have minifying filter
+							// bits 8-10 have magnifying filter
+							switch( packet.Argument & 0x7 )
+							{
+								case 0x0: // Nearest
+									break;
+								case 0x1: // Linear
+									break;
+								case 0x4: // Nearest; mipmap nearest
+									break;
+								case 0x5: // Linear; mipmap nearest
+									break;
+								case 0x6: // Nearest; mipmap linear
+									break;
+								case 0x7: // Linear; mipmap linear
+									break;
+							}
+							switch( ( packet.Argument >> 8 ) & 0x7 )
+							{
+								case 0x0: // Nearest
+									break;
+								case 0x1: // Linear
+									break;
+								case 0x4: // Nearest; mipmap nearest
+									break;
+								case 0x5: // Linear; mipmap nearest
+									break;
+								case 0x6: // Nearest; mipmap linear
+									break;
+								case 0x7: // Linear; mipmap linear
+									break;
+							}
+						}
+						break;
+					case VideoCommand.TFUNC:
+						// TODO: texture function
+						break;
+					case VideoCommand.TFLUSH:
+						_context.TexturesValid = false;
+						break;
+					case VideoCommand.USCALE:
+						// (float) should be 1
+						break;
+					case VideoCommand.VSCALE:
+						// (float) should be 1
+						break;
+					case VideoCommand.UOFFSET:
+						// (float) should be 0
+						break;
+					case VideoCommand.VOFFSET:
+						// (float) should be 0
+						break;
+					case VideoCommand.TBP0:
+						{
+							_context.Textures[ 0 ].Address = packet.Argument;
+						}
+						break;
+					case VideoCommand.TBW0:
+						{
+							_context.Textures[ 0 ].Address |= ( packet.Argument << 8 ) & unchecked( ( int )0xFF000000 ); // | with bufferPointer from TBP
+							_context.Textures[ 0 ].LineWidth = packet.Argument & 0xFFFF;
+						}
+						break;
+					case VideoCommand.TSIZE0:
+						{
+							_context.Textures[ 0 ].Width = ( int )Math.Pow( 2, ( packet.Argument & 0xFF ) );
+							_context.Textures[ 0 ].Height = ( int )Math.Pow( 2, ( ( packet.Argument >> 8 ) & 0xFF ) );
 						}
 						break;
 
@@ -429,38 +574,6 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						Debug.WriteLine( "VideoDriver::ParseList: unknown video packet: " + packet.ToString() );
 						break;
 				}
-			}
-		}
-
-		private PositionColored[] _tempVerts;
-
-		protected VertexBuffer BuildVertexBuffer( PrimitiveType primitiveType, PositionColored[] vertices )
-		{
-			_tempVerts = vertices;
-			int stride = PositionColored.StrideSize;
-			VertexFormats format = PositionColored.Format;
-			VertexBuffer buffer = new VertexBuffer( _device, stride * vertices.Length, Usage.None, format, Pool.Default, new EventHandler( VertexBufferCreated ) );
-			return buffer;
-		}
-
-		protected void VertexBufferCreated( object sender, EventArgs e )
-		{
-			try
-			{
-				VertexBuffer buffer = sender as VertexBuffer;
-				Debug.Assert( buffer != null );
-				Debug.Assert( _tempVerts != null );
-				Debug.Assert( _tempVerts.Length > 0 );
-
-				using( GraphicsBuffer<PositionColored> gb = buffer.Lock<PositionColored>( 0, _tempVerts.Length, LockFlags.Discard ) )
-				{
-					gb.Write( _tempVerts );
-					buffer.Unlock();
-				}
-			}
-			catch
-			{
-				throw;
 			}
 		}
 

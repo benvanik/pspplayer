@@ -19,6 +19,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		//_memory->DefineSegment( MemoryType::HardwareMapped, "Hardware IO 1", 0x1C000000, 0x03BFFFFF );
 		//_memory->DefineSegment( MemoryType::HardwareMapped, "Hardware IO 2", 0x1FD00000, 0x002FFFFF );
 
+		internal const int MainMemoryBaseAddress = 0x08000000;
 		internal byte[] _mainMemory;
 		private byte[] _scratchPad;
 		private byte[] _frameBufferBytes;
