@@ -1,4 +1,10 @@
-﻿using System;
+﻿// ----------------------------------------------------------------------------
+// Shared Utility Library
+// Copyright (C) 2006 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections.ObjectModel;
