@@ -1,3 +1,9 @@
+// ----------------------------------------------------------------------------
+// Shared Utility Library
+// Copyright (C) 2006 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -43,7 +49,7 @@ namespace Noxa
 	/// </summary>
 	/// <typeparam name="T">Type of item being stored.</typeparam>
 	/// <remarks>
-	/// Written by ben@vanik.net (http://www.noxa.org).
+	/// Written by ben -at- vanik.net (http://www.noxa.org).
 	/// A similar class is present in the WinFX SDK; perhaps I'll rip out theirs.
 	/// </remarks>
 	public class EventfulList<T> : System.Collections.ObjectModel.Collection<T>

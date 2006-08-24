@@ -1,15 +1,22 @@
+// ----------------------------------------------------------------------------
+// PSP Player Emulation Suite
+// Copyright (C) 2006 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
 //#define DEBUGPATTERN
 
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Noxa.Emulation.Psp.Cpu;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
+
+using Noxa.Emulation.Psp.Cpu;
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.Generic;
-using System.Drawing;
-using System.Runtime.InteropServices;
 
 namespace Noxa.Emulation.Psp.Video.Direct3DM
 {

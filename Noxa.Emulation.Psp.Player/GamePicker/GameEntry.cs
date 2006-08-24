@@ -1,3 +1,9 @@
+// ----------------------------------------------------------------------------
+// PSP Player Emulation Suite
+// Copyright (C) 2006 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -5,11 +11,11 @@ using System.Drawing;
 using System.Data;
 using System.Text;
 using System.Windows.Forms;
-using Noxa.Emulation.Psp.Games;
 using System.Diagnostics;
-using Noxa.Emulation.Psp.Player.Properties;
 using System.IO;
 using System.Drawing.Drawing2D;
+using Noxa.Emulation.Psp.Games;
+using Noxa.Emulation.Psp.Player.Properties;
 
 namespace Noxa.Emulation.Psp.Player.GamePicker
 {
