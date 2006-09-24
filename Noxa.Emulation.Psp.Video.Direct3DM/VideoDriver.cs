@@ -249,6 +249,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		#region Render Loop
 
+		private List<DisplayList> _toProcess = new List<DisplayList>( 5 );
+
 		private void VideoThread()
 		{
 			try
@@ -257,7 +259,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				{
 					lock( this )
 					{
-						//_device.Clear( ClearFlags.Target, Color.Red, 0, 0 );
+						if( _context.ClearFlags != ( ClearFlags )0 )
+							_device.Clear( _context.ClearFlags, _context.ClearColor, _context.ClearZDepth, _context.ClearStencil );
 						_device.BeginScene();
 
 						lock( _frameBuffer )
@@ -275,9 +278,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						}
 
 						// Display list processing
-						List<DisplayList> toProcess = new List<DisplayList>( 5 );
-						bool hasElements = _lists.Count > 0;
-						if( hasElements == true )
+						
+						if( _lists.Count > 0 )
 							_listSync.WaitOne();
 						lock( _lists )
 						{
@@ -289,17 +291,19 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 									if( list.Ready == false )
 										break;
 
-									toProcess.Add( list );
+									_toProcess.Add( list );
 								}
 							}
 
-							_lists.RemoveRange( 0, toProcess.Count );
+							_lists.RemoveRange( 0, _toProcess.Count );
 						}
 
 						// Process lists
-						for( int n = 0; n < toProcess.Count; n++ )
-							ParseList( toProcess[ n ] );
+						for( int n = 0; n < _toProcess.Count; n++ )
+							ParseList( _toProcess[ n ] );
 
+						_toProcess.Clear();
+						
 						_device.EndScene();
 						try
 						{

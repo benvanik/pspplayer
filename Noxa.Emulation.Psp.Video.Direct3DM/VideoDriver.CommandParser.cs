@@ -132,6 +132,11 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		public uint FrameBufferPointer;
 		public int FrameBufferWidth;
 
+		public ClearFlags ClearFlags;
+		public int ClearColor;
+		public int ClearZDepth;
+		public int ClearStencil;
+
 		public Matrix WorldMatrix;
 		public Matrix ViewMatrix;
 		public Matrix ProjectionMatrix;
@@ -181,7 +186,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		{
 			_context = null;
 		}
-
+		
 		protected void ParseList( DisplayList list )
 		{
 			IMemory memory = _emulator.Cpu.Memory;
@@ -230,6 +235,40 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 					//    break;
 
 					case VideoCommand.CLEAR:
+						// This is a bad command as all it does is tell us what the psp cleared, not what actually needs
+						// to be cleared - pspsdk will actually create a billboard (it's the SPRITE that comes through)
+						// to do the target clear!
+						if( ( packet.Argument & 0x1 ) == 0x1 )
+						{
+							bool clearAny = false;
+							ClearFlags clearFlags = ClearFlags.Target;
+							if( ( packet.Argument & 0x100 ) != 0 )
+							{
+								// Clear color buffer
+								clearFlags = ClearFlags.Target;
+								clearAny = true;
+							}
+							if( ( packet.Argument & 0x200 ) != 0 )
+							{
+								// Clear stencil/alpha buffer
+								//if( clearAny == true )
+								//    clearFlags |= ClearFlags.Stencil;
+								//else
+								//    clearFlags = ClearFlags.Stencil;
+								//clearAny = true;
+							}
+							if( ( packet.Argument & 0x400 ) != 0 )
+							{
+								// Clear depth buffer
+								//if( clearAny == true )
+								//    clearFlags |= ClearFlags.ZBuffer;
+								//else
+								//    clearFlags = ClearFlags.ZBuffer;
+								//clearAny = true;
+							}
+							// Done at start of the next frame
+							_context.ClearFlags = clearFlags;
+						}
 						break;
 
 					case VideoCommand.SHADE:

@@ -186,7 +186,7 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 		protected static DateTime ParseDate( string dateString )
 		{
 			// Offset from GMT in 15 minute intervals
-			sbyte gmt = ( sbyte )dateString[ 16 ];
+			//sbyte gmt = ( sbyte )dateString[ 16 ];
 			// Don't care.... really
 
 			dateString = dateString.Substring( 0, 16 );
