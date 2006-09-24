@@ -39,10 +39,14 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			for( int n = 0; n < _context.Textures.Length; n++ )
 			{
 				TextureContext context = _context.Textures[ n ];
-				if( ( context.Address == 0x0 ) ||
+				if( ( ( context.Address == 0x0 ) ||
 					( context.LineWidth == 0 ) ||
 					( context.Width == 0 ) ||
-					( context.Height == 0 ) )
+					( context.Height == 0 ) ) ||
+					( ( context.Address == 0x04000000 ) &&
+					( context.LineWidth == 0x4 ) &&
+					( context.Width == 0x2 ) &&
+					( context.Height == 0x2 ) ) )
 				{
 					_device.SetTexture( n, null );
 					continue;
