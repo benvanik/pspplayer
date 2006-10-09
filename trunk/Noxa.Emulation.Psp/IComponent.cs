@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp
 {
@@ -66,6 +67,13 @@ namespace Noxa.Emulation.Psp
 		{
 			get;
 		}
+
+		bool IsTestable
+		{
+			get;
+		}
+
+		IList<ComponentIssue> Test( ComponentParameters parameters );
 
 		bool IsConfigurable
 		{

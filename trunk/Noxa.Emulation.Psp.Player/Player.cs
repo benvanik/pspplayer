@@ -39,6 +39,8 @@ namespace Noxa.Emulation.Psp.Player
 			_host = host;
 
 			this.Icon = Properties.Resources.PspIcon;
+
+			this.SetupGlass();
 		}
 
 		public IntPtr ControlHandle
@@ -138,7 +140,9 @@ namespace Noxa.Emulation.Psp.Player
 				_host.CurrentInstance.StateChanged -= new EventHandler( CurrentInstance_StateChanged );
 			}
 
-			_host.CreateInstance();
+			if( _host.CreateInstance() == false )
+				return;
+
 			_host.CurrentInstance.StateChanged += new EventHandler( CurrentInstance_StateChanged );
 
 			CurrentInstance_StateChanged( _host.CurrentInstance, EventArgs.Empty );
@@ -173,6 +177,49 @@ namespace Noxa.Emulation.Psp.Player
 				_host.ComponentSettings = options.ComponentSettings;
 				_host.Save();
 			}
+		}
+
+		private string GetStatusText()
+		{
+			InstanceState state;
+			if( _host.CurrentInstance != null )
+				state = _host.CurrentInstance.State;
+			else
+				state = InstanceState.Idle;
+
+			switch( state )
+			{
+				case InstanceState.Idle:
+					return "Idle";
+				case InstanceState.Paused:
+					return "Paused - press play to resume";
+				case InstanceState.Running:
+					{
+						string status = string.Format( "Running {0}",
+							_host.CurrentInstance.Bios.Kernel.Game.Parameters.Title );
+						if( ( _host.CurrentInstance.Cpu.Capabilities.SupportedStatistics & Noxa.Emulation.Psp.Cpu.CpuStatisticsCapabilities.InstructionsPerSecond ) != 0 )
+						{
+							string ips = string.Format( "IPS: {1}",
+								_host.CurrentInstance.Cpu.Statistics.InstructionsPerSecond );
+							status = string.Format( "{0} - {1}", status, ips );
+						}
+						return status;
+					}
+					break;
+				case InstanceState.Ended:
+					return "Execution completed successfully";
+				case InstanceState.Crashed:
+					return "Crashed - see dump report for more information";
+				case InstanceState.Debugging:
+					return "Debugging";
+			}
+
+			return "";
+		}
+
+		private void UpdateStatusText()
+		{
+			this.PaintMe();
 		}
 
 		#region Display Size

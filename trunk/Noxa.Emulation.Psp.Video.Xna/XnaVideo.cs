@@ -8,18 +8,19 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using Noxa.Emulation.Psp.IO.Media.FileSystem;
-using Noxa.Emulation.Psp.IO.Media.FileSystem.Configuration;
+using Noxa.Emulation.Psp.Video.Xna;
+using Noxa.Emulation.Psp.Video.Xna.Configuration;
+using System.Diagnostics;
 
-namespace Noxa.Emulation.Psp.IO.Media
+namespace Noxa.Emulation.Psp.Video
 {
-	public class GameHostFileSystem : IComponent
+	public class XnaVideo : IComponent
 	{
 		public ComponentType Type
 		{
 			get
 			{
-				return ComponentType.GameMedia;
+				return ComponentType.Video;
 			}
 		}
 
@@ -27,7 +28,7 @@ namespace Noxa.Emulation.Psp.IO.Media
 		{
 			get
 			{
-				return "Game Host File System Media";
+				return "Managed XNA Video";
 			}
 		}
 
@@ -84,7 +85,7 @@ namespace Noxa.Emulation.Psp.IO.Media
 		{
 			get
 			{
-				return false;
+				return true;
 			}
 		}
 
@@ -101,25 +102,38 @@ namespace Noxa.Emulation.Psp.IO.Media
 			}
 		}
 
+		private void EnsureDefaults( ComponentParameters parameters )
+		{
+			if( parameters.ContainsKey( XnaSettings.Multithreaded ) == false )
+				parameters[ XnaSettings.Multithreaded ] = ( Environment.ProcessorCount > 1 );
+		}
+
+		private bool EnsureValid( ComponentParameters parameters )
+		{
+			if( ( Environment.ProcessorCount == 1 ) &&
+				( ( bool )parameters[ XnaSettings.Multithreaded ] == true ) )
+			{
+				Debug.Assert( false, "Multiple cores are probably required for multithreading" );
+				return false;
+			}
+
+			return true;
+		}
+
 		public IComponentConfiguration CreateConfiguration( ComponentParameters parameters )
 		{
-			return new FileSystem.Configuration.MediaConfiguration( ComponentType.GameMedia, parameters );
+			this.EnsureDefaults( parameters );
+			return XnaConfigurationFactory.Create( parameters );
 		}
 
 		public IComponentInstance CreateInstance( IEmulationInstance emulator, ComponentParameters parameters )
 		{
-			string path = parameters.GetValue<string>( MediaConfiguration.PathSetting, null );
-			if( ( path == null ) ||
-				( path.Length == 0 ) ||
-				( Directory.Exists( path ) == false ) )
-			{
-				// Error!
+			this.EnsureDefaults( parameters );
+
+			if( this.EnsureValid( parameters ) == false )
 				return null;
-			}
 
-			long capacity = parameters.GetValue<long>( MediaConfiguration.CapacitySetting, 1024 * 1024 * 1800 );
-
-			return new UmdDevice( emulator, parameters, path, capacity );
+			return new VideoDriver( emulator, parameters );
 		}
 	}
 }

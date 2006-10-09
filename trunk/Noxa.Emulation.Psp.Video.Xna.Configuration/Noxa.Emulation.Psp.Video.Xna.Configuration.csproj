@@ -4,54 +4,46 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{65DADACB-3DDB-43BE-9AAD-615AFCA39CA4}</ProjectGuid>
+    <ProjectGuid>{2EBB3610-B212-4AE0-8B07-2B534162AA0D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Noxa.Emulation.Psp.Video.Direct3DM</RootNamespace>
-    <AssemblyName>Noxa.Emulation.Psp.Video.Direct3DM</AssemblyName>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <RootNamespace>Noxa.Emulation.Psp.Video.Xna.Configuration</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp.Video.Xna.Configuration</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\debug\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\release\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.DirectX, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Direct3DMVideo.cs" />
-    <Compile Include="FrameBuffer.cs" />
+    <Compile Include="XnaConfigurationFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VideoDriver.CommandParser.cs" />
-    <Compile Include="VideoDriver.cs" />
-    <Compile Include="VideoDriver.Generation.cs" />
-    <Compile Include="VideoDriver.Textures.cs" />
+    <Compile Include="XnaSettings.cs" />
+    <Compile Include="XnaConfiguration.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="XnaConfiguration.Designer.cs">
+      <DependentUpon>XnaConfiguration.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">
@@ -62,10 +54,20 @@
       <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
       <Name>Noxa.Emulation.Psp</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj">
+      <Project>{67000884-BAF0-40B5-8D24-F06D2D623787}</Project>
+      <Name>Noxa.Utilities.Controls</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Noxa.Utilities\Noxa.Utilities.csproj">
       <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
       <Name>Noxa.Utilities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="XnaConfiguration.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>XnaConfiguration.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

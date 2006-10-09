@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using Microsoft.DirectX.XInput;
 
 namespace Noxa.Emulation.Psp.IO.Input.XInput
 {
@@ -104,9 +103,22 @@ namespace Noxa.Emulation.Psp.IO.Input.XInput
 			}
 		}
 
+		private static NativeXInput.State _state = new NativeXInput.State();
+
+		private NativeXInput.State GetState( int padIndex )
+		{
+			uint ret = NativeXInput.XInputGetState( padIndex, ref _state );
+			if( ret == 0 )
+				_state.IsConnected = true;
+			else
+				_state.IsConnected = false;
+
+			return _state;
+		}
+
 		public void Poll()
 		{
-			State state = Controller.GetState( _padIndex );
+			NativeXInput.State state = this.GetState( _padIndex );
 			bool wasConnected = _isConnected;
 			_isConnected = state.IsConnected;
 			if( _isConnected == false )
@@ -158,11 +170,11 @@ namespace Noxa.Emulation.Psp.IO.Input.XInput
 			int analogX = state.GamePad.LeftThumbX;
 			int analogY = state.GamePad.LeftThumbY;
 
-			if( ( analogX < Controller.LeftThumbDeadZone ) &&
-				( analogX > -Controller.LeftThumbDeadZone ) )
+			if( ( analogX < NativeXInput.LeftThumbDeadZone ) &&
+				( analogX > -NativeXInput.LeftThumbDeadZone ) )
 				analogX = 0;
-			if( ( analogY < Controller.LeftThumbDeadZone ) &&
-				( analogY > -Controller.LeftThumbDeadZone ) )
+			if( ( analogY < NativeXInput.LeftThumbDeadZone ) &&
+				( analogY > -NativeXInput.LeftThumbDeadZone ) )
 				analogY = 0;
 
 			_analogX = analogX;

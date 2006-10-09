@@ -16,6 +16,12 @@ namespace Noxa.Emulation.Psp.Cpu
 		BigEndian
 	}
 
+	public enum CpuStatisticsCapabilities
+	{
+		None = 0,
+		InstructionsPerSecond = 0x001,
+	}
+
 	public interface ICpuCapabilities
 	{
 		Endianess Endianess
@@ -42,11 +48,29 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get;
 		}
+
+		CpuStatisticsCapabilities SupportedStatistics
+		{
+			get;
+		}
+	}
+
+	public interface ICpuStatistics
+	{
+		int InstructionsPerSecond
+		{
+			get;
+		}
 	}
 
 	public interface ICpu : IComponentInstance
 	{
 		ICpuCapabilities Capabilities
+		{
+			get;
+		}
+
+		ICpuStatistics Statistics
 		{
 			get;
 		}

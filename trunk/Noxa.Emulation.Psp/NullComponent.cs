@@ -73,6 +73,19 @@ namespace Noxa.Emulation.Psp
 			return "Disabled";
 		}
 
+		public bool IsTestable
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		public IList<ComponentIssue> Test( ComponentParameters parameters )
+		{
+			return null;
+		}
+
 		public bool IsConfigurable
 		{
 			get

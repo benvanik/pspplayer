@@ -49,6 +49,7 @@
     <Compile Include="Bios\IKernel.cs" />
     <Compile Include="Bios\IModule.cs" />
     <Compile Include="Bios\IStatefulModule.cs" />
+    <Compile Include="ComponentIssue.cs" />
     <Compile Include="ComponentParameters.cs" />
     <Compile Include="Cpu\IAvcDecoder.cs" />
     <Compile Include="Cpu\IClock.cs" />
