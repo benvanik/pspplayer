@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Noxa.Emulation.Psp.IO.Input.XInput;
+using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp.IO.Input
 {
@@ -79,6 +80,22 @@ namespace Noxa.Emulation.Psp.IO.Input
 			return this.Name;
 		}
 
+		public bool IsTestable
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		public IList<ComponentIssue> Test( ComponentParameters parameters )
+		{
+			List<ComponentIssue> issues = new List<ComponentIssue>();
+			if( NativeXInput.LibraryExists == false )
+				issues.Add( new ComponentIssue( this, IssueLevel.Error, Strings.ErrorLibraryNotFound, Strings.ErrorLibraryNotFoundUrl ) );
+			return issues;
+		}
+
 		public bool IsConfigurable
 		{
 			get
@@ -94,6 +111,11 @@ namespace Noxa.Emulation.Psp.IO.Input
 
 		public IComponentInstance CreateInstance( IEmulationInstance emulator, ComponentParameters parameters )
 		{
+			// Ensure library is present
+			Debug.Assert( NativeXInput.LibraryExists == true );
+			if( NativeXInput.LibraryExists == false )
+				return null;
+
 			return new XInputPad( emulator, parameters );
 		}
 	}

@@ -129,7 +129,7 @@ namespace Noxa.Emulation.Psp.IO.Input.DirectInput
 			try
 			{
 				_device.Poll();
-				state = _device.CurrentKeyboardState;
+				state = _device.GetCurrentKeyboardState();
 			}
 			catch
 			{

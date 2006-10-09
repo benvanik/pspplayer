@@ -117,68 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="AddIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\addicon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ErrorLibraryNotFound" xml:space="preserve">
+    <value>The XInput library was not found or could not be accessed. Please ensure that you have properly installed the driver for the Windows Common Controller and have the latest version of DirectX.</value>
   </data>
-  <data name="ClearIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\clearicon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ErrorIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ErrorIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="IconBackground" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\iconbackground.png;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="InfoIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\InfoIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="InvalidIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\InvalidIcon.png;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="MemoryStickIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\memorystickicon.png;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="OptionsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\optionsicon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PauseIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\pauseicon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PspIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\psp.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="PspShake" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\PspShake.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="RemoveIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\RemoveIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ResizeIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\resizeicon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="RestartIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\restarticon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="SelectedMemoryStickIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\selectedmemorystickicon.png;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="SelectedUmdIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\selectedumdicon.png;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="SmallMemoryStickIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\SmallMemoryStickIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="SmallUmdIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\SmallUmdIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="StartIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\starticon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="StopIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\stopicon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="WarningIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\WarningIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ErrorLibraryNotFoundUrl" xml:space="preserve">
+    <value>http://www.microsoft.com/downloads/details.aspx?FamilyID=0e989b12-576b-42f2-b7c1-2a17ce25188b&amp;displaylang=en</value>
   </data>
 </root>

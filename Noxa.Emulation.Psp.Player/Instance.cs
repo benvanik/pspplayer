@@ -158,6 +158,39 @@ namespace Noxa.Emulation.Psp.Player
 				handler( this, EventArgs.Empty );
 		}
 
+		private void TestComponent( List<ComponentIssue> issues, IComponent component, ComponentType type, bool required )
+		{
+			if( component == null )
+			{
+				if( required == true )
+					issues.Add( new ComponentIssue( null, IssueLevel.Error,
+						string.Format( Strings.ErrorRequiredComponentNotFound, type ) ) );
+				else
+					issues.Add( new ComponentIssue( null, IssueLevel.Warning,
+						string.Format( Strings.ErrorOptionalComponentNotFound, type ) ) );
+				return;
+			}
+
+			if( component.IsTestable == true )
+			{
+				IList<ComponentIssue> testResults = component.Test( _params[ component ] );
+				if( testResults != null )
+					issues.AddRange( testResults );
+			}
+		}
+
+		public List<ComponentIssue> Test()
+		{
+			List<ComponentIssue> issues = new List<ComponentIssue>();
+			TestComponent( issues, _params.CpuComponent, ComponentType.Cpu, true );
+			TestComponent( issues, _params.BiosComponent, ComponentType.Bios, true );
+			TestComponent( issues, _params.VideoComponent, ComponentType.Video, true );
+			foreach( IComponent component in _params.IOComponents )
+				TestComponent( issues, component, component.Type, false );
+			TestComponent( issues, _params.AudioComponent, ComponentType.Audio, false );
+			return issues;
+		}
+
 		public bool Create()
 		{
 			Debug.Assert( _isCreated == false );

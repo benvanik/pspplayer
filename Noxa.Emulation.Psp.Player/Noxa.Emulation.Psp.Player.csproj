@@ -37,7 +37,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.DirectX, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -52,17 +51,6 @@
     <Compile Include="Configuration\ConfigurationHost.Designer.cs">
       <DependentUpon>ConfigurationHost.cs</DependentUpon>
     </Compile>
-    <Compile Include="CrossMediaBar\BarGroup.cs" />
-    <Compile Include="CrossMediaBar\BarItem.cs" />
-    <Compile Include="CrossMediaBar\GameBarItem.cs" />
-    <Compile Include="CrossMediaBar\Helpers\Vmr9Allocator.cs" />
-    <Compile Include="CrossMediaBar\InputManager.cs" />
-    <Compile Include="CrossMediaBar\Manager.cs" />
-    <Compile Include="CrossMediaBar\MemoryStickBarGroup.cs" />
-    <Compile Include="CrossMediaBar\Scene.cs" />
-    <Compile Include="CrossMediaBar\SoundManager.cs" />
-    <Compile Include="CrossMediaBar\UmdBarGroup.cs" />
-    <Compile Include="CrossMediaBar\VideoManager.cs" />
     <Compile Include="GamePicker\GameEntry.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -89,11 +77,20 @@
     <Compile Include="Configuration\Options.Designer.cs">
       <DependentUpon>Options.cs</DependentUpon>
     </Compile>
+    <Compile Include="IssueReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IssueReport.Designer.cs">
+      <DependentUpon>IssueReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="Player.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Player.Designer.cs">
       <DependentUpon>Player.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Player.Glass.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -117,6 +114,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>PickerDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="IssueReport.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>IssueReport.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Player.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Player.cs</DependentUpon>
@@ -125,6 +126,11 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Strings.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -140,6 +146,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Properties\Settings.cs" />
+    <Compile Include="Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -167,7 +179,9 @@
     <None Include="Resources\InvalidIcon.png" />
     <Content Include="Resources\AddIcon.png" />
     <Content Include="Resources\ClearIcon.png" />
+    <None Include="Resources\ErrorIcon.png" />
     <Content Include="Resources\IconBackground.png" />
+    <None Include="Resources\InfoIcon.png" />
     <Content Include="Resources\MemoryStickIcon.png" />
     <Content Include="Resources\psp.ico" />
     <None Include="Resources\PspBoot.wmv" />
@@ -189,18 +203,19 @@
     <Content Include="Resources\RestartIcon.png" />
     <Content Include="Resources\StopIcon.png" />
     <Content Include="Resources\UmdIcon.png" />
-    <Content Include="Resources\Wallpaper01.jpg" />
-    <Content Include="Resources\Wallpaper02.jpg" />
-    <Content Include="Resources\Wallpaper03.jpg" />
-    <Content Include="Resources\Wallpaper04.jpg" />
-    <Content Include="Resources\Wallpaper05.jpg" />
-    <Content Include="Resources\Wallpaper06.jpg" />
-    <Content Include="Resources\Wallpaper07.jpg" />
-    <Content Include="Resources\Wallpaper08.jpg" />
-    <Content Include="Resources\Wallpaper09.jpg" />
-    <Content Include="Resources\Wallpaper10.jpg" />
-    <Content Include="Resources\Wallpaper11.jpg" />
-    <Content Include="Resources\Wallpaper12.jpg" />
+    <None Include="Resources\Wallpaper01.jpg" />
+    <None Include="Resources\Wallpaper02.jpg" />
+    <None Include="Resources\Wallpaper03.jpg" />
+    <None Include="Resources\Wallpaper04.jpg" />
+    <None Include="Resources\Wallpaper05.jpg" />
+    <None Include="Resources\Wallpaper06.jpg" />
+    <None Include="Resources\Wallpaper07.jpg" />
+    <None Include="Resources\Wallpaper08.jpg" />
+    <None Include="Resources\Wallpaper09.jpg" />
+    <None Include="Resources\Wallpaper10.jpg" />
+    <None Include="Resources\Wallpaper11.jpg" />
+    <None Include="Resources\Wallpaper12.jpg" />
+    <None Include="Resources\WarningIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,3 +1,9 @@
+// ----------------------------------------------------------------------------
+// PSP Player Emulation Suite
+// Copyright (C) 2006 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
 namespace Noxa.Emulation.Psp.Player
 {
 	partial class Player
@@ -130,7 +136,7 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.originalPSPDimensionsToolStripMenuItem.Name = "originalPSPDimensionsToolStripMenuItem";
 			this.originalPSPDimensionsToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.D1 ) ) );
-			this.originalPSPDimensionsToolStripMenuItem.Size = new System.Drawing.Size( 221, 22 );
+			this.originalPSPDimensionsToolStripMenuItem.Size = new System.Drawing.Size( 240, 22 );
 			this.originalPSPDimensionsToolStripMenuItem.Text = "&Original PSP Dimensions";
 			this.originalPSPDimensionsToolStripMenuItem.Click += new System.EventHandler( this.originalPSPDimensionsToolStripMenuItem_Click );
 			// 
@@ -138,7 +144,7 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.twoXToolStripMenuItem.Name = "twoXToolStripMenuItem";
 			this.twoXToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.D2 ) ) );
-			this.twoXToolStripMenuItem.Size = new System.Drawing.Size( 221, 22 );
+			this.twoXToolStripMenuItem.Size = new System.Drawing.Size( 240, 22 );
 			this.twoXToolStripMenuItem.Text = "2X";
 			this.twoXToolStripMenuItem.Click += new System.EventHandler( this.twoXToolStripMenuItem_Click );
 			// 
@@ -146,7 +152,7 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.threeXToolStripMenuItem.Name = "threeXToolStripMenuItem";
 			this.threeXToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.D3 ) ) );
-			this.threeXToolStripMenuItem.Size = new System.Drawing.Size( 221, 22 );
+			this.threeXToolStripMenuItem.Size = new System.Drawing.Size( 240, 22 );
 			this.threeXToolStripMenuItem.Text = "3X";
 			this.threeXToolStripMenuItem.Click += new System.EventHandler( this.threeXToolStripMenuItem_Click );
 			// 
@@ -154,7 +160,7 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.fullscreenToolStripMenuItem.Name = "fullscreenToolStripMenuItem";
 			this.fullscreenToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F ) ) );
-			this.fullscreenToolStripMenuItem.Size = new System.Drawing.Size( 221, 22 );
+			this.fullscreenToolStripMenuItem.Size = new System.Drawing.Size( 240, 22 );
 			this.fullscreenToolStripMenuItem.Text = "&Fullscreen";
 			this.fullscreenToolStripMenuItem.Click += new System.EventHandler( this.fullscreenToolStripMenuItem_Click );
 			// 
@@ -168,16 +174,18 @@ namespace Noxa.Emulation.Psp.Player
 			this.configureToolStripButton.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.OptionsIcon;
 			this.configureToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.configureToolStripButton.Name = "configureToolStripButton";
-			this.configureToolStripButton.Size = new System.Drawing.Size( 74, 22 );
+			this.configureToolStripButton.Size = new System.Drawing.Size( 80, 22 );
 			this.configureToolStripButton.Text = "Configure";
 			this.configureToolStripButton.ToolTipText = "Configure components";
 			this.configureToolStripButton.Click += new System.EventHandler( this.configureToolStripButton_Click );
 			// 
 			// renderSurface
 			// 
+			this.renderSurface.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+						| System.Windows.Forms.AnchorStyles.Left )
+						| System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.renderSurface.BackColor = System.Drawing.Color.White;
 			this.renderSurface.Controls.Add( this.splashPicture );
-			this.renderSurface.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.renderSurface.Location = new System.Drawing.Point( 0, 25 );
 			this.renderSurface.Name = "renderSurface";
 			this.renderSurface.Size = new System.Drawing.Size( 480, 272 );
@@ -198,9 +206,10 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size( 480, 297 );
+			this.ClientSize = new System.Drawing.Size( 480, 319 );
 			this.Controls.Add( this.renderSurface );
 			this.Controls.Add( this.toolStrip1 );
+			this.DoubleBuffered = true;
 			this.MinimumSize = new System.Drawing.Size( 488, 331 );
 			this.Name = "Player";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

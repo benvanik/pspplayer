@@ -78,6 +78,19 @@ namespace Noxa.Emulation.Psp.Bios
 			return this.Name;
 		}
 
+		public bool IsTestable
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		public IList<ComponentIssue> Test( ComponentParameters parameters )
+		{
+			return null;
+		}
+
 		public bool IsConfigurable
 		{
 			get

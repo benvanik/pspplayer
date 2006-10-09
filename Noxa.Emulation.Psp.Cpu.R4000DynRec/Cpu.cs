@@ -49,11 +49,16 @@ namespace Noxa.Emulation.Psp.Cpu
 		protected bool _debug = false;
 #endif
 
-#if STATS
-		protected PerformanceTimer _timer;
-		protected double _timeSinceLastIpsPrint;
+		#region Statistics
 
-		protected struct RuntimeStatistics
+#if STATS
+		protected double _timeSinceLastIpsPrint;
+#endif
+
+		protected PerformanceTimer _timer;
+		protected RuntimeStatistics _stats;
+
+		protected class RuntimeStatistics : ICpuStatistics
 		{
 			public int InstructionsExecuted;
 			public int CodeBlocksExecuted;
@@ -76,10 +81,21 @@ namespace Noxa.Emulation.Psp.Cpu
 			public double AverageGenerationTime;
 			public double InstructionsPerSecond;
 			public double RunTime;
+
+			#region ICpuStatistics Members
+
+			int ICpuStatistics.InstructionsPerSecond
+			{
+				get
+				{
+					return ( int )InstructionsPerSecond;
+				}
+			}
+
+			#endregion
 		}
 
-		protected RuntimeStatistics _stats = new RuntimeStatistics();
-#endif
+		#endregion
 
 		public Cpu( IEmulationInstance emulator, ComponentParameters parameters )
 		{
@@ -87,6 +103,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			Debug.Assert( parameters != null );
 
 			_caps = new CpuCapabilities();
+			_stats = new RuntimeStatistics();
 			_emulator = emulator;
 			_params = parameters;
 
@@ -162,6 +179,18 @@ namespace Noxa.Emulation.Psp.Cpu
 					return true;
 				}
 			}
+
+			public CpuStatisticsCapabilities SupportedStatistics
+			{
+				get
+				{
+#if STATS
+					return CpuStatisticsCapabilities.InstructionsPerSecond;
+#else
+					return CpuStatisticsCapabilities.None;
+#endif
+				}
+			}
 		}
 
 		#endregion
@@ -195,6 +224,14 @@ namespace Noxa.Emulation.Psp.Cpu
 			get
 			{
 				return _caps;
+			}
+		}
+
+		public ICpuStatistics Statistics
+		{
+			get
+			{
+				return _stats;
 			}
 		}
 

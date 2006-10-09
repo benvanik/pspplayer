@@ -87,7 +87,7 @@ namespace Noxa.Emulation.Psp.Player
 			Properties.Settings.Default.Save();
 		}
 
-		public void CreateInstance()
+		public bool CreateInstance()
 		{
 			EmulationParameters emulationParams = new EmulationParameters();
 
@@ -185,7 +185,40 @@ namespace Noxa.Emulation.Psp.Player
 			}
 
 			_instance = new Instance( this, emulationParams );
-			_instance.Create();
+
+			List<ComponentIssue> issues = _instance.Test();
+			bool showReport = false;
+			bool allowRun = true;
+			if( issues.Count > 0 )
+			{
+				int errorCount = 0;
+				foreach( ComponentIssue issue in issues )
+				{
+					if( issue.Level == IssueLevel.Warning )
+						errorCount++;
+				}
+				if( errorCount == 0 )
+				{
+					if( Properties.Settings.Default.ShowReportOnWarnings == true )
+						showReport = true;
+				}
+				else
+				{
+					showReport = true;
+					allowRun = false;
+				}
+			}
+
+			if( showReport == true )
+			{
+				IssueReport report = new IssueReport( this, issues );
+				report.ShowDialog( _player );
+			}
+
+			if( allowRun == true )
+				return _instance.Create();
+			else
+				return false;
 		}
 	}
 }
