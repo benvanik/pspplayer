@@ -131,6 +131,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.continueButton.TabIndex = 3;
 			this.continueButton.Text = "&Start";
 			this.continueButton.UseVisualStyleBackColor = true;
+			this.continueButton.Click += new System.EventHandler( this.continueButton_Click );
 			// 
 			// cancelButton
 			// 
