@@ -338,8 +338,8 @@ namespace Noxa.Emulation.Psp.Cpu
 			{
 				int address = _core0.Pc;
 				address = _core0.TranslateAddress( address );
-				if( address == 0x08901878 )
-					_debug = true;
+				//if( address == 0x08901878 )
+				//	_debug = true;
 				//if( address == 0x08924928 )
 				//	_debug = true;
 				//if( address == 0x89005fc )
@@ -407,13 +407,14 @@ namespace Noxa.Emulation.Psp.Cpu
 			double blockTime = _timer.Elapsed - blockStart;
 			if( blockTime <= 0.0 )
 				blockTime = 0.000001;
+
+			_stats.InstructionsPerSecond = ( _stats.InstructionsPerSecond * .8 ) + ( ( ( double )count / blockTime ) * .2 );
 			
 			_timeSinceLastIpsPrint += blockTime;
 			if( _timeSinceLastIpsPrint > 1.0 )
 			{
-				double ips = ( ( double )count / blockTime );
-				Debug.WriteLine( string.Format( "IPS: {0}", ( long )ips ) );
-				_timeSinceLastIpsPrint = 0.0;
+				Debug.WriteLine( string.Format( "IPS: {0}", ( long )_stats.InstructionsPerSecond ) );
+				_timeSinceLastIpsPrint -= 1.0;
 			}
 #endif
 

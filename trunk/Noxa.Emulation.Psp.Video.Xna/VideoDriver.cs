@@ -13,22 +13,29 @@ using System.Threading;
 using Noxa.Emulation.Psp.Cpu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Noxa.Emulation.Psp.Utilities;
 
 namespace Noxa.Emulation.Psp.Video.Xna
 {
-	class VideoDriver : IVideoDriver
+	partial class VideoDriver : IVideoDriver
 	{
 		protected ComponentParameters _params;
 		protected IEmulationInstance _emulator;
+		protected VideoCapabilities _caps;
+		protected VideoStatistics _stats;
+		protected PerformanceTimer _timer;
 
 		protected DisplayProperties _props;
 		protected DisplayProperties _currentProps;
 
 		protected IntPtr _controlHandle;
-		protected PresentParameters _presentParams;
-		protected Device _device;
+		protected PresentationParameters _presentParams;
+		protected GraphicsDevice _device;
 		protected FrameBuffer _frameBuffer;
-		protected Sprite _sprite;
+		protected SpriteBatch _spriteBatch;
+		
+		internal List<SwapChain> _swapChains;
+		internal SwapChain _currentSwapChain;
 
 		protected Thread _thread;
 		protected AutoResetEvent _threadSync;
@@ -47,11 +54,15 @@ namespace Noxa.Emulation.Psp.Video.Xna
 
 			_params = parameters;
 			_emulator = emulator;
+			_caps = new VideoCapabilities();
+			_stats = new VideoStatistics();
+			_timer = new PerformanceTimer();
 
 			_props = new DisplayProperties();
 
 			// Latch our frame buffer into the memory system
 			_frameBuffer = new FrameBuffer( this );
+			_swapChains = new List<SwapChain>();
 			_emulator.Cpu.Memory.RegisterSegment( _frameBuffer );
 
 			_listSync = new AutoResetEvent( false );
@@ -80,7 +91,23 @@ namespace Noxa.Emulation.Psp.Video.Xna
 		{
 			get
 			{
-				return typeof( Direct3DMVideo );
+				return typeof( XnaVideo );
+			}
+		}
+
+		public IVideoCapabilities Capabilities
+		{
+			get
+			{
+				return _caps;
+			}
+		}
+
+		public IVideoStatistics Statistics
+		{
+			get
+			{
+				return _stats;
 			}
 		}
 
@@ -104,7 +131,7 @@ namespace Noxa.Emulation.Psp.Video.Xna
 			}
 		}
 
-		public Device Device
+		public GraphicsDevice Device
 		{
 			get
 			{
@@ -125,6 +152,14 @@ namespace Noxa.Emulation.Psp.Video.Xna
 			get
 			{
 				return _vcount;
+			}
+		}
+
+		public SwapChain CurrentSwapChain
+		{
+			get
+			{
+				return _currentSwapChain;
 			}
 		}
 
@@ -171,9 +206,9 @@ namespace Noxa.Emulation.Psp.Video.Xna
 
 			CleanupContext();
 
-			if( _sprite != null )
-				_sprite.Dispose();
-			_sprite = null;
+			if( _spriteBatch != null )
+				_spriteBatch.Dispose();
+			_spriteBatch = null;
 
 			if( _device != null )
 				_device.Dispose();
@@ -188,28 +223,29 @@ namespace Noxa.Emulation.Psp.Video.Xna
 
 		private bool CreateDevice()
 		{
-			_presentParams = new PresentParameters();
-			_presentParams.PresentationInterval = PresentInterval.One;
+			_presentParams = new PresentationParameters();
+			_presentParams.PresentationInterval = PresentInterval.Immediate;
 			_presentParams.PresentFlag = PresentFlag.LockableBackBuffer;
-			_presentParams.SwapEffect = SwapEffect.Flip;
-			_presentParams.IsWindowed = true;
-			_presentParams.BackBufferFormat = Format.A8R8G8B8;
+			_presentParams.SwapEffect = SwapEffect.Discard;
+			_presentParams.IsFullScreen = false;
+			_presentParams.BackBufferCount = 1;
+			_presentParams.BackBufferFormat = SurfaceFormat.Bgr32;
+			_presentParams.DeviceWindowHandle = _controlHandle;
+			_presentParams.BackBufferWidth = 480;
+			_presentParams.BackBufferHeight = 272;
 
-			int adapter = 0;
-			_device = TryCreate( adapter, DeviceType.Hardware, CreateFlags.FpuPreserve | CreateFlags.HardwareVertexProcessing );
+			GraphicsAdapter adapter = GraphicsAdapter.DefaultAdapter;
+
+			_device = TryCreate( adapter, DeviceType.Hardware, CreateOptions.HardwareVertexProcessing );
 			if( _device == null )
 			{
-				_device = TryCreate( adapter, DeviceType.Hardware, CreateFlags.FpuPreserve | CreateFlags.MixedVertexProcessing );
+				_device = TryCreate( adapter, DeviceType.Hardware, CreateOptions.MixedVertexProcessing );
 				if( _device == null )
 				{
-					_device = TryCreate( adapter, DeviceType.Hardware, CreateFlags.FpuPreserve | CreateFlags.SoftwareVertexProcessing );
+					_device = TryCreate( adapter, DeviceType.Hardware, CreateOptions.SoftwareVertexProcessing );
 					if( _device == null )
 					{
-						_device = TryCreate( adapter, DeviceType.Software, CreateFlags.FpuPreserve | CreateFlags.SoftwareVertexProcessing );
-						if( _device == null )
-						{
-							_device = TryCreate( adapter, DeviceType.Reference, CreateFlags.FpuPreserve | CreateFlags.SoftwareVertexProcessing );
-						}
+						_device = TryCreate( adapter, DeviceType.Reference, CreateOptions.SoftwareVertexProcessing );
 					}
 				}
 			}
@@ -217,7 +253,7 @@ namespace Noxa.Emulation.Psp.Video.Xna
 			if( _device == null )
 				return false;
 
-			_sprite = new Sprite( _device );
+			_spriteBatch = new SpriteBatch( _device );
 
 			InitializeContext();
 
@@ -233,17 +269,21 @@ namespace Noxa.Emulation.Psp.Video.Xna
 			return true;
 		}
 
-		private Device TryCreate( int adapter, DeviceType deviceType, CreateFlags createFlags )
+		private GraphicsDevice TryCreate( GraphicsAdapter adapter, DeviceType deviceType, CreateOptions creationOptions )
 		{
 			try
 			{
-				return new Device( adapter, deviceType, _controlHandle, createFlags, _presentParams );
+				return new GraphicsDevice( adapter, deviceType, this.ControlHandle, creationOptions, _presentParams );
 			}
 			catch
 			{
 				return null;
 			}
 		}
+
+		#endregion
+
+		#region Swap Chains
 
 		#endregion
 
@@ -257,27 +297,15 @@ namespace Noxa.Emulation.Psp.Video.Xna
 			{
 				while( _shutdown == false )
 				{
-					lock( this )
+					double startTime = _timer.Elapsed;
+					//lock( this )
 					{
-						if( _context.ClearFlags != ( ClearFlags )0 )
-							_device.Clear( _context.ClearFlags, _context.ClearColor, _context.ClearZDepth, _context.ClearStencil );
+						//if( _context.ClearOptions != ( ClearOptions )0 )
+						//	_device.Clear( _context.ClearOptions, _context.ClearColor, _context.ClearZDepth, _context.ClearStencil );
+						//_device.Clear( Color.Black );
 						_device.BeginScene();
 
-						lock( _frameBuffer )
-						{
-							_frameBuffer.Copy();
-						}
-
-						if( _currentProps != null )
-						{
-							Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
-							SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
-							_sprite.Begin( SpriteFlags.None );
-							_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
-							_sprite.End();
-						}
-
-						// Display list processing
+						// -- Display list processing --
 
 						if( _lists.Count > 0 )
 							_listSync.WaitOne();
@@ -304,10 +332,15 @@ namespace Noxa.Emulation.Psp.Video.Xna
 
 						_toProcess.Clear();
 
+						_frameBuffer.Flush();
+
 						_device.EndScene();
 						try
 						{
-							_device.Present();
+							if( _currentSwapChain != null )
+								_currentSwapChain.Present();
+							else
+								_device.Present();
 						}
 						catch
 						{
@@ -319,6 +352,17 @@ namespace Noxa.Emulation.Psp.Video.Xna
 					}
 
 					//Thread.Sleep( 0 );
+
+					_stats.TimeElapsed += ( _timer.Elapsed - startTime );
+					_stats.FrameCount++;
+					if( _stats.TimeElapsed > 1.0 )
+					{
+						_stats._framesPerSecond = ( int )( _stats.FrameCount / _stats.TimeElapsed );
+						_stats.TimeElapsed -= 1.0;
+						_stats.FrameCount = 0;
+
+						Debug.WriteLine( string.Format( "FPS: {0}", _stats.FramesPerSecond ) );
+					}
 				}
 			}
 			catch( ThreadAbortException )
@@ -397,5 +441,31 @@ namespace Noxa.Emulation.Psp.Video.Xna
 		}
 
 		#endregion
+	}
+
+	class VideoCapabilities : IVideoCapabilities
+	{
+		public VideoStatisticsCapabilities SupportedStatistics
+		{
+			get
+			{
+				return VideoStatisticsCapabilities.FramesPerSecond;
+			}
+		}
+	}
+
+	class VideoStatistics : IVideoStatistics
+	{
+		internal int _framesPerSecond;
+		public int FrameCount;
+		public double TimeElapsed;
+
+		public int FramesPerSecond
+		{
+			get
+			{
+				return _framesPerSecond;
+			}
+		}
 	}
 }

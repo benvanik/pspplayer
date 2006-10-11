@@ -27,6 +27,8 @@ namespace Noxa.Emulation.Psp.Player
 	{
 		protected Host _host;
 		protected DisplaySize _displaySize;
+		protected int _widthPadding;
+		protected int _heightPadding;
 
 		public Player()
 		{
@@ -41,6 +43,9 @@ namespace Noxa.Emulation.Psp.Player
 			this.Icon = Properties.Resources.PspIcon;
 
 			this.SetupGlass();
+
+			_widthPadding = this.Width - 480;
+			_heightPadding = this.Height - 272;
 		}
 
 		public IntPtr ControlHandle
@@ -195,17 +200,21 @@ namespace Noxa.Emulation.Psp.Player
 					return "Paused - press play to resume";
 				case InstanceState.Running:
 					{
-						string status = string.Format( "Running {0}",
-							_host.CurrentInstance.Bios.Kernel.Game.Parameters.Title );
-						if( ( _host.CurrentInstance.Cpu.Capabilities.SupportedStatistics & Noxa.Emulation.Psp.Cpu.CpuStatisticsCapabilities.InstructionsPerSecond ) != 0 )
+						if( _host.CurrentInstance.Bios.Kernel.Game != null )
 						{
-							string ips = string.Format( "IPS: {1}",
-								_host.CurrentInstance.Cpu.Statistics.InstructionsPerSecond );
-							status = string.Format( "{0} - {1}", status, ips );
+							string status = string.Format( "Running {0}",
+								_host.CurrentInstance.Bios.Kernel.Game.Parameters.Title );
+							if( ( _host.CurrentInstance.Cpu.Capabilities.SupportedStatistics & Noxa.Emulation.Psp.Cpu.CpuStatisticsCapabilities.InstructionsPerSecond ) != 0 )
+							{
+								string ips = string.Format( "IPS: {0:###.##}M",
+									_host.CurrentInstance.Cpu.Statistics.InstructionsPerSecond / 1000000.0 );
+								status = string.Format( "{0} - {1}", status, ips );
+							}
+							return status;
 						}
-						return status;
+						else
+							return "Selecting game...";
 					}
-					break;
 				case InstanceState.Ended:
 					return "Execution completed successfully";
 				case InstanceState.Crashed:
@@ -220,6 +229,11 @@ namespace Noxa.Emulation.Psp.Player
 		private void UpdateStatusText()
 		{
 			this.PaintMe();
+		}
+
+		private void statusUpdateTimer_Tick( object sender, EventArgs e )
+		{
+			this.UpdateStatusText();
 		}
 
 		#region Display Size
@@ -273,20 +287,17 @@ namespace Noxa.Emulation.Psp.Player
 			this.threeXToolStripMenuItem.Checked = ( newSize == DisplaySize.ThreeX );
 			this.fullscreenToolStripMenuItem.Checked = ( newSize == DisplaySize.Fullscreen );
 
-			int widthPadding = 8;
-			int heightPadding = 59;
-
 			this.WindowState = FormWindowState.Normal;
 			switch( newSize )
 			{
 				case DisplaySize.Original:
-					this.Size = new Size( 480 + widthPadding, 272 + heightPadding );
+					this.Size = new Size( 480 + _widthPadding, 272 + _heightPadding );
 					break;
 				case DisplaySize.TwoX:
-					this.Size = new Size( ( 480 * 2 ) + widthPadding, ( 272 * 2 ) + heightPadding );
+					this.Size = new Size( ( 480 * 2 ) + _widthPadding, ( 272 * 2 ) + _heightPadding );
 					break;
 				case DisplaySize.ThreeX:
-					this.Size = new Size( ( 480 * 3 ) + widthPadding, ( 272 * 3 ) + heightPadding );
+					this.Size = new Size( ( 480 * 3 ) + _widthPadding, ( 272 * 3 ) + _heightPadding );
 					break;
 				case DisplaySize.Fullscreen:
 					this.WindowState = FormWindowState.Maximized;

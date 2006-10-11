@@ -194,7 +194,7 @@ namespace Noxa.Emulation.Psp.Player
 				int errorCount = 0;
 				foreach( ComponentIssue issue in issues )
 				{
-					if( issue.Level == IssueLevel.Warning )
+					if( issue.Level == IssueLevel.Error )
 						errorCount++;
 				}
 				if( errorCount == 0 )

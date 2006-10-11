@@ -12,8 +12,43 @@ using System.Threading;
 
 namespace Noxa.Emulation.Psp.Video
 {
+	public enum VideoStatisticsCapabilities
+	{
+		None = 0,
+		FramesPerSecond = 0x001,
+	}
+
+	public interface IVideoCapabilities
+	{
+		VideoStatisticsCapabilities SupportedStatistics
+		{
+			get;
+		}
+	}
+
+	public interface IVideoStatistics
+	{
+		int FramesPerSecond
+		{
+			get;
+		}
+
+		// tris per second, fb writes per second
+		// also per frame
+	}
+
 	public interface IVideoDriver : IComponentInstance
 	{
+		IVideoCapabilities Capabilities
+		{
+			get;
+		}
+
+		IVideoStatistics Statistics
+		{
+			get;
+		}
+
 		DisplayProperties Properties
 		{
 			get;

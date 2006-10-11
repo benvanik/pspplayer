@@ -113,5 +113,11 @@ namespace Noxa.Emulation.Psp.Player
 			Properties.Settings.Default.ShowReportOnWarnings = !dontShowWarningsCheckBox.Checked;
 			Properties.Settings.Default.Save();
 		}
+
+		private void continueButton_Click( object sender, EventArgs e )
+		{
+			this.DialogResult = DialogResult.OK;
+			this.Close();
+		}
 	}
 }
