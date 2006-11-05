@@ -246,7 +246,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		public int ReadWord( int address )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			throw new NotImplementedException();
 		}
 
 		public byte[] ReadBytes( int address, int count )
@@ -306,27 +306,27 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		public void Load( System.IO.Stream stream )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			throw new NotImplementedException();
 		}
 
 		public void Load( string fileName )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			throw new NotImplementedException();
 		}
 
 		public void Save( System.IO.Stream stream )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			throw new NotImplementedException();
 		}
 
 		public void Save( string fileName )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			throw new NotImplementedException();
 		}
 
 		public uint GetMemoryHash( int address, int count, uint prime )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			throw new NotImplementedException();
 		}
 
 		#endregion
