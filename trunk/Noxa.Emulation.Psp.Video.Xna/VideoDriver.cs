@@ -311,19 +311,19 @@ namespace Noxa.Emulation.Psp.Video.Xna
 							_listSync.WaitOne();
 						lock( _lists )
 						{
-							for( int n = 0; n < _lists.Count; n++ )
-							{
-								DisplayList list = _lists[ n ];
-								lock( list )
-								{
-									if( list.Ready == false )
-										break;
+						    for( int n = 0; n < _lists.Count; n++ )
+						    {
+						        DisplayList list = _lists[ n ];
+						        lock( list )
+						        {
+						            if( list.Ready == false )
+						                break;
 
-									_toProcess.Add( list );
-								}
-							}
+						            _toProcess.Add( list );
+						        }
+						    }
 
-							_lists.RemoveRange( 0, _toProcess.Count );
+						    _lists.RemoveRange( 0, _toProcess.Count );
 						}
 
 						// Process lists

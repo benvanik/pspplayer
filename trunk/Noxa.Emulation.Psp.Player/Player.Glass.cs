@@ -524,7 +524,7 @@ namespace Noxa.Emulation.Psp.Player
 			dttopts.dwFlags = NativeHelpers.DttFlags.Composited | NativeHelpers.DttFlags.GlowSize;
 			dttopts.iGlowSize = 10;
 
-			Rectangle textPadding = new Rectangle( 5, 6, 5, 5 );
+			Rectangle textPadding = new Rectangle( 7, 5, 5, 5 );
 
 			NativeHelpers.FormatValues textFormat = NativeHelpers.FormatValues.SingleLine | NativeHelpers.FormatValues.Left | NativeHelpers.FormatValues.NoPrefix;
 			NativeHelpers.RECT textBounds = new NativeHelpers.RECT( textPadding.Left, textPadding.Top, statusBounds.Width - textPadding.Right, statusBounds.Height );

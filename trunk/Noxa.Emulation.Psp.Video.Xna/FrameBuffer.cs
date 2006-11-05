@@ -4,7 +4,7 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-#define DEBUGPATTERN
+//#define DEBUGPATTERN
 
 using System;
 using System.Collections.Generic;
@@ -197,9 +197,9 @@ namespace Noxa.Emulation.Psp.Video.Xna
 				_dirtyMinX = Math.Max( 0, _dirtyMinX );
 				_dirtyMinY = Math.Max( 0, _dirtyMinY );
 				Rectangle dirtyRect = new Rectangle( _dirtyMinX, _dirtyMinY, _dirtyMaxX - _dirtyMinX, _dirtyMaxY - _dirtyMinY );
-				if( dirtyRect.Right > 480 )
+				if( dirtyRect.Right >= 480 )
 					dirtyRect.Width = 480 - dirtyRect.X;
-				if( dirtyRect.Height > 272 )
+				if( dirtyRect.Bottom >= 272 )
 					dirtyRect.Height = 272 - dirtyRect.Y;
 				_dirtyMinX = int.MaxValue;
 				_dirtyMinY = int.MaxValue;
@@ -223,12 +223,11 @@ namespace Noxa.Emulation.Psp.Video.Xna
 						if( _isHalfWord == false )
 						{
 							uint* dptr = ( uint* )dvptr;
-							uint* sptr = ( uint* )svptr;
-
-							sptr += dirtyRect.Y * 512 + dirtyRect.X;
 
 							for( int y = 0; y < dirtyRect.Height; y++ )
 							{
+								uint* sptr = ( uint* )svptr + ( dirtyRect.Y + y ) * 512 + dirtyRect.X;
+
 								for( int x = 0; x < dirtyRect.Width; x++ )
 								{
 									uint val = *sptr;
@@ -240,8 +239,6 @@ namespace Noxa.Emulation.Psp.Video.Xna
 									dptr++;
 									sptr++;
 								}
-
-								sptr += 512 - dirtyRect.Width + dirtyRect.X;
 							}
 						}
 						else

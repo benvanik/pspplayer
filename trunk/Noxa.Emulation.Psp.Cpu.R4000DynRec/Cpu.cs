@@ -4,9 +4,9 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-#define GENTRACE
-#define VERBOSEEMIT
-#define REGISTEREMIT
+//#define GENTRACE
+//#define VERBOSEEMIT
+//#define REGISTEREMIT
 #define STATS
 #if STATS
 // note that instruction count will be wrong without this, but it's slow
