@@ -224,13 +224,13 @@ namespace Noxa.Emulation.Psp.Video.Xna
 		private bool CreateDevice()
 		{
 			_presentParams = new PresentationParameters();
-			_presentParams.PresentationInterval = PresentInterval.Immediate;
+			_presentParams.DeviceWindowHandle = _controlHandle;
+			_presentParams.PresentationInterval = PresentInterval.One;
 			_presentParams.PresentFlag = PresentFlag.LockableBackBuffer;
 			_presentParams.SwapEffect = SwapEffect.Discard;
 			_presentParams.IsFullScreen = false;
 			_presentParams.BackBufferCount = 1;
 			_presentParams.BackBufferFormat = SurfaceFormat.Bgr32;
-			_presentParams.DeviceWindowHandle = _controlHandle;
 			_presentParams.BackBufferWidth = 480;
 			_presentParams.BackBufferHeight = 272;
 
