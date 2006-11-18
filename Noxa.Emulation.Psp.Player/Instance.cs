@@ -383,13 +383,20 @@ namespace Noxa.Emulation.Psp.Player
 #else
 			DummyDelegate del = delegate()
 			{
-				_picker = new Noxa.Emulation.Psp.Player.GamePicker.PickerDialog( this );
-				if( _picker.ShowDialog( _host.Player ) == System.Windows.Forms.DialogResult.OK )
+				try
 				{
+					_picker = new Noxa.Emulation.Psp.Player.GamePicker.PickerDialog( this );
+					if( _picker.ShowDialog( _host.Player ) == System.Windows.Forms.DialogResult.OK )
+					{
+					}
+					else
+						this.Stop();
+					_picker = null;
 				}
-				else
-					this.Stop();
-				_picker = null;
+				catch( Exception ex )
+				{
+					throw ex;
+				}
 			};
 			_host.Player.Invoke( del );
 #endif
