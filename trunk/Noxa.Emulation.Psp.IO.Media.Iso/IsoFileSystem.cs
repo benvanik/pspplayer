@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Noxa.Emulation.Psp.IO.Media.Iso.Configuration;
+using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp.IO.Media.Iso
 {
@@ -112,8 +113,9 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 				( path.Length == 0 ) ||
 				( File.Exists( path ) == false ) )
 			{
-				// Error!
-				return null;
+				// Path not found - this is just a generic UMD
+				Debug.WriteLine( string.Format( "IsoFileSystem: unable to create instance, path {0} not found", path ) );
+				return new UmdDevice( emulator, parameters );
 			}
 
 			return new UmdDevice( emulator, parameters, path );

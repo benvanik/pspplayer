@@ -23,15 +23,22 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 
 		protected MediaFolder _root;
 
-		public UmdDevice( IEmulationInstance emulator, ComponentParameters parameters, string hostPath )
+		public UmdDevice( IEmulationInstance emulator, ComponentParameters parameters )
 		{
 			Debug.Assert( emulator != null );
 			Debug.Assert( parameters != null );
-			Debug.Assert( hostPath != null );
-			Debug.Assert( File.Exists( hostPath ) == true );
 
 			_emulator = emulator;
 			_parameters = parameters;
+
+			_state = MediaState.Ejected;
+		}
+
+		public UmdDevice( IEmulationInstance emulator, ComponentParameters parameters, string hostPath )
+			: this( emulator, parameters )
+		{
+			Debug.Assert( hostPath != null );
+			Debug.Assert( File.Exists( hostPath ) == true );
 
 			this.Load( hostPath );
 		}
@@ -147,6 +154,8 @@ namespace Noxa.Emulation.Psp.IO.Media.Iso
 			// Would be nice to do something with this that was official-like (serial number?)
 			_description = string.Format( "UMD ({0}MB)",
 				_capacity / 1024 / 1024 );
+
+			_state = MediaState.Present;
 
 			return true;
 		}

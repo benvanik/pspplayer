@@ -168,6 +168,8 @@ namespace Noxa.Emulation.Psp.Games
 				IMediaDevice device = driver as IMediaDevice;
 				if( device == null )
 					continue;
+				if( device.State != MediaState.Present )
+					continue;
 
 				GameInformation info;
 
