@@ -4,6 +4,8 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
+#define GLASSENABLED
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -473,7 +475,9 @@ namespace Noxa.Emulation.Psp.Player
 
 			if( supported == false )
 				return;
-			//return;
+#if !GLASSENABLED
+			return;
+#endif
 
 			_glassEnabled = true;
 
