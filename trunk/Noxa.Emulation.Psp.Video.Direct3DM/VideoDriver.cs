@@ -128,6 +128,22 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			}
 		}
 
+		public IVideoCapabilities Capabilities
+		{
+			get
+			{
+				return null;
+			}
+		}
+
+		public IVideoStatistics Statistics
+		{
+			get
+			{
+				return null;
+			}
+		}
+
 		public void Suspend()
 		{
 		}
@@ -192,7 +208,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			_presentParams.PresentationInterval = PresentInterval.One;
 			_presentParams.PresentFlag = PresentFlag.LockableBackBuffer;
 			_presentParams.SwapEffect = SwapEffect.Flip;
-			_presentParams.IsWindowed = true;
+			_presentParams.Windowed = true;
 			_presentParams.BackBufferFormat = Format.A8R8G8B8;
 
 			int adapter = 0;
@@ -273,7 +289,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
 							SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
 							_sprite.Begin( SpriteFlags.None );
-							_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbSize, PointF.Empty, 0.0f, PointF.Empty, Color.Transparent );
+							_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbRect, Point.Empty, Color.Transparent );
 							_sprite.End();
 						}
 

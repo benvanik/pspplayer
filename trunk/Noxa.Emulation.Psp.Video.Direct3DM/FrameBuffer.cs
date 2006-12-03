@@ -15,8 +15,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 using Noxa.Emulation.Psp.Cpu;
+
+using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
-using Microsoft.DirectX.Generic;
 
 namespace Noxa.Emulation.Psp.Video.Direct3DM
 {
@@ -159,10 +160,10 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			if( currentBuffer < 0 )
 				currentBuffer = 0;
 
-			GraphicsBuffer<int> buffer;
+			GraphicsStream buffer;
 			try
 			{
-				buffer = _texture.Lock<int>( 0, null, LockFlags.None );
+				buffer = _texture.LockRectangle( 0, LockFlags.None );
 			}
 			catch
 			{
@@ -173,7 +174,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 			unsafe
 			{
-				void* dvptr = buffer.DataBufferPointer;
+				void* dvptr = buffer.InternalDataPointer;
 				void* svptr = _buffers[ currentBuffer ].ToPointer();
 
 				if( _isHalfWord == false )
@@ -203,7 +204,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				}
 			}
 
-			_texture.Unlock( 0 );
+			_texture.UnlockRectangle( 0 );
 			
 			//_texture.Save( "a." + DateTime.Now.Millisecond.ToString() + ".bmp", ImageFileFormat.Bitmap );
 		}

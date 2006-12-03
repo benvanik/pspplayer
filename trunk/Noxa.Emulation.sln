@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Video.Xn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Video.Xna.Configuration", "Noxa.Emulation.Psp.Video.Xna.Configuration\Noxa.Emulation.Psp.Video.Xna.Configuration.csproj", "{2EBB3610-B212-4AE0-8B07-2B534162AA0D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CpuTests", "Tests\CpuTests\CpuTests.vcproj", "{9A891E57-91F1-4625-B2BB-21AAB64F56C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -177,6 +179,15 @@ Global
 		{2EBB3610-B212-4AE0-8B07-2B534162AA0D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2EBB3610-B212-4AE0-8B07-2B534162AA0D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2EBB3610-B212-4AE0-8B07-2B534162AA0D}.Release|Win32.ActiveCfg = Release|Any CPU
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Debug|Win32.Build.0 = Debug|Win32
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Release|Win32.ActiveCfg = Release|Win32
+		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
