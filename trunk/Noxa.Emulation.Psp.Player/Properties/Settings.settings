@@ -20,5 +20,11 @@
     <Setting Name="ShowReportOnWarnings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="Noxa_Emulation_Psp_Player_Noxa_Emulation_Psp_CompatibilityService_Service" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:8080/PSPCompat/Service.asmx</Value>
+    </Setting>
+    <Setting Name="Noxa_Emulation_Psp_Player_Noxa_Emulation_Psp_CompatabilityService_Service" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://localhost:8080/PSPCompat/Service.asmx</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

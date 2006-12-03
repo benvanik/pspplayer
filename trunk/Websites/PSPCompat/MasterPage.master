@@ -1,17 +1,50 @@
-<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
-
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" EnableViewState="false" %>
+<%@ Register Src="AuthenticationControl.ascx" TagName="AuthenticationControl" TagPrefix="uc1" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" >
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>PSP Player Compatibility Database</title>
+	<title>PSP Player Compatibility Database</title>
+	<link href="Resources/trac.css" rel="stylesheet" type="text/css" />
+	<link href="Resources/PSPCompat.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-    <form id="form1" runat="server">
-    <div>
-        <asp:contentplaceholder id="ContentPlaceHolder1" runat="server">
-        </asp:contentplaceholder>
-    </div>
-    </form>
+	<form id="form1" runat="server">
+		<div id="banner">
+			<div id="header">
+				<a id="logo" href="/">
+					<img src="Resources/Banner.png" width="350" height="44" alt="PSP Dev / PSP Emulation / PSP Player" />
+				</a>
+				<hr />
+			</div>
+			<div id="metanav" class="nav">
+				<ul>
+					<li class="first">PSP Compatability Database</li>
+					<li>
+						<asp:Label ID="VersionLabel" runat="server" Text="[version]"></asp:Label></li>
+					<li class="last"><a href="http://www.TODO.com">Help</a></li>
+				</ul>
+			</div>
+			<div id="mainnav" class="nav">
+				<ul>
+					<li class="active first"><a href="Default.aspx" accesskey="1">Home</a></li><li><a accesskey="2" href="Games.aspx">Games</a></li><li><a accesskey="3" href="Modules.aspx">Modules</a></li><li class="last"><a accesskey="4" href="Search.aspx">Search</a></li>
+				</ul>
+			</div>
+		</div>
+		<div id="main">
+			<asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+			</asp:ContentPlaceHolder>
+		</div>
+		<div id="footer" style="height: 45px">
+			<a id="tracpowered" href="http://www.noxa.org/">
+				<img alt="Owned by noxa" height="35" src="http://dev.ixtli.com/pspdev/chrome/common/Haruhi-small2.png" width="54" /></a>
+			<p id="tracAd" class="left">
+				^_^
+			</p>
+			<hr />
+			<div style="text-align: right; margin: 0; vertical-align: middle;">
+				<uc1:AuthenticationControl ID="AuthenticationControl1" runat="server" />
+			</div>
+		</div>
+	</form>
 </body>
 </html>

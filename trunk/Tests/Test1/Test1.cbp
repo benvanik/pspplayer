@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE CodeBlocks_project_file>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="1"/>
+	<Project>
+		<Option title="Test 1"/>
+		<Option makefile="Makefile"/>
+		<Option makefile_is_custom="0"/>
+		<Option compiler="6"/>
+		<Build>
+			<Target title="default">
+				<Option output="C:\Dev\Noxa.Emulation\trunk\Tests\Test1\Test1.elf"/>
+				<Option working_dir="."/>
+				<Option object_output=".objs"/>
+				<Option deps_output=".deps"/>
+				<Option type="1"/>
+				<Option compiler="6"/>
+				<Option projectResourceIncludeDirsRelation="1"/>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-fno-exceptions"/>
+		</Compiler>
+		<Linker>
+			<Add library="libg.a"/>
+			<Add library="libm.a"/>
+			<Add library="libstc++.a"/>
+			<Add library="libsupc++.a"/>
+			<Add library="libg.a"/>
+			<Add library="libpsprtc.a"/>
+			<Add library="libpspuser.a"/>
+			<Add library="libpsputility.a"/>
+			<Add library="libpspdebug.a"/>
+			<Add library="libpsplibc.a"/>
+			<Add library="libpspgum.a"/>
+			<Add library="libpspvfpu.a"/>
+			<Add library="libpspgu.a"/>
+			<Add library="libpspge.a"/>
+			<Add library="libpspdisplay_driver.a"/>
+			<Add library="libpspdisplay.a"/>
+			<Add library="libpspge_driver.a"/>
+			<Add library="libpspsdk.a"/>
+			<Add library="libpsppower.a"/>
+			<Add library="libpsppower_driver.a"/>
+			<Add library="libpspgum_vfpu.a"/>
+			<Add library="libpspkernel.a"/>
+		</Linker>
+		<Unit filename="main.cpp">
+			<Option compilerVar="CPP"/>
+			<Option target="default"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

@@ -16,6 +16,7 @@ using System.IO;
 using System.Drawing.Drawing2D;
 using Noxa.Emulation.Psp.Games;
 using Noxa.Emulation.Psp.Player.Properties;
+using Noxa.Emulation.Psp.Player.ServiceTools;
 
 namespace Noxa.Emulation.Psp.Player.GamePicker
 {
@@ -302,6 +303,17 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		private void mediaPicture_DoubleClick( object sender, EventArgs e )
 		{
 			this.OnDoubleClick( e );
+		}
+
+		private void checkCompatibilityToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			SubmitGame dialog = new SubmitGame( _game );
+			dialog.ShowDialog( this.FindForm() );
+		}
+
+		private void removeToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			MessageBox.Show( "TODO" );
 		}
 	}
 }

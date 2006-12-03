@@ -33,12 +33,18 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.infoLabel = new System.Windows.Forms.Label();
 			this.titleLabel = new System.Windows.Forms.Label();
 			this.toolTip1 = new System.Windows.Forms.ToolTip( this.components );
+			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip( this.components );
+			this.checkCompatibilityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+			this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			( ( System.ComponentModel.ISupportInitialize )( this.gamePicture ) ).BeginInit();
+			this.contextMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// gamePicture
 			// 
 			this.gamePicture.BackColor = System.Drawing.Color.Transparent;
+			this.gamePicture.ContextMenuStrip = this.contextMenuStrip1;
 			this.gamePicture.Location = new System.Drawing.Point( 3, 3 );
 			this.gamePicture.Name = "gamePicture";
 			this.gamePicture.Size = new System.Drawing.Size( 75, 41 );
@@ -53,6 +59,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.infoLabel.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left )
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.infoLabel.BackColor = System.Drawing.Color.Transparent;
+			this.infoLabel.ContextMenuStrip = this.contextMenuStrip1;
 			this.infoLabel.Location = new System.Drawing.Point( 84, 26 );
 			this.infoLabel.Name = "infoLabel";
 			this.infoLabel.Size = new System.Drawing.Size( 171, 13 );
@@ -66,6 +73,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.titleLabel.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left )
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.titleLabel.BackColor = System.Drawing.Color.Transparent;
+			this.titleLabel.ContextMenuStrip = this.contextMenuStrip1;
 			this.titleLabel.Font = new System.Drawing.Font( "Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
 			this.titleLabel.Location = new System.Drawing.Point( 84, 6 );
 			this.titleLabel.Name = "titleLabel";
@@ -75,16 +83,48 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.titleLabel.DoubleClick += new System.EventHandler( this.titleLabel_DoubleClick );
 			this.titleLabel.Click += new System.EventHandler( this.titleLabel_Click );
 			// 
+			// contextMenuStrip1
+			// 
+			this.contextMenuStrip1.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.checkCompatibilityToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.removeToolStripMenuItem} );
+			this.contextMenuStrip1.Name = "contextMenuStrip1";
+			this.contextMenuStrip1.Size = new System.Drawing.Size( 186, 54 );
+			// 
+			// checkCompatibilityToolStripMenuItem
+			// 
+			this.checkCompatibilityToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.ReportIcon;
+			this.checkCompatibilityToolStripMenuItem.Name = "checkCompatibilityToolStripMenuItem";
+			this.checkCompatibilityToolStripMenuItem.Size = new System.Drawing.Size( 185, 22 );
+			this.checkCompatibilityToolStripMenuItem.Text = "&Check Compatibility";
+			this.checkCompatibilityToolStripMenuItem.Click += new System.EventHandler( this.checkCompatibilityToolStripMenuItem_Click );
+			// 
+			// toolStripMenuItem1
+			// 
+			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+			this.toolStripMenuItem1.Size = new System.Drawing.Size( 182, 6 );
+			// 
+			// removeToolStripMenuItem
+			// 
+			this.removeToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.RemoveIcon;
+			this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+			this.removeToolStripMenuItem.Size = new System.Drawing.Size( 185, 22 );
+			this.removeToolStripMenuItem.Text = "&Remove";
+			this.removeToolStripMenuItem.Click += new System.EventHandler( this.removeToolStripMenuItem_Click );
+			// 
 			// GameEntry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.ContextMenuStrip = this.contextMenuStrip1;
 			this.Controls.Add( this.titleLabel );
 			this.Controls.Add( this.infoLabel );
 			this.Controls.Add( this.gamePicture );
 			this.Name = "GameEntry";
 			this.Size = new System.Drawing.Size( 258, 48 );
 			( ( System.ComponentModel.ISupportInitialize )( this.gamePicture ) ).EndInit();
+			this.contextMenuStrip1.ResumeLayout( false );
 			this.ResumeLayout( false );
 
 		}
@@ -95,5 +135,9 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		private System.Windows.Forms.Label infoLabel;
 		private System.Windows.Forms.Label titleLabel;
 		private System.Windows.Forms.ToolTip toolTip1;
+		private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+		private System.Windows.Forms.ToolStripMenuItem checkCompatibilityToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem removeToolStripMenuItem;
 	}
 }

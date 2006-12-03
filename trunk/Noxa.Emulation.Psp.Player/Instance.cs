@@ -395,6 +395,7 @@ namespace Noxa.Emulation.Psp.Player
 				}
 				catch( Exception ex )
 				{
+					Debugger.Break();
 					throw ex;
 				}
 			};

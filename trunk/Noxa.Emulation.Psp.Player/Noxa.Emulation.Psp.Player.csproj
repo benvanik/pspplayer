@@ -41,6 +41,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -127,6 +129,18 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="ServiceTools\CheckCompatability.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>CheckCompatability.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ServiceTools\PleaseWaitDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>PleaseWaitDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ServiceTools\SubmitGame.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>SubmitGame.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Strings.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
@@ -148,10 +162,40 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Properties\Settings.cs" />
+    <Compile Include="ServiceTools\CheckCompatability.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ServiceTools\CheckCompatability.Designer.cs">
+      <DependentUpon>CheckCompatability.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceTools\PleaseWaitDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ServiceTools\PleaseWaitDialog.Designer.cs">
+      <DependentUpon>PleaseWaitDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceTools\ServiceUtilities.cs" />
+    <Compile Include="ServiceTools\SubmitGame.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ServiceTools\SubmitGame.Designer.cs">
+      <DependentUpon>SubmitGame.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ServiceTools\SubmitReport.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ServiceTools\SubmitReport.Designer.cs">
+      <DependentUpon>SubmitReport.cs</DependentUpon>
+    </Compile>
     <Compile Include="Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Web References\CompatibilityService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -178,11 +222,14 @@
   <ItemGroup>
     <None Include="Resources\InvalidIcon.png" />
     <Content Include="Resources\AddIcon.png" />
+    <Content Include="Resources\AeroWait.gif" />
     <Content Include="Resources\ClearIcon.png" />
     <None Include="Resources\ErrorIcon.png" />
+    <Content Include="Resources\Google.png" />
     <Content Include="Resources\IconBackground.png" />
     <None Include="Resources\InfoIcon.png" />
     <Content Include="Resources\MemoryStickIcon.png" />
+    <Content Include="Resources\ReportIcon.png" />
     <Content Include="Resources\psp.ico" />
     <None Include="Resources\PspBoot.wmv" />
     <None Include="Resources\Sound Bank.xsb">
@@ -203,6 +250,20 @@
     <Content Include="Resources\RestartIcon.png" />
     <Content Include="Resources\StopIcon.png" />
     <Content Include="Resources\UmdIcon.png" />
+    <None Include="Web References\CompatibilityService\AddResult1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\CompatibilityService\CompatibilityResults.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\CompatibilityService\Game.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\CompatibilityService\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\CompatibilityService\Service.disco" />
     <None Include="Resources\Wallpaper01.jpg" />
     <None Include="Resources\Wallpaper02.jpg" />
     <None Include="Resources\Wallpaper03.jpg" />
@@ -216,6 +277,23 @@
     <None Include="Resources\Wallpaper11.jpg" />
     <None Include="Resources\Wallpaper12.jpg" />
     <None Include="Resources\WarningIcon.png" />
+    <None Include="Web References\CompatibilityService\Service.wsdl" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://localhost:8080/PSPCompat/Service.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\CompatibilityService\</RelPath>
+      <UpdateFromURL>http://localhost:8080/PSPCompat/Service.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>Noxa_Emulation_Psp_Player_Noxa_Emulation_Psp_CompatabilityService_Service</CachedSettingsPropName>
+    </WebReferenceUrl>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
