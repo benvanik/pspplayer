@@ -13,22 +13,22 @@ namespace Noxa.Emulation.Psp
 {
 	public enum ComponentType
 	{
-		Audio,
-		Bios,
-		Cpu,
-		Input,
-		UserMedia,
-		GameMedia,
-		Network,
-		Video,
-		Other
+		Audio = 0,
+		Bios = 1,
+		Cpu = 2,
+		Input = 3,
+		UserMedia = 4,
+		GameMedia = 5,
+		Network = 6,
+		Video = 7,
+		Other = 9
 	}
 
 	public enum ComponentBuild
 	{
-		Debug,
-		Testing,
-		Release
+		Debug = 0,
+		Testing = 1,
+		Release = 2
 	}
 
 	public interface IComponent

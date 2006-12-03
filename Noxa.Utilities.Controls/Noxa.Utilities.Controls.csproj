@@ -59,6 +59,7 @@
     <Compile Include="GraphicalHeader.designer.cs">
       <DependentUpon>GraphicalHeader.cs</DependentUpon>
     </Compile>
+    <Compile Include="IconUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WhidbeyTabCollection.cs" />
     <Compile Include="WhidbeyTabControl.cs">
