@@ -766,11 +766,11 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Ldc_I4, 32 );
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Conv_I4 );
-					context.ILGen.Emit( OpCodes.Stfld, context.Core0Lo );
+					context.ILGen.Emit( OpCodes.Stfld, context.Core0Hi );
 
 					context.ILGen.Emit( OpCodes.Ldarg_0 );
 					context.ILGen.Emit( OpCodes.Ldloc_0 );
-					context.ILGen.Emit( OpCodes.Stfld, context.Core0Hi );
+					context.ILGen.Emit( OpCodes.Stfld, context.Core0Lo );
 
 					//long res = rs * rt;
 					//context.Hi.Value = ( int )( res >> 32 );
@@ -804,11 +804,11 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Ldc_I4, 32 );
 					context.ILGen.Emit( OpCodes.Shr_Un );
 					context.ILGen.Emit( OpCodes.Conv_I4 );
-					context.ILGen.Emit( OpCodes.Stfld, context.Core0Lo );
+					context.ILGen.Emit( OpCodes.Stfld, context.Core0Hi );
 
 					context.ILGen.Emit( OpCodes.Ldarg_0 );
 					context.ILGen.Emit( OpCodes.Ldloc_0 );
-					context.ILGen.Emit( OpCodes.Stfld, context.Core0Hi );
+					context.ILGen.Emit( OpCodes.Stfld, context.Core0Lo );
 
 					//long res = rs * rt;
 					//context.Hi.Value = ( int )( res >> 32 );

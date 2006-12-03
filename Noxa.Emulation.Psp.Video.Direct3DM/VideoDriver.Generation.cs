@@ -11,8 +11,6 @@ using System.Text;
 
 using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
-using Microsoft.DirectX.Direct3D.CustomVertex;
-using Microsoft.DirectX.Generic;
 
 namespace Noxa.Emulation.Psp.Video.Direct3DM
 {
@@ -286,7 +284,9 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			}
 
 			_vertexTempLength = strideSize * vertexCount;
-			VertexBuffer vb = new VertexBuffer( _device, _vertexTempLength, Usage.None, format, Pool.Default, new EventHandler( VertexBufferCreated ) );
+			VertexBuffer vb = new VertexBuffer( _device, _vertexTempLength, Usage.None, format, Pool.Default );
+			vb.Created += new EventHandler( VertexBufferCreated );
+			VertexBufferCreated( vb, EventArgs.Empty );
 			CachedVertexBuffer ret = new CachedVertexBuffer( format, strideSize, vb );
 			return ret;
 		}
@@ -343,7 +343,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				Debug.Assert( _vertexTemp != null );
 				Debug.Assert( _vertexTemp.Length > 0 );
 
-				using( GraphicsBuffer gb = buffer.Lock( 0, _vertexTempLength, LockFlags.Discard ) )
+				using( GraphicsStream gb = buffer.Lock( 0, _vertexTempLength, LockFlags.Discard ) )
 				{
 					gb.Write( _vertexTemp, 0, _vertexTempLength );
 					buffer.Unlock();

@@ -12,7 +12,6 @@ using System.IO;
 
 using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
-using Microsoft.DirectX.Generic;
 
 namespace Noxa.Emulation.Psp.Video.Direct3DM
 {
@@ -82,10 +81,10 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							stream.WriteTo( fs );
 						}
 						texture.Texture = new Texture( _device, texture.Width, texture.Height, 1, Usage.Dynamic, Format.A4R4G4B4, Pool.Default );
-						using( GraphicsBuffer gb = texture.Texture.Lock( 0, null, LockFlags.None ) )
+						using( GraphicsStream gb = texture.Texture.LockRectangle( 0, LockFlags.None ) )
 						{
 							gb.Write( internalMemory, offset, length );
-							texture.Texture.Unlock( 0 );
+							texture.Texture.UnlockRectangle( 0 );
 						}
 
 						_context.CachedTextures.Add( texture.Address, texture );

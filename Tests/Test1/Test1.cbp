@@ -20,16 +20,20 @@
 		</Build>
 		<Compiler>
 			<Add option="-fno-exceptions"/>
+			<Add directory="C:\cygwin\usr\local\pspdev\psp\include"/>
+			<Add directory="C:\cygwin\usr\local\pspdev\psp\sdk\include"/>
 		</Compiler>
 		<Linker>
 			<Add library="libg.a"/>
 			<Add library="libm.a"/>
-			<Add library="libstc++.a"/>
+			<Add library="libstdc++.a"/>
 			<Add library="libsupc++.a"/>
 			<Add library="libg.a"/>
 			<Add library="libpsprtc.a"/>
 			<Add library="libpspuser.a"/>
 			<Add library="libpsputility.a"/>
+			<Add library="libpspnet.a"/>
+			<Add library="libpspnet_inet.a"/>
 			<Add library="libpspdebug.a"/>
 			<Add library="libpsplibc.a"/>
 			<Add library="libpspgum.a"/>
@@ -44,6 +48,8 @@
 			<Add library="libpsppower_driver.a"/>
 			<Add library="libpspgum_vfpu.a"/>
 			<Add library="libpspkernel.a"/>
+			<Add directory="C:\cygwin\usr\local\pspdev\psp\lib"/>
+			<Add directory="C:\cygwin\usr\local\pspdev\psp\sdk\lib"/>
 		</Linker>
 		<Unit filename="main.cpp">
 			<Option compilerVar="CPP"/>

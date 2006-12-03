@@ -79,6 +79,19 @@ namespace Noxa.Emulation.Psp.Video
 			return this.Name;
 		}
 
+		public bool IsTestable
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		public IList<ComponentIssue> Test( ComponentParameters parameters )
+		{
+			throw new Exception( "The method or operation is not implemented." );
+		}
+
 		public bool IsConfigurable
 		{
 			get

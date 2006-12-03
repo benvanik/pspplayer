@@ -14,8 +14,6 @@ using System.IO;
 using Noxa.Emulation.Psp.Cpu;
 using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
-using Microsoft.DirectX.Generic;
-using Microsoft.DirectX.Direct3D.CustomVertex;
 
 namespace Noxa.Emulation.Psp.Video.Direct3DM
 {
@@ -312,18 +310,18 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 					case VideoCommand.ALA:
 						{
-							int ambient = _device.RenderState.AmbientValue;
+							int ambient = _device.RenderState.AmbientColor;
 							ambient &= 0x00FFFFFF;
 							ambient |= packet.Argument << 24;
-							_device.RenderState.AmbientValue = ambient;
+							_device.RenderState.AmbientColor = ambient;
 						}
 						break;
 					case VideoCommand.ALC:
 						{
 							// Ambient color in BGR format - need to flip
-							int ambient = _device.RenderState.AmbientValue;
+							int ambient = _device.RenderState.AmbientColor;
 							ambient &= unchecked( ( int )0xFF000000 ) | ( ( packet.Argument & 0x00FF0000 ) >> 16 ) | ( packet.Argument & 0x0000FF00 ) | ( ( packet.Argument & 0x000000FF ) << 16 );
-							_device.RenderState.AmbientValue = ambient;
+							_device.RenderState.AmbientColor = ambient;
 						}
 						break;
 					case VideoCommand.AMA:
