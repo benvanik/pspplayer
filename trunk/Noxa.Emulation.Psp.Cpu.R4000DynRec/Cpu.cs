@@ -24,6 +24,7 @@ using System.Reflection.Emit;
 using Noxa.Emulation.Psp.Cpu.Generation;
 using System.Reflection;
 using System.Threading;
+using Noxa.Emulation.Psp.Debugging;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
@@ -45,8 +46,13 @@ namespace Noxa.Emulation.Psp.Cpu
 		internal int _lastSyscall;
 		internal BiosFunction[] _syscalls;
 
+		protected ExecutionMode _executionMode;
+		protected int _executionParameter;
+		internal bool _debugging;
+		protected AutoResetEvent _debugWait;
+
 #if DEBUG
-		protected bool _debug = false;
+		protected bool _debug = true;
 #endif
 
 		#region Statistics
@@ -134,6 +140,8 @@ namespace Noxa.Emulation.Psp.Cpu
 			_context.Cpu = this;
 			_context.Core0 = _core0;
 			_context.Memory = _memory;
+
+			_executionMode = ExecutionMode.Run;
 		}
 
 		#region Caps
@@ -189,6 +197,14 @@ namespace Noxa.Emulation.Psp.Cpu
 #else
 					return CpuStatisticsCapabilities.None;
 #endif
+				}
+			}
+
+			public bool DebuggingSupported
+			{
+				get
+				{
+					return true;
 				}
 			}
 		}
@@ -311,6 +327,66 @@ namespace Noxa.Emulation.Psp.Cpu
 			}
 		}
 
+		public ExecutionMode ExecutionMode
+		{
+			get
+			{
+				return _executionMode;
+			}
+			set
+			{
+				_executionMode = value;
+			}
+		}
+
+		public int ExecutionParameter
+		{
+			get
+			{
+				return _executionParameter;
+			}
+			set
+			{
+				_executionParameter = value;
+			}
+		}
+
+		public bool DebuggingEnabled
+		{
+			get
+			{
+				return _debugging;
+			}
+		}
+
+		public void EnableDebugging()
+		{
+			_emulator.Host.Debugger.Control.BreakpointAdded += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointAdded );
+			_emulator.Host.Debugger.Control.BreakpointRemoved += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointRemoved );
+			_emulator.Host.Debugger.Control.BreakpointToggled += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointToggled );
+
+			_codeCache.Clear();
+			_debugging = true;
+			_debugWait = new AutoResetEvent( false );
+
+			_executionMode = ExecutionMode.Step;
+		}
+
+		private void DebuggerControlBreakpointAdded( object sender, BreakpointEventArgs e )
+		{
+			_codeCache.Invalidate( e.Breakpoint.Address );
+		}
+
+		private void DebuggerControlBreakpointRemoved( object sender, BreakpointEventArgs e )
+		{
+			_codeCache.Invalidate( e.Breakpoint.Address );
+		}
+
+		private void DebuggerControlBreakpointToggled( object sender, BreakpointEventArgs e )
+		{
+			_codeCache.Invalidate( e.Breakpoint.Address );
+		}
+
 		public int RegisterSyscall( uint nid )
 		{
 			BiosFunction function = _emulator.Bios.FindFunction( nid );
@@ -323,35 +399,79 @@ namespace Noxa.Emulation.Psp.Cpu
 			return sid;
 		}
 
+		public void Resume()
+		{
+			_debugWait.Set();
+		}
+
+		public void Break()
+		{
+			throw new NotImplementedException();
+		}
+
 		public int ExecuteBlock()
 		{
 			// This happens after syscall
+
+			if( _debugging )
+			{
+				switch( _executionMode )
+				{
+					case ExecutionMode.Step:
+					case ExecutionMode.StepN:
+						_debugWait.WaitOne();
+						break;
+					case ExecutionMode.RunUntil:
+						throw new NotImplementedException();
+					default:
+					case ExecutionMode.Run:
+						break;
+				}
+			}
 
 #if STATS
 			double blockStart = _timer.Elapsed;
 			if( _stats.RunTime == 0.0 )
 				_stats.RunTime = _timer.Elapsed;
 #endif
-			//_memory.DumpMainMemory( @"c:\cygwin\home\noxa\mmem.bin" );
+			
 			int count = 0;
-			for( int n = 0; n < DefaultBlockCount; n++ )
+			int maxCount;
+			if( _debugging == false )
+				maxCount = DefaultBlockCount;
+			else
+			{
+				switch( _executionMode )
+				{
+						// TODO: Figure out the proper values for these
+					default:
+					case ExecutionMode.Run:
+						maxCount = DefaultBlockCount;
+						break;
+					case ExecutionMode.RunUntil:
+						maxCount = DefaultBlockCount;
+						break;
+					case ExecutionMode.Step:
+						maxCount = 1;
+						break;
+					case ExecutionMode.StepN:
+						maxCount = _executionParameter;
+						break;
+				}
+			}
+			for( int n = 0; n < maxCount; n++ )
 			{
 				int address = _core0.Pc;
 				address = _core0.TranslateAddress( address );
-				//if( address == 0x08900e40 )
-				//	_debug = true;
-				//if( address == 0x08924928 )
-				//	_debug = true;
-				//if( address == 0x89005fc )
-				//	_debug = true;
-				//if( address == 0x089004D0 )
-				//	_debug = true;
-				//if( address == 0x8900350 )
-				//	Debugger.Break();
-				//if( address == 0x8900374 )
-				//	Debugger.Break();
-				//if( address == 0x08902744 )
-				//	Debugger.Break();
+				if( _debugging == true )
+				{
+					Breakpoint breakpoint = _emulator.Host.Debugger.Control.FindBreakpoint( address );
+					if( breakpoint != null )
+					{
+						Debugger.Break();
+						break;
+					}
+				}
 
 				CodeBlock block = _codeCache.Find( address );
 				if( block == null )
@@ -482,6 +602,16 @@ namespace Noxa.Emulation.Psp.Cpu
 			Debug.WriteLine( string.Format( "Starting generate for block at 0x{0:X8}", startAddress ) );
 #endif
 
+			// Note that this is NOT a solid value - unfortunately things aren't setup
+			// to handle debugging at branches right, so if a branch/jump occurs this
+			// value will be incremented by one!
+			int maxCodeLength = MaximumCodeLength;
+			if( _debugging == true )
+			{
+				// TODO: have debugger pick proper code gen amount
+				maxCodeLength = 1;
+			}
+
 			bool jumpDelay = false;
 			GenerationResult lastResult = GenerationResult.Success;
 			for( int pass = 0; pass <= 1; pass++ )
@@ -497,7 +627,7 @@ namespace Noxa.Emulation.Psp.Cpu
 				bool breakOut = false;
 				bool checkNullDelay = false;
 				int address = startAddress;
-				for( int n = 0; n < MaximumCodeLength; n++ )
+				for( int n = 0; n < maxCodeLength; n++ )
 				{
 					GenerationResult result = GenerationResult.Invalid;
 
@@ -757,36 +887,47 @@ namespace Noxa.Emulation.Psp.Cpu
 					// This is so that we can handle delay slots
 					if( breakOut == true )
 						break;
-					if( result == GenerationResult.Branch )
+
+					bool padBlockCheck = false;
+					switch( result )
 					{
-						_context.InDelay = true;
-						lastResult = result;
-					}
-					if( result == GenerationResult.Jump )
-					{
-						// This is tricky - if lastTargetPc > currentPc, don't break out
-						if( _context.LastBranchTarget <= address )
-						{
-							//Debug.WriteLine( string.Format( "Jump breakout at {0:X8}", address ) );
-							breakOut = true;
+						case GenerationResult.Branch:
+							_context.InDelay = true;
 							lastResult = result;
-						}
-						else
-						{
-							//Debug.WriteLine( string.Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _context.LastBranchTarget ) );
-							if( pass == 1 )
+							padBlockCheck = true;
+							break;
+						case GenerationResult.Jump:
+							// This is tricky - if lastTargetPc > currentPc, don't break out
+							if( _context.LastBranchTarget <= address )
 							{
-								jumpDelay = true;
-								_context.InDelay = true;
+								//Debug.WriteLine( string.Format( "Jump breakout at {0:X8}", address ) );
+								breakOut = true;
+								lastResult = result;
 							}
-						}
+							else
+							{
+								//Debug.WriteLine( string.Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _context.LastBranchTarget ) );
+								if( pass == 1 )
+								{
+									jumpDelay = true;
+									_context.InDelay = true;
+								}
+							}
+							padBlockCheck = true;
+							break;
+						case GenerationResult.BranchAndNullifyDelay:
+							_context.InDelay = true;
+							if( pass == 1 )
+								checkNullDelay = true;
+							lastResult = result;
+							padBlockCheck = true;
+							break;
 					}
-					if( result == GenerationResult.BranchAndNullifyDelay )
+
+					if( padBlockCheck == true )
 					{
-						_context.InDelay = true;
-						if( pass == 1 )
-							checkNullDelay = true;
-						lastResult = result;
+						if( n == maxCodeLength - 1 )
+							maxCodeLength++;
 					}
 				}
 

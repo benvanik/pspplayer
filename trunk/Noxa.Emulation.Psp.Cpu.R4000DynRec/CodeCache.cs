@@ -103,5 +103,39 @@ namespace Noxa.Emulation.Psp.Cpu
 				return block;
 			}
 		}
+
+		public void Invalidate( int address )
+		{
+			uint addr = ( uint )address;
+			addr >>= 2;
+
+			uint b0 = addr >> 20;
+			uint b1 = ( addr >> 10 ) & 0x3FF;
+
+			lock( SyncRoot )
+			{
+				CodeBlock[][] block0 = Lookup[ b0 ];
+				if( block0 == null )
+					return;
+
+				CodeBlock[] block1 = block0[ b1 ];
+				if( block1 == null )
+					return;
+
+				for( int n = 0; n < block1.Length; n++ )
+				{
+					CodeBlock block = block1[ n ];
+					if( ( block.Address <= address ) &&
+						( block.Address + block.InstructionCount >= address ) )
+						block1[ n ] = null;
+				}
+			}
+		}
+
+		public void Clear()
+		{
+			lock( SyncRoot )
+				Lookup = new CodeBlock[ 1024 ][][];
+		}
 	}
 }

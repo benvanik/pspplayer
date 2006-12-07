@@ -1,0 +1,195 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{19EF75B2-B414-4EB0-9486-160FAF93E62C}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>Puzzle.SyntaxBox.NET2</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>
+    </RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>Compona.Syntaxbox.xml</DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Design">
+      <Name>System.Design</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+    <ProjectReference Include="..\CoreLib\Puzzle.CoreLib.NET 2.0.csproj">
+      <Name>Puzzle.CoreLib.NET 2.0</Name>
+      <Project>{7858FB56-9BB3-40CE-BA9C-5FB9F04E79DE}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+    <ProjectReference Include="..\SyntaxDocument\Puzzle.SyntaxDocument.NET 2.0.csproj">
+      <Name>Puzzle.SyntaxDocument.NET 2.0</Name>
+      <Project>{55D040D8-B8F2-4C15-8FCD-A73F82A3882C}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Classes\Caret.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Classes\KeyboadActionList.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Classes\KeyboardAction.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Classes\Painter_GDI.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Classes\Selection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Classes\Structs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\Autolist\AutoListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Autolist\TabListBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\EditView\EditViewControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\InfoTip\InfoTipForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Syntaxbox\Dialogs\FindReplace.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Syntaxbox\Dialogs\GotoLine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\Syntaxbox\Dialogs\Settings.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\Syntaxbox\Events.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\Syntaxbox\SyntaxBoxControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Syntaxbox\SyntaxBoxDesigner.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\IPainter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <EmbeddedResource Include="Controls\Autolist\AutoListForm.resx">
+      <DependentUpon>AutoListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Autolist\TabListBox.resx">
+      <DependentUpon>TabListBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\EditView\EditViewControl.resx">
+      <DependentUpon>EditViewControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\InfoTip\InfoTipForm.resx">
+      <DependentUpon>InfoTipForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Syntaxbox\Dialogs\FindReplace.resx">
+      <DependentUpon>FindReplace.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Syntaxbox\Dialogs\GotoLine.resx">
+      <DependentUpon>GotoLine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Syntaxbox\Dialogs\Settings.resx">
+      <DependentUpon>Settings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\Syntaxbox\SyntaxBoxControl.resx">
+      <DependentUpon>SyntaxBoxControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FlippedCursor.cur" />
+    <EmbeddedResource Include="Puzzle.Windows.Forms.SyntaxBoxControl.bmp" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

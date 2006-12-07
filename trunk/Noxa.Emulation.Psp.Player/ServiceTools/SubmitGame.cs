@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 using Noxa.Utilities.Controls;
@@ -13,8 +15,6 @@ using Noxa.Utilities.Controls;
 using Noxa.Emulation.Psp.Games;
 using Noxa.Emulation.Psp.Player.CompatibilityService;
 using Noxa.Emulation.Psp.Player.Properties;
-using System.Threading;
-using System.Globalization;
 
 namespace Noxa.Emulation.Psp.Player.ServiceTools
 {

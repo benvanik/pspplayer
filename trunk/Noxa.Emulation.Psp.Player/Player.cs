@@ -12,6 +12,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using Noxa.Emulation.Psp.Player.Configuration;
+using Noxa.Emulation.Psp.Player.Development;
 
 namespace Noxa.Emulation.Psp.Player
 {
@@ -86,6 +87,8 @@ namespace Noxa.Emulation.Psp.Player
 						this.stopToolStripButton.Enabled = false;
 						this.restartToolStripButton.Enabled = false;
 						this.configureToolStripButton.Enabled = true;
+						this.debugToolStripButton.Enabled = true;
+						this.attachToolStripButton.Enabled = false;
 						this.splashPicture.Visible = true;
 						invalidate = true;
 						break;
@@ -95,6 +98,8 @@ namespace Noxa.Emulation.Psp.Player
 						this.stopToolStripButton.Enabled = true;
 						this.restartToolStripButton.Enabled = true;
 						this.configureToolStripButton.Enabled = false;
+						this.debugToolStripButton.Enabled = false;
+						this.attachToolStripButton.Enabled = true;
 						this.splashPicture.Visible = false;
 						break;
 					case InstanceState.Paused:
@@ -103,6 +108,8 @@ namespace Noxa.Emulation.Psp.Player
 						this.stopToolStripButton.Enabled = true;
 						this.restartToolStripButton.Enabled = true;
 						this.configureToolStripButton.Enabled = false;
+						this.debugToolStripButton.Enabled = false;
+						this.attachToolStripButton.Enabled = true;
 						this.splashPicture.Visible = false;
 						break;
 					case InstanceState.Ended:
@@ -111,6 +118,8 @@ namespace Noxa.Emulation.Psp.Player
 						this.stopToolStripButton.Enabled = false;
 						this.restartToolStripButton.Enabled = true;
 						this.configureToolStripButton.Enabled = true;
+						this.debugToolStripButton.Enabled = true;
+						this.attachToolStripButton.Enabled = false;
 						this.splashPicture.Visible = true;
 						invalidate = true;
 						break;
@@ -122,6 +131,8 @@ namespace Noxa.Emulation.Psp.Player
 						this.stopToolStripButton.Enabled = false;
 						this.restartToolStripButton.Enabled = true;
 						this.configureToolStripButton.Enabled = true;
+						this.debugToolStripButton.Enabled = false;
+						this.attachToolStripButton.Enabled = true;
 						this.splashPicture.Visible = true;
 						invalidate = true;
 						break;
@@ -138,7 +149,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.Invoke( del );
 		}
 
-		private void startToolStripButton_Click( object sender, EventArgs e )
+		private void StartInstance( bool debugging )
 		{
 			if( _host.CurrentInstance != null )
 			{
@@ -152,7 +163,12 @@ namespace Noxa.Emulation.Psp.Player
 
 			CurrentInstance_StateChanged( _host.CurrentInstance, EventArgs.Empty );
 
-			_host.CurrentInstance.Start();
+			_host.CurrentInstance.Start( debugging );
+		}
+
+		private void startToolStripButton_Click( object sender, EventArgs e )
+		{
+			this.StartInstance( false );
 		}
 
 		private void pauseToolStripButton_Click( object sender, EventArgs e )
@@ -182,6 +198,22 @@ namespace Noxa.Emulation.Psp.Player
 				_host.ComponentSettings = options.ComponentSettings;
 				_host.Save();
 			}
+		}
+
+		private void debugToolStripButton_Click( object sender, EventArgs e )
+		{
+			this.StartInstance( true );
+		}
+
+		private void attachToolStripButton_Click( object sender, EventArgs e )
+		{
+			if( _host.Debugger != null )
+			{
+				_host.Debugger.Show();
+				return;
+			}
+
+			_host.AttachDebugger();
 		}
 
 		private string GetStatusText()

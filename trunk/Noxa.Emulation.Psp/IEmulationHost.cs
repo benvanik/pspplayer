@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Noxa.Emulation.Psp.Debugging;
 
 namespace Noxa.Emulation.Psp
 {
@@ -16,5 +17,12 @@ namespace Noxa.Emulation.Psp
 		{
 			get;
 		}
+
+		IDebugger Debugger
+		{
+			get;
+		}
+
+		void AttachDebugger();
 	}
 }

@@ -29,6 +29,11 @@ namespace Noxa.Emulation.Psp
 
 	public interface IEmulationInstance
 	{
+		IEmulationHost Host
+		{
+			get;
+		}
+
 		EmulationParameters Parameters
 		{
 			get;
@@ -78,7 +83,7 @@ namespace Noxa.Emulation.Psp
 
 		bool Create();
 		void Destroy();
-		void Start();
+		void Start( bool debugging );
 		void Stop();
 		void Pause();
 		void Resume();

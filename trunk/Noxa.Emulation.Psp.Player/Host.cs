@@ -11,6 +11,7 @@ using System.IO;
 using System.Reflection;
 using System.Diagnostics;
 using Noxa.Emulation.Psp.Player.Configuration;
+using Noxa.Emulation.Psp.Debugging;
 
 namespace Noxa.Emulation.Psp.Player
 {
@@ -18,6 +19,7 @@ namespace Noxa.Emulation.Psp.Player
 	{
 		protected Player _player;
 		protected Instance _instance;
+		protected IDebugger _debugger;
 		protected Settings _componentSettings;
 
 		public Host()
@@ -52,6 +54,14 @@ namespace Noxa.Emulation.Psp.Player
 			get
 			{
 				return _instance;
+			}
+		}
+
+		public IDebugger Debugger
+		{
+			get
+			{
+				return _debugger;
 			}
 		}
 
@@ -219,6 +229,18 @@ namespace Noxa.Emulation.Psp.Player
 				return _instance.Create();
 			else
 				return false;
+		}
+
+		public void AttachDebugger()
+		{
+			Debug.Assert( _debugger == null, "Debugger already attached!" );
+			if( _debugger != null )
+				return;
+
+			_debugger = new Noxa.Emulation.Psp.Player.Development.Debugger( this );
+			_debugger.Show();
+
+			_instance.Cpu.EnableDebugging();
 		}
 	}
 }
