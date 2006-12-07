@@ -7,10 +7,46 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace Noxa.Emulation.Psp.Debugging
 {
-	interface IDebugger
+	public enum DebugDataType
 	{
+		Objdump,
+		Elf,
+	}
+
+	public interface IDebugger
+	{
+		IEmulationHost Host
+		{
+			get;
+		}
+
+		bool IsAttached
+		{
+			get;
+		}
+
+		IDebugControl Control
+		{
+			get;
+		}
+
+		IDebugInspector Inspector
+		{
+			get;
+		}
+
+		IProgramDebugData DebugData
+		{
+			get;
+		}
+
+		bool LoadDebugData( DebugDataType dataType, Stream stream );
+
+		void Show();
+		void Hide();
 	}
 }

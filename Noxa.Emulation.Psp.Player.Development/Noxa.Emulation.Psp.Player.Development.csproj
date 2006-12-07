@@ -1,0 +1,272 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CC484F2B-C009-4756-8A3F-2E488EE611BE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Noxa.Emulation.Psp.Player.Development</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp.Player.Development</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DockPanel2005, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\DockPanel\DockPanel2005\bin\Release\DockPanel2005.dll</HintPath>
+    </Reference>
+    <Reference Include="PropertyGridEx, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\PropertyGridEx.dll</HintPath>
+    </Reference>
+    <Reference Include="Puzzle.CoreLib.NET2, Version=1.0.6.33714, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Syntaxbox\SyntaxBox\bin\Debug\Puzzle.CoreLib.NET2.dll</HintPath>
+    </Reference>
+    <Reference Include="Puzzle.SyntaxBox.NET2, Version=1.4.10.33714, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Syntaxbox\SyntaxBox\bin\Debug\Puzzle.SyntaxBox.NET2.dll</HintPath>
+    </Reference>
+    <Reference Include="Puzzle.SyntaxDocument.NET2, Version=1.4.10.33714, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Syntaxbox\SyntaxBox\bin\Debug\Puzzle.SyntaxDocument.NET2.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\DockPanel\WinFormsUI\bin\Release\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BasicBreakpoint.cs" />
+    <Compile Include="BasicCallstackFrame.cs" />
+    <Compile Include="DebugControl.cs" />
+    <Compile Include="Debugger.cs" />
+    <Compile Include="DebugInspector.cs" />
+    <Compile Include="DebugSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DebugSetup.Designer.cs">
+      <DependentUpon>DebugSetup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Studio.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Studio.Designer.cs">
+      <DependentUpon>Studio.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\BreakpointsPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\BreakpointsPane.Designer.cs">
+      <DependentUpon>BreakpointsPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\CallstackPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\CallstackPane.Designer.cs">
+      <DependentUpon>CallstackPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\DisassemblyDocument.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\DisassemblyDocument.Designer.cs">
+      <DependentUpon>DisassemblyDocument.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\CpuPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\CpuPane.Designer.cs">
+      <DependentUpon>CpuPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\MemoryDocument.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\MemoryDocument.Designer.cs">
+      <DependentUpon>MemoryDocument.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\ThreadsPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\ThreadsPane.Designer.cs">
+      <DependentUpon>ThreadsPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\ToolDocument.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\ToolDocument.Designer.cs">
+      <DependentUpon>ToolDocument.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\ToolPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\ToolPane.Designer.cs">
+      <DependentUpon>ToolPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\WatchesPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\WatchesPane.Designer.cs">
+      <DependentUpon>WatchesPane.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DebugSetup.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DebugSetup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Studio.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Studio.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\DisassemblyDocument.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DisassemblyDocument.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">
+      <Project>{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}</Project>
+      <Name>Noxa.Emulation.Psp.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
+      <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
+      <Name>Noxa.Emulation.Psp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj">
+      <Project>{67000884-BAF0-40B5-8D24-F06D2D623787}</Project>
+      <Name>Noxa.Utilities.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities\Noxa.Utilities.csproj">
+      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
+      <Name>Noxa.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StopIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PauseIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PlayIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RestartIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OptionsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HighlightIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StepOutIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StepOverIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StepIntoIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HelpIndexIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HelpContentsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\WatchesIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BreakpointOffIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BreakpointsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CallstackIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DeleteAllBreakpointsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DeleteBreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisassemblyIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FindBreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MemoryIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NewBreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RegistersIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatementCallIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatementDeadIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatementIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ThreadsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToggleAllBreakpointsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToggleBreakpointIcon.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

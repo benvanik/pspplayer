@@ -59,6 +59,14 @@ namespace Noxa.Emulation.Psp.Player
 			_params = parameters;
 		}
 
+		public IEmulationHost Host
+		{
+			get
+			{
+				return _host;
+			}
+		}
+
 		public EmulationParameters Parameters
 		{
 			get
@@ -284,7 +292,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.OnStateChanged();
 		}
 
-		public void Start()
+		public void Start( bool debugging )
 		{
 			if( _isCreated == false )
 				this.Create();
@@ -308,6 +316,9 @@ namespace Noxa.Emulation.Psp.Player
 					this.Restart();
 					return;
 			}
+
+			if( debugging == true )
+				_host.AttachDebugger();
 
 			_state = InstanceState.Running;
 			_stateChangeEvent.Set();
@@ -365,7 +376,7 @@ namespace Noxa.Emulation.Psp.Player
 
 			this.Stop();
 			this.Create();
-			this.Start();
+			this.Start( ( _host.Debugger != null ) );
 		}
 
 		public void LightReset()

@@ -53,6 +53,11 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get;
 		}
+
+		bool DebuggingSupported
+		{
+			get;
+		}
 	}
 
 	public interface ICpuStatistics
@@ -61,6 +66,14 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get;
 		}
+	}
+
+	public enum ExecutionMode
+	{
+		Run,
+		Step,
+		StepN,
+		RunUntil,
 	}
 
 	public interface ICpu : IComponentInstance
@@ -115,7 +128,29 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 		}
 
+		ExecutionMode ExecutionMode
+		{
+			get;
+			set;
+		}
+
+		int ExecutionParameter
+		{
+			get;
+			set;
+		}
+
+		bool DebuggingEnabled
+		{
+			get;
+		}
+
+		void EnableDebugging();
+
 		int RegisterSyscall( uint nid );
+
+		void Resume();
+		void Break();
 
 		int ExecuteBlock();
 

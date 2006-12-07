@@ -35,6 +35,7 @@ namespace Noxa.Emulation.Psp.Player
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager( typeof( Player ) );
 			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
 			this.startToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.pauseToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -48,9 +49,12 @@ namespace Noxa.Emulation.Psp.Player
 			this.fullscreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.configureToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+			this.attachToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.renderSurface = new System.Windows.Forms.Panel();
 			this.splashPicture = new System.Windows.Forms.PictureBox();
 			this.statusUpdateTimer = new System.Windows.Forms.Timer( this.components );
+			this.debugToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.toolStrip1.SuspendLayout();
 			this.renderSurface.SuspendLayout();
 			( ( System.ComponentModel.ISupportInitialize )( this.splashPicture ) ).BeginInit();
@@ -66,7 +70,10 @@ namespace Noxa.Emulation.Psp.Player
             this.toolStripSeparator2,
             this.sizeToolStripSplitButton,
             this.toolStripSeparator1,
-            this.configureToolStripButton} );
+            this.configureToolStripButton,
+            this.toolStripSeparator3,
+            this.debugToolStripButton,
+            this.attachToolStripButton} );
 			this.toolStrip1.Location = new System.Drawing.Point( 0, 0 );
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Size = new System.Drawing.Size( 480, 25 );
@@ -181,6 +188,21 @@ namespace Noxa.Emulation.Psp.Player
 			this.configureToolStripButton.ToolTipText = "Configure components";
 			this.configureToolStripButton.Click += new System.EventHandler( this.configureToolStripButton_Click );
 			// 
+			// toolStripSeparator3
+			// 
+			this.toolStripSeparator3.Name = "toolStripSeparator3";
+			this.toolStripSeparator3.Size = new System.Drawing.Size( 6, 25 );
+			// 
+			// attachToolStripButton
+			// 
+			this.attachToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.attachToolStripButton.Image = ( ( System.Drawing.Image )( resources.GetObject( "attachToolStripButton.Image" ) ) );
+			this.attachToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.attachToolStripButton.Name = "attachToolStripButton";
+			this.attachToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.attachToolStripButton.Text = "Attach Debugger";
+			this.attachToolStripButton.Click += new System.EventHandler( this.attachToolStripButton_Click );
+			// 
 			// renderSurface
 			// 
 			this.renderSurface.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
@@ -209,6 +231,15 @@ namespace Noxa.Emulation.Psp.Player
 			this.statusUpdateTimer.Enabled = true;
 			this.statusUpdateTimer.Interval = 1000;
 			this.statusUpdateTimer.Tick += new System.EventHandler( this.statusUpdateTimer_Tick );
+			// 
+			// debugToolStripButton
+			// 
+			this.debugToolStripButton.Image = ( ( System.Drawing.Image )( resources.GetObject( "debugToolStripButton.Image" ) ) );
+			this.debugToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.debugToolStripButton.Name = "debugToolStripButton";
+			this.debugToolStripButton.Size = new System.Drawing.Size( 139, 22 );
+			this.debugToolStripButton.Text = "Start with Debugging";
+			this.debugToolStripButton.Click += new System.EventHandler( this.debugToolStripButton_Click );
 			// 
 			// Player
 			// 
@@ -251,6 +282,9 @@ namespace Noxa.Emulation.Psp.Player
 		private System.Windows.Forms.ToolStripMenuItem threeXToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem fullscreenToolStripMenuItem;
 		private System.Windows.Forms.Timer statusUpdateTimer;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+		private System.Windows.Forms.ToolStripButton attachToolStripButton;
+		private System.Windows.Forms.ToolStripButton debugToolStripButton;
 	}
 }
 

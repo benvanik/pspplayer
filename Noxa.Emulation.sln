@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Video.Xn
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CpuTests", "Tests\CpuTests\CpuTests.vcproj", "{9A891E57-91F1-4625-B2BB-21AAB64F56C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Player.Development", "Noxa.Emulation.Psp.Player.Development\Noxa.Emulation.Psp.Player.Development.csproj", "{CC484F2B-C009-4756-8A3F-2E488EE611BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -188,6 +190,16 @@ Global
 		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Release|Win32.ActiveCfg = Release|Win32
 		{9A891E57-91F1-4625-B2BB-21AAB64F56C5}.Release|Win32.Build.0 = Release|Win32
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{CC484F2B-C009-4756-8A3F-2E488EE611BE}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
