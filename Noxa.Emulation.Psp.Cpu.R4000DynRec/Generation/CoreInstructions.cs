@@ -3006,11 +3006,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 								byte func = ( byte )( code & 0x3F );
 
 								GenerateInstructionFpu instr = FpuInstructions.TableFpu[ func ];
-								if( pass == 1 )
-								{
-									context.Cpu.EmitDebugInfo( context, address, code, instr.Method.Name,
-										string.Format( "fmt:{0} fs:{1} ft:{2} fd:{3}", fmt, fs, ft, fd ) );
-								}
+								//if( pass == 1 )
+									//context.Cpu.EmitDebugInfo( context, address, code, instr.Method.Name, string.Format( "fmt:{0} fs:{1} ft:{2} fd:{3}", fmt, fs, ft, fd ) );
 								return instr( context, pass, address + 4, code, fmt, fs, ft, fd, func );
 							}
 							else
@@ -3024,65 +3021,41 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 							switch( rs )
 							{
 								case 0x00:			// mfcz rt, rd
-									if( pass == 1 )
-									{
-										context.Cpu.EmitDebugInfo( context, address, code, "MFCz",
-											string.Format( "cop:{3} rd:{0} rt:{1} imm:{2}", cop, rd, rt, ( int )( short )imm ) );
-									}
+									//if( pass == 1 )
+										//context.Cpu.EmitDebugInfo( context, address, code, "MFCz", string.Format( "cop:{3} rd:{0} rt:{1} imm:{2}", cop, rd, rt, ( int )( short )imm ) );
 									return Cop.MFCz( context, pass, address, code, cop, rd, rt, imm );
 								case 0x04:			// mtcz rt, rd
-									if( pass == 1 )
-									{
-										context.Cpu.EmitDebugInfo( context, address, code, "MTCz",
-											string.Format( "cop:{3} rd:{0} rt:{1} imm:{2}", cop, rd, rt, ( int )( short )imm ) );
-									}
+									//if( pass == 1 )
+										//context.Cpu.EmitDebugInfo( context, address, code, "MTCz", string.Format( "cop:{3} rd:{0} rt:{1} imm:{2}", cop, rd, rt, ( int )( short )imm ) );
 									return Cop.MTCz( context, pass, address, code, cop, rd, rt, imm );
 								case 0x02:			// cfcz rt, rd
-									if( pass == 1 )
-									{
-										context.Cpu.EmitDebugInfo( context, address, code, "CFCz",
-											string.Format( "cop:{3} rd:{0} rt:{1} imm:{2}", cop, rd, rt, ( int )( short )imm ) );
-									}
+									//if( pass == 1 )
+										//context.Cpu.EmitDebugInfo( context, address, code, "CFCz", string.Format( "cop:{3} rd:{0} rt:{1} imm:{2}", cop, rd, rt, ( int )( short )imm ) );
 									return Cop.CFCz( context, pass, address, code, cop, rd, rt, imm );
 								case 0x06:			// ctcz rt, rd
-									if( pass == 1 )
-									{
-										context.Cpu.EmitDebugInfo( context, address, code, "CTCz",
-											string.Format( "cop:{3} rd:{0} rt:{1} imm:{2}", cop, rd, rt, ( int )( short )imm ) );
-									}
+									//if( pass == 1 )
+										//context.Cpu.EmitDebugInfo( context, address, code, "CTCz", string.Format( "cop:{3} rd:{0} rt:{1} imm:{2}", cop, rd, rt, ( int )( short )imm ) );
 									return Cop.CTCz( context, pass, address, code, cop, rd, rt, imm );
 								case 0x08:
 									{
 										switch( rt )
 										{
 											case 0x0:		// BCzF
-												if( pass == 1 )
-												{
-													context.Cpu.EmitDebugInfo( context, address, code, "BCzF",
-														string.Format( "cop:{3} rs:{0} rt:{1} imm:{2}", cop, rs, rt, ( int )( short )imm ) );
-												}
+												//if( pass == 1 )
+													//context.Cpu.EmitDebugInfo( context, address, code, "BCzF", string.Format( "cop:{3} rs:{0} rt:{1} imm:{2}", cop, rs, rt, ( int )( short )imm ) );
 												return Cop.BCzF( context, pass, address, code, cop, rs, rt, imm );
 											case 0x2:		// BCzFL
-												if( pass == 1 )
-												{
-													context.Cpu.EmitDebugInfo( context, address, code, "BCzFL",
-														string.Format( "cop:{3} rs:{0} rt:{1} imm:{2}", cop, rs, rt, ( int )( short )imm ) );
-												}
+												//if( pass == 1 )
+													//context.Cpu.EmitDebugInfo( context, address, code, "BCzFL", string.Format( "cop:{3} rs:{0} rt:{1} imm:{2}", cop, rs, rt, ( int )( short )imm ) );
 												return Cop.BCzFL( context, pass, address, code, cop, rs, rt, imm );
 											case 0x1:		// BCzT
-												if( pass == 1 )
-												{
-													context.Cpu.EmitDebugInfo( context, address, code, "BCzT",
-														string.Format( "cop:{3} rs:{0} rt:{1} imm:{2}", cop, rs, rt, ( int )( short )imm ) );
-												}
+												//if( pass == 1 )
+													//context.Cpu.EmitDebugInfo( context, address, code, "BCzT", string.Format( "cop:{3} rs:{0} rt:{1} imm:{2}", cop, rs, rt, ( int )( short )imm ) );
 												return Cop.BCzT( context, pass, address, code, cop, rs, rt, imm );
 											case 0x3:		// BCzTL
-												if( pass == 1 )
-												{
-													context.Cpu.EmitDebugInfo( context, address, code, "BCzTL",
-														string.Format( "cop:{3} rs:{0} rt:{1} imm:{2}", cop, rs, rt, ( int )( short )imm ) );
-												}
-												return Cop.BCzTL( context, pass, address, code, cop, rs, rt, imm );
+												//if( pass == 1 )
+													//context.Cpu.EmitDebugInfo( context, address, code, "BCzTL", string.Format( "cop:{3} rs:{0} rt:{1} imm:{2}", cop, rs, rt, ( int )( short )imm ) );
+													return Cop.BCzTL( context, pass, address, code, cop, rs, rt, imm );
 										}
 
 										if( cop == 1 )

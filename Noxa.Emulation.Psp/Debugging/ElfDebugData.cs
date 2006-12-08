@@ -9,6 +9,7 @@ namespace Noxa.Emulation.Psp.Debugging
 	class ElfDebugData : IProgramDebugData
 	{
 		private List<ElfMethod> _methods;
+		private Method[] _methodCache;
 		private Dictionary<int, ElfMethod> _methodLookup;
 
 		public ElfDebugData( Stream source )
@@ -19,6 +20,16 @@ namespace Noxa.Emulation.Psp.Debugging
 			_methodLookup = new Dictionary<int, ElfMethod>( _methods.Count );
 			foreach( ElfMethod method in _methods )
 				_methodLookup.Add( method.EntryAddress, method );
+		}
+
+		public Method[] Methods
+		{
+			get
+			{
+				if( _methodCache == null )
+					_methodCache = ( Method[] )_methods.ToArray();
+				return _methodCache;
+			}
 		}
 
 		#region Method detection/etc

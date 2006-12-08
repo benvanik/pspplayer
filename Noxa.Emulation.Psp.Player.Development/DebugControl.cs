@@ -53,7 +53,27 @@ namespace Noxa.Emulation.Psp.Player.Development
 				return null;
 			}
 
-			BasicBreakpoint breakpoint = new BasicBreakpoint( this, address );
+			BasicBreakpoint breakpoint = new BasicBreakpoint( this, BreakpointType.UserSet, address );
+			_breakpoints.Add( breakpoint );
+			_breakpointLookup.Add( address, breakpoint );
+
+			this.OnBreakpointAdded( breakpoint );
+
+			return breakpoint;
+		}
+
+		public Breakpoint AddSteppingBreakpoint( int address )
+		{
+			// TODO: redo things so that adding a stepping bp does not change real bp's enabled state
+
+			if( _breakpointLookup.ContainsKey( address ) == true )
+			{
+				Breakpoint existing = _breakpointLookup[ address ];
+				existing.Enabled = true;
+				return null;
+			}
+
+			BasicBreakpoint breakpoint = new BasicBreakpoint( this, BreakpointType.Stepping, address );
 			_breakpoints.Add( breakpoint );
 			_breakpointLookup.Add( address, breakpoint );
 
@@ -103,12 +123,14 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		public void Run()
 		{
+			_debugger.State = DebuggerState.Running;
 			_cpu.ExecutionMode = ExecutionMode.Run;
 			_cpu.Resume();
 		}
 
 		public void RunUntil( int address )
 		{
+			_debugger.State = DebuggerState.Running;
 			_cpu.ExecutionMode = ExecutionMode.RunUntil;
 			_cpu.ExecutionParameter = address;
 			_cpu.Resume();
@@ -116,6 +138,7 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		public void Step()
 		{
+			_debugger.State = DebuggerState.Stepping;
 			_cpu.ExecutionMode = ExecutionMode.Step;
 			_cpu.Resume();
 		}
@@ -127,6 +150,7 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		public void StepOver()
 		{
+			_debugger.State = DebuggerState.Stepping;
 			_cpu.ExecutionMode = ExecutionMode.RunUntil;
 			_cpu.ExecutionParameter = _cpu[ 0 ].ProgramCounter + 4;
 			_cpu.Resume();

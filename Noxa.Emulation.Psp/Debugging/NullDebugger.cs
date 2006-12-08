@@ -59,6 +59,14 @@ namespace Noxa.Emulation.Psp.Debugging
 			}
 		}
 
+		public DebuggerState State
+		{
+			get
+			{
+				return DebuggerState.Running;
+			}
+		}
+
 		public bool LoadDebugData( DebugDataType dataType, System.IO.Stream stream )
 		{
 			throw new Exception( "The method or operation is not implemented." );

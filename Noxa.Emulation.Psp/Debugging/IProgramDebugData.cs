@@ -12,6 +12,11 @@ namespace Noxa.Emulation.Psp.Debugging
 {
 	public interface IProgramDebugData
 	{
+		Method[] Methods
+		{
+			get;
+		}
+
 		Method FindMethod( int address );
 	}
 }

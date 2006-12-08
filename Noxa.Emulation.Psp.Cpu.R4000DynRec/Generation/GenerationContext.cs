@@ -78,6 +78,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 		public int TempBase;
 
+		public FieldInfo Core0Cpu;
 		public FieldInfo Core0Pc;
 		public FieldInfo Core0NullifyDelay;
 		public FieldInfo Core0Delay;
@@ -98,9 +99,11 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		public MethodInfo DelegateTargetGet;
 		public MethodInfo DebugWriteLine;
 		public MethodInfo StringFormat1;
+		public MethodInfo DebugBreak;
 
 		public GenerationContext()
 		{
+			Core0Cpu = typeof( Core ).GetField( "Cpu", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0Pc = typeof( Core ).GetField( "Pc", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0NullifyDelay = typeof( Core ).GetField( "DelayNop", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0Delay = typeof( Core ).GetField( "InDelaySlot", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
@@ -125,6 +128,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 			DebugWriteLine = typeof( Debug ).GetMethod( "WriteLine", new Type[] { typeof( string ) } );
 			StringFormat1 = typeof( String ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object ) } );
+
+			DebugBreak = typeof( Cpu ).GetMethod( "DebugBreak", new Type[] { typeof( int ) } );
 		}
 
 		public void Reset( ILGenerator ilgen, int startAddress )

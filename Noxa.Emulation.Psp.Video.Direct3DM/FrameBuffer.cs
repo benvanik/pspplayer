@@ -176,6 +176,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			{
 				void* dvptr = buffer.InternalDataPointer;
 				void* svptr = _buffers[ currentBuffer ].ToPointer();
+				Debug.Assert( new IntPtr( dvptr ) != IntPtr.Zero );
 
 				if( _isHalfWord == false )
 				{

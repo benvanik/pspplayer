@@ -75,11 +75,11 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						// If we are trying to read from video memory, this could be negative - need to find a way to do this!
 						Debug.Assert( offset > 0 );
 
-						using( MemoryStream stream = new MemoryStream( internalMemory, offset, length, false, false ) )
-						using( FileStream fs = File.OpenWrite( string.Format( "c:/test{0:X8}.raw", texture.Address ) ) )
-						{
-							stream.WriteTo( fs );
-						}
+						//using( MemoryStream stream = new MemoryStream( internalMemory, offset, length, false, false ) )
+						//using( FileStream fs = File.OpenWrite( string.Format( "c:/test{0:X8}.raw", texture.Address ) ) )
+						//{
+						//    stream.WriteTo( fs );
+						//}
 						texture.Texture = new Texture( _device, texture.Width, texture.Height, 1, Usage.Dynamic, Format.A4R4G4B4, Pool.Default );
 						using( GraphicsStream gb = texture.Texture.LockRectangle( 0, LockFlags.None ) )
 						{

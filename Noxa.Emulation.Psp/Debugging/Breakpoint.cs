@@ -10,14 +10,36 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Debugging
 {
+	public enum BreakpointType
+	{
+		UserSet,
+		Stepping,
+	}
+
 	public abstract class Breakpoint
 	{
+		protected BreakpointType _type;
 		protected bool _enabled;
 		protected int _address;
 
 		public Breakpoint( int address )
+			: this( BreakpointType.UserSet, address )
 		{
+		}
+
+		public Breakpoint( BreakpointType type, int address )
+		{
+			_type = type;
+			_enabled = true;
 			_address = address;
+		}
+
+		public BreakpointType Type
+		{
+			get
+			{
+				return _type;
+			}
 		}
 
 		public bool Enabled

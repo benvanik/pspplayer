@@ -125,6 +125,8 @@ namespace Noxa.Emulation.Psp.Cpu
 				for( int n = 0; n < block1.Length; n++ )
 				{
 					CodeBlock block = block1[ n ];
+					if( block == null )
+						continue;
 					if( ( block.Address <= address ) &&
 						( block.Address + block.InstructionCount >= address ) )
 						block1[ n ] = null;

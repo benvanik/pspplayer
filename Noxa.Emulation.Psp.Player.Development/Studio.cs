@@ -7,7 +7,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -20,9 +19,12 @@ namespace Noxa.Emulation.Psp.Player.Development
 {
 	partial class Studio : Form
 	{
+		private const string MessageCaption = "PSP Player Debugger";
+
 		private Debugger _debugger;
 
-		private Dictionary<Method, DisassemblyDocument> _disasmDocs;
+		private DisassemblyDocument _disasmDoc;
+		private Statement _steppingStatement;
 
 		public Studio()
 		{
@@ -40,23 +42,14 @@ namespace Noxa.Emulation.Psp.Player.Development
 			// Uses the nasty VB stuff
 			DockPanel2005.VS2005Style.Extender.SetSchema( dockPanel, DockPanel2005.VS2005Style.Extender.Schema.FromBase );
 
-			_disasmDocs = new Dictionary<Method, DisassemblyDocument>();
+			_debugger.StateChanged += new EventHandler( DebuggerStateChanged );
 		}
 
-		public void ShowMethodDisassembly( Method method )
+		public Debugger Debugger
 		{
-			if( _disasmDocs.ContainsKey( method ) == true )
+			get
 			{
-				DisassemblyDocument doc = _disasmDocs[ method ];
-				doc.Activate();
-			}
-			else
-			{
-				DisassemblyDocument doc = new DisassemblyDocument( this );
-				doc.DisplayMethod( method );
-				_disasmDocs.Add( method, doc );
-				doc.Show( dockPanel );
-				doc.Activate();
+				return _debugger;
 			}
 		}
 
@@ -68,12 +61,16 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		private void continueToolStripButton_Click( object sender, EventArgs e )
 		{
-			this.ShowMethodDisassembly( _debugger.DebugData.FindMethod( 0x08900000 ) );
-			//_debugger.Control.Run();
+			Method m = _debugger.DebugData.FindMethod( 0x08900000 );
+			foreach( int addr in m.Instructions.Keys )
+				_debugger.Control.AddBreakpoint( addr );
+			this.CleanupBreakpoint();
+			_debugger.Control.Run();
 		}
 
 		private void breakToolStripButton_Click( object sender, EventArgs e )
 		{
+			this.CleanupBreakpoint();
 			_debugger.Control.Break();
 		}
 
@@ -91,22 +88,132 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		private void stepIntoToolStripButton_Click( object sender, EventArgs e )
 		{
+			this.CleanupBreakpoint();
 			_debugger.Control.StepInto();
 		}
 
 		private void stepOverToolStripButton_Click( object sender, EventArgs e )
 		{
+			this.CleanupBreakpoint();
 			_debugger.Control.StepOver();
 		}
 
 		private void stepOutToolStripButton_Click( object sender, EventArgs e )
 		{
+			this.CleanupBreakpoint();
 			_debugger.Control.StepOut();
 		}
 
 		private void hexDisplayToolStripButton_Click( object sender, EventArgs e )
 		{
 
+		}
+
+		private void CleanupBreakpoint()
+		{
+			if( ( _steppingStatement != null ) &&
+				( _disasmDoc != null ) )
+			{
+				_disasmDoc.RemoveStatement( _steppingStatement );
+			}
+		}
+
+		public void OnBreakpointTriggered( Breakpoint breakpoint )
+		{
+			switch( breakpoint.Type )
+			{
+				default:
+				case BreakpointType.UserSet:
+					this.UpdateStatusMessage( string.Format( "Stopped at breakpoint 0x{0:X8}", breakpoint.Address ) );
+					break;
+				case BreakpointType.Stepping:
+					this.UpdateStatusMessage( string.Format( "Finished stepping at 0x{0:X8}", breakpoint.Address ) );
+					break;
+			}
+
+			if( this.InvokeRequired == true )
+				this.Invoke( new OnBreakpointTriggereDelegate( this.OnBreakpointTriggeredHandler ), breakpoint );
+			else
+				this.OnBreakpointTriggeredHandler( breakpoint );
+		}
+
+		private delegate void OnBreakpointTriggereDelegate( Breakpoint breakpoint );
+		private void OnBreakpointTriggeredHandler( Breakpoint breakpoint )
+		{
+			if( this.ShowDisassembly( breakpoint.Address ) == false )
+				return;
+			_steppingStatement = _disasmDoc.AddStatement( StatementType.Current, breakpoint.Address );
+		}
+
+		#endregion
+
+		#region Status bar
+
+		private delegate void SetStatusLabelDelegate( ToolStripLabel label, string value );
+		private void SetStatusLabel( ToolStripLabel label, string value )
+		{
+			label.Text = value;
+		}
+
+		private void DebuggerStateChanged( object sender, EventArgs e )
+		{
+			string value = _debugger.State.ToString();
+			if( this.InvokeRequired == true )
+				this.Invoke( new SetStatusLabelDelegate( this.SetStatusLabel ), this.stateStripStatusLabel, value );
+			else
+				this.SetStatusLabel( this.stateStripStatusLabel, value );
+		}
+
+		private void UpdateStatusMessage( string message )
+		{
+			if( this.InvokeRequired == true )
+				this.Invoke( new SetStatusLabelDelegate( this.SetStatusLabel ), this.messageStripStatusLabel, message );
+			else
+				this.SetStatusLabel( this.messageStripStatusLabel, message );
+		}
+
+		#endregion
+
+		#region Disassembly
+
+		private void AlertMethodNotFound( int address )
+		{
+			MessageBox.Show( this,
+				string.Format( "Unable to find a method corresponding to the address 0x{0:X8}. Unable to show disassemly.", address ),
+				MessageCaption );
+		}
+
+		public bool ShowDisassembly( int address )
+		{
+			Method method = _debugger.DebugData.FindMethod( address );
+			if( method == null )
+			{
+				this.AlertMethodNotFound( address );
+				return false;
+			}
+			return this.ShowDisassembly( method );
+		}
+
+		public bool ShowDisassembly( Method method )
+		{
+			if( method == null )
+				throw new ArgumentNullException( "method" );
+
+			if( _disasmDoc != null )
+			{
+				_disasmDoc.DisplayMethod( method );
+				_disasmDoc.Activate();
+			}
+			else
+			{
+				DisassemblyDocument doc = new DisassemblyDocument( this );
+				doc.DisplayMethod( method );
+				doc.Show( dockPanel );
+				doc.Activate();
+				_disasmDoc = doc;
+			}
+
+			return true;
 		}
 
 		#endregion

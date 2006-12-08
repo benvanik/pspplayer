@@ -46,7 +46,8 @@ namespace Noxa.Emulation.Psp.Debugging
 
 		public override string ToString()
 		{
-			return string.Format( "[{0:X8}] {1} ({2} instructions)", _entryAddress, _name, _instructions.Count );
+			//return string.Format( "[{0:X8}] {1} ({2} instructions)", _entryAddress, _name, _instructions.Count );
+			return string.Format( "{0} (0x{1:X8})", _name, _entryAddress );
 		}
 	}
 }

@@ -7,12 +7,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 using Noxa.Emulation.Psp.Debugging;
 using Noxa.Emulation.Psp.IO.Media;
-using System.Windows.Forms;
-using System.IO;
 
 namespace Noxa.Emulation.Psp.Player.Development
 {
@@ -24,6 +24,9 @@ namespace Noxa.Emulation.Psp.Player.Development
 		private DebugControl _control;
 		private DebugInspector _inspector;
 		private IProgramDebugData _debugData;
+		private DebuggerState _state;
+
+		public event EventHandler StateChanged;
 
 		public Debugger( IEmulationHost host )
 		{
@@ -60,6 +63,9 @@ namespace Noxa.Emulation.Psp.Player.Development
 			Debug.Assert( result == true );
 			if( result == false )
 				throw new InvalidOperationException( "Could not load debugging data - cannot continue." );
+
+			// Crazy, I know
+			_host.CurrentInstance.Cpu.BreakpointTriggered += new EventHandler<BreakpointEventArgs>( CpuBreakpointTriggered );
 		}
 
 		public IEmulationHost Host
@@ -102,6 +108,22 @@ namespace Noxa.Emulation.Psp.Player.Development
 			}
 		}
 
+		public DebuggerState State
+		{
+			get
+			{
+				return _state;
+			}
+			internal set
+			{
+				if( _state != value )
+				{
+					_state = value;
+					this.StateChanged( this, EventArgs.Empty );
+				}
+			}
+		}
+
 		public bool LoadDebugData( DebugDataType dataType, Stream stream )
 		{
 			_debugData = ProgramDebugData.Load( dataType, stream );
@@ -115,6 +137,13 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		public void Hide()
 		{
+		}
+
+		private void CpuBreakpointTriggered( object sender, BreakpointEventArgs e )
+		{
+			this.State = DebuggerState.Paused;
+
+			_studio.OnBreakpointTriggered( e.Breakpoint );
 		}
 	}
 }
