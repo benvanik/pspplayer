@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using Noxa.Emulation.Psp.Debugging;
+
 namespace Noxa.Emulation.Psp.Cpu
 {
 	public enum Endianess
@@ -78,6 +80,8 @@ namespace Noxa.Emulation.Psp.Cpu
 
 	public interface ICpu : IComponentInstance
 	{
+		event EventHandler<BreakpointEventArgs> BreakpointTriggered;
+
 		ICpuCapabilities Capabilities
 		{
 			get;

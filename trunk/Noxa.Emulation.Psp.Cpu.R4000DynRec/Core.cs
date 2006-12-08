@@ -20,7 +20,6 @@ namespace Noxa.Emulation.Psp.Cpu
 
 	class Core : ICpuCore
 	{
-		protected Cpu _cpu;
 		protected int _coreId;
 		protected string _coreName;
 
@@ -30,7 +29,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			Debug.Assert( coreId >= 0 );
 			Debug.Assert( coreName != null );
 
-			_cpu = cpu;
+			Cpu = cpu;
 			_coreId = coreId;
 			_coreName = coreName;
 
@@ -45,6 +44,8 @@ namespace Noxa.Emulation.Psp.Cpu
 
 			this.Clear();
 		}
+
+		internal Cpu Cpu;
 
 		internal Coprocessor0 Cp0;
 		internal Coprocessor1 Cp1;

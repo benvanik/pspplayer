@@ -11,6 +11,7 @@ namespace Noxa.Emulation.Psp.Debugging
 	class ObjdumpDebugData : IProgramDebugData
 	{
 		private List<ObjdumpMethod> _methods;
+		private Method[] _methodCache;
 		private Dictionary<int, ObjdumpMethod> _methodLookup;
 
 		private ObjdumpMethod _textMethod;
@@ -24,6 +25,16 @@ namespace Noxa.Emulation.Psp.Debugging
 			_methodLookup = new Dictionary<int, ObjdumpMethod>( _methods.Count );
 			foreach( ObjdumpMethod method in _methods )
 				_methodLookup.Add( method.EntryAddress, method );
+		}
+
+		public Method[] Methods
+		{
+			get
+			{
+				if( _methodCache == null )
+					_methodCache = ( Method[] )_methods.ToArray();
+				return _methodCache;
+			}
 		}
 
 		#region Method detection/etc
@@ -90,7 +101,7 @@ namespace Noxa.Emulation.Psp.Debugging
 				{
 					ObjdumpMethod method = _methods[ n ];
 					if( ( method.EntryAddress <= address ) &&
-						( ( method.EntryAddress + method.Instructions.Count ) > address ) )
+						( ( method.EntryAddress + ( ( method.Instructions.Count + 1 ) * 4 ) ) >= address ) )
 						return method;
 				}
 				return null;

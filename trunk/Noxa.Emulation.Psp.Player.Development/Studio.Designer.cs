@@ -67,7 +67,14 @@ namespace Noxa.Emulation.Psp.Player.Development
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip = new System.Windows.Forms.StatusStrip();
 			this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
-			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+			this.dockPanel = new WeifenLuo.WinFormsUI.DockPanel();
+			this.panesToolStrip = new System.Windows.Forms.ToolStrip();
+			this.toolStripButton10 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton11 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton12 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton13 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton14 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton15 = new System.Windows.Forms.ToolStripButton();
 			this.controlToolStrip = new System.Windows.Forms.ToolStrip();
 			this.continueToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.breakToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -80,20 +87,16 @@ namespace Noxa.Emulation.Psp.Player.Development
 			this.stepOutToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
 			this.hexDisplayToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.panesToolStrip = new System.Windows.Forms.ToolStrip();
-			this.toolStripButton10 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton11 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton12 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton13 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton14 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton15 = new System.Windows.Forms.ToolStripButton();
-			this.dockPanel = new WeifenLuo.WinFormsUI.DockPanel();
+			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+			this.messageStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+			this.stateStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
 			this.menuStrip.SuspendLayout();
+			this.statusStrip.SuspendLayout();
 			this.toolStripContainer1.ContentPanel.SuspendLayout();
 			this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
 			this.toolStripContainer1.SuspendLayout();
-			this.controlToolStrip.SuspendLayout();
 			this.panesToolStrip.SuspendLayout();
+			this.controlToolStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// menuStrip
@@ -335,6 +338,9 @@ namespace Noxa.Emulation.Psp.Player.Development
 			// 
 			// statusStrip
 			// 
+			this.statusStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.messageStripStatusLabel,
+            this.stateStripStatusLabel} );
 			this.statusStrip.Location = new System.Drawing.Point( 0, 636 );
 			this.statusStrip.Name = "statusStrip";
 			this.statusStrip.Size = new System.Drawing.Size( 841, 22 );
@@ -361,13 +367,86 @@ namespace Noxa.Emulation.Psp.Player.Development
 			this.toolStripContainer1.TopToolStripPanel.Controls.Add( this.controlToolStrip );
 			this.toolStripContainer1.TopToolStripPanel.Controls.Add( this.toolStrip1 );
 			// 
-			// toolStrip1
+			// dockPanel
 			// 
-			this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
-			this.toolStrip1.Location = new System.Drawing.Point( 3, 50 );
-			this.toolStrip1.Name = "toolStrip1";
-			this.toolStrip1.Size = new System.Drawing.Size( 111, 25 );
-			this.toolStrip1.TabIndex = 0;
+			this.dockPanel.ActiveAutoHideContent = null;
+			this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.dockPanel.DocumentStyle = WeifenLuo.WinFormsUI.DocumentStyles.DockingWindow;
+			this.dockPanel.Font = new System.Drawing.Font( "Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.World );
+			this.dockPanel.Location = new System.Drawing.Point( 0, 0 );
+			this.dockPanel.Name = "dockPanel";
+			this.dockPanel.ShowDocumentIcon = true;
+			this.dockPanel.Size = new System.Drawing.Size( 841, 537 );
+			this.dockPanel.TabIndex = 0;
+			// 
+			// panesToolStrip
+			// 
+			this.panesToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+			this.panesToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripButton10,
+            this.toolStripButton11,
+            this.toolStripButton12,
+            this.toolStripButton13,
+            this.toolStripButton14,
+            this.toolStripButton15} );
+			this.panesToolStrip.Location = new System.Drawing.Point( 3, 0 );
+			this.panesToolStrip.Name = "panesToolStrip";
+			this.panesToolStrip.Size = new System.Drawing.Size( 150, 25 );
+			this.panesToolStrip.TabIndex = 2;
+			// 
+			// toolStripButton10
+			// 
+			this.toolStripButton10.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton10.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.RegistersIcon;
+			this.toolStripButton10.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton10.Name = "toolStripButton10";
+			this.toolStripButton10.Size = new System.Drawing.Size( 23, 22 );
+			this.toolStripButton10.Text = "Registers";
+			// 
+			// toolStripButton11
+			// 
+			this.toolStripButton11.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton11.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.ThreadsIcon;
+			this.toolStripButton11.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton11.Name = "toolStripButton11";
+			this.toolStripButton11.Size = new System.Drawing.Size( 23, 22 );
+			this.toolStripButton11.Text = "Threads";
+			// 
+			// toolStripButton12
+			// 
+			this.toolStripButton12.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton12.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.CallstackIcon;
+			this.toolStripButton12.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton12.Name = "toolStripButton12";
+			this.toolStripButton12.Size = new System.Drawing.Size( 23, 22 );
+			this.toolStripButton12.Text = "Callstack";
+			// 
+			// toolStripButton13
+			// 
+			this.toolStripButton13.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton13.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.BreakpointsIcon;
+			this.toolStripButton13.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton13.Name = "toolStripButton13";
+			this.toolStripButton13.Size = new System.Drawing.Size( 23, 22 );
+			this.toolStripButton13.Text = "Breakpoints";
+			// 
+			// toolStripButton14
+			// 
+			this.toolStripButton14.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton14.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.WatchesIcon;
+			this.toolStripButton14.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton14.Name = "toolStripButton14";
+			this.toolStripButton14.Size = new System.Drawing.Size( 23, 22 );
+			this.toolStripButton14.Text = "Watches";
+			// 
+			// toolStripButton15
+			// 
+			this.toolStripButton15.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton15.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.MemoryIcon;
+			this.toolStripButton15.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton15.Name = "toolStripButton15";
+			this.toolStripButton15.Size = new System.Drawing.Size( 23, 22 );
+			this.toolStripButton15.Text = "Memory";
 			// 
 			// controlToolStrip
 			// 
@@ -491,86 +570,27 @@ namespace Noxa.Emulation.Psp.Player.Development
 			this.hexDisplayToolStripButton.Text = "Hex";
 			this.hexDisplayToolStripButton.Click += new System.EventHandler( this.hexDisplayToolStripButton_Click );
 			// 
-			// panesToolStrip
+			// toolStrip1
 			// 
-			this.panesToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-			this.panesToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton10,
-            this.toolStripButton11,
-            this.toolStripButton12,
-            this.toolStripButton13,
-            this.toolStripButton14,
-            this.toolStripButton15} );
-			this.panesToolStrip.Location = new System.Drawing.Point( 3, 0 );
-			this.panesToolStrip.Name = "panesToolStrip";
-			this.panesToolStrip.Size = new System.Drawing.Size( 150, 25 );
-			this.panesToolStrip.TabIndex = 2;
+			this.toolStrip1.Dock = System.Windows.Forms.DockStyle.None;
+			this.toolStrip1.Location = new System.Drawing.Point( 3, 50 );
+			this.toolStrip1.Name = "toolStrip1";
+			this.toolStrip1.Size = new System.Drawing.Size( 111, 25 );
+			this.toolStrip1.TabIndex = 0;
 			// 
-			// toolStripButton10
+			// messageStripStatusLabel
 			// 
-			this.toolStripButton10.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton10.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.RegistersIcon;
-			this.toolStripButton10.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton10.Name = "toolStripButton10";
-			this.toolStripButton10.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton10.Text = "Registers";
+			this.messageStripStatusLabel.Name = "messageStripStatusLabel";
+			this.messageStripStatusLabel.Size = new System.Drawing.Size( 677, 17 );
+			this.messageStripStatusLabel.Spring = true;
+			this.messageStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// toolStripButton11
+			// stateStripStatusLabel
 			// 
-			this.toolStripButton11.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton11.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.ThreadsIcon;
-			this.toolStripButton11.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton11.Name = "toolStripButton11";
-			this.toolStripButton11.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton11.Text = "Threads";
-			// 
-			// toolStripButton12
-			// 
-			this.toolStripButton12.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton12.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.CallstackIcon;
-			this.toolStripButton12.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton12.Name = "toolStripButton12";
-			this.toolStripButton12.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton12.Text = "Callstack";
-			// 
-			// toolStripButton13
-			// 
-			this.toolStripButton13.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton13.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.BreakpointsIcon;
-			this.toolStripButton13.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton13.Name = "toolStripButton13";
-			this.toolStripButton13.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton13.Text = "Breakpoints";
-			// 
-			// toolStripButton14
-			// 
-			this.toolStripButton14.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton14.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.WatchesIcon;
-			this.toolStripButton14.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton14.Name = "toolStripButton14";
-			this.toolStripButton14.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton14.Text = "Watches";
-			// 
-			// toolStripButton15
-			// 
-			this.toolStripButton15.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton15.Image = global::Noxa.Emulation.Psp.Player.Development.Properties.Resources.MemoryIcon;
-			this.toolStripButton15.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton15.Name = "toolStripButton15";
-			this.toolStripButton15.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton15.Text = "Memory";
-			// 
-			// dockPanel
-			// 
-			this.dockPanel.ActiveAutoHideContent = null;
-			this.dockPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.dockPanel.DocumentStyle = WeifenLuo.WinFormsUI.DocumentStyles.DockingWindow;
-			this.dockPanel.Font = new System.Drawing.Font( "Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.World );
-			this.dockPanel.Location = new System.Drawing.Point( 0, 0 );
-			this.dockPanel.Name = "dockPanel";
-			this.dockPanel.ShowDocumentIcon = true;
-			this.dockPanel.Size = new System.Drawing.Size( 841, 537 );
-			this.dockPanel.TabIndex = 0;
+			this.stateStripStatusLabel.AutoSize = false;
+			this.stateStripStatusLabel.Name = "stateStripStatusLabel";
+			this.stateStripStatusLabel.Size = new System.Drawing.Size( 118, 17 );
+			this.stateStripStatusLabel.Text = "Debugging";
 			// 
 			// Studio
 			// 
@@ -585,15 +605,17 @@ namespace Noxa.Emulation.Psp.Player.Development
 			this.Text = "Studio";
 			this.menuStrip.ResumeLayout( false );
 			this.menuStrip.PerformLayout();
+			this.statusStrip.ResumeLayout( false );
+			this.statusStrip.PerformLayout();
 			this.toolStripContainer1.ContentPanel.ResumeLayout( false );
 			this.toolStripContainer1.TopToolStripPanel.ResumeLayout( false );
 			this.toolStripContainer1.TopToolStripPanel.PerformLayout();
 			this.toolStripContainer1.ResumeLayout( false );
 			this.toolStripContainer1.PerformLayout();
-			this.controlToolStrip.ResumeLayout( false );
-			this.controlToolStrip.PerformLayout();
 			this.panesToolStrip.ResumeLayout( false );
 			this.panesToolStrip.PerformLayout();
+			this.controlToolStrip.ResumeLayout( false );
+			this.controlToolStrip.PerformLayout();
 			this.ResumeLayout( false );
 			this.PerformLayout();
 
@@ -654,5 +676,7 @@ namespace Noxa.Emulation.Psp.Player.Development
 		private System.Windows.Forms.ToolStripButton toolStripButton14;
 		private System.Windows.Forms.ToolStripButton toolStripButton15;
 		private WeifenLuo.WinFormsUI.DockPanel dockPanel;
+		private System.Windows.Forms.ToolStripStatusLabel messageStripStatusLabel;
+		private System.Windows.Forms.ToolStripStatusLabel stateStripStatusLabel;
 	}
 }

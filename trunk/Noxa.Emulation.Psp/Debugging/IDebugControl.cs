@@ -22,6 +22,7 @@ namespace Noxa.Emulation.Psp.Debugging
 		event EventHandler<BreakpointEventArgs> BreakpointToggled;
 
 		Breakpoint AddBreakpoint( int address );
+		Breakpoint AddSteppingBreakpoint( int address );
 		Breakpoint RemoveBreakpoint( int address );
 		Breakpoint FindBreakpoint( int address );
 

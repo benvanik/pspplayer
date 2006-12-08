@@ -17,6 +17,14 @@ namespace Noxa.Emulation.Psp.Debugging
 		Elf,
 	}
 
+	public enum DebuggerState
+	{
+		Running,
+		Stepping,
+		Paused,
+		Crashed,
+	}
+
 	public interface IDebugger
 	{
 		IEmulationHost Host
@@ -40,6 +48,11 @@ namespace Noxa.Emulation.Psp.Debugging
 		}
 
 		IProgramDebugData DebugData
+		{
+			get;
+		}
+
+		DebuggerState State
 		{
 			get;
 		}

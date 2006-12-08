@@ -5,8 +5,8 @@
 // ----------------------------------------------------------------------------
 
 #define GENTRACE
-#define VERBOSEEMIT
-#define REGISTEREMIT
+//#define VERBOSEEMIT // Legacy
+//#define REGISTEREMIT // Legacy
 #define STATS
 #if STATS
 // note that instruction count will be wrong without this, but it's slow
@@ -46,14 +46,14 @@ namespace Noxa.Emulation.Psp.Cpu
 		internal int _lastSyscall;
 		internal BiosFunction[] _syscalls;
 
+		protected IDebugger _debugger;
 		protected ExecutionMode _executionMode;
 		protected int _executionParameter;
 		internal bool _debugging;
 		protected AutoResetEvent _debugWait;
+		private bool _firstExecute;
 
-#if DEBUG
-		protected bool _debug = true;
-#endif
+		public event EventHandler<BreakpointEventArgs> BreakpointTriggered;
 
 		#region Statistics
 
@@ -142,6 +142,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			_context.Memory = _memory;
 
 			_executionMode = ExecutionMode.Run;
+			_firstExecute = true;
 		}
 
 		#region Caps
@@ -361,9 +362,14 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public void EnableDebugging()
 		{
-			_emulator.Host.Debugger.Control.BreakpointAdded += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointAdded );
-			_emulator.Host.Debugger.Control.BreakpointRemoved += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointRemoved );
-			_emulator.Host.Debugger.Control.BreakpointToggled += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointToggled );
+			_debugger = _emulator.Host.Debugger;
+			Debug.Assert( _debugger != null );
+			if( _debugger == null )
+				throw new InvalidOperationException( "Debugger is not attached." );
+
+			_debugger.Control.BreakpointAdded += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointAdded );
+			_debugger.Control.BreakpointRemoved += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointRemoved );
+			_debugger.Control.BreakpointToggled += new EventHandler<BreakpointEventArgs>( DebuggerControlBreakpointToggled );
 
 			_codeCache.Clear();
 			_debugging = true;
@@ -401,6 +407,21 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public void Resume()
 		{
+			// We add special stepping breakpoints
+
+			switch( _executionMode )
+			{
+				case ExecutionMode.Run:
+					break;
+				case ExecutionMode.RunUntil:
+					_debugger.Control.AddSteppingBreakpoint( _executionParameter );
+					break;
+				case ExecutionMode.Step:
+					_debugger.Control.AddSteppingBreakpoint( _core0.Pc + 4 );
+					break;
+				case ExecutionMode.StepN:
+					throw new NotSupportedException();
+			}
 			_debugWait.Set();
 		}
 
@@ -413,19 +434,13 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			// This happens after syscall
 
-			if( _debugging )
+			if( _debugging == true )
 			{
-				switch( _executionMode )
+				// Always break on the first execute
+				if( _firstExecute == true )
 				{
-					case ExecutionMode.Step:
-					case ExecutionMode.StepN:
-						_debugWait.WaitOne();
-						break;
-					case ExecutionMode.RunUntil:
-						throw new NotImplementedException();
-					default:
-					case ExecutionMode.Run:
-						break;
+					_firstExecute = false;
+					_debugWait.WaitOne();
 				}
 			}
 
@@ -436,43 +451,11 @@ namespace Noxa.Emulation.Psp.Cpu
 #endif
 			
 			int count = 0;
-			int maxCount;
-			if( _debugging == false )
-				maxCount = DefaultBlockCount;
-			else
-			{
-				switch( _executionMode )
-				{
-						// TODO: Figure out the proper values for these
-					default:
-					case ExecutionMode.Run:
-						maxCount = DefaultBlockCount;
-						break;
-					case ExecutionMode.RunUntil:
-						maxCount = DefaultBlockCount;
-						break;
-					case ExecutionMode.Step:
-						maxCount = 1;
-						break;
-					case ExecutionMode.StepN:
-						maxCount = _executionParameter;
-						break;
-				}
-			}
-			for( int n = 0; n < maxCount; n++ )
+			for( int n = 0; n < DefaultBlockCount; n++ )
 			{
 				int address = _core0.Pc;
 				address = _core0.TranslateAddress( address );
-				if( _debugging == true )
-				{
-					Breakpoint breakpoint = _emulator.Host.Debugger.Control.FindBreakpoint( address );
-					if( breakpoint != null )
-					{
-						Debugger.Break();
-						break;
-					}
-				}
-
+				
 				CodeBlock block = _codeCache.Find( address );
 				if( block == null )
 				{
@@ -602,16 +585,6 @@ namespace Noxa.Emulation.Psp.Cpu
 			Debug.WriteLine( string.Format( "Starting generate for block at 0x{0:X8}", startAddress ) );
 #endif
 
-			// Note that this is NOT a solid value - unfortunately things aren't setup
-			// to handle debugging at branches right, so if a branch/jump occurs this
-			// value will be incremented by one!
-			int maxCodeLength = MaximumCodeLength;
-			if( _debugging == true )
-			{
-				// TODO: have debugger pick proper code gen amount
-				maxCodeLength = 1;
-			}
-
 			bool jumpDelay = false;
 			GenerationResult lastResult = GenerationResult.Success;
 			for( int pass = 0; pass <= 1; pass++ )
@@ -627,17 +600,9 @@ namespace Noxa.Emulation.Psp.Cpu
 				bool breakOut = false;
 				bool checkNullDelay = false;
 				int address = startAddress;
-				for( int n = 0; n < maxCodeLength; n++ )
+				for( int n = 0; n < MaximumCodeLength; n++ )
 				{
 					GenerationResult result = GenerationResult.Invalid;
-
-#if DEBUG
-					if( ( pass == 1 ) && ( _debug == true ) )
-					{
-						//Debug.WriteLine( string.Format( "generating instr at 0x{0:X8}", address ) );
-						EmitRegisterPrint( ilgen );
-					}
-#endif
 
 #if ACCURATESTATS
 					if( pass == 1 )
@@ -682,6 +647,16 @@ namespace Noxa.Emulation.Psp.Cpu
 						}
 					}
 
+					// Must be after the nulldelay/branching stuff
+					if( ( pass == 1 ) && ( _debugging == true ) )
+					{
+						Breakpoint bp = _debugger.Control.FindBreakpoint( address );
+						if( bp != null )
+						{
+							this.EmitBreakpoint( _context, bp );
+						}
+					}
+
 					bool inDelay = _context.InDelay;
 					uint code = ( uint )_memory.ReadWord( address );
 
@@ -703,11 +678,8 @@ namespace Noxa.Emulation.Psp.Cpu
 										byte shamt = ( byte )( ( code >> 6 ) & 0x1F );
 
 										GenerateInstructionR instr = CoreInstructions.TableR[ function ];
-										if( pass == 1 )
-										{
-											EmitDebugInfo( _context, address, code, instr.Method.Name,
-												string.Format( "rs:{0} rt:{1} rd:{2} shamt:{3}", rs, rt, rd, shamt ) );
-										}
+										//if( pass == 1 )
+										//	EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} rd:{2} shamt:{3}", rs, rt, rd, shamt ) );
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, shamt, function );
 									}
 									break;
@@ -717,11 +689,8 @@ namespace Noxa.Emulation.Psp.Cpu
 										uint rt = ( code >> 16 ) & 0x1F;
 
 										GenerateInstructionJ instr = CoreInstructions.TableJ[ rt ];
-										if( pass == 1 )
-										{
-											EmitDebugInfo( _context, address, code, instr.Method.Name,
-												string.Format( "imm:{0}", imm ) );
-										}
+										//if( pass == 1 )
+											//EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "imm:{0}", imm ) );
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, imm );
 									}
 									break;
@@ -733,11 +702,8 @@ namespace Noxa.Emulation.Psp.Cpu
 										byte rd = ( byte )( ( code >> 11 ) & 0x1F );
 
 										GenerateInstructionR instr = CoreInstructions.TableAllegrex[ function ];
-										if( pass == 1 )
-										{
-											EmitDebugInfo( _context, address, code, instr.Method.Name,
-												string.Format( "rs:{0} rt:{1} rd:{2}", rs, rt, rd ) );
-										}
+										//if( pass == 1 )
+											//EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} rd:{2}", rs, rt, rd ) );
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, 0, function );
 									}
 									break;
@@ -755,11 +721,8 @@ namespace Noxa.Emulation.Psp.Cpu
 											instr = CoreInstructions.TableSpecial3[ bshfl ];
 										else
 											instr = CoreInstructions.TableSpecial3[ function ];
-										if( pass == 1 )
-										{
-											EmitDebugInfo( _context, address, code, instr.Method.Name,
-												string.Format( "func:{0}", function ) );
-										}
+										//if( pass == 1 )
+											//EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "func:{0}", function ) );
 										result = instr( _context, pass, address + 4, code, rt, rd, function, ( ushort )bshfl );
 									}
 									break;
@@ -770,11 +733,8 @@ namespace Noxa.Emulation.Psp.Cpu
 										ushort imm = ( ushort )( code & 0xFFFF );
 
 										GenerateInstructionI instr = CoreInstructions.TableI[ opcode ];
-										if( pass == 1 )
-										{
-											EmitDebugInfo( _context, address, code, instr.Method.Name,
-												string.Format( "rs:{0} rt:{1} imm:{2}", rs, rt, ( int )( short )imm ) );
-										}
+										//if( pass == 1 )
+											//EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} imm:{2}", rs, rt, ( int )( short )imm ) );
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, imm );
 									}
 									break;
@@ -795,8 +755,8 @@ namespace Noxa.Emulation.Psp.Cpu
 					}
 					else
 					{
-						if( pass == 1 )
-							EmitDebugInfo( _context, address, code, "NOP", "" );
+						//if( pass == 1 )
+							//EmitDebugInfo( _context, address, code, "NOP", "" );
 					}
 
 					// This will print out NOP's when we are in a null delay slot
@@ -804,13 +764,13 @@ namespace Noxa.Emulation.Psp.Cpu
 					{
 						if( checkNullDelay == true )
 						{
-							Label omfg = ilgen.DefineLabel();
-							ilgen.Emit( OpCodes.Br, omfg );
+							Label nullDelayHuhhhh = ilgen.DefineLabel();
+							ilgen.Emit( OpCodes.Br, nullDelayHuhhhh );
 							ilgen.MarkLabel( nullDelaySkip );
-							EmitDebugInfo( _context, address, 0x0, "NOP", "" );
+							//EmitDebugInfo( _context, address, 0x0, "NOP", "" );
 							ilgen.Emit( OpCodes.Ldc_I4_0 );
 							ilgen.Emit( OpCodes.Stloc_S, ( byte )LocalNullifyDelay );
-							ilgen.MarkLabel( omfg );
+							ilgen.MarkLabel( nullDelayHuhhhh );
 						}
 					}
 
@@ -888,13 +848,11 @@ namespace Noxa.Emulation.Psp.Cpu
 					if( breakOut == true )
 						break;
 
-					bool padBlockCheck = false;
 					switch( result )
 					{
 						case GenerationResult.Branch:
 							_context.InDelay = true;
 							lastResult = result;
-							padBlockCheck = true;
 							break;
 						case GenerationResult.Jump:
 							// This is tricky - if lastTargetPc > currentPc, don't break out
@@ -913,21 +871,13 @@ namespace Noxa.Emulation.Psp.Cpu
 									_context.InDelay = true;
 								}
 							}
-							padBlockCheck = true;
 							break;
 						case GenerationResult.BranchAndNullifyDelay:
 							_context.InDelay = true;
 							if( pass == 1 )
 								checkNullDelay = true;
 							lastResult = result;
-							padBlockCheck = true;
 							break;
-					}
-
-					if( padBlockCheck == true )
-					{
-						if( n == maxCodeLength - 1 )
-							maxCodeLength++;
 					}
 				}
 
@@ -1069,46 +1019,77 @@ namespace Noxa.Emulation.Psp.Cpu
 			ilgen.Emit( OpCodes.Ret );
 		}
 
-		[Conditional( "VERBOSEEMIT" )]
-		internal void EmitDebugInfo( GenerationContext context, int address, uint code, string name, string args )
+		protected void EmitBreakpoint( GenerationContext context, Breakpoint breakpoint )
 		{
-#if DEBUG
-			if( _debug == false )
+			ILGenerator ilgen = context.ILGen;
+
+			Debug.Assert( context.Cpu._debugging == true );
+
+			ilgen.Emit( OpCodes.Ldarg_0 );
+			ilgen.Emit( OpCodes.Ldfld, context.Core0Cpu );
+			ilgen.Emit( OpCodes.Ldc_I4, breakpoint.Address );
+			ilgen.Emit( OpCodes.Call, context.DebugBreak );
+		}
+
+		public void DebugBreak( int address )
+		{
+			Breakpoint bp = _debugger.Control.FindBreakpoint( address );
+			Debug.Assert( bp != null );
+			if( bp == null )
 				return;
-#endif
+			if( bp.Enabled == false )
+				return;
 
-			string line = string.Format( "[0x{0:X8}] {1:X8} {2:8} {3}",
-				address, code, name, args );
-			//string line = string.Format( "0x{0:X8}: {1:X8}",
-			//	address, code );
-
-			context.ILGen.Emit( OpCodes.Ldstr, line );
-			context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+			this.BreakpointTriggered( this, new BreakpointEventArgs( bp ) );
+			if( bp.Type == BreakpointType.Stepping )
+				_debugger.Control.RemoveBreakpoint( bp.Address );
+			_debugWait.WaitOne();
 		}
 
-		[Conditional( "REGISTEREMIT" )]
-		protected void EmitRegisterPrint( ILGenerator ilgen )
-		{
-			ilgen.Emit( OpCodes.Ldstr, "0={0:X8} 1={1:X8} 2={2:X8} 3={3:X8} 4={4:X8} 5={5:X8} 6={6:X8} 7={7:X8} 8={8:X8} 9={9:X8} 10={10:X8} 11={11:X8} 12={12:X8} 13={13:X8} 14={14:X8} 15={15:X8} 16={16:X8} 17={17:X8} 18={18:X8} 19={19:X8} 20={20:X8} 21={21:X8} 22={22:X8} 23={23:X8} 24={24:X8} 25={25:X8} 26={26:X8} 27={27:X8} 28={28:X8} 29={29:X8} 30={30:X8} 31={31:X8}" );
-			ilgen.Emit( OpCodes.Ldc_I4, 32 );
-			ilgen.Emit( OpCodes.Newarr, typeof( object ) );
-			ilgen.Emit( OpCodes.Stloc_0 );
-			for( int r = 0; r < 32; r++ )
-				EmitRegister( ilgen, r );
-			ilgen.Emit( OpCodes.Ldloc_0 );
-			ilgen.Emit( OpCodes.Call, typeof( String ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object[] ) } ) );
-			ilgen.Emit( OpCodes.Call, _context.DebugWriteLine );
-		}
+		#region Legacy debug code
 
-		[Conditional( "REGISTEREMIT" )]
-		private void EmitRegister( ILGenerator ilgen, int n )
-		{
-			ilgen.Emit( OpCodes.Ldloc_0 );
-			ilgen.Emit( OpCodes.Ldc_I4, n );
-			CoreInstructions.EmitLoadRegister( _context, n );
-			ilgen.Emit( OpCodes.Box, typeof( Int32 ) );
-			ilgen.Emit( OpCodes.Stelem_Ref );
-		}
+//        [Conditional( "VERBOSEEMIT" )]
+//        internal void EmitDebugInfo( GenerationContext context, int address, uint code, string name, string args )
+//        {
+//#if DEBUG
+//            if( _debug == false )
+//                return;
+//#endif
+
+//            string line = string.Format( "[0x{0:X8}] {1:X8} {2:8} {3}",
+//                address, code, name, args );
+//            //string line = string.Format( "0x{0:X8}: {1:X8}",
+//            //	address, code );
+
+//            context.ILGen.Emit( OpCodes.Ldstr, line );
+//            context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+//        }
+
+//        [Conditional( "REGISTEREMIT" )]
+//        protected void EmitRegisterPrint( ILGenerator ilgen )
+//        {
+//            ilgen.Emit( OpCodes.Ldstr, "0={0:X8} 1={1:X8} 2={2:X8} 3={3:X8} 4={4:X8} 5={5:X8} 6={6:X8} 7={7:X8} 8={8:X8} 9={9:X8} 10={10:X8} 11={11:X8} 12={12:X8} 13={13:X8} 14={14:X8} 15={15:X8} 16={16:X8} 17={17:X8} 18={18:X8} 19={19:X8} 20={20:X8} 21={21:X8} 22={22:X8} 23={23:X8} 24={24:X8} 25={25:X8} 26={26:X8} 27={27:X8} 28={28:X8} 29={29:X8} 30={30:X8} 31={31:X8}" );
+//            ilgen.Emit( OpCodes.Ldc_I4, 32 );
+//            ilgen.Emit( OpCodes.Newarr, typeof( object ) );
+//            ilgen.Emit( OpCodes.Stloc_0 );
+//            for( int r = 0; r < 32; r++ )
+//                EmitRegister( ilgen, r );
+//            ilgen.Emit( OpCodes.Ldloc_0 );
+//            ilgen.Emit( OpCodes.Call, typeof( String ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object[] ) } ) );
+//            ilgen.Emit( OpCodes.Call, _context.DebugWriteLine );
+//        }
+
+//        [Conditional( "REGISTEREMIT" )]
+//        private void EmitRegister( ILGenerator ilgen, int n )
+//        {
+//            ilgen.Emit( OpCodes.Ldloc_0 );
+//            ilgen.Emit( OpCodes.Ldc_I4, n );
+//            CoreInstructions.EmitLoadRegister( _context, n );
+//            ilgen.Emit( OpCodes.Box, typeof( Int32 ) );
+//            ilgen.Emit( OpCodes.Stelem_Ref );
+//        }
+
+		#endregion
 
 		public void Cleanup()
 		{

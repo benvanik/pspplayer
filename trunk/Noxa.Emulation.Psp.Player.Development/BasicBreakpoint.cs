@@ -17,8 +17,8 @@ namespace Noxa.Emulation.Psp.Player.Development
 	{
 		protected DebugControl _control;
 
-		public BasicBreakpoint( DebugControl control, int address )
-			: base( address )
+		public BasicBreakpoint( DebugControl control, BreakpointType type, int address )
+			: base( type, address )
 		{
 			Debug.Assert( control != null );
 			if( control == null )
