@@ -164,6 +164,32 @@ namespace Noxa.Emulation.Psp.Cpu
 			}
 		}
 
+		public CoreState State
+		{
+			get
+			{
+				CoreState state = new CoreState();
+
+				state.ProgramCounter = this.Pc;
+				state.GeneralRegisters = new int[ this.Registers.Length ];
+				Array.Copy( this.Registers, state.GeneralRegisters, this.Registers.Length );
+				state.Hi = this.Hi;
+				state.Lo = this.Lo;
+				state.LL = this.LL;
+
+				state.Cp0ControlRegisters = Cp0.Control;
+				state.Cp0Registers = new int[ Cp0.Registers.Length ];
+				Array.Copy( Cp0.Registers, state.Cp0Registers, Cp0.Registers.Length );
+				state.Cp0ConditionBit = Cp0.ConditionBit;
+
+				state.FpuControlRegister = Cp1.ControlRegister;
+				state.FpuRegisters = new float[ Cp1.Registers.Length ];
+				Array.Copy( Cp1.Registers, state.FpuRegisters, Cp1.Registers.Length );
+
+				return state;
+			}
+		}
+
 		public void Clear()
 		{
 			Pc = 0;

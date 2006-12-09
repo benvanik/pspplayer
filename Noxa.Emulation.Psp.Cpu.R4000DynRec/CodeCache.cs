@@ -13,7 +13,7 @@ using System.Reflection.Emit;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
-	delegate int DynamicCodeDelegate( Core core0, Memory memory, int[] generalRegisters, BiosFunction[] syscallList );
+	delegate int DynamicCodeDelegate( Core core0, Memory memory, int[] generalRegisters, BiosFunction[] syscallList, int branchTarget );
 
 	enum GenerationMethod
 	{

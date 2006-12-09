@@ -16,6 +16,8 @@ using System.Windows.Forms;
 
 using Puzzle.SourceCode;
 
+using Noxa.Utilities.Controls;
+
 using Noxa.Emulation.Psp.Debugging;
 
 namespace Noxa.Emulation.Psp.Player.Development.Tools
@@ -45,6 +47,8 @@ namespace Noxa.Emulation.Psp.Player.Development.Tools
 			if( studio == null )
 				throw new ArgumentNullException( "studio" );
 			_studio = studio;
+
+			this.Icon = IconUtilities.ConvertToIcon( Properties.Resources.DisassemblyIcon );
 
 			_statementIcon = codeEditorControl.GutterIcons.Images.Add( Properties.Resources.StatementIcon, Color.Transparent );
 			_statementCallIcon = codeEditorControl.GutterIcons.Images.Add( Properties.Resources.StatementCallIcon, Color.Transparent );
