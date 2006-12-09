@@ -33,5 +33,10 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 			set;
 		}
+
+		CoreState State
+		{
+			get;
+		}
 	}
 }

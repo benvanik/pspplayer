@@ -479,7 +479,7 @@ namespace Noxa.Emulation.Psp.Cpu
 				_core0.BlockCounter = 0;
 #endif
 
-				int ret = block.Pointer( _core0, _memory, _core0.Registers, _syscalls );
+				int ret = block.Pointer( _core0, _memory, _core0.Registers, _syscalls, 0 );
 				if( ( ret == 0 ) &&
 					( block.EndsOnSyscall == false ) )
 				{
@@ -556,7 +556,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// </summary>
 		protected const int MaximumCodeLength = 600;
 
-		private Type[] _methodParams = new Type[] { typeof( Core ), typeof( Memory ), typeof( int[] ), typeof( BiosFunction[] ) };
+		private Type[] _methodParams = new Type[] { typeof( Core ), typeof( Memory ), typeof( int[] ), typeof( BiosFunction[] ), typeof( int ) };
 
 		/// <summary>
 		/// Generate and cache a codeblock starting from the given address.
@@ -648,12 +648,26 @@ namespace Noxa.Emulation.Psp.Cpu
 					}
 
 					// Must be after the nulldelay/branching stuff
-					if( ( pass == 1 ) && ( _debugging == true ) )
+					if( ( _debugging == true ) && ( pass == 1 ) )
 					{
 						Breakpoint bp = _debugger.Control.FindBreakpoint( address );
 						if( bp != null )
 						{
 							this.EmitBreakpoint( _context, bp );
+						}
+					}
+
+					if( _context.WriteBranchTable == true )
+					{
+						if( pass == 0 )
+						{
+							Label label = ilgen.DefineLabel();
+							_context.BranchTable.Add( label );
+						}
+						else
+						{
+							Label label = _context.BranchTable[ n ];
+							ilgen.MarkLabel( label );
 						}
 					}
 
@@ -931,13 +945,16 @@ namespace Noxa.Emulation.Psp.Cpu
 		}
 
 		// Input:
-		// 0      1       2                   3
-		// core0, memory, generalRegisters[], syscallList[]
+		// 0      1       2                   3              4
+		// core0, memory, generalRegisters[], syscallList[], branchTarget
+
+		// If you want to change these, you must go through and find all the LdargN's!
 
 		public const int ArgCore0 = 0;			// DO NOT CHANGE
 		public const int ArgMemory = 1;			// DO NOT CHANGE
 		public const int ArgRegisterList = 2;	// DO NOT CHANGE
 		public const int ArgSyscallList = 3;	// DO NOT CHANGE
+		public const int ArgBranchTarget = 4;
 
 		public const int LocalTempA = 0;		// DO NOT CHANGE
 		public const int LocalTempB = 1;		// DO NOT CHANGE
@@ -984,6 +1001,12 @@ namespace Noxa.Emulation.Psp.Cpu
 
 				ilgen.Emit( OpCodes.Ldc_I4_0 );
 				ilgen.Emit( OpCodes.Stloc_S, ( byte )LocalNullifyDelay );
+			}
+
+			if( context.WriteBranchTable == true )
+			{
+				ilgen.Emit( OpCodes.Ldarg_S, ArgBranchTarget );
+				ilgen.Emit( OpCodes.Switch, context.BranchTable.ToArray() );
 			}
 		}
 

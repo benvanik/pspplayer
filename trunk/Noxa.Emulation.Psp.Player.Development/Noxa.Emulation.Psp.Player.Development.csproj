@@ -151,6 +151,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>Studio.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Tools\CpuPane.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>CpuPane.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Tools\DisassemblyDocument.resx">
       <SubType>Designer</SubType>
       <DependentUpon>DisassemblyDocument.cs</DependentUpon>

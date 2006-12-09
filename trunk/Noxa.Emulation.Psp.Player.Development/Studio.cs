@@ -26,6 +26,10 @@ namespace Noxa.Emulation.Psp.Player.Development
 		private DisassemblyDocument _disasmDoc;
 		private Statement _steppingStatement;
 
+		private bool _useHex;
+
+		public event EventHandler GlobalRefreshRequested;
+
 		public Studio()
 		{
 			InitializeComponent();
@@ -43,6 +47,16 @@ namespace Noxa.Emulation.Psp.Player.Development
 			DockPanel2005.VS2005Style.Extender.SetSchema( dockPanel, DockPanel2005.VS2005Style.Extender.Schema.FromBase );
 
 			_debugger.StateChanged += new EventHandler( DebuggerStateChanged );
+
+			_useHex = true;
+		}
+
+		public bool UseHex
+		{
+			get
+			{
+				return _useHex;
+			}
 		}
 
 		public Debugger Debugger
@@ -61,6 +75,8 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		private void continueToolStripButton_Click( object sender, EventArgs e )
 		{
+			CpuPane pane = new CpuPane( this );
+			pane.Show( this.dockPanel );
 			Method m = _debugger.DebugData.FindMethod( 0x08900000 );
 			foreach( int addr in m.Instructions.Keys )
 				_debugger.Control.AddBreakpoint( addr );
@@ -84,6 +100,9 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		private void showStatementToolStripButton_Click( object sender, EventArgs e )
 		{
+			if( _debugger.State == DebuggerState.Running )
+				return;
+			//this.ShowDisassembly( _debugger.h.Address );
 		}
 
 		private void stepIntoToolStripButton_Click( object sender, EventArgs e )
@@ -106,7 +125,14 @@ namespace Noxa.Emulation.Psp.Player.Development
 
 		private void hexDisplayToolStripButton_Click( object sender, EventArgs e )
 		{
+			_useHex = !_useHex;
+			hexDisplayToolStripButton.Checked = _useHex;
+			this.OnGlobalRefreshRequested();
+		}
 
+		private void OnGlobalRefreshRequested()
+		{
+			this.GlobalRefreshRequested( this, EventArgs.Empty );
 		}
 
 		private void CleanupBreakpoint()

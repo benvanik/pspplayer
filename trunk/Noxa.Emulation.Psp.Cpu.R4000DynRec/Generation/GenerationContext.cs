@@ -56,6 +56,10 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		public Memory Memory;
 		public ILGenerator ILGen;
 
+		// Unused for now, but could be used to allow jumping to a particular instruction inside of a block
+		public bool WriteBranchTable;
+		public List<Label> BranchTable;
+
 		public bool UseCore;
 		public bool UseMemory;
 		public bool UseSyscalls;
@@ -103,6 +107,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 		public GenerationContext()
 		{
+			BranchTable = new List<Label>();
+
 			Core0Cpu = typeof( Core ).GetField( "Cpu", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0Pc = typeof( Core ).GetField( "Pc", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
 			Core0NullifyDelay = typeof( Core ).GetField( "DelayNop", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance );
@@ -138,6 +144,9 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			StartAddress = startAddress;
 			EndAddress = startAddress;
 			InstructionCount = 0;
+
+			WriteBranchTable = false;
+			BranchTable.Clear();
 
 			UseCore = false;
 			UseMemory = false;
