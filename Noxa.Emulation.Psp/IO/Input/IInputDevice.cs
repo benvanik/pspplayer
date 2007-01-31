@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Noxa.Emulation.Psp.IO.Input
+namespace Noxa.Emulation.Psp.Input
 {
 	[Flags]
 	public enum PadButtons
@@ -31,7 +31,7 @@ namespace Noxa.Emulation.Psp.IO.Input
 		MusicNote		= 0x800000,
 	}
 
-	public interface IInputDevice : IIODriver
+	public interface IInputDevice : IComponentInstance
 	{
 		event EventHandler Connected;
 		event EventHandler Disconnected;
