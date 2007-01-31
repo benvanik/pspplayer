@@ -83,11 +83,11 @@ namespace Noxa.Emulation.Psp.Games
 
 			ElfLoadResult result = elf.Load( bootStream, instance, baseAddress );
 //#if DEBUG
-			if( result.StubFailures.Count > 0 )
+			if( result.Stubs.Count > 0 )
 			{
 				XmlDocument doc = new XmlDocument();
 				doc.AppendChild( doc.CreateXmlDeclaration( "1.0", null, "yes" ) );
-				XmlElement root = doc.CreateElement( "elfLoadResult" );
+				XmlElement root = doc.CreateElement( "loadResult" );
 				XmlElement gameRoot = doc.CreateElement( "game" );
 				gameRoot.SetAttribute( "type", game.GameType.ToString() );
 				if( game.UniqueID != null )
@@ -111,30 +111,51 @@ namespace Noxa.Emulation.Psp.Games
 					gameRoot.AppendChild( sfoRoot );
 				}
 				root.AppendChild( gameRoot );
-				foreach( StubFailure failure in result.StubFailures )
+				XmlElement biosRoot = doc.CreateElement( "bios" );
 				{
-					XmlElement failureRoot = doc.CreateElement( "failure" );
-					failureRoot.SetAttribute( "type", failure.FailureType.ToString() );
-					failureRoot.SetAttribute( "module", failure.ModuleName );
-					failureRoot.SetAttribute( "nid", string.Format( "{0:X8}", failure.Nid ) );
+					IComponent factory = Activator.CreateInstance( instance.Bios.Factory ) as IComponent;
+					if( factory != null )
+					{
+						biosRoot.SetAttribute( "name", factory.Name );
+						biosRoot.SetAttribute( "version", factory.Version.ToString() );
+						biosRoot.SetAttribute( "build", factory.Build.ToString() );
+						if( factory.Author != null )
+							biosRoot.SetAttribute( "author", factory.Author );
+						if( factory.Website != null )
+							biosRoot.SetAttribute( "website", factory.Website );
+					}
+					else
+					{
+						biosRoot.SetAttribute( "status", "Unknown" );
+					}
+				}
+				root.AppendChild( biosRoot );
+				XmlElement referencesRoot = doc.CreateElement( "references" );
+				foreach( StubReference reference in result.Stubs )
+				{
+					XmlElement referenceRoot = doc.CreateElement( "reference" );
+					referenceRoot.SetAttribute( "type", reference.Result.ToString() );
+					referenceRoot.SetAttribute( "module", reference.ModuleName );
+					referenceRoot.SetAttribute( "nid", string.Format( "{0:X8}", reference.Nid ) );
 
-					if( failure.Function != null )
+					if( reference.Function != null )
 					{
 						XmlElement functionRoot = doc.CreateElement( "function" );
-						functionRoot.SetAttribute( "name", failure.Function.Name );
-						functionRoot.SetAttribute( "isImplemented", failure.Function.IsImplemented.ToString() );
-						failureRoot.AppendChild( functionRoot );
+						functionRoot.SetAttribute( "name", reference.Function.Name );
+						functionRoot.SetAttribute( "isImplemented", reference.Function.IsImplemented.ToString() );
+						referenceRoot.AppendChild( functionRoot );
 					}
 
-					root.AppendChild( failureRoot );
+					referencesRoot.AppendChild( referenceRoot );
 				}
+				root.AppendChild( referencesRoot );
 				doc.AppendChild( root );
 
 				string fileName;
 				if( game.GameType == GameType.Eboot )
-					fileName = string.Format( "ElfLoadResult-Eboot-{0}.xml", game.Parameters.Title );
+					fileName = string.Format( "LoadResult-Eboot-{0}.xml", game.Parameters.Title );
 				else
-					fileName = string.Format( "ElfLoadResult-{0}.xml", game.Parameters.DiscID );
+					fileName = string.Format( "LoadResult-{0}.xml", game.Parameters.DiscID );
 				using( FileStream stream = File.Open( fileName, FileMode.Create ) )
 					doc.Save( stream );
 			}
