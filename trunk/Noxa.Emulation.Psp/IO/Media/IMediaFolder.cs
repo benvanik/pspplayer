@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Noxa.Emulation.Psp.IO.Media
+namespace Noxa.Emulation.Psp.Media
 {
 	public interface IMediaFolder : IMediaItem, IEnumerable<IMediaItem>
 	{
