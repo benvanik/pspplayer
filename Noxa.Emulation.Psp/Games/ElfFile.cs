@@ -397,6 +397,8 @@ namespace Noxa.Emulation.Psp.Games
 
 		public ElfFile( Stream source )
 		{
+			_address = 0;
+
 			if( LoadElf( new BinaryReader( source ) ) == false )
 			{
 				// Failed
@@ -931,15 +933,15 @@ namespace Noxa.Emulation.Psp.Games
 				}
 			}
 
-			result.StubFailures = this.FixupStubs( reader, emulator.Cpu, memory, emulator.Bios, baseAddress );
+			result.Stubs = this.FixupStubs( reader, emulator.Cpu, memory, emulator.Bios, baseAddress );
 
 			result.Successful = true;
 			return result;
 		}
 
-		protected List<StubFailure> FixupStubs( BinaryReader reader, ICpu cpu, IMemory memory, IBios bios, uint baseAddress )
+		protected List<StubReference> FixupStubs( BinaryReader reader, ICpu cpu, IMemory memory, IBios bios, uint baseAddress )
 		{
-			List<StubFailure> failures = new List<StubFailure>();
+			List<StubReference> stubs = new List<StubReference>();
 
 			ElfSection libEnt = _sectionLookup[ ".lib.ent.top" ];
 			ElfSection libEntBottom = _sectionLookup[ ".lib.ent.btm" ];
@@ -989,25 +991,27 @@ namespace Noxa.Emulation.Psp.Games
 
 							Debug.WriteLine( string.Format( "FixupStubs: 0x{1:X8} found and patched at 0x{2:X8} -> 0x{3:X8} {0}::{4} {5}", moduleName, nid, syscallAddress, syscall, function.Name, ( function.IsImplemented == true ) ? "" : "(NI)" ) );
 							if( function.IsImplemented == false )
-								failures.Add( StubFailure.NidNotImplemented( moduleName, nid, function ) );
+								stubs.Add( StubReference.NidNotImplemented( moduleName, nid, function ) );
+							else
+								stubs.Add( StubReference.Success( moduleName, nid, function ) );
 						}
 						else
 						{
 							Debug.WriteLine( string.Format( "FixupStubs: {0} 0x{1:X8} not found (nid not present)", moduleName, nid ) );
-							failures.Add( StubFailure.NidNotFound( moduleName, nid ) );
+							stubs.Add( StubReference.NidNotFound( moduleName, nid ) );
 						}
 					}
 					else
 					{
 						Debug.WriteLine( string.Format( "FixupStubs: {0} 0x{1:X8} not found (module not present)", moduleName, nid ) );
-						failures.Add( StubFailure.ModuleNotFound( moduleName, nid ) );
+						stubs.Add( StubReference.ModuleNotFound( moduleName, nid ) );
 					}
 
 					address += 4;
 				}
 			}
 
-			return failures;
+			return stubs;
 		}
 
 		protected static string ReadString( BinaryReader reader )
@@ -1027,45 +1031,56 @@ namespace Noxa.Emulation.Psp.Games
 	public class ElfLoadResult
 	{
 		public bool Successful;
-		public List<StubFailure> StubFailures;
+		public List<StubReference> Stubs;
 	}
 
-	public enum StubFailureType
+	public enum StubReferenceResult
 	{
+		Success,
 		ModuleNotFound,
 		NidNotFound,
 		NidNotImplemented
 	}
 
-	public class StubFailure
+	public class StubReference
 	{
-		public StubFailureType FailureType;
+		public StubReferenceResult Result;
 		public string ModuleName;
 		public uint Nid;
 		public BiosFunction Function;
 
-		public static StubFailure ModuleNotFound( string moduleName, uint nid )
+		public static StubReference Success( string moduleName, uint nid, BiosFunction function )
 		{
-			StubFailure ret = new StubFailure();
-			ret.FailureType = StubFailureType.ModuleNotFound;
+			StubReference ret = new StubReference();
+			ret.Result = StubReferenceResult.Success;
+			ret.ModuleName = moduleName;
+			ret.Nid = nid;
+			ret.Function = function;
+			return ret;
+		}
+
+		public static StubReference ModuleNotFound( string moduleName, uint nid )
+		{
+			StubReference ret = new StubReference();
+			ret.Result = StubReferenceResult.ModuleNotFound;
 			ret.ModuleName = moduleName;
 			ret.Nid = nid;
 			return ret;
 		}
 
-		public static StubFailure NidNotFound( string moduleName, uint nid )
+		public static StubReference NidNotFound( string moduleName, uint nid )
 		{
-			StubFailure ret = new StubFailure();
-			ret.FailureType = StubFailureType.NidNotFound;
+			StubReference ret = new StubReference();
+			ret.Result = StubReferenceResult.NidNotFound;
 			ret.ModuleName = moduleName;
 			ret.Nid = nid;
 			return ret;
 		}
 
-		public static StubFailure NidNotImplemented( string moduleName, uint nid, BiosFunction function )
+		public static StubReference NidNotImplemented( string moduleName, uint nid, BiosFunction function )
 		{
-			StubFailure ret = new StubFailure();
-			ret.FailureType = StubFailureType.NidNotImplemented;
+			StubReference ret = new StubReference();
+			ret.Result = StubReferenceResult.NidNotImplemented;
 			ret.ModuleName = moduleName;
 			ret.Nid = nid;
 			ret.Function = function;
