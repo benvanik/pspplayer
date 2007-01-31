@@ -4,6 +4,9 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
+// When defined, the framebuffer will be replaced with a null operator, essentially
+//#define DUMMYFRAMEBUFFER
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,7 +30,11 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		protected IntPtr _controlHandle;
 		protected PresentParameters _presentParams;
 		protected Device _device;
+#if DUMMYFRAMEBUFFER
+		protected DummyFrameBuffer _frameBuffer;
+#else
 		protected FrameBuffer _frameBuffer;
+#endif
 		protected Sprite _sprite;
 
 		protected Thread _thread;
@@ -51,7 +58,11 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			_props = new DisplayProperties();
 
 			// Latch our frame buffer into the memory system
+#if DUMMYFRAMEBUFFER
+			_frameBuffer = new DummyFrameBuffer( this );
+#else
 			_frameBuffer = new FrameBuffer( this );
+#endif
 			_emulator.Cpu.Memory.RegisterSegment( _frameBuffer );
 
 			_listSync = new AutoResetEvent( false );
@@ -279,24 +290,10 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							_device.Clear( _context.ClearFlags, _context.ClearColor, _context.ClearZDepth, _context.ClearStencil );
 						_device.BeginScene();
 
-						lock( _frameBuffer )
-						{
-							_frameBuffer.Copy();
-						}
-
-						if( _currentProps != null )
-						{
-							Rectangle fbRect = new Rectangle( 0, 0, _currentProps.Width, _currentProps.Height );
-							SizeF fbSize = new SizeF( fbRect.Width, fbRect.Height );
-							_sprite.Begin( SpriteFlags.None );
-							_sprite.Draw2D( _frameBuffer.Texture, fbRect, fbRect, Point.Empty, Color.Transparent );
-							_sprite.End();
-						}
-
 						// Display list processing
 						
-						if( _lists.Count > 0 )
-							_listSync.WaitOne();
+						//if( _lists.Count > 0 )
+						//	_listSync.WaitOne();
 						lock( _lists )
 						{
 							for( int n = 0; n < _lists.Count; n++ )
@@ -319,6 +316,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							ParseList( _toProcess[ n ] );
 
 						_toProcess.Clear();
+
+						_frameBuffer.Flush();
 						
 						_device.EndScene();
 						try

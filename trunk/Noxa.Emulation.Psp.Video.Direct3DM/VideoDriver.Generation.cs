@@ -284,7 +284,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			}
 
 			_vertexTempLength = strideSize * vertexCount;
-			VertexBuffer vb = new VertexBuffer( _device, _vertexTempLength, Usage.None, format, Pool.Default );
+			VertexBuffer vb = new VertexBuffer( _device, _vertexTempLength, Usage.WriteOnly, format, Pool.Default );
 			vb.Created += new EventHandler( VertexBufferCreated );
 			VertexBufferCreated( vb, EventArgs.Empty );
 			CachedVertexBuffer ret = new CachedVertexBuffer( format, strideSize, vb );
@@ -343,7 +343,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 				Debug.Assert( _vertexTemp != null );
 				Debug.Assert( _vertexTemp.Length > 0 );
 
-				using( GraphicsStream gb = buffer.Lock( 0, _vertexTempLength, LockFlags.Discard ) )
+				using( GraphicsStream gb = buffer.Lock( 0, _vertexTempLength, LockFlags.NoSystemLock ) )
 				{
 					gb.Write( _vertexTemp, 0, _vertexTempLength );
 					buffer.Unlock();
