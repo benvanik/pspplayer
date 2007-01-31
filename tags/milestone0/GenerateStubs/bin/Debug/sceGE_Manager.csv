@@ -1,0 +1,19 @@
+,NID,Return,Function,Params
+1,0x1f6752ad,unsigned int,sceGeEdramGetSize,void
+2,0xe47e40e4,void *,sceGeEdramGetAddr,void
+3,0xb77905ea,,sceGeEdramSetAddrTranslation,
+4,0xdc93cfef,unsigned int,sceGeGetCmd,int cmd
+5,0x57c8945b,int,sceGeGetMtx,"int type,void *matrix"
+6,0x438a385a,,sceGeSaveContext,
+7,0x0bf608fb,int,sceGeRestoreContext,const PspGeContext *context
+8,0xab49e76a,int,sceGeListEnQueue,"const void *list,void *stall,int cbid,void *arg"
+9,0x1c0d95a6,int,sceGeListEnQueueHead,"const void *list,void *stall,int cbid,void *arg"
+10,0x5fb86ab0,int,sceGeListDeQueue,int qid
+11,0xe0d68148,int,sceGeListUpdateStallAddr,"int qid,void *stall"
+12,0x03444eb4,int,sceGeListSync,"int qid,int syncType"
+13,0xb287bd61,int,sceGeDrawSync,int syncType
+14,0xb448ec0d,,sceGeBreak,
+15,0x4c06e472,,sceGeContinue,
+16,0xa4fc06a4,int,sceGeSetCallback,PspGeCallbackData *cb
+17,0x05db22ce,int,sceGeUnsetCallback,int cbid
+18,0xe66cb92e,,,

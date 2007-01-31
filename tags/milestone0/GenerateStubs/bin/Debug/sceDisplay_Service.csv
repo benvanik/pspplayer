@@ -1,0 +1,22 @@
+,NID,Return,Function,Params
+1,0x0e20f177,int,sceDisplaySetMode,"int mode,int width,int height"
+2,0xdea197d4,int,sceDisplayGetMode,"int *pmode,int *pwidth,int *pheight"
+3,0xdba6c4c4,,sceDisplayGetFramePerSec,
+4,0x7ed59bc4,,sceDisplaySetHoldMode,
+5,0xa544c486,,sceDisplaySetResumeMode,
+6,0x289d82fe,void,sceDisplaySetFrameBuf,"void *topaddr,int bufferwidth,int pixelformat,int sync"
+7,0xbf79f646,,,
+8,0xeeda2e54,int,sceDisplayGetFrameBuf,"void * *topaddr,int *bufferwidth,int *pixelformat,int *unk1"
+9,0xb4f378fa,,sceDisplayIsForeground,
+10,0x31c4baa8,,sceDisplayGetBrightness,
+11,0x9c6eaad7,unsigned int,sceDisplayGetVcount,void
+12,0x4d4e10ec,,sceDisplayIsVblank,
+13,0x36cdfade,,sceDisplayWaitVblank,
+14,0x8eb9ec49,,sceDisplayWaitVblankCB,
+15,0x984c27e7,int,sceDisplayWaitVblankStart,void
+16,0x21038913,,,
+17,0x46f186c3,,sceDisplayWaitVblankStartCB,
+18,0x773dd3a3,,sceDisplayGetCurrentHcount,
+19,0x210eab3a,,sceDisplayGetAccumulatedHcount,
+20,0xa83ef139,,,
+21,0x69b53541,,sceDisplayGetVblankRest,

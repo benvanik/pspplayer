@@ -1,0 +1,23 @@
+,NID,Return,Function,Params
+1,0x8c1009b2,,sceAudioOutput,
+2,0x136caf51,int,sceAudioOutputBlocking,"int channel,int vol,void *buf"
+3,0xe2d56b2d,int,sceAudioOutputPanned,"int channel,int leftvol,int rightvol,void *buffer"
+4,0x13f592bc,int,sceAudioOutputPannedBlocking,"int channel,int leftvol,int rightvol,void *buffer"
+5,0x5ec81c55,int,sceAudioChReserve,"int channel,int samplecount,int format"
+6,0x41efade7,,sceAudioOneshotOutput,
+7,0x6fc46853,int,sceAudioChRelease,int channel
+8,0xe9d97901,int,sceAudioGetChannelRestLen,int channel
+9,0xb011922f,,,
+10,0xcb2e439e,int,sceAudioSetChannelDataLen,"int channel,int samplecount"
+11,0x95fd0c2d,int,sceAudioChangeChannelConfig,"int channel,int format"
+12,0xb7e1d8e7,int,sceAudioChangeChannelVolume,"int channel,int leftvol,int rightvol"
+13,0x38553111,,,
+14,0x5c37c0ae,,,
+15,0xe0727056,,,
+16,0x086e5895,,sceAudioInputBlocking,
+17,0x6d4bec68,,sceAudioInput,
+18,0xa708c6a6,,sceAudioGetInputLength,
+19,0x87b2e651,,sceAudioWaitInputEnd,
+20,0x7de61688,,sceAudioInputInit,
+21,0xe926d3fb,,,
+22,0xa633048e,,,

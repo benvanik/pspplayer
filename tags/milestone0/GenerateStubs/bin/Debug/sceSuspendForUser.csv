@@ -1,0 +1,4 @@
+,NID,Return,Function,Params
+1,0xeadb1bd7,,sceKernelPowerLock,
+2,0x3aee7261,,sceKernelPowerUnlock,
+3,0x090ccb3f,,sceKernelPowerTick,
