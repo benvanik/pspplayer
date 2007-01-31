@@ -9,10 +9,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Reflection.Emit;
 using System.Diagnostics;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Text;
+
 using Noxa.Emulation.Psp.Bios;
 
 namespace Noxa.Emulation.Psp.Cpu.Generation
@@ -2701,6 +2702,13 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 				return GenerationResult.Success;
 			}
 
+			public delegate void SyscallDebugThunkDelegate( BiosFunction biosFunction );
+			public static void SyscallDebugThunk( BiosFunction biosFunction )
+			{
+				string s = string.Format( "Syscall {0}::{1} (0x{2:X8}){3}", biosFunction.Module, biosFunction.Name, biosFunction.NID, ( biosFunction.IsImplemented == true ) ? "" : " (NI)" );
+				Debug.WriteLine( s );
+			}
+
 			public static GenerationResult SYSCALL( GenerationContext context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 			{
 				// We could probably save a register write by properly obeying the
@@ -2786,8 +2794,10 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Stfld, context.Core0Pc );
 
 #if VERBOSESYSCALLS
-					context.ILGen.Emit( OpCodes.Ldstr, string.Format( "Syscall to {0}::{1} (0x{2:X8}){3}", biosFunction.Module, biosFunction.Name, biosFunction.NID, ( biosFunction.IsImplemented == true ) ? "" : " (NI)" ) );
-					context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+					context.ILGen.Emit( OpCodes.Ldarg_3 );
+					context.ILGen.Emit( OpCodes.Ldc_I4, syscall );
+					context.ILGen.Emit( OpCodes.Ldelem, typeof( BiosFunction ) );
+					context.ILGen.Emit( OpCodes.Call, typeof( Special ).GetMethod( "SyscallDebugThunk" ) );
 #endif
 
 					if( willCall == true )
