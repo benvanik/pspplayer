@@ -206,7 +206,7 @@ namespace Noxa.Emulation.Psp.Video.Xna
 			//_device.Transform.View = Matrix.Identity;
 			//_device.Transform.World = Matrix.Identity;
 
-			for( int n = 0; n < list.Packets.Length; n++ )
+			for( int n = 0; n < list.Packets.Count; n++ )
 			{
 				VideoPacket packet = list.Packets[ n ];
 
