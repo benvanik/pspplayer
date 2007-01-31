@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Noxa.Emulation.Psp.IO.Media;
+using Noxa.Emulation.Psp.Media;
 using System.IO;
 using System.Diagnostics;
 

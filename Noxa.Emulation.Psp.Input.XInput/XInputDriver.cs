@@ -8,10 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using Noxa.Emulation.Psp.IO.Input.XInput;
+using Noxa.Emulation.Psp.Input.XInput;
 using System.Diagnostics;
 
-namespace Noxa.Emulation.Psp.IO.Input
+namespace Noxa.Emulation.Psp.Input
 {
 	public class XInputDriver : IComponent
 	{

@@ -10,7 +10,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 
-namespace Noxa.Emulation.Psp.IO.Media.FileSystem
+namespace Noxa.Emulation.Psp.Media.FileSystem
 {
 	class MemoryStickDevice : IMemoryStickDevice
 	{

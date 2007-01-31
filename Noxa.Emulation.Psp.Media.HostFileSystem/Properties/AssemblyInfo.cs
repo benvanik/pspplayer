@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Noxa.Emulation.Psp.IO.Media.HostFileSystem" )]
+[assembly: AssemblyTitle( "Noxa.Emulation.Psp.Media.HostFileSystem" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "Noxa.Emulation.Psp.IO.Media.HostFileSystem" )]
+[assembly: AssemblyProduct( "Noxa.Emulation.Psp.Media.HostFileSystem" )]
 [assembly: AssemblyCopyright( "Copyright ©  2006" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]

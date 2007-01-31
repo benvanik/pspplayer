@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp
 {
@@ -18,6 +19,9 @@ namespace Noxa.Emulation.Psp
 		protected IComponent _bios;
 		protected IComponent _cpu;
 		protected List<IComponent> _io = new List<IComponent>();
+		protected IComponent _input;
+		protected IComponent _umd;
+		protected IComponent _memoryStick;
 		protected IComponent _video;
 
 		protected Dictionary<IComponent, ComponentParameters> _params = new Dictionary<IComponent, ComponentParameters>();
@@ -31,6 +35,7 @@ namespace Noxa.Emulation.Psp
 			}
 			set
 			{
+				Debug.Assert( _isLocked == false );
 				if( _isLocked == true )
 					return;
 				_audio = value;
@@ -45,6 +50,7 @@ namespace Noxa.Emulation.Psp
 			}
 			set
 			{
+				Debug.Assert( _isLocked == false );
 				if( _isLocked == true )
 					return;
 				_bios = value;
@@ -59,6 +65,7 @@ namespace Noxa.Emulation.Psp
 			}
 			set
 			{
+				Debug.Assert( _isLocked == false );
 				if( _isLocked == true )
 					return;
 				_cpu = value;
@@ -76,6 +83,51 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		public IComponent InputComponent
+		{
+			get
+			{
+				return _input;
+			}
+			set
+			{
+				Debug.Assert( _isLocked == false );
+				if( _isLocked == true )
+					return;
+				_input = value;
+			}
+		}
+
+		public IComponent UmdComponent
+		{
+			get
+			{
+				return _umd;
+			}
+			set
+			{
+				Debug.Assert( _isLocked == false );
+				if( _isLocked == true )
+					return;
+				_umd = value;
+			}
+		}
+
+		public IComponent MemoryStickComponent
+		{
+			get
+			{
+				return _memoryStick;
+			}
+			set
+			{
+				Debug.Assert( _isLocked == false );
+				if( _isLocked == true )
+					return;
+				_memoryStick = value;
+			}
+		}
+
 		public IComponent VideoComponent
 		{
 			get
@@ -84,6 +136,7 @@ namespace Noxa.Emulation.Psp
 			}
 			set
 			{
+				Debug.Assert( _isLocked == false );
 				if( _isLocked == true )
 					return;
 				_video = value;
@@ -113,6 +166,7 @@ namespace Noxa.Emulation.Psp
 			}
 			set
 			{
+				Debug.Assert( _isLocked == false );
 				if( _isLocked == true )
 					return;
 				_params[ component ] = value;

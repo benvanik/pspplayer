@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using Noxa.Emulation.Psp.Cpu;
-using Noxa.Emulation.Psp.IO.Media;
+using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 {

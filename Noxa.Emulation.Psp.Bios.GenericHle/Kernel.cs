@@ -12,7 +12,7 @@ using System.IO;
 using System.Threading;
 using Noxa.Emulation.Psp.Games;
 using Noxa.Emulation.Psp.Cpu;
-using Noxa.Emulation.Psp.IO.Media;
+using Noxa.Emulation.Psp.Media;
 using Noxa.Emulation.Psp.Utilities;
 
 namespace Noxa.Emulation.Psp.Bios.GenericHle
@@ -328,23 +328,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 			_devices.Clear();
 
 			// We do this here because we want to make sure the file systems are setup
-			IMediaDevice msDevice = null;
-			IMediaDevice umdDevice = null;
-			for( int n = 0; n < _hle.Emulator.IO.Count; n++ )
-			{
-				IMediaDevice device = _hle.Emulator.IO[ n ] as IMediaDevice;
-				if( device == null )
-					continue;
-				switch( device.MediaType )
-				{
-					case MediaType.MemoryStick:
-						msDevice = device;
-						break;
-					case MediaType.Umd:
-						umdDevice = device;
-						break;
-				}
-			}
+			IMediaDevice msDevice = _hle.Emulator.MemoryStick;
+			IMediaDevice umdDevice = _hle.Emulator.Umd;
 			_devices.Add( new KernelFileDevice( "MemoryStick", new string[] { "fatms0", "ms0", "fatms" }, true, ( msDevice != null ) ? msDevice.IsReadOnly : true, msDevice, ( msDevice != null ) ? msDevice.Root : null ) );
 			_devices.Add( new KernelFileDevice( "UMD", new string[] { "umd0", "isofs", "isofs0", "disc0" }, true, true, umdDevice, ( umdDevice != null ) ? umdDevice.Root : null ) );
 			//_devices.Add( new KernelFileDevice( "flash0", new string[] { "flash0", "flashfat", "flashfat0" }, true, false, null, null ) );

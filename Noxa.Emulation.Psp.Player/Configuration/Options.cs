@@ -191,7 +191,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 			return null;
 		}
 
-		void ListSelectedIndexChanged( object sender, EventArgs e )
+		private void ListSelectedIndexChanged( object sender, EventArgs e )
 		{
 			ComboBox comboBox = sender as ComboBox;
 			ComponentType type = FindType<ComboBox>( _comboLookup, comboBox );
@@ -215,7 +215,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 			}
 		}
 
-		void InfoLinkClicked( object sender, LinkLabelLinkClickedEventArgs e )
+		private void InfoLinkClicked( object sender, LinkLabelLinkClickedEventArgs e )
 		{
 			LinkLabel link = sender as LinkLabel;
 			ComponentType type = FindType<LinkLabel>( _linkLookup, link );
@@ -231,7 +231,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 			}
 		}
 
-		void ConfigureClick( object sender, EventArgs e )
+		private void ConfigureClick( object sender, EventArgs e )
 		{
 			Button configButton = sender as Button;
 			ComponentType type = FindType<Button>( _configLookup, configButton );

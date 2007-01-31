@@ -12,7 +12,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Noxa.Emulation.Psp.IO.Media.Iso.Configuration
+namespace Noxa.Emulation.Psp.Media.Iso.Configuration
 {
 	partial class MediaConfiguration : Noxa.Emulation.Psp.Configuration.ConfigurationBase
 	{

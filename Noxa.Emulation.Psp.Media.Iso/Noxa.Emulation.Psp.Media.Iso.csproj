@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{EDB1DA0A-2FE8-478D-93F6-5D8141D1C123}</ProjectGuid>
+    <ProjectGuid>{5724E076-9383-49DF-BFE2-21D206ED3E0A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Noxa.Emulation.Psp.IO.Input.DirectInput</RootNamespace>
-    <AssemblyName>Noxa.Emulation.Psp.IO.Input.DirectInput</AssemblyName>
+    <RootNamespace>Noxa.Emulation.Psp.Media.Iso</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp.Media.Iso</AssemblyName>
     <SccProjectName>
     </SccProjectName>
     <SccLocalPath>
@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,21 +35,35 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.DirectX.DirectInput, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirectInputDriver.cs" />
-    <Compile Include="Keyboard.cs" />
+    <Compile Include="Configuration\MediaConfiguration.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Configuration\MediaConfiguration.Designer.cs">
+      <DependentUpon>MediaConfiguration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IsoFileSystem.cs" />
+    <Compile Include="IsoStream.cs" />
+    <Compile Include="MediaFile.cs" />
+    <Compile Include="MediaFolder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UmdDevice.cs" />
+    <Compile Include="UmdDevice.FileSystem.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">
+      <Project>{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}</Project>
+      <Name>Noxa.Emulation.Psp.Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
       <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
       <Name>Noxa.Emulation.Psp</Name>
@@ -57,6 +72,12 @@
       <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
       <Name>Noxa.Utilities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Configuration\MediaConfiguration.resx">
+      <DependentUpon>MediaConfiguration.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
