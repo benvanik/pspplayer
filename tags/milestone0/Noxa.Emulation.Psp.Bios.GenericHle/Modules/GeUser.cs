@@ -190,7 +190,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				List<VideoPacket> packets = new List<VideoPacket>( 256 );
 				bool done = ReadPackets( memory, a0, packets, 0, new DisplayListData() );
 				Debug.Assert( done == true );
-				list.Packets = packets.ToArray();
+				list.Packets = packets;
 			}
 			else
 			{
@@ -239,7 +239,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				List<VideoPacket> packets = new List<VideoPacket>( 256 );
 				bool done = ReadPackets( memory, a0, packets, 0, new DisplayListData() );
 				Debug.Assert( done == true );
-				list.Packets = packets.ToArray();
+				list.Packets = packets;
 			}
 			else
 			{
@@ -303,7 +303,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				{
 					lock( list )
 					{
-						list.Packets = dld.Packets.ToArray();
+						list.Packets = dld.Packets;
 						list.Ready = true;
 					}
 
@@ -341,7 +341,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				Debug.Assert( done == true );
 				lock( list )
 				{
-					list.Packets = dld.Packets.ToArray();
+					list.Packets = dld.Packets;
 					list.Ready = true;
 				}
 
@@ -378,7 +378,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 					Debug.Assert( done == true );
 					lock( list )
 					{
-						list.Packets = dld.Packets.ToArray();
+						list.Packets = dld.Packets;
 						list.Ready = true;
 					}
 

@@ -332,7 +332,7 @@ namespace Noxa.Emulation.Psp.Video
 	public class DisplayList
 	{
 		public int ID;
-		public VideoPacket[] Packets;
+		public List<VideoPacket> Packets;
 		public bool Ready;
 		public object KernelData;
 		public int CallbackId;

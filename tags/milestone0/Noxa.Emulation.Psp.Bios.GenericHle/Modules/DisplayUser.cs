@@ -118,7 +118,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 			//Debug.WriteLine( string.Format( "fb addr set to {0:X8}", a0 ) );
 
-			_hle.Emulator.Video.Resume();
+			if( props.HasChanged == true )
+				_hle.Emulator.Video.Resume();
 			
 			return 0;
 		}

@@ -30,7 +30,7 @@
   <ItemGroup>
     <Reference Include="DockPanel2005, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\DockPanel\DockPanel2005\bin\Release\DockPanel2005.dll</HintPath>
+      <HintPath>..\Dependencies\DockPanel2005.dll</HintPath>
     </Reference>
     <Reference Include="PropertyGridEx, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -38,15 +38,15 @@
     </Reference>
     <Reference Include="Puzzle.CoreLib.NET2, Version=1.0.6.33714, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\Syntaxbox\SyntaxBox\bin\Debug\Puzzle.CoreLib.NET2.dll</HintPath>
+      <HintPath>..\Dependencies\Puzzle.CoreLib.NET2.dll</HintPath>
     </Reference>
     <Reference Include="Puzzle.SyntaxBox.NET2, Version=1.4.10.33714, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\Syntaxbox\SyntaxBox\bin\Debug\Puzzle.SyntaxBox.NET2.dll</HintPath>
+      <HintPath>..\Dependencies\Puzzle.SyntaxBox.NET2.dll</HintPath>
     </Reference>
     <Reference Include="Puzzle.SyntaxDocument.NET2, Version=1.4.10.33714, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\Syntaxbox\SyntaxBox\bin\Debug\Puzzle.SyntaxDocument.NET2.dll</HintPath>
+      <HintPath>..\Dependencies\Puzzle.SyntaxDocument.NET2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -55,7 +55,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Dependencies\DockPanel\WinFormsUI\bin\Release\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+      <HintPath>..\Dependencies\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

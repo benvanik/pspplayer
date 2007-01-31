@@ -208,7 +208,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			//_device.Transform.View = Matrix.Identity;
 			//_device.Transform.World = Matrix.Identity;
 			
-			for( int n = 0; n < list.Packets.Length; n++ )
+			for( int n = 0; n < list.Packets.Count; n++ )
 			{
 				VideoPacket packet = list.Packets[ n ];
 
@@ -412,9 +412,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 							{
 								// This could be optimized somehow
 								int vertexSize;
-								if( _context.VertexTypeSizes.ContainsKey( _context.VertexTypeValue ) == true )
-									vertexSize = _context.VertexTypeSizes[ _context.VertexTypeValue ];
-								else
+								if( _context.VertexTypeSizes.TryGetValue( _context.VertexTypeValue, out vertexSize ) == false )
 								{
 									vertexSize = DetermineVertexSize( _context.VertexType );
 									_context.VertexTypeSizes.Add( _context.VertexTypeValue, vertexSize );
@@ -427,12 +425,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 								// Get
 								uint hash = memory.GetMemoryHash( _context.VertexBufferAddress, bufferLength, VideoContext.MaximumCachedVertexBuffers );
 
-								CachedVertexBuffer vb = null;
-								if( _context.CachedVertexBuffers.ContainsKey( hash ) == true )
-								{
-									vb = _context.CachedVertexBuffers[ hash ];
-								}
-								else
+								CachedVertexBuffer vb;
+								if( _context.CachedVertexBuffers.TryGetValue( hash, out vb ) == false )
 								{
 									if( supportInternalMemory == true )
 									{
@@ -460,7 +454,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 								Debug.Assert( vb != null );
 								if( vb != null )
 								{
-									this.SetTextures();
+									//this.SetTextures();
 
 									_device.VertexFormat = vb.Format;
 									_device.SetStreamSource( 0, vb.Buffer, 0, vb.StrideSize );
