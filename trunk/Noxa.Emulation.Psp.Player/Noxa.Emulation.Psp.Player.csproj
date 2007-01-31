@@ -235,13 +235,6 @@
     <Content Include="Resources\MemoryStickIcon.png" />
     <Content Include="Resources\ReportIcon.png" />
     <Content Include="Resources\psp.ico" />
-    <None Include="Resources\PspBoot.wmv" />
-    <None Include="Resources\Sound Bank.xsb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\Wave Bank.xwb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\PspShake.png" />
     <None Include="Resources\RemoveIcon.png" />
     <Content Include="Resources\ResizeIcon.png" />
@@ -268,18 +261,6 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Web References\CompatibilityService\Service.disco" />
-    <None Include="Resources\Wallpaper01.jpg" />
-    <None Include="Resources\Wallpaper02.jpg" />
-    <None Include="Resources\Wallpaper03.jpg" />
-    <None Include="Resources\Wallpaper04.jpg" />
-    <None Include="Resources\Wallpaper05.jpg" />
-    <None Include="Resources\Wallpaper06.jpg" />
-    <None Include="Resources\Wallpaper07.jpg" />
-    <None Include="Resources\Wallpaper08.jpg" />
-    <None Include="Resources\Wallpaper09.jpg" />
-    <None Include="Resources\Wallpaper10.jpg" />
-    <None Include="Resources\Wallpaper11.jpg" />
-    <None Include="Resources\Wallpaper12.jpg" />
     <None Include="Resources\WarningIcon.png" />
     <None Include="Web References\CompatibilityService\Service.wsdl" />
   </ItemGroup>
