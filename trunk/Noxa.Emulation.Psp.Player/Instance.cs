@@ -19,8 +19,8 @@ using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Video;
 using Noxa.Emulation.Psp.IO;
-using Noxa.Emulation.Psp.IO.Input;
-using Noxa.Emulation.Psp.IO.Media;
+using Noxa.Emulation.Psp.Input;
+using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Player
 {
@@ -40,6 +40,7 @@ namespace Noxa.Emulation.Psp.Player
 		protected IBios _bios;
 		protected ICpu _cpu;
 		protected List<IIODriver> _io = new List<IIODriver>();
+		protected IInputDevice _input;
 		protected IUmdDevice _umd;
 		protected IMemoryStickDevice _memoryStick;
 		protected IVideoDriver _video;
@@ -107,19 +108,18 @@ namespace Noxa.Emulation.Psp.Player
 			}
 		}
 
+		public IInputDevice Input
+		{
+			get
+			{
+				return _input;
+			}
+		}
+
 		public IUmdDevice Umd
 		{
 			get
 			{
-				if( _umd == null )
-				{
-					for( int n = 0; n < _io.Count; n++ )
-					{
-						_umd = _io[ n ] as IUmdDevice;
-						if( _umd != null )
-							break;
-					}
-				}
 				return _umd;
 			}
 		}
@@ -128,15 +128,6 @@ namespace Noxa.Emulation.Psp.Player
 		{
 			get
 			{
-				if( _memoryStick == null )
-				{
-					for( int n = 0; n < _io.Count; n++ )
-					{
-						_memoryStick = _io[ n ] as IMemoryStickDevice;
-						if( _memoryStick != null )
-							break;
-					}
-				}
 				return _memoryStick;
 			}
 		}
@@ -225,8 +216,22 @@ namespace Noxa.Emulation.Psp.Player
 				IIODriver driver = component.CreateInstance( this, _params[ component ] ) as IIODriver;
 				_io.Add( driver );
 				_instances.Add( ( IComponentInstance )driver );
-				if( driver is IInputDevice )
-					( driver as IInputDevice ).WindowHandle = _host.Player.Handle;
+			}
+			if( _params.InputComponent != null )
+			{
+				_input = _params.InputComponent.CreateInstance( this, _params[ _params.InputComponent ] ) as IInputDevice;
+				_instances.Add( _input );
+				_input.WindowHandle = _host.Player.Handle;
+			}
+			if( _params.UmdComponent != null )
+			{
+				_umd = _params.UmdComponent.CreateInstance( this, _params[ _params.UmdComponent ] ) as IUmdDevice;
+				_instances.Add( _umd );
+			}
+			if( _params.MemoryStickComponent != null )
+			{
+				_memoryStick = _params.MemoryStickComponent.CreateInstance( this, _params[ _params.MemoryStickComponent ] ) as IMemoryStickDevice;
+				_instances.Add( _memoryStick );
 			}
 			if( _params.VideoComponent != null )
 			{

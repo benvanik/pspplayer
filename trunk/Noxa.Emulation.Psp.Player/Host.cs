@@ -163,13 +163,13 @@ namespace Noxa.Emulation.Psp.Player
 							emulationParams.CpuComponent = component;
 							break;
 						case ComponentType.Input:
-							emulationParams.IOComponents.Add( component );
+							emulationParams.InputComponent = component;
 							break;
 						case ComponentType.UserMedia:
-							emulationParams.IOComponents.Add( component );
+							emulationParams.MemoryStickComponent = component;
 							break;
 						case ComponentType.GameMedia:
-							emulationParams.IOComponents.Add( component );
+							emulationParams.UmdComponent = component;
 							break;
 						case ComponentType.Network:
 							emulationParams.IOComponents.Add( component );

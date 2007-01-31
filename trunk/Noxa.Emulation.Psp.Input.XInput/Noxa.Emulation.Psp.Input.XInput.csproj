@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2EFF513B-ABE1-48C4-AE6F-F79A091AD457}</ProjectGuid>
+    <ProjectGuid>{66261194-90FB-4F51-91DD-6C49741AFB3C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Noxa.Emulation.Psp.IO.Media.FileSystem</RootNamespace>
-    <AssemblyName>Noxa.Emulation.Psp.IO.Media.HostFileSystem</AssemblyName>
+    <RootNamespace>Noxa.Emulation.Psp.Input.XInput</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp.Input.XInput</AssemblyName>
     <SccProjectName>
     </SccProjectName>
     <SccLocalPath>
@@ -38,31 +38,20 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Design" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\MediaConfiguration.cs">
-      <SubType>UserControl</SubType>
+    <Compile Include="NativeXInput.cs" />
+    <Compile Include="Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-    <Compile Include="Configuration\MediaConfiguration.Designer.cs">
-      <DependentUpon>MediaConfiguration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GameHostFileSystem.cs" />
-    <Compile Include="MediaFile.cs" />
-    <Compile Include="MediaFolder.cs" />
-    <Compile Include="MemoryStickDevice.cs" />
+    <Compile Include="XInputDriver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UmdDevice.cs" />
-    <Compile Include="UserHostFileSystem.cs" />
+    <Compile Include="XInputPad.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">
-      <Project>{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}</Project>
-      <Name>Noxa.Emulation.Psp.Configuration</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
       <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
       <Name>Noxa.Emulation.Psp</Name>
@@ -73,9 +62,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Configuration\MediaConfiguration.resx">
+    <EmbeddedResource Include="Strings.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>MediaConfiguration.cs</DependentUpon>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

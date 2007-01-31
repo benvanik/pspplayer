@@ -13,7 +13,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Noxa.Emulation.Psp.Games;
-using Noxa.Emulation.Psp.IO.Media;
+using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Player.GamePicker
 {

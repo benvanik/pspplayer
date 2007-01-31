@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.IO;
-using Noxa.Emulation.Psp.IO.Media;
+using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Games
 {
@@ -163,33 +163,24 @@ namespace Noxa.Emulation.Psp.Games
 		{
 			List<GameInformation> infos = new List<GameInformation>();
 
-			foreach( IIODriver driver in instance.IO )
+			if( ( instance.Umd != null ) &&
+				( instance.Umd.State == MediaState.Present ) )
 			{
-				IMediaDevice device = driver as IMediaDevice;
-				if( device == null )
-					continue;
-				if( device.State != MediaState.Present )
-					continue;
+				GameInformation info = this.GetUmdGameInformation( instance.Umd );
+				if( infos != null )
+					infos.Add( info );
+			}
 
-				GameInformation info;
-
-				switch( device.MediaType )
+			if( ( instance.MemoryStick != null ) &&
+				( instance.MemoryStick.State == MediaState.Present ) )
+			{
+				// Eboots in PSP\GAME\*
+				IMediaFolder rootFolder = instance.MemoryStick.Root.FindFolder( @"PSP\GAME\" );
+				foreach( IMediaFolder folder in rootFolder )
 				{
-					case MediaType.MemoryStick:
-						// Eboots in PSP\GAME\*
-						IMediaFolder rootFolder = device.Root.FindFolder( @"PSP\GAME\" );
-						foreach( IMediaFolder folder in rootFolder )
-						{
-							info = this.GetEbootGameInformation( folder );
-							if( info != null )
-								infos.Add( info );
-						}
-						break;
-					case MediaType.Umd:
-						info = this.GetUmdGameInformation( device );
-						if( infos != null )
-							infos.Add( info );
-						break;
+					GameInformation info = this.GetEbootGameInformation( folder );
+					if( info != null )
+						infos.Add( info );
 				}
 			}
 

@@ -10,7 +10,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 
-namespace Noxa.Emulation.Psp.IO.Media.FileSystem
+namespace Noxa.Emulation.Psp.Media.FileSystem
 {
 	class UmdDevice : IUmdDevice
 	{

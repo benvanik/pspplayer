@@ -12,7 +12,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Globalization;
 
-namespace Noxa.Emulation.Psp.IO.Media.Iso
+namespace Noxa.Emulation.Psp.Media.Iso
 {
 	partial class UmdDevice
 	{

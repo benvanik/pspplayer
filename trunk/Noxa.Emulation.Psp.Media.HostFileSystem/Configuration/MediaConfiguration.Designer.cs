@@ -1,4 +1,4 @@
-namespace Noxa.Emulation.Psp.IO.Media.FileSystem.Configuration
+namespace Noxa.Emulation.Psp.Media.FileSystem.Configuration
 {
 	partial class MediaConfiguration
 	{

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "Noxa.Emulation.Psp.IO.Input.DirectInput" )]
+[assembly: AssemblyTitle( "Noxa.Emulation.Psp.Input.DirectInput" )]
 [assembly: AssemblyDescription( "" )]
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
-[assembly: AssemblyProduct( "Noxa.Emulation.Psp.IO.Input.DirectInput" )]
+[assembly: AssemblyProduct( "Noxa.Emulation.Psp.Input.DirectInput" )]
 [assembly: AssemblyCopyright( "Copyright ©  2006" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]

@@ -10,7 +10,7 @@ using System.Text;
 using System.Diagnostics;
 using Microsoft.DirectX.DirectInput;
 
-namespace Noxa.Emulation.Psp.IO.Input.DirectInput
+namespace Noxa.Emulation.Psp.Input.DirectInput
 {
 	class Keyboard : IInputDevice
 	{

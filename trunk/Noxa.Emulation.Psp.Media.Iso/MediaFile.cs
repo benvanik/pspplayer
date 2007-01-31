@@ -12,7 +12,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 
-namespace Noxa.Emulation.Psp.IO.Media.Iso
+namespace Noxa.Emulation.Psp.Media.Iso
 {
 	class MediaFile : IMediaFile
 	{

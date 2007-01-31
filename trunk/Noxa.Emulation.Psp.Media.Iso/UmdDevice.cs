@@ -10,7 +10,7 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 
-namespace Noxa.Emulation.Psp.IO.Media.Iso
+namespace Noxa.Emulation.Psp.Media.Iso
 {
 	partial class UmdDevice : IUmdDevice
 	{

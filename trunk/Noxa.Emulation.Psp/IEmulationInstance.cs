@@ -13,7 +13,8 @@ using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.IO;
 using Noxa.Emulation.Psp.Video;
-using Noxa.Emulation.Psp.IO.Media;
+using Noxa.Emulation.Psp.Media;
+using Noxa.Emulation.Psp.Input;
 
 namespace Noxa.Emulation.Psp
 {
@@ -55,6 +56,11 @@ namespace Noxa.Emulation.Psp
 		}
 
 		ReadOnlyCollection<IIODriver> IO
+		{
+			get;
+		}
+
+		IInputDevice Input
 		{
 			get;
 		}

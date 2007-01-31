@@ -7,11 +7,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Noxa.Emulation.Psp.IO.Media.FileSystem;
+using Noxa.Emulation.Psp.Media.FileSystem;
 using System.IO;
-using Noxa.Emulation.Psp.IO.Media.FileSystem.Configuration;
+using Noxa.Emulation.Psp.Media.FileSystem.Configuration;
 
-namespace Noxa.Emulation.Psp.IO.Media
+namespace Noxa.Emulation.Psp.Media
 {
 	public class UserHostFileSystem : IComponent
 	{

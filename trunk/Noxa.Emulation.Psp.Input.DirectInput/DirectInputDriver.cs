@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Noxa.Emulation.Psp.IO.Input.DirectInput
+namespace Noxa.Emulation.Psp.Input.DirectInput
 {
 	public class DirectInputDriver : IComponent
 	{

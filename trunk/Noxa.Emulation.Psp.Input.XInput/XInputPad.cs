@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
-namespace Noxa.Emulation.Psp.IO.Input.XInput
+namespace Noxa.Emulation.Psp.Input.XInput
 {
 	class XInputPad : IInputDevice
 	{

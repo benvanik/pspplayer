@@ -8,10 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using Noxa.Emulation.Psp.IO.Media.Iso.Configuration;
+using Noxa.Emulation.Psp.Media.Iso.Configuration;
 using System.Diagnostics;
 
-namespace Noxa.Emulation.Psp.IO.Media.Iso
+namespace Noxa.Emulation.Psp.Media.Iso
 {
 	public class IsoFileSystem : IComponent
 	{

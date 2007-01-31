@@ -1,4 +1,4 @@
-namespace Noxa.Emulation.Psp.IO.Media.Iso.Configuration
+namespace Noxa.Emulation.Psp.Media.Iso.Configuration
 {
 	partial class MediaConfiguration
 	{

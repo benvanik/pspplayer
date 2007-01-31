@@ -11,7 +11,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections;
 
-namespace Noxa.Emulation.Psp.IO.Media.FileSystem
+namespace Noxa.Emulation.Psp.Media.FileSystem
 {
 	class MediaFolder : IMediaFolder
 	{

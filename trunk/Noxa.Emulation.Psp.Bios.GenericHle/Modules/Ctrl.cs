@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using Noxa.Emulation.Psp.Cpu;
 using System.Diagnostics;
-using Noxa.Emulation.Psp.IO.Input;
+using Noxa.Emulation.Psp.Input;
 using System.Threading;
 
 namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
@@ -102,14 +102,6 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 		protected void InputThread()
 		{
-			List<IInputDevice> devices = new List<IInputDevice>();
-			for( int n = 0; n < _hle.Emulator.IO.Count; n++ )
-			{
-				IInputDevice device = _hle.Emulator.IO[ n ] as IInputDevice;
-				if( device != null )
-					devices.Add( device );
-			}
-
 			try
 			{
 				while( _threadRunning == true )
@@ -117,10 +109,9 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 					ControlSample sample = new ControlSample();
 					sample.Timestamp = ( uint )( _kernel.RunTime * 1000 );
 
-					for( int n = 0; n < devices.Count; n++ )
+					IInputDevice device = _hle.Emulator.Input;
+					if( device != null )
 					{
-						IInputDevice device = devices[ n ];
-						
 						device.Poll();
 						sample.Buttons |= device.Buttons;
 						float max = ushort.MaxValue;
@@ -128,13 +119,13 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 							sample.AnalogX = ( int )( ( ( ( float )device.AnalogX / max ) + 0.5f ) * 256 );
 						if( sample.AnalogY == 0 )
 							sample.AnalogY = ( int )( ( ( -( float )device.AnalogY / max ) + 0.5f ) * 256 );
-					}
 
-					lock( this )
-					{
-						_buffer.Add( sample );
-						if( _buffer.Count == 1 )
-							_dataPresent.Set();
+						lock( this )
+						{
+							_buffer.Add( sample );
+							if( _buffer.Count == 1 )
+								_dataPresent.Set();
+						}
 					}
 
 					Thread.Sleep( InputPollInterval );
