@@ -28,6 +28,8 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 		}
 
+		void SetGeneralRegister( int register, int value );
+
 		object Context
 		{
 			get;

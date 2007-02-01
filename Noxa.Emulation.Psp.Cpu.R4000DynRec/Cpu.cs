@@ -313,6 +313,14 @@ namespace Noxa.Emulation.Psp.Cpu
 			}
 		}
 
+		public IntPtr InternalMemoryPointer
+		{
+			get
+			{
+				return IntPtr.Zero;
+			}
+		}
+
 		public int InternalMemoryBaseAddress
 		{
 			get

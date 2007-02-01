@@ -37,7 +37,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 		protected byte[] _vertexTemp = new byte[ 16 * 1000 ];
 		protected int _vertexTempLength = 0;
 
-		protected CachedVertexBuffer BuildVertexBuffer( int vertexCount, int vertexSize, byte[] buffer, int offset, int length )
+		protected unsafe CachedVertexBuffer BuildVertexBuffer( int vertexCount, int vertexSize, byte* ptr, int length )
 		{
 			VertexTypes vertexType = _context.VertexType;
 
@@ -102,7 +102,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 			unsafe
 			{
-				fixed( byte* sourceBase = &buffer[ offset ] )
+				byte* sourceBase = ptr;
 				fixed( byte* destBase = &_vertexTemp[ 0 ] )
 				{
 					byte* src = sourceBase;

@@ -304,9 +304,9 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 					// Start of thread
 					// Set entry address and argc / argv
 					core.ProgramCounter = _activeThread.EntryAddress; // PC is weird - interpreted needs -4!
-					core.GeneralRegisters[ 29 ] = ( int )_activeThread.StackBlock.Address;
-					core.GeneralRegisters[ 4 ] = _activeThread.ArgumentsLength;
-					core.GeneralRegisters[ 5 ] = _activeThread.ArgumentsPointer;
+					core.SetGeneralRegister( 29, ( int )_activeThread.StackBlock.Address );
+					core.SetGeneralRegister( 4, _activeThread.ArgumentsLength );
+					core.SetGeneralRegister( 5, _activeThread.ArgumentsPointer );
 				}
 
 				_activeThread.State = KernelThreadState.Running;

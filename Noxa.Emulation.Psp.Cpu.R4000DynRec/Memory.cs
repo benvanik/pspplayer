@@ -78,7 +78,7 @@ namespace Noxa.Emulation.Psp.Cpu
 					return *ptr;
 				}
 			}
-			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+			else if( ( address >= 0x00010000 ) && ( address < 0x00013FFF ) )
 			{
 				address -= 0x00010000;
 				fixed( byte* basePointer = _scratchPad )
@@ -87,7 +87,7 @@ namespace Noxa.Emulation.Psp.Cpu
 					return *ptr;
 				}
 			}
-			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+			else if( ( address >= 0x04000000 ) && ( address < 0x041FFFFF ) )
 			{
 				if( _frameBuffer != null )
 					return _frameBuffer.ReadWord( address );
@@ -117,9 +117,9 @@ namespace Noxa.Emulation.Psp.Cpu
 				Array.Copy( _mainMemory, address, buffer, 0, count );
 				return buffer;
 			}
-			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+			else if( ( address >= 0x00010000 ) && ( address < 0x00013FFF ) )
 				throw new NotImplementedException();
-			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+			else if( ( address >= 0x04000000 ) && ( address < 0x041FFFFF ) )
 				throw new NotImplementedException();
 			else
 				return null;
@@ -135,9 +135,9 @@ namespace Noxa.Emulation.Psp.Cpu
 				//destination.Position = pos;
 				return count;
 			}
-			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+			else if( ( address >= 0x00010000 ) && ( address < 0x00013FFF ) )
 				throw new NotImplementedException();
-			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+			else if( ( address >= 0x04000000 ) && ( address < 0x041FFFFF ) )
 				throw new NotImplementedException();
 			else
 				return 0;
@@ -240,12 +240,12 @@ namespace Noxa.Emulation.Psp.Cpu
 				address -= 0x08000000;
 				Array.Copy( bytes, 0, _mainMemory, address, bytes.Length );
 			}
-			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+			else if( ( address >= 0x00010000 ) && ( address < 0x00013FFF ) )
 			{
 				address -= 0x00010000;
 				Array.Copy( bytes, 0, _scratchPad, address, bytes.Length );
 			}
-			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+			else if( ( address >= 0x04000000 ) && ( address < 0x041FFFFF ) )
 			{
 				if( _frameBuffer != null )
 					_frameBuffer.WriteBytes( address, bytes );
@@ -273,9 +273,9 @@ namespace Noxa.Emulation.Psp.Cpu
 				source.Read( _mainMemory, address, count );
 				//source.Position = pos;
 			}
-			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+			else if( ( address >= 0x00010000 ) && ( address < 0x00013FFF ) )
 				throw new NotImplementedException();
-			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+			else if( ( address >= 0x04000000 ) && ( address < 0x041FFFFF ) )
 				throw new NotImplementedException();
 			else
 				Debugger.Break();
@@ -303,7 +303,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public uint GetMemoryHash( int address, int count, uint prime )
 		{
-			if( ( address >= 0x08000000 ) && ( address < 0x9FFFFFF ) )
+			if( ( address >= 0x08000000 ) && ( address < 0x09FFFFFF ) )
 			{
 				address -= 0x08000000;
 
@@ -313,9 +313,9 @@ namespace Noxa.Emulation.Psp.Cpu
 					hash = hash + _mainMemory[ address + n ];
 				return hash % prime;
 			}
-			else if( ( address >= 0x00010000 ) && ( address < 0x00003FFF ) )
+			else if( ( address >= 0x00010000 ) && ( address < 0x00013FFF ) )
 				throw new NotImplementedException();
-			else if( ( address >= 0x04000000 ) && ( address < 0x001FFFFF ) )
+			else if( ( address >= 0x04000000 ) && ( address < 0x041FFFFF ) )
 				throw new NotImplementedException();
 			else
 				throw new NotSupportedException();

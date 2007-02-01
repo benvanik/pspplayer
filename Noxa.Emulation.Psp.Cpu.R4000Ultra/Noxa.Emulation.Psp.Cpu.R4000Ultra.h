@@ -6,9 +6,10 @@
 
 #pragma once
 
-//#include "R4000Cpu.h"
+#include "R4000Cpu.h"
 
 using namespace System;
+using namespace System::Collections::Generic;
 using namespace Noxa::Emulation::Psp;
 
 namespace Noxa {
@@ -79,6 +80,19 @@ namespace Noxa {
 						}
 					}
 
+					property bool IsTestable
+					{
+						virtual bool get()
+						{
+							return false;
+						}
+					}
+
+					virtual IList<ComponentIssue^>^ Test( ComponentParameters^ parameters )
+					{
+						return nullptr;
+					}
+
 					virtual String^ ToString() override
 					{
 						return this->Name;
@@ -99,8 +113,7 @@ namespace Noxa {
 
 					virtual IComponentInstance^ CreateInstance( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 					{
-						//return gcnew R4000Cpu( emulator, parameters );
-						return nullptr;
+						return gcnew R4000Cpu( emulator, parameters );
 					}
 				};
 

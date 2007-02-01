@@ -200,6 +200,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Cpu.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Memory.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stdafx.cpp"
 				>
 				<FileConfiguration
@@ -227,6 +235,42 @@
 			>
 			<File
 				RelativePath=".\Noxa.Emulation.Psp.Cpu.R4000Ultra.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Capabilities.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Clock.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Core.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Cp0.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Cp1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Cp2.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Cpu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Memory.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Statistics.h"
 				>
 			</File>
 			<File
