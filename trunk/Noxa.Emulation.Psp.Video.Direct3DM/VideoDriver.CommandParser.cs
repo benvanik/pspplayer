@@ -185,11 +185,12 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			_context = null;
 		}
 		
-		protected void ParseList( DisplayList list )
+		protected unsafe void ParseList( DisplayList list )
 		{
 			IMemory memory = _emulator.Cpu.Memory;
 			bool supportInternalMemory = _emulator.Cpu.Capabilities.InternalMemorySupported;
 			byte[] internalMemory = _emulator.Cpu.InternalMemory;
+			byte* internalMemoryPtr = ( byte* )_emulator.Cpu.InternalMemoryPointer.ToPointer();
 			int internalMemoryBaseAddress = _emulator.Cpu.InternalMemoryBaseAddress;
 
 			//Debug.WriteLine( string.Format( "VideoDriver: got a complete list with {0} packets", list.Packets.Length ) );
@@ -436,7 +437,16 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 										// If we are trying to read from video memory, this could be negative - need to find a way to do this!
 										Debug.Assert( offset > 0 );
 
-										vb = this.BuildVertexBuffer( vertexCount, vertexSize, internalMemory, offset, bufferLength );
+										if( internalMemory == null )
+										{
+											byte* ptr = internalMemoryPtr + offset;
+											vb = this.BuildVertexBuffer( vertexCount, vertexSize, ptr, bufferLength );
+										}
+										else
+										{
+											fixed( byte* ptr = &internalMemory[ 0 ] )
+												vb = this.BuildVertexBuffer( vertexCount, vertexSize, ptr + offset, bufferLength );
+										}
 									}
 									else
 									{

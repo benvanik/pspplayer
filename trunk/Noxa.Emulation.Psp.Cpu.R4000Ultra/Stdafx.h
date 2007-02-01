@@ -4,4 +4,7 @@
 
 #pragma once
 
+typedef unsigned char byte;
+typedef unsigned int uint;
 
+#define SAFEFREE( x ) { if( x != NULL ) free( x ); x = NULL; }

@@ -120,7 +120,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			ControlRegister |= value << 12;
 		}
 
-		public void SetEnableBits( FpuFlags flags)
+		public void SetEnableBits( FpuFlags flags )
 		{
 			// TODO: optimize - no reason to have a control register!
 			uint value = ( uint )flags;

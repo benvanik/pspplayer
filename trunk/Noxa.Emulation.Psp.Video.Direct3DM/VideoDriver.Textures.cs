@@ -26,13 +26,14 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 	partial class VideoDriver
 	{
-		protected void SetTextures()
+		protected unsafe void SetTextures()
 		{
 			// TODO: the whole texture caching thing needs to be like the vertex buffer cache (based on memory contents)
 			// as right now dynamic textures are not supported
 
 			bool internalMemorySupported = _emulator.Cpu.Capabilities.InternalMemorySupported;
 			byte[] internalMemory = _emulator.Cpu.InternalMemory;
+			byte* internalMemoryPtr = ( byte* )_emulator.Cpu.InternalMemoryPointer.ToPointer();
 			int internalMemoryBaseAddress = _emulator.Cpu.InternalMemoryBaseAddress;
 
 			for( int n = 0; n < _context.Textures.Length; n++ )
@@ -83,7 +84,19 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						texture.Texture = new Texture( _device, texture.Width, texture.Height, 1, Usage.Dynamic, Format.A4R4G4B4, Pool.Default );
 						using( GraphicsStream gb = texture.Texture.LockRectangle( 0, LockFlags.None ) )
 						{
-							gb.Write( internalMemory, offset, length );
+							if( internalMemory != null )
+								gb.Write( internalMemory, offset, length );
+							else
+							{
+								byte* dptr = ( byte* )gb.InternalDataPointer;
+								byte* sptr = internalMemoryPtr + offset;
+								for( int m = 0; m < length; m++ )
+								{
+									*dptr = *sptr;
+									dptr++;
+									sptr++;
+								}
+							}
 							texture.Texture.UnlockRectangle( 0 );
 						}
 

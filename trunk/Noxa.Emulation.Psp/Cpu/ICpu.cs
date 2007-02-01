@@ -69,6 +69,11 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 		}
 
+		IntPtr InternalMemoryPointer
+		{
+			get;
+		}
+
 		int InternalMemoryBaseAddress
 		{
 			get;

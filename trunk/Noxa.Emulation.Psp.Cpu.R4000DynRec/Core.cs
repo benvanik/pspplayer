@@ -95,6 +95,11 @@ namespace Noxa.Emulation.Psp.Cpu
 			}
 		}
 
+		public void SetGeneralRegister( int register, int value )
+		{
+			Registers[ register ] = value;
+		}
+
 		#region Internal context
 
 		private class CoreContext
