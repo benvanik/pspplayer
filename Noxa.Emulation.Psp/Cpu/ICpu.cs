@@ -12,64 +12,6 @@ using Noxa.Emulation.Psp.Debugging;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
-	public enum Endianess
-	{
-		LittleEndian,
-		BigEndian
-	}
-
-	public enum CpuStatisticsCapabilities
-	{
-		None = 0,
-		InstructionsPerSecond = 0x001,
-	}
-
-	public interface ICpuCapabilities
-	{
-		Endianess Endianess
-		{
-			get;
-		}
-
-		bool VectorFpuSupported
-		{
-			get;
-		}
-
-		bool DmaSupported
-		{
-			get;
-		}
-
-		bool AvcSupported
-		{
-			get;
-		}
-
-		bool InternalMemorySupported
-		{
-			get;
-		}
-
-		CpuStatisticsCapabilities SupportedStatistics
-		{
-			get;
-		}
-
-		bool DebuggingSupported
-		{
-			get;
-		}
-	}
-
-	public interface ICpuStatistics
-	{
-		int InstructionsPerSecond
-		{
-			get;
-		}
-	}
-
 	public enum ExecutionMode
 	{
 		Run,

@@ -7,31 +7,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Noxa.Emulation.Psp.Cpu;
 
-namespace Noxa.Emulation.Psp.Bios
+namespace Noxa.Emulation.Psp.Video
 {
-	public interface IBios : IComponentInstance
+	public enum VideoStatisticsCapabilities
 	{
-		IKernel Kernel
+		None = 0,
+		FramesPerSecond = 0x001,
+	}
+
+	public interface IVideoCapabilities
+	{
+		VideoStatisticsCapabilities SupportedStatistics
 		{
 			get;
 		}
-
-		IModule[] Modules
-		{
-			get;
-		}
-
-		BiosFunction[] Functions
-		{
-			get;
-		}
-
-		IModule FindModule( string name );
-		BiosFunction FindFunction( uint nid );
-
-		void RegisterFunction( BiosFunction function );
-		void UnregisterFunction( uint nid );
 	}
 }

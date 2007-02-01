@@ -7,16 +7,40 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.IO;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
-	public interface IMemory
+	public enum MemoryType
 	{
-		IMemorySegment DefineSegment( MemoryType type, string name, int baseAddress, int length );
-		void RegisterSegment( IMemorySegment segment );
-		IMemorySegment FindSegment( string name );
-		IMemorySegment FindSegment( int baseAddress );
+		PhysicalMemory,
+		HardwareMapped
+	}
+
+	public delegate void MemoryChangeDelegate( IMemorySegment segment, int address, int width, int value );
+
+	public interface IMemorySegment
+	{
+		MemoryType MemoryType
+		{
+			get;
+		}
+
+		string Name
+		{
+			get;
+		}
+
+		int BaseAddress
+		{
+			get;
+		}
+
+		int Length
+		{
+			get;
+		}
+
+		event MemoryChangeDelegate MemoryChanged;
 
 		int ReadWord( int address );
 		byte[] ReadBytes( int address, int count );
