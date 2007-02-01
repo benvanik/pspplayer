@@ -8,10 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using System.Diagnostics;
+
 using Noxa.Emulation.Psp.Games;
 using Noxa.Emulation.Psp.Media;
 
@@ -110,6 +112,9 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		{
 			try
 			{
+				if( File.Exists( gamePath ) == false )
+					return null;
+
 				Type deviceType = _emulator.Umd.Factory;
 				IComponent component = ( IComponent )Activator.CreateInstance( deviceType );
 				Debug.Assert( component != null );
