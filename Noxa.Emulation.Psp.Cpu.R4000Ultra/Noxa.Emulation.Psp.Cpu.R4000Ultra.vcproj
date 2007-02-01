@@ -238,6 +238,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Options.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Cache.h"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Capabilities.h"
 				>
 			</File>
@@ -263,6 +271,10 @@
 			</File>
 			<File
 				RelativePath=".\R4000Cpu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000GenContext.h"
 				>
 			</File>
 			<File

@@ -4,15 +4,23 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently,
-// but are changed infrequently
-
 #pragma once
 
-#include "Options.h"
+using namespace System;
+using namespace Noxa::Emulation::Psp;
 
-typedef unsigned char byte;
-typedef unsigned int uint;
+namespace Noxa {
+	namespace Emulation {
+		namespace Psp {
+			namespace Cpu {
 
-#define SAFEFREE( x ) { if( x != NULL ) free( x ); x = NULL; }
+				ref class R4000GenContext
+				{
+				public:
+					R4000GenContext(){}
+				};
+
+			}
+		}
+	}
+}

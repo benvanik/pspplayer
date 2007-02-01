@@ -4,15 +4,8 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently,
-// but are changed infrequently
-
 #pragma once
 
-#include "Options.h"
-
-typedef unsigned char byte;
-typedef unsigned int uint;
-
-#define SAFEFREE( x ) { if( x != NULL ) free( x ); x = NULL; }
+// When enabled, code dealing with certain critical areas that may later
+// be accessed from multiple threads will be gaurded with locks.
+//#define MULTITHREADED
