@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using Noxa.Emulation.Psp.Cpu;
+
 namespace Noxa.Emulation.Psp.Bios
 {
 	#region BiosStubAttribute

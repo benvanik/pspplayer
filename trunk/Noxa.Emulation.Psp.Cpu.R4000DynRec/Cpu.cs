@@ -16,15 +16,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics;
-using Noxa.Emulation.Psp.Utilities;
-using Noxa.Emulation.Psp.Bios;
-using System.Reflection.Emit;
-using Noxa.Emulation.Psp.Cpu.Generation;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Text;
 using System.Threading;
+
+using Noxa.Emulation.Psp.Bios;
+using Noxa.Emulation.Psp.Cpu.Generation;
 using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Utilities;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
@@ -473,13 +474,19 @@ namespace Noxa.Emulation.Psp.Cpu
 
 				block.ExecutionCount++;
 
-				//Debug.WriteLine( string.Format( "Running block 0x{0:X8}", block.Address ) );
+				Debug.WriteLine( string.Format( "Running block 0x{0:X8}", block.Address ) );
 
 #if ACCURATESTATS
 				_core0.BlockCounter = 0;
 #endif
 
-				int ret = block.Pointer( _core0, _memory, _core0.Registers, _syscalls, 0 );
+				int targetInstruction = 0;
+				if( _debugging == true )
+				{
+					// Pick instruction to jump to (0..n)
+				}
+
+				int ret = block.Pointer( _core0, _memory, _core0.Registers, _syscalls, targetInstruction );
 				if( ( ret == 0 ) &&
 					( block.EndsOnSyscall == false ) )
 				{

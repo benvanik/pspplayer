@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\IAudioDriver.cs" />
+    <Compile Include="Bios\BiosFunction.cs" />
     <Compile Include="Bios\IBios.cs" />
     <Compile Include="Bios\IKernel.cs" />
     <Compile Include="Bios\IModule.cs" />
@@ -55,10 +56,13 @@
     <Compile Include="Cpu\IAvcDecoder.cs" />
     <Compile Include="Cpu\IClock.cs" />
     <Compile Include="Cpu\ICpu.cs" />
+    <Compile Include="Cpu\ICpuCapabilities.cs" />
     <Compile Include="Cpu\ICpuCore.cs" />
     <Compile Include="Cpu\ICpuCoreProfiler.cs" />
+    <Compile Include="Cpu\ICpuStatistics.cs" />
     <Compile Include="Cpu\IDmaController.cs" />
     <Compile Include="Cpu\IMemory.cs" />
+    <Compile Include="Cpu\IMemorySegment.cs" />
     <Compile Include="Debugging\Breakpoint.cs" />
     <Compile Include="Debugging\BreakpointEventArgs.cs" />
     <Compile Include="Debugging\CallstackFrame.cs" />
@@ -96,7 +100,9 @@
     <Compile Include="PspDebug.cs" />
     <Compile Include="Utilities\PerformanceTimer.cs" />
     <Compile Include="Video\DisplayProperties.cs" />
+    <Compile Include="Video\IVideoCapabilities.cs" />
     <Compile Include="Video\IVideoDriver.cs" />
+    <Compile Include="Video\IVideoStatistics.cs" />
     <Compile Include="Video\VideoCommand.cs" />
   </ItemGroup>
   <ItemGroup>
