@@ -920,6 +920,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 			block.EndsOnSyscall = ( lastResult == GenerationResult.Syscall );
 			block.InstructionCount = _context.InstructionCount;
+			block.AddressBounds = block.Address + ( block.InstructionCount * 4 );
 			
 			block.Pointer = ( DynamicCodeDelegate )method.CreateDelegate( typeof( DynamicCodeDelegate ) );
 			_codeCache.Add( block );

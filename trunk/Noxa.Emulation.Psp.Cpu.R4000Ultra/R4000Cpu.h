@@ -12,9 +12,11 @@ using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Debugging;
 using namespace Noxa::Emulation::Psp::Utilities;
 
+#include "R4000Cache.h"
 #include "R4000Capabilities.h"
 #include "R4000Clock.h"
 #include "R4000Core.h"
+#include "R4000GenContext.h"
 #include "R4000Memory.h"
 #include "R4000Statistics.h"
 
@@ -35,6 +37,9 @@ namespace Noxa {
 					R4000Statistics^			_stats;
 					R4000Memory^				_memory;
 					R4000Core^					_core0;
+
+					R4000Cache^					_codeCache;
+					R4000GenContext^			_context;
 
 					EventHandler<BreakpointEventArgs^>^ _breakpointTriggeredHandler;
 

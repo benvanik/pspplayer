@@ -24,6 +24,7 @@ namespace Noxa.Emulation.Psp.Cpu
 	class CodeBlock
 	{
 		public int Address;
+		public int AddressBounds;
 		public int InstructionCount;
 		public DynamicCodeDelegate Pointer;
 		public GenerationMethod MethodUsed;
@@ -127,8 +128,8 @@ namespace Noxa.Emulation.Psp.Cpu
 					CodeBlock block = block1[ n ];
 					if( block == null )
 						continue;
-					if( ( block.Address <= address ) &&
-						( block.Address + block.InstructionCount >= address ) )
+					if( ( address >= block.Address ) &&
+						( address <= block.AddressBounds + block.InstructionCount ) )
 						block1[ n ] = null;
 				}
 			}
