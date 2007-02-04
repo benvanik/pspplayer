@@ -482,7 +482,7 @@ namespace Noxa.Emulation.Psp.Cpu
 
 				block.ExecutionCount++;
 
-				Debug.WriteLine( string.Format( "Running block 0x{0:X8}", block.Address ) );
+				//Debug.WriteLine( string.Format( "Running block 0x{0:X8}", block.Address ) );
 
 #if ACCURATESTATS
 				_core0.BlockCounter = 0;

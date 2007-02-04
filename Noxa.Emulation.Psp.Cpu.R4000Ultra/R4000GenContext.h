@@ -7,6 +7,7 @@
 #pragma once
 
 using namespace System;
+using namespace System::Collections::Generic;
 using namespace Noxa::Emulation::Psp;
 
 namespace Noxa {
@@ -14,10 +15,85 @@ namespace Noxa {
 		namespace Psp {
 			namespace Cpu {
 
-				ref class R4000GenContext
+				ref class R4000BlockBuilder;
+				class R4000Generator;
+
+				enum class GenerationResult
+				{
+					Success,
+					Invalid,
+					Syscall,
+
+					Branch,
+					BranchAndNullifyDelay,
+
+					Jump
+				};
+
+				ref class LabelMarker
 				{
 				public:
-					R4000GenContext(){}
+
+					char*	Label;
+					bool	Found;
+					int		Address;
+
+					LabelMarker( int address )
+					{
+						Address = address;
+					}
+				};
+
+				ref class R4000GenContext
+				{
+				protected:
+					R4000BlockBuilder^	_builder;
+					R4000Generator*		_gen;
+
+				public:
+					R4000GenContext( R4000BlockBuilder^ builder, R4000Generator* generator )
+					{
+						_builder = builder;
+						_gen = generator;
+					}
+
+					property R4000Generator* Generator
+					{
+						virtual R4000Generator* get()
+						{
+							return _gen;
+						}
+					}
+
+					int StartAddress;
+					int EndAddress;
+
+					bool UpdatePC;
+
+					Dictionary<int, LabelMarker^>^ BranchLabels;
+					int LastBranchTarget;
+
+					bool InDelay;
+					LabelMarker^ BranchTarget;
+
+					void Reset( int startAddress )
+					{
+						StartAddress = startAddress;
+						EndAddress = startAddress;
+
+						UpdatePC = false;
+
+						BranchLabels->Clear();
+						LastBranchTarget = 0;
+						InDelay = false;
+						BranchTarget = nullptr;
+					}
+
+					bool IsBranchLocal( int address )
+					{
+						return( ( address >= StartAddress ) &&
+							( address <= EndAddress ) );
+					}
 				};
 
 			}

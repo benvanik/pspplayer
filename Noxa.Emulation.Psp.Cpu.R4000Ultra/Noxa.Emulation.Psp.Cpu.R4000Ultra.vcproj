@@ -41,9 +41,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="$(SolutionDir)\Dependencies\SoftWire"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
+				BrowseInformation="1"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -58,8 +60,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit)"
+				AdditionalDependencies="$(SolutionDir)\Dependencies\SoftWire\Debug\SoftWire.lib $(NOINHERIT)"
 				LinkIncremental="2"
+				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
 				TargetMachine="1"
@@ -200,7 +203,43 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000AdvancedBlockBuilder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000BasicBlockBuilder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000BlockBuilder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Cpu.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Generator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Generator_Arithmetic.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Generator_Control.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Generator_Instructions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Generator_Memory.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Generator_Special.cpp"
 				>
 			</File>
 			<File
@@ -242,6 +281,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000AdvancedBlockBuilder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000BasicBlockBuilder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000BlockBuilder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Cache.h"
 				>
 			</File>
@@ -274,7 +325,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Ctx.h"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000GenContext.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Generator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Generator_Instructions.h"
 				>
 			</File>
 			<File
