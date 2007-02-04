@@ -13,6 +13,8 @@
 #include "Options.h"
 
 typedef unsigned char byte;
+typedef unsigned short ushort;
 typedef unsigned int uint;
 
 #define SAFEFREE( x ) { if( x != NULL ) free( x ); x = NULL; }
+#define SAFEDELETE( x ) { if( x != NULL ) delete x; x = NULL; }

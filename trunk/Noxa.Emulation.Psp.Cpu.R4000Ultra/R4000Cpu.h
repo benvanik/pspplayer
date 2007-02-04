@@ -218,6 +218,14 @@ namespace Noxa {
 						}
 					}
 
+					property R4000Cache^ CodeCache
+					{
+						virtual R4000Cache^ get()
+						{
+							return _codeCache;
+						}
+					}
+
 					R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters );
 
 					virtual void EnableDebugging()

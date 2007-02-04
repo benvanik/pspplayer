@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\cygwin\home\noxa\softwire"
+				AdditionalIncludeDirectories="C:\Cache\Dev\Noxa.Emulation\trunk\Dependencies\SoftWire"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="C:\cygwin\home\noxa\softwire\Debug\SoftWire.lib $(NOINHERIT)"
+				AdditionalDependencies="C:\Cache\Dev\Noxa.Emulation\trunk\Dependencies\SoftWire\Debug\SoftWire.lib $(NOINHERIT)"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
