@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "R4000BlockBuilder.h"
+
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace Noxa::Emulation::Psp;
@@ -15,7 +17,7 @@ namespace Noxa {
 		namespace Psp {
 			namespace Cpu {
 
-				ref class R4000BlockBuilder;
+				ref class R4000Memory;
 				class R4000Generator;
 
 				enum class GenerationResult
@@ -55,6 +57,14 @@ namespace Noxa {
 					{
 						_builder = builder;
 						_gen = generator;
+					}
+
+					property R4000Memory^ Memory
+					{
+						virtual R4000Memory^ get()
+						{
+							return _builder->_memory;
+						}
 					}
 
 					property R4000Generator* Generator
