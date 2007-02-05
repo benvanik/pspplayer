@@ -21,6 +21,8 @@ using namespace SoftWire;
 #define EDX g->edx
 #define ESP g->esp
 #define AX g->ax
+#define BX g->bx
+#define CX g->cx
 #define AL g->al
 #define BL g->bl
 #define CL g->cl

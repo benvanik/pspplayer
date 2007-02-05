@@ -1607,6 +1607,9 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 					EmitDirectMemoryReadByte( context );
 
+					context.ILGen.Emit( OpCodes.Conv_I1 );
+					context.ILGen.Emit( OpCodes.Conv_I4 );
+
 					EmitStoreRegister( context, rt );
 				}
 				return GenerationResult.Success;
