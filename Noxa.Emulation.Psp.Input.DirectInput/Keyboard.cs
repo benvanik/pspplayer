@@ -59,6 +59,20 @@ namespace Noxa.Emulation.Psp.Input.DirectInput
 		public event EventHandler Connected;
 		public event EventHandler Disconnected;
 
+		public void OnConnected()
+		{
+			EventHandler handler = this.Connected;
+			if( handler != null )
+				handler( this, EventArgs.Empty );
+		}
+
+		public void OnDisconnected()
+		{
+			EventHandler handler = this.Disconnected;
+			if( handler != null )
+				handler( this, EventArgs.Empty );
+		}
+
 		public IntPtr WindowHandle
 		{
 			get

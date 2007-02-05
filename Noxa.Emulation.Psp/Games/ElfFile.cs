@@ -147,7 +147,7 @@ namespace Noxa.Emulation.Psp.Games
 			public uint Length;
 			public uint LinkInfo;
 			public uint AddressAlignment;
-			public uint EntryLength;
+			//public uint EntryLength;
 
 			// For relocation
 			public ElfSection Reference;
@@ -161,12 +161,12 @@ namespace Noxa.Emulation.Psp.Games
 
 		public class ElfRelocation
 		{
-			public ElfSection Section;
+			//public ElfSection Section;
 			public uint BaseAddress;
 			public ElfRelocationType RelocationType;
 			public uint Symbol;
 			public uint Offset;
-			public uint NewAddress;
+			//public uint NewAddress;
 		}
 
 		public class ElfSymbol

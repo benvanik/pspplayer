@@ -1,9 +1,0 @@
-SoftWire.ncb
-SoftWire-VC8.ncb
-Debug
-Release
-*.user
-x64
-StaticLibrary-VC8.ncb
-TestApplication-VC8.ncb
-StaticLibrary-VC8.suo

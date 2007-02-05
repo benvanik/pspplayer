@@ -25,6 +25,8 @@ namespace Noxa.Emulation.Psp.Player.Development
 			if( debugger == null )
 				throw new ArgumentNullException( "debugger" );
 			_debugger = debugger;
+
+			_callstack = new Stack<CallstackFrame>();
 		}
 
 		public void Update( int newAddress )

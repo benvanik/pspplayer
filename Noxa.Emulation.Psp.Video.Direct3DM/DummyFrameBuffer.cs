@@ -80,6 +80,13 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 		public event MemoryChangeDelegate MemoryChanged;
 
+		protected void OnMemoryChanged( IMemorySegment segment, int address, int width, int value )
+		{
+			MemoryChangeDelegate handler = this.MemoryChanged;
+			if( handler != null )
+				handler( segment, address, width, value );
+		}
+
 		public int ReadWord( int address )
 		{
 			throw new NotImplementedException();
