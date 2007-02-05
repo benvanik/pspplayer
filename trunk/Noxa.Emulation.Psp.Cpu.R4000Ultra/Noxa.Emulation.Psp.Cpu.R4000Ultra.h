@@ -32,7 +32,7 @@ namespace Noxa {
 					{
 						virtual String^ get()
 						{
-							return "Unmanaged DynaRec CPU";
+							return "Ultra CPU";
 						}
 					}
 

@@ -239,12 +239,12 @@ void R4000Memory::WriteBytes( int address, array<byte>^ bytes )
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
 		pin_ptr<array<byte>^> ptr = &bytes;
-		memcpy( ptr, MainMemory + ( address - MainMemoryBase ), bytes->Length );
+		memcpy( MainMemory + ( address - MainMemoryBase ), ptr, bytes->Length );
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 	{
 		pin_ptr<array<byte>^> ptr = &bytes;
-		memcpy( ptr, _scratchPad + ( address - ScratchPadBase ), bytes->Length );
+		memcpy( _scratchPad + ( address - ScratchPadBase ), ptr, bytes->Length );
 	}
 	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
 	{
@@ -253,7 +253,7 @@ void R4000Memory::WriteBytes( int address, array<byte>^ bytes )
 		else
 		{
 			pin_ptr<array<byte>^> ptr = &bytes;
-			memcpy( ptr, _frameBufferBytes + ( address - FrameBufferBase ), bytes->Length );
+			memcpy( _frameBufferBytes + ( address - FrameBufferBase ), ptr, bytes->Length );
 		}
 	}
 	else
@@ -271,9 +271,9 @@ void R4000Memory::WriteStream( int address, Stream^ source, int count )
 	{
 		//long pos = source.Position;
 		array<byte>^ buffer = gcnew array<byte>( count );
-		pin_ptr<array<byte>^> ptr = &buffer;
-		memcpy( ptr, MainMemory + ( address - MainMemoryBase ), count );
 		source->Read( buffer, 0, count );
+		pin_ptr<array<byte>^> ptr = &buffer;
+		memcpy( MainMemory + ( address - MainMemoryBase ), ptr, count );
 		//source.Position = pos;
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
