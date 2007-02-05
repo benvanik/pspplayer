@@ -9,6 +9,10 @@
 #include "R4000Core.h"
 #include "R4000Memory.h"
 
+#include "R4000AdvancedBlockBuilder.h"
+#include "R4000Generator.h"
+#include "R4000Ctx.h"
+
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
@@ -31,6 +35,21 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 
 	_lastSyscall = -1;
 	_syscalls = gcnew array<BiosFunction^>( 1024 );
+
+	R4000AdvancedBlockBuilder^ builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
+	R4000Generator* gen = new R4000Generator();
+	_context = gcnew R4000GenContext( builder, gen );
+
+	_bounce = builder->BuildBounce();
+	_ctx = new R4000Ctx();
+}
+
+R4000Cpu::~R4000Cpu()
+{
+	if( _ctx != NULL )
+		delete ( R4000Ctx* )_ctx;
+	_ctx = NULL;
+	SAFEFREE( _bounce );
 }
 
 int R4000Cpu::RegisterSyscall( unsigned int nid )
@@ -57,6 +76,38 @@ int R4000Cpu::ExecuteBlock()
 #endif
 
 	int instructionsExecuted = 0;
+
+	// Get/build block
+	int pc = _core0->PC;
+	CodeBlock^ block = _codeCache->Find( pc );
+	if( block == nullptr )
+		block = _context->_builder->Build( pc );
+	Debug::Assert( block != nullptr );
+
+	// Populate ctx
+	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
+	ctx->PC = pc;
+	//ctx->PCValid = false;
+	//ctx->NullifyDelay = false;
+	memcpy( ctx->Registers, _core0->Registers, sizeof( int ) * 32 );
+	ctx->LO = _core0->LO;
+	ctx->HI = _core0->HI;
+	ctx->Cp1ConditionBit = _core0->Cp1->ConditionBit;
+	// TODO: fixup cp1 to use float* so memcpy can happen
+	pin_ptr<float> cp1r = &_core0->Cp1->Registers[ 0 ];
+	memcpy( ctx->Cp1Registers, ( void* )cp1r, sizeof( float ) * 32 );
+
+	// Bounce in to it
+	bouncefn bounce = ( bouncefn )_bounce;
+	int x = bounce( ctx, ( int )block->Pointer );
+
+	_core0->PC = ctx->PC;
+	_core0->DelayNop = ( ctx->NullifyDelay == 1 ) ? true : false;
+	memcpy( _core0->Registers, ctx->Registers, sizeof( int ) * 32 );
+	_core0->LO = ctx->LO;
+	_core0->HI = ctx->HI;
+	_core0->Cp1->ConditionBit = ( ctx->Cp1ConditionBit == 1 ) ? true : false;
+	memcpy( ( void* )cp1r, ctx->Cp1Registers, sizeof( float ) * 32 );
 
 #ifdef _DEBUG
 	double blockTime = _timer->Elapsed - blockStart;
