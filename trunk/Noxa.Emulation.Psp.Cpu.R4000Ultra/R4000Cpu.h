@@ -41,15 +41,16 @@ namespace Noxa {
 					R4000Memory^				_memory;
 					R4000Core^					_core0;
 
-					R4000Cache^					_codeCache;
-					R4000GenContext^			_context;
-
 					EventHandler<BreakpointEventArgs^>^ _breakpointTriggeredHandler;
 
 #ifdef _DEBUG
 					PerformanceTimer^			_timer;
 					double						_timeSinceLastIpsPrint;
 #endif
+
+				internal:
+					R4000Cache^					_codeCache;
+					R4000GenContext^			_context;
 
 				internal:
 					int							_lastSyscall;

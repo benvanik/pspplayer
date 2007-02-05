@@ -19,7 +19,7 @@ using namespace Noxa::Emulation::Psp::Cpu;
 using namespace SoftWire;
 
 void __fixupBlockJump( void* sourceAddress, int newTarget );
-void __missingBlockThunk( byte builderId, void* targetAddress, void* stackPointer );
+void __missingBlockThunk( void* targetAddress, void* stackPointer );
 
 R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 {
@@ -34,12 +34,6 @@ R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 #endif
 
 	_ctx = gcnew R4000GenContext( this, _gen );
-
-	// For thunk method:
-	if( _builders == nullptr )
-		_builders = gcnew List<R4000BlockBuilder^>();
-	_builders->Add( this );
-	_builderId = _builders->Count - 1;
 }
 
 R4000BlockBuilder::~R4000BlockBuilder()
@@ -148,26 +142,24 @@ void* R4000BlockBuilder::BuildBounce()
 /* Format for a jump that has not been cached (as per method 1 above):
    PUSH ESP				54					push stack pointer
    PUSH NNNNNNNN		68 NN NN NN NN		push target address
-   PUSH XX				6A XX				push builder ID
    MOV EAX, NNNNNNNN	B8 NN NN NN NN		eax = __missingBlockThunk address
    CALL					FF 10				call eax (maybe D0?)
-       15 bytes [THUNKJUMPSIZE]
+       13 bytes [THUNKJUMPSIZE]
 
    This is replaced with the following code:
    MOV EAX, NNNNNNNN	B8 NN NN NN NN		eax = address of target method
    JMP EAX				FF E0				jump to target
    [NOP padding until same as above]
        7 bytes [THUNKJUMPNEWSIZE]
-	     + 8 byte pad (0x90 = NOP)
+	     + 6 byte pad (0x90 = NOP)
 */
-#define THUNKJUMPSIZE		15
+#define THUNKJUMPSIZE		13
 #define THUNKJUMPNEWSIZE	7
 
 void R4000BlockBuilder::EmitJumpBlock( int targetAddress, int sourceAddress )
 {
 	_gen->db( 0x54 );
 	_gen->db( 0x68 ); _gen->dd( targetAddress );		// PUSH targetAddress
-	_gen->db( 0x6A ); _gen->db( ( byte )_builderId );	// PUSH builderId
 	_gen->db( 0xB8 ); _gen->dd( ( int )__missingBlockThunk );	// MOV EAX, &__missingBlockThunk
 	_gen->db( 0xFF ); _gen->db( 0x10 );					// CALL EAX
 }
@@ -202,10 +194,9 @@ void __fixupBlockJump( void* sourceAddress, int newTarget )
 // This method is called by generated code when the target block is not found.
 // Here we try to look it up and see if we can find the block, and if not we
 // generate it. Once we do that, we go back and fix up the caller.
-int __missingBlockThunkM( byte builderId, void* sourceAddress, void* targetAddress, void* stackPointer )
+int __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackPointer )
 {
-	Debug::Assert( ( builderId >= 0 ) && ( builderId < R4000BlockBuilder::_builders->Count ) );
-	R4000BlockBuilder^ builder = R4000BlockBuilder::_builders[ builderId ];
+	R4000BlockBuilder^ builder = R4000Cpu::GlobalCpu->_context->_builder;
 	Debug::Assert( builder != nullptr );
 
 	CodeBlock^ targetBlock = builder->_codeCache->Find( ( int )targetAddress );
@@ -241,11 +232,11 @@ EXTERNC void * _ReturnAddress ( void );
 
 // Unmanaged portion of the thunk
 #pragma warning(disable:4793)
-void __missingBlockThunk( byte builderId, void* targetAddress, void* stackPointer )
+void __missingBlockThunk( void* targetAddress, void* stackPointer )
 {
 	void* sourceAddress = _ReturnAddress();
 
-	int jumpTarget = __missingBlockThunkM( builderId, sourceAddress, targetAddress, stackPointer );
+	int jumpTarget = __missingBlockThunkM( sourceAddress, targetAddress, stackPointer );
 
 	// We cannot do RET, so need to do jump, but must fix up stack pointer first
 	__asm
