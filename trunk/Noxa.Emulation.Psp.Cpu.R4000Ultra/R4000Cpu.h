@@ -29,6 +29,9 @@ namespace Noxa {
 
 				ref class R4000Cpu : ICpu
 				{
+				public:
+					static R4000Cpu^			GlobalCpu;
+
 				protected:
 					IEmulationInstance^			_emu;
 					ComponentParameters^		_params;

@@ -15,6 +15,8 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 {
+	GlobalCpu = this;
+
 	_emu = emulator;
 	_params = parameters;
 	_caps = gcnew R4000Capabilities();

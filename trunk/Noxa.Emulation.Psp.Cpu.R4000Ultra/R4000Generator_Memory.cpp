@@ -28,13 +28,20 @@ void EmitAddressTranslation( R4000Generator *gen )
 
 int __readMemoryThunk( int targetAddress )
 {
-	// Need to somehow do a memory ReadWord
-	return 0;
+	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
+	Debug::Assert( cpu != nullptr );
+	if( cpu != nullptr )
+		return cpu->Memory->ReadWord( targetAddress );
+	else
+		return 0;
 }
 
 void __writeMemoryThunk( int targetAddress, int width, int value )
 {
-	// Need to somehow do a memory WriteWord
+	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
+	Debug::Assert( cpu != nullptr );
+	if( cpu != nullptr )
+		cpu->Memory->WriteWord( targetAddress, width, value );
 	return;
 }
 
