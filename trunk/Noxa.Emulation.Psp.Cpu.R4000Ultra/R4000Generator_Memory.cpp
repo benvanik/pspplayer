@@ -345,17 +345,6 @@ GenerationResult LL( R4000GenContext^ context, int pass, int address, uint code,
 	return GenerationResult::Invalid;
 }
 
-GenerationResult LWCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
-{
-	if( pass == 0 )
-	{
-	}
-	else if( pass == 1 )
-	{
-	}
-	return GenerationResult::Invalid;
-}
-
 GenerationResult SC( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
 	if( pass == 0 )
@@ -367,13 +356,66 @@ GenerationResult SC( R4000GenContext^ context, int pass, int address, uint code,
 	return GenerationResult::Invalid;
 }
 
-GenerationResult SWCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+GenerationResult LWCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
+	byte cop = ( byte )( opcode & 0x3 );
+	if( ( cop == 0 ) || ( cop == 2 ) )
+		return GenerationResult::Invalid;
+
 	if( pass == 0 )
 	{
 	}
 	else if( pass == 1 )
 	{
+		g->mov( EAX, MREG( rs ) );
+		g->add( EAX, SE( imm ) );
+		EmitAddressTranslation( g );
+
+		EmitDirectMemoryRead( context, address );
+
+		switch( cop )
+		{
+		case 0:
+			//g->mov( MCP0REG( rt ), EAX );
+			break;
+		case 1:
+			g->mov( MCP1REG( rt ), EAX );
+			break;
+		case 2:
+			//g->mov( MCP2REG( rt ), EAX );
+			break;
+		}
 	}
-	return GenerationResult::Invalid;
+	return GenerationResult::Success;
+}
+
+GenerationResult SWCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
+{
+	byte cop = ( byte )( opcode & 0x3 );
+	if( ( cop == 0 ) || ( cop == 2 ) )
+		return GenerationResult::Invalid;
+
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		g->mov( EAX, MREG( rs ) );
+		g->add( EAX, SE( imm ) );
+		EmitAddressTranslation( g );
+		
+		switch( cop )
+		{
+		case 0:
+			break;
+		case 1:
+			g->mov( EBX, MCP1REG( rt ) );
+			break;
+		case 2:
+			break;
+		}
+
+		EmitDirectMemoryWrite( context, address, 4 );
+	}
+	return GenerationResult::Success;
 }

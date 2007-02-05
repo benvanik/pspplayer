@@ -15,7 +15,11 @@ using namespace Noxa::Emulation::Psp;
 #define CTXNULLDELAY	136
 #define CTXPCVALID		140
 #define CTXPC			144
-#define CTXSIZE			148
+#define CTXCP1REGS		148
+#define CTXCP1CONDBIT	276
+//#define CTXCP0REGS	
+//#define CTXCP0CONTROL	
+#define CTXSIZE			280
 
 namespace Noxa {
 	namespace Emulation {
@@ -27,12 +31,16 @@ namespace Noxa {
 				typedef struct R4000Ctx_t
 				{
 													// Start offset
-					int		Registers[ 32 ];		// +0
+					int		Registers[ 32 ];		// +0 (128)
 					int		LO;						// +128
 					int		HI;						// +132
 					int		NullifyDelay;			// +136
 					int		PCValid;				// +140
 					int		PC;						// +144
+					float	Cp1Registers[ 32 ];		// +148 (128)
+					float	Cp1ConditionBit;		// +276
+					//int		Cp0Registers[ 32 ];		// + (128)
+					//int		Cp0Control[ 32 ];		// + (128)
 				} R4000Ctx;
 				#pragma pack(pop)
 

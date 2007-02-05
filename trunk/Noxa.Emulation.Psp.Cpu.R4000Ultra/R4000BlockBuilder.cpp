@@ -33,6 +33,12 @@ R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 	R4000Generator::disableListing();
 #endif
 
+#ifdef _DEBUG
+#ifdef GENECHOFILE
+	_gen->setEchoFile( GENECHOFILE );
+#endif
+#endif
+
 	_ctx = gcnew R4000GenContext( this, _gen );
 }
 

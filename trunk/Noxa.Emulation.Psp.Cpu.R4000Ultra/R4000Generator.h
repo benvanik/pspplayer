@@ -31,10 +31,12 @@ using namespace SoftWire;
 #define SE( x ) ((int)(short)x)
 
 // Offset of CTX from ESP
-#define CTX			4
-#define MREG( r )	g->dword_ptr[ g->esp + CTX ] + CTXREGS + ( r << 2 )
-#define MLO()		g->dword_ptr[ g->esp + CTX ] + CTXLO 
-#define MHI()		g->dword_ptr[ g->esp + CTX ] + CTXHI
+#define CTX				4
+#define MREG( r )		g->dword_ptr[ g->esp + CTX ] + CTXREGS + ( r << 2 )
+#define MLO()			g->dword_ptr[ g->esp + CTX ] + CTXLO 
+#define MHI()			g->dword_ptr[ g->esp + CTX ] + CTXHI
+#define MCP1REG( r )	g->dword_ptr[ g->esp + CTX ] + CTXCP1REGS + ( r << 2 )
+#define MCP1CONDBIT()	g->dword_ptr[ g->esp + CTX ] + CTXCP1CONDBIT
 
 namespace Noxa {
 	namespace Emulation {
