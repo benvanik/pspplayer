@@ -39,7 +39,6 @@ namespace Noxa {
 					R4000Clock^					_clock;
 					R4000Statistics^			_stats;
 					R4000Memory^				_memory;
-					R4000Core^					_core0;
 
 					EventHandler<BreakpointEventArgs^>^ _breakpointTriggeredHandler;
 
@@ -49,8 +48,13 @@ namespace Noxa {
 #endif
 
 				internal:
+					R4000Core^					_core0;
+
 					R4000Cache^					_codeCache;
 					R4000GenContext^			_context;
+
+					void*						_ctx;
+					void*						_bounce;
 
 				internal:
 					int							_lastSyscall;
@@ -231,6 +235,7 @@ namespace Noxa {
 					}
 
 					R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters );
+					~R4000Cpu();
 
 					virtual void EnableDebugging()
 					{

@@ -32,6 +32,7 @@ R4000BasicBlockBuilder::~R4000BasicBlockBuilder()
 int R4000BasicBlockBuilder::InternalBuild( int startAddress )
 {
 	int count = 0;
+	int endAddress = startAddress;
 	_ctx->Reset( startAddress );
 
 	Debug::WriteLine( String::Format( "!- Generating block at 0x{0:X8}:", startAddress ) );
@@ -48,6 +49,7 @@ int R4000BasicBlockBuilder::InternalBuild( int startAddress )
 		GenerationResult result = GenerationResult::Invalid;
 
 		count++;
+		endAddress = address;
 
 		if( checkNullDelay == true )
 		{
@@ -160,7 +162,7 @@ int R4000BasicBlockBuilder::InternalBuild( int startAddress )
 		{
 			g->jmp( "noNullDelay" );
 			g->label( "nullDelaySkip" );
-			g->mov( g->dword_ptr[ g->esp + CTX ] + CTXNULLDELAY, 0 );
+			g->mov( MNULLDELAY(), 0 );
 			g->label( "noNullDelay" );
 		}
 

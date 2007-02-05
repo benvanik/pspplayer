@@ -849,14 +849,14 @@ namespace Noxa.Emulation.Psp.Cpu
 								ilgen.Emit( OpCodes.Ldloc_3 );
 								ilgen.Emit( OpCodes.Ldc_I4_0 );
 								ilgen.Emit( OpCodes.Beq_S, noBranch );
-								ilgen.Emit( OpCodes.Ldc_I4_1 );
-								ilgen.Emit( OpCodes.Stloc_3 );
+								//ilgen.Emit( OpCodes.Ldc_I4_1 );
+								//ilgen.Emit( OpCodes.Stloc_3 );
 								ilgen.Emit( OpCodes.Ldc_I4, _context.BranchTarget.Address );
 								ilgen.Emit( OpCodes.Stloc_2 );
 								
 								// This is an early exit
 								GenerateTail( _context );
-								ilgen.Emit( OpCodes.Ret );
+								//ilgen.Emit( OpCodes.Ret );
 
 								ilgen.MarkLabel( noBranch );
 

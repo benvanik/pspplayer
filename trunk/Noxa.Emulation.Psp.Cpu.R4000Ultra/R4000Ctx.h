@@ -38,13 +38,13 @@ namespace Noxa {
 					int		PCValid;				// +140
 					int		PC;						// +144
 					float	Cp1Registers[ 32 ];		// +148 (128)
-					float	Cp1ConditionBit;		// +276
+					int		Cp1ConditionBit;		// +276
 					//int		Cp0Registers[ 32 ];		// + (128)
 					//int		Cp0Control[ 32 ];		// + (128)
 				} R4000Ctx;
 				#pragma pack(pop)
 
-				typedef void (*bouncefn)( R4000Ctx* ctx, int targetAddress );
+				typedef int (*bouncefn)( R4000Ctx* ctx, int targetAddress );
 			}
 		}
 	}

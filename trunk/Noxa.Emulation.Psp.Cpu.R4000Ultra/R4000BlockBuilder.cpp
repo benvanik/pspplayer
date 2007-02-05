@@ -90,7 +90,7 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 // It then cleans things up when done.
 void* R4000BlockBuilder::BuildBounce()
 {
-	//void bouncefn( R4000Ctx ctx, int targetAddress );
+	//int bouncefn( R4000Ctx ctx, int targetAddress );
 	
 	// esp + 12 = target address
 	// esp + 8 = ctx ptr
@@ -162,12 +162,12 @@ void* R4000BlockBuilder::BuildBounce()
 #define THUNKJUMPSIZE		13
 #define THUNKJUMPNEWSIZE	7
 
-void R4000BlockBuilder::EmitJumpBlock( int targetAddress, int sourceAddress )
+void R4000BlockBuilder::EmitJumpBlock( int targetAddress )
 {
 	_gen->db( 0x54 );
-	_gen->db( 0x68 ); _gen->dd( targetAddress );		// PUSH targetAddress
+	_gen->db( 0x68 ); _gen->dd( targetAddress );				// PUSH targetAddress
 	_gen->db( 0xB8 ); _gen->dd( ( int )__missingBlockThunk );	// MOV EAX, &__missingBlockThunk
-	_gen->db( 0xFF ); _gen->db( 0x10 );					// CALL EAX
+	_gen->db( 0xFF ); _gen->db( 0x10 );							// CALL EAX
 }
 
 // This method is really tricky. When we emit a method and a jump target is
