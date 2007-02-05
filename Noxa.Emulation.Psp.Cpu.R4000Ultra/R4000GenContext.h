@@ -48,8 +48,10 @@ namespace Noxa {
 
 				ref class R4000GenContext
 				{
-				protected:
+				internal:
 					R4000BlockBuilder^	_builder;
+
+				protected:
 					R4000Generator*		_gen;
 
 				public:

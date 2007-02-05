@@ -34,9 +34,6 @@ namespace Noxa {
 					R4000GenContext^	_ctx;
 					R4000Generator*		_gen;
 
-					int					_builderId;
-					static List<R4000BlockBuilder^>^	_builders;
-
 				protected:
 					virtual int InternalBuild( int address ) = 0;
 
