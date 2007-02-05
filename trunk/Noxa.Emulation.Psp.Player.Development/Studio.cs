@@ -166,6 +166,7 @@ namespace Noxa.Emulation.Psp.Player.Development
 		private delegate void OnBreakpointTriggereDelegate( Breakpoint breakpoint );
 		private void OnBreakpointTriggeredHandler( Breakpoint breakpoint )
 		{
+			_debugger.Inspector.Update( breakpoint.Address );
 			if( this.ShowDisassembly( breakpoint.Address ) == false )
 				return;
 			_steppingStatement = _disasmDoc.AddStatement( StatementType.Current, breakpoint.Address );
