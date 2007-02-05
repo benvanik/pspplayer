@@ -106,6 +106,10 @@ namespace Noxa {
 						return( ( address >= StartAddress ) &&
 							( address <= EndAddress ) );
 					}
+
+					void DefineBranchTarget( int address )
+					{
+					}
 				};
 
 			}

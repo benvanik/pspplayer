@@ -35,6 +35,9 @@ using namespace SoftWire;
 #define MREG( r )		g->dword_ptr[ g->esp + CTX ] + CTXREGS + ( r << 2 )
 #define MLO()			g->dword_ptr[ g->esp + CTX ] + CTXLO 
 #define MHI()			g->dword_ptr[ g->esp + CTX ] + CTXHI
+#define MNULLDELAY()	g->dword_ptr[ g->esp + CTX ] + CTXNULLDELAY
+#define MPCVALID()		g->dword_ptr[ g->esp + CTX ] + CTXPCVALID
+#define MPC()			g->dword_ptr[ g->esp + CTX ] + CTXPC
 #define MCP1REG( r )	g->dword_ptr[ g->esp + CTX ] + CTXCP1REGS + ( r << 2 )
 #define MCP1CONDBIT()	g->dword_ptr[ g->esp + CTX ] + CTXCP1CONDBIT
 
