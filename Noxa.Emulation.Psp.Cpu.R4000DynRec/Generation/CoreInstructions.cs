@@ -2538,8 +2538,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.BranchTarget = targetLabel;
 
 					Label l1 = context.ILGen.DefineLabel();
-					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
-					EmitStoreRegister( context, 31 );
 					EmitLoadRegister( context, rs );
 					//context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					//context.ILGen.Emit( OpCodes.Bge, l1 );
@@ -2547,6 +2545,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
+					EmitStoreRegister( context, 31 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -2578,8 +2578,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.BranchTarget = targetLabel;
 
 					Label l1 = context.ILGen.DefineLabel();
-					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
-					EmitStoreRegister( context, 31 );
 					EmitLoadRegister( context, rs );
 					//context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					//context.ILGen.Emit( OpCodes.Blt, l1 );
@@ -2587,6 +2585,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
+					EmitStoreRegister( context, 31 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.MarkLabel( l1 );
@@ -2619,8 +2619,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
-					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
-					EmitStoreRegister( context, 31 );
 					EmitLoadRegister( context, rs );
 					//context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					//context.ILGen.Emit( OpCodes.Bge, l1 );
@@ -2628,6 +2626,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
+					EmitStoreRegister( context, 31 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br_S, l2 );
@@ -2666,8 +2666,6 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 
 					Label l1 = context.ILGen.DefineLabel();
 					Label l2 = context.ILGen.DefineLabel();
-					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
-					EmitStoreRegister( context, 31 );
 					EmitLoadRegister( context, rs );
 					//context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					//context.ILGen.Emit( OpCodes.Blt, l1 );
@@ -2675,6 +2673,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 					context.ILGen.Emit( OpCodes.Shr );
 					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
 					context.ILGen.Emit( OpCodes.Bne_Un, l1 );
+					context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
+					EmitStoreRegister( context, 31 );
 					context.ILGen.Emit( OpCodes.Ldc_I4_1 );
 					context.ILGen.Emit( OpCodes.Stloc_3 );
 					context.ILGen.Emit( OpCodes.Br_S, l2 );
