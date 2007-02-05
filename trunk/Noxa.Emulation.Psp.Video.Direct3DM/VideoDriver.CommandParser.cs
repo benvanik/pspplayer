@@ -239,13 +239,13 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 						// to do the target clear!
 						if( ( packet.Argument & 0x1 ) == 0x1 )
 						{
-							bool clearAny = false;
+							//bool clearAny = false;
 							ClearFlags clearFlags = ClearFlags.Target;
 							if( ( packet.Argument & 0x100 ) != 0 )
 							{
 								// Clear color buffer
 								clearFlags = ClearFlags.Target;
-								clearAny = true;
+								//clearAny = true;
 							}
 							if( ( packet.Argument & 0x200 ) != 0 )
 							{
