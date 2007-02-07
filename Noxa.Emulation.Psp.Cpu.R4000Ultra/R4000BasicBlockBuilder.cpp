@@ -53,7 +53,7 @@ int R4000BasicBlockBuilder::InternalBuild( int startAddress )
 
 		if( checkNullDelay == true )
 		{
-			g->mov( EAX, g->dword_ptr[ g->esp + CTX ] + CTXNULLDELAY );
+			g->mov( EAX, MNULLDELAY( CTXP( _ctx->CtxPointer ) ) );
 			g->cmp( EAX, 1 );
 			g->je( "nullDelaySkip" );
 		}
@@ -162,7 +162,7 @@ int R4000BasicBlockBuilder::InternalBuild( int startAddress )
 		{
 			g->jmp( "noNullDelay" );
 			g->label( "nullDelaySkip" );
-			g->mov( MNULLDELAY(), 0 );
+			g->mov( MNULLDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
 			g->label( "noNullDelay" );
 		}
 

@@ -26,7 +26,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 {
 	int syscall = ( int )( ( code >> 6 ) & 0xFFFFF );
 
-	BiosFunction^ biosFunction = context->Cpu->_syscalls[ syscall ];
+	BiosFunction^ biosFunction = R4000Cpu::GlobalCpu->_syscalls[ syscall ];
 	bool willCall;
 	bool hasReturn;
 	int paramCount;

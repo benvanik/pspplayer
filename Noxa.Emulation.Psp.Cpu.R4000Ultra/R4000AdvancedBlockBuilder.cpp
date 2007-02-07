@@ -27,7 +27,7 @@ R4000AdvancedBlockBuilder::~R4000AdvancedBlockBuilder()
 {
 }
 
-#define MAXCODELENGTH 100
+#define MAXCODELENGTH 1
 
 int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 {
@@ -55,9 +55,17 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 		{
 			GenerationResult result = GenerationResult::Invalid;
 
+			bool inDelay = _ctx->InDelay;
+			uint code = ( uint )_memory->ReadWord( address );
+
+			if( pass == 1 )
+			{
+				g->annotate( "[%#08X]: %08X", address, code );
+			}
+
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )
 			{
-				g->mov( EAX, g->dword_ptr[ g->esp + CTX ] + CTXNULLDELAY );
+				g->mov( EAX, MNULLDELAY( CTXP( _ctx->CtxPointer ) ) );
 				g->cmp( EAX, 1 );
 				g->je( "nullDelaySkip" );
 			}
@@ -82,9 +90,6 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 					_gen->label( lm->Label );
 				}
 			}
-
-			bool inDelay = _ctx->InDelay;
-			uint code = ( uint )_memory->ReadWord( address );
 
 			if( code != 0 )
 			{
@@ -174,6 +179,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 			else
 			{
 				// NOP
+				result = GenerationResult::Success;
 			}
 
 			if( result == GenerationResult::Invalid )
@@ -187,7 +193,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 			{
 				g->jmp( "noNullDelay" );
 				g->label( "nullDelaySkip" );
-				g->mov( MNULLDELAY(), 0 );
+				g->mov( MNULLDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
 				g->label( "noNullDelay" );
 			}
 
@@ -230,8 +236,8 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 
 					if( _ctx->IsBranchLocal( lm->Address ) == true )
 					{
-						g->cmp( MPCVALID(), 1 );
-						g->mov( MPCVALID(), 0 );
+						g->cmp( MPCVALID( CTXP( _ctx->CtxPointer ) ), 1 );
+						g->mov( MPCVALID( CTXP( _ctx->CtxPointer ) ), 0 );
 						g->je( lm->Label );
 					}
 					else
@@ -242,10 +248,10 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 						char noBranch[20];
 						sprintf( noBranch, "l%Xnobr", address );
 
-						g->cmp( MPCVALID(), 1 );
+						g->cmp( MPCVALID( CTXP( _ctx->CtxPointer ) ), 1 );
 						//g->mov( MPCVALID(), 0 ); - keep valid because PC is set
 						g->jne( noBranch );
-						g->mov( MPC(), lm->Address );
+						g->mov( MPC( CTXP( _ctx->CtxPointer ) ), lm->Address );
 
 						// Generate tail to bounce to target block (jump block/etc)
 						GenerateTail( true, lm->Address );
@@ -313,9 +319,9 @@ void R4000AdvancedBlockBuilder::GeneratePreamble()
 {
 	R4000Generator *g = _gen;
 
-	g->mov( MPC(), _ctx->StartAddress );
-	g->mov( MPCVALID(), 0 );
-	g->mov( MNULLDELAY(), 0 );
+	g->mov( MPC( CTXP( _ctx->CtxPointer ) ), _ctx->StartAddress );
+	g->mov( MPCVALID( CTXP( _ctx->CtxPointer ) ), 0 );
+	g->mov( MNULLDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
 }
 
 void __updateCorePC( int newPc )
@@ -336,8 +342,8 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 	{
 		// PC was never touched (wow!) - need to update now ourselves
 		int instructionLength = 4 * ( _ctx->EndAddress - _ctx->StartAddress ) ;
-		g->mov( MPC(), _ctx->StartAddress + instructionLength );
-		g->mov( MPCVALID(), 1 );
+		g->mov( MPC( CTXP( _ctx->CtxPointer ) ), _ctx->StartAddress + instructionLength );
+		g->mov( MPCVALID( CTXP( _ctx->CtxPointer ) ), 1 );
 	}
 
 	if( ( _ctx->UseSyscalls == false ) &&
@@ -345,7 +351,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 	{
 		// Store ctx PC back in to real ctx
 		// This is only needed when we aren't tail jumping
-		g->push( MPC() );
+		g->push( MPC( CTXP( _ctx->CtxPointer ) ) );
 		g->call( (int)__updateCorePC );
 		g->add( g->esp, 4 );
 	}

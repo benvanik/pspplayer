@@ -44,7 +44,7 @@ namespace Noxa {
 				} R4000Ctx;
 				#pragma pack(pop)
 
-				typedef int (*bouncefn)( R4000Ctx* ctx, int targetAddress );
+				typedef int (*bouncefn)( int targetAddress );
 			}
 		}
 	}

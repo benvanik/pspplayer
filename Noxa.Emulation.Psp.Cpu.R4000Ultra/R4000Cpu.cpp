@@ -8,6 +8,7 @@
 #include "R4000Cpu.h"
 #include "R4000Core.h"
 #include "R4000Memory.h"
+#include "R4000Cache.h"
 
 #include "R4000AdvancedBlockBuilder.h"
 #include "R4000Generator.h"
@@ -27,6 +28,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_clock = gcnew R4000Clock();
 	_memory = gcnew R4000Memory();
 	_core0 = gcnew R4000Core( this );
+	_codeCache = gcnew R4000Cache();
 
 #ifdef _DEBUG
 	_timer = gcnew PerformanceTimer();
@@ -36,12 +38,14 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_lastSyscall = -1;
 	_syscalls = gcnew array<BiosFunction^>( 1024 );
 
+	// Ugly: has to be above the block builder constructor!
+	_ctx = new R4000Ctx();
+
 	R4000AdvancedBlockBuilder^ builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	R4000Generator* gen = new R4000Generator();
 	_context = gcnew R4000GenContext( builder, gen );
 
 	_bounce = builder->BuildBounce();
-	_ctx = new R4000Ctx();
 }
 
 R4000Cpu::~R4000Cpu()
@@ -99,7 +103,7 @@ int R4000Cpu::ExecuteBlock()
 
 	// Bounce in to it
 	bouncefn bounce = ( bouncefn )_bounce;
-	int x = bounce( ctx, ( int )block->Pointer );
+	int x = bounce( ( int )block->Pointer );
 
 	_core0->PC = ctx->PC;
 	_core0->DelayNop = ( ctx->NullifyDelay == 1 ) ? true : false;
