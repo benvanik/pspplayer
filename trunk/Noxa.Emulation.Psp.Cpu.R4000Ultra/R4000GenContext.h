@@ -69,6 +69,8 @@ namespace Noxa {
 					{
 						_builder = builder;
 						_gen = generator;
+
+						BranchLabels = gcnew Dictionary<int, LabelMarker^>();
 					}
 
 					property R4000Memory^ Memory
@@ -98,6 +100,8 @@ namespace Noxa {
 
 					bool InDelay;
 					LabelMarker^ BranchTarget;
+
+					void* CtxPointer;
 
 					void Reset( int startAddress )
 					{

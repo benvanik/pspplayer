@@ -31,9 +31,10 @@ GenerationResult SLL( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
 		g->shl( EAX, shamt );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -48,9 +49,10 @@ GenerationResult SRL( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
 		g->shr( EAX, shamt );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -65,9 +67,10 @@ GenerationResult SRA( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rt ) );
+		LOADCTXBASE( EBX );
+		g->mov( EAX, MREG( EBX, rt ) );
 		g->sar( EAX, shamt );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( EBX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -82,12 +85,13 @@ GenerationResult SLLV( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rt ) );
-		g->mov( EBX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
+		g->mov( EBX, MREG( CTX, rs ) );
 		g->and( EBX, 0x1F );
 		g->mov( CL, BL );
 		g->shl( EAX, CL );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -102,12 +106,13 @@ GenerationResult SRLV( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rt ) );
-		g->mov( EBX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
+		g->mov( EBX, MREG( CTX, rs ) );
 		g->and( EBX, 0x1F );
 		g->mov( CL, BL );
 		g->shr( EAX, CL );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -122,12 +127,13 @@ GenerationResult SRAV( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rt ) );
-		g->mov( EBX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
+		g->mov( EBX, MREG( CTX, rs ) );
 		g->and( EBX, 0x1F );
 		g->mov( CL, BL );
 		g->sar( EAX, CL );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -144,11 +150,12 @@ GenerationResult MOVZ( R4000GenContext^ context, int pass, int address, uint cod
 	{
 		char label[20];
 		sprintf( label, "l%X", address );
-		g->mov( EAX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
 		g->cmp( EAX, 0 );
 		g->jne( label );
-		g->mov( EAX, MREG( rs ) );
-		g->mov( MREG( rd ), EAX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( MREG( CTX, rd ), EAX );
 		g->label( label );
 	}
 	return GenerationResult::Success;
@@ -166,11 +173,12 @@ GenerationResult MOVN( R4000GenContext^ context, int pass, int address, uint cod
 	{
 		char label[20];
 		sprintf( label, "l%X", address );
-		g->mov( EAX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
 		g->cmp( EAX, 0 );
 		g->je( label );
-		g->mov( EAX, MREG( rs ) );
-		g->mov( MREG( rd ), EAX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( MREG( CTX, rd ), EAX );
 		g->label( label );
 	}
 	return GenerationResult::Success;
@@ -186,8 +194,9 @@ GenerationResult MFHI( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MHI() );
-		g->mov( MREG( rd ), EAX );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MHI( CTX ) );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -199,8 +208,9 @@ GenerationResult MTHI( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( MHI(), EAX );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( MHI( CTX ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -215,8 +225,9 @@ GenerationResult MFLO( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MLO() );
-		g->mov( MREG( rd ), EAX );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MLO( CTX ) );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -228,8 +239,9 @@ GenerationResult MTLO( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( MLO(), EAX );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( MLO( CTX ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -241,10 +253,11 @@ GenerationResult MULT( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->imul( MREG( rt ) );
-		g->mov( MLO(), EAX );
-		g->mov( MHI(), EDX );
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->imul( MREG( CTX, rt ) );
+		g->mov( MLO( CTX ), EAX );
+		g->mov( MHI( CTX ), EDX );
 	}
 	return GenerationResult::Success;
 }
@@ -256,10 +269,11 @@ GenerationResult MULTU( R4000GenContext^ context, int pass, int address, uint co
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mul( MREG( rt ) );
-		g->mov( MLO(), EAX );
-		g->mov( MHI(), EDX );
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mul( MREG( CTX, rt ) );
+		g->mov( MLO( CTX ), EAX );
+		g->mov( MHI( CTX ), EDX );
 	}
 	return GenerationResult::Success;
 }
@@ -271,11 +285,12 @@ GenerationResult DIV( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->mov( EDX, 0 );
-		g->idiv( MREG( rt ) );
-		g->mov( MLO(), EAX );
-		g->mov( MHI(), EDX );
+		g->idiv( MREG( CTX, rt ) );
+		g->mov( MLO( CTX ), EAX );
+		g->mov( MHI( CTX ), EDX );
 	}
 	return GenerationResult::Success;
 }
@@ -287,11 +302,12 @@ GenerationResult DIVU( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->mov( EDX, 0 );
-		g->div( MREG( rt ) );
-		g->mov( MLO(), EAX );
-		g->mov( MHI(), EDX );
+		g->div( MREG( CTX, rt ) );
+		g->mov( MLO( CTX ), EAX );
+		g->mov( MHI( CTX ), EDX );
 	}
 	return GenerationResult::Success;
 }
@@ -306,10 +322,11 @@ GenerationResult ADD( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->add( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -324,10 +341,11 @@ GenerationResult ADDU( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->add( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -342,10 +360,11 @@ GenerationResult SUB( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->sub( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -360,10 +379,11 @@ GenerationResult SUBU( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->sub( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -378,10 +398,11 @@ GenerationResult AND( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->and( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -396,10 +417,11 @@ GenerationResult OR( R4000GenContext^ context, int pass, int address, uint code,
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->or( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -414,10 +436,11 @@ GenerationResult XOR( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->xor( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -432,11 +455,12 @@ GenerationResult NOR( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->or( EAX, EBX );
 		g->not( EAX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -451,11 +475,12 @@ GenerationResult SLT( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
+		LOADCTXBASE( EDX );
 		g->xor( EBX, EBX );
-		g->mov( EAX, MREG( rs ) );
-		g->cmp( EAX, MREG( rt ) );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->cmp( EAX, MREG( CTX, rt ) );
 		g->setl( BL );
-		g->mov( MREG( rd ), EBX );
+		g->mov( MREG( CTX, rd ), EBX );
 	}
 	return GenerationResult::Success;
 }
@@ -470,11 +495,12 @@ GenerationResult SLTU( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
+		LOADCTXBASE( EDX );
 		g->xor( EBX, EBX );
-		g->mov( EAX, MREG( rs ) );
-		g->cmp( EAX, MREG( rt ) );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->cmp( EAX, MREG( CTX, rt ) );
 		g->setb( BL );
-		g->mov( MREG( rd ), EBX );
+		g->mov( MREG( CTX, rd ), EBX );
 	}
 	return GenerationResult::Success;
 }
@@ -489,11 +515,12 @@ GenerationResult MAX( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->cmp( EAX, EBX );
 		g->cmovl( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -508,11 +535,12 @@ GenerationResult MIN( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
-		g->mov( EBX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->cmp( EAX, EBX );
 		g->cmovg( EAX, EBX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -527,9 +555,10 @@ GenerationResult ADDI( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->add( EAX, SE( imm ) );
-		g->mov( MREG( rt ), EAX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -544,9 +573,10 @@ GenerationResult ADDIU( R4000GenContext^ context, int pass, int address, uint co
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->add( EAX, SE( imm ) );
-		g->mov( MREG( rt ), EAX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -561,11 +591,12 @@ GenerationResult SLTI( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
+		LOADCTXBASE( EDX );
 		g->xor( EBX, EBX );
-		g->mov( EAX, MREG( rs ) );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->cmp( EAX, SE( imm ) );
 		g->setl( BL );
-		g->mov( MREG( rt ), EBX );
+		g->mov( MREG( CTX, rt ), EBX );
 	}
 	return GenerationResult::Success;
 }
@@ -580,11 +611,12 @@ GenerationResult SLTIU( R4000GenContext^ context, int pass, int address, uint co
 	}
 	else if( pass == 1 )
 	{
+		LOADCTXBASE( EDX );
 		g->xor( EBX, EBX );
-		g->mov( EAX, MREG( rs ) );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->cmp( EAX, SE( imm ) );
 		g->setb( BL );
-		g->mov( MREG( rt ), EBX );
+		g->mov( MREG( CTX, rt ), EBX );
 	}
 	return GenerationResult::Success;
 }
@@ -599,9 +631,10 @@ GenerationResult ANDI( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->and( EAX, ZE( imm ) );
-		g->mov( MREG( rt ), EAX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -616,9 +649,10 @@ GenerationResult ORI( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->or( EAX, ZE( imm ) );
-		g->mov( MREG( rt ), EAX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -633,9 +667,10 @@ GenerationResult XORI( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->xor( EAX, ZE( imm ) );
-		g->mov( MREG( rt ), EAX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -650,7 +685,7 @@ GenerationResult LUI( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( MREG( rt ), ( int )( ( uint )imm << 16 ) );
+		g->mov( MREG( CTX, rt ), ( int )( ( uint )imm << 16 ) );
 	}
 	return GenerationResult::Success;
 }
@@ -680,10 +715,11 @@ GenerationResult EXT( R4000GenContext^ context, int pass, int address, uint code
 	{
 		// value =>> pos
 		// value &= bitfield
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->shr( EAX, function );
 		g->and( EAX, bitmask );
-		g->mov( MREG( rt ), EAX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -716,13 +752,14 @@ GenerationResult INS( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rs ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
 		g->and( EAX, rsmask );
 		g->shl( EAX, function );
-		g->mov( EBX, MREG( rt ) );
+		g->mov( EBX, MREG( CTX, rt ) );
 		g->and( EBX, rtmask );
 		g->or( EAX, EBX );
-		g->mov( MREG( rt ), EAX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -737,9 +774,10 @@ GenerationResult SEB( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
 		g->movsx( EAX, AL );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -754,9 +792,10 @@ GenerationResult SEH( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
 		g->movsx( EAX, AX );
-		g->mov( MREG( rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }

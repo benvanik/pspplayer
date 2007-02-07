@@ -122,7 +122,7 @@ namespace Noxa {
 							if( Registers != NULL )
 							{
 								array<int>^ ret = gcnew array<int>( RegisterCount );
-								pin_ptr<array<int>^> ptr = &ret;
+								pin_ptr<int> ptr = &ret[ 0 ];
 								memcpy( ptr, Registers, RegistersSize );
 								return ret;
 							}
