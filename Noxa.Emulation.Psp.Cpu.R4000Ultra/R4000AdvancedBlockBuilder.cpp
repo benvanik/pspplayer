@@ -352,16 +352,17 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 				if( _ctx->LastBranchTarget <= address )
 				{
 					// This is the last jump in the block - need to exit
-					Debug::WriteLine( String::Format( "Jump breakout at {0:X8}", address ) );
+					if( pass == 1 )
+						Debug::WriteLine( String::Format( "Jump breakout at {0:X8}", address ) );
 					breakOut = true;
 					lastResult = result;
 				}
 				else
 				{
 					// Remaining branches and such, so we can exit
-					Debug::WriteLine( String::Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _ctx->LastBranchTarget ) );
 					if( pass == 1 )
 					{
+						Debug::WriteLine( String::Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _ctx->LastBranchTarget ) );
 						jumpDelay = true;
 						_ctx->InDelay = true;
 					}
