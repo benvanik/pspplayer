@@ -33,13 +33,13 @@ using namespace SoftWire;
 #define LOADCTXBASE( xr )	
 #define CTX					CTXP( context->CtxPointer )
 #define CTXP( x )			( ( int )x )
-#define MREG( xr, r )		g->dword_ptr[ xr + CTXREGS + ( ( r + 1 ) << 2 ) ]
+#define MREG( xr, r )		g->dword_ptr[ xr + CTXREGS + ( r << 2 ) ]
 #define MLO( xr )			g->dword_ptr[ xr + CTXLO ]
 #define MHI( xr )			g->dword_ptr[ xr + CTXHI ]
 #define MNULLDELAY( xr )	g->dword_ptr[ xr + CTXNULLDELAY ]
 #define MPCVALID( xr )		g->dword_ptr[ xr + CTXPCVALID ]
 #define MPC( xr )			g->dword_ptr[ xr + CTXPC ]
-#define MCP1REG( xr, r )	g->dword_ptr[ xr + CTXCP1REGS + ( ( r + 1 ) << 2 ) ]
+#define MCP1REG( xr, r )	g->dword_ptr[ xr + CTXCP1REGS + ( r << 2 ) ]
 #define MCP1CONDBIT( xr )	g->dword_ptr[ xr + CTXCP1CONDBIT ]
 
 namespace Noxa {

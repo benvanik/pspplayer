@@ -27,7 +27,7 @@ R4000AdvancedBlockBuilder::~R4000AdvancedBlockBuilder()
 {
 }
 
-#define MAXCODELENGTH 1
+#define MAXCODELENGTH 100
 
 int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 {
@@ -362,14 +362,14 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 		CodeBlock^ block = _ctx->_builder->_codeCache->Find( targetAddress );
 		if( block == nullptr )
 		{
-			Debug::WriteLine( String::Format( "Target block 0x{0:X8} not found, emitting jumpblock" ) );
+			Debug::WriteLine( String::Format( "Target block 0x{0:X8} not found, emitting jumpblock", targetAddress ) );
 
 			// Not found - we write the missing block jump code
 			this->EmitJumpBlock( targetAddress );
 		}
 		else
 		{
-			Debug::WriteLine( String::Format( "Target block 0x{0:X8} found, emitting direct jump" ) );
+			Debug::WriteLine( String::Format( "Target block 0x{0:X8} found, emitting direct jump", targetAddress ) );
 
 			// Can do a direct jump to the translated block
 			g->mov( EAX, ( int )block->Pointer );

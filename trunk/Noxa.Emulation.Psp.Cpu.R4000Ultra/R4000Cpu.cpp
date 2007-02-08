@@ -105,12 +105,15 @@ int R4000Cpu::ExecuteBlock()
 	bouncefn bounce = ( bouncefn )_bounce;
 	int x = bounce( ( int )block->Pointer );
 
-	_core0->PC = ctx->PC;
+	// PC updated via __updateCorePC
+	//_core0->PC = ctx->PC;
 	_core0->DelayNop = ( ctx->NullifyDelay == 1 ) ? true : false;
-	memcpy( _core0->Registers, ctx->Registers, sizeof( int ) * 32 );
+	// Registers in ctx are a memory reference to core0 registers
+	//memcpy( _core0->Registers, ctx->Registers, sizeof( int ) * 32 );
 	_core0->LO = ctx->LO;
 	_core0->HI = ctx->HI;
 	_core0->Cp1->ConditionBit = ( ctx->Cp1ConditionBit == 1 ) ? true : false;
+	// TODO: make cp1 registers in ctx a ref to cp1 registers (fix cp1 registers first)
 	memcpy( ( void* )cp1r, ctx->Cp1Registers, sizeof( float ) * 32 );
 
 #ifdef _DEBUG
