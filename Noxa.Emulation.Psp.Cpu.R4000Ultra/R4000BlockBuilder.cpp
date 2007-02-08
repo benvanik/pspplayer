@@ -96,35 +96,23 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 void* R4000BlockBuilder::BuildBounce()
 {
 	//int bouncefn( int targetAddress );
-	
-	// esp + 12 = target address
-	// esp + 8 = ctx ptr
-	// esp + 4 = caller address
 
 	_gen->int3();
 
 	_gen->push( _gen->ebp );
 	_gen->mov( _gen->ebp, _gen->esp );
-	//_gen->sub( _gen->esp, 4 + 32 );
 
 	_gen->push( _gen->eax );
-	_gen->push( _gen->ebx );
 
-	//_gen->mov( _gen->eax, _gen->dword_ptr[ _gen->esp + 20 ] ); // ctx ptr
-	_gen->mov( _gen->ebx, _gen->dword_ptr[ _gen->esp + 16 ] ); // target address
+	_gen->mov( _gen->eax, _gen->dword_ptr[ _gen->esp + 12 ] ); // target address
 
 	// Nasty, but oh well - note we do this after the above command so we can get those values first
 	_gen->pushad();
 	
-	//_gen->push( _gen->ebx ); // ctx ptr
-	
 	_gen->call( _gen->eax );
-	
-	//_gen->add( _gen->esp, 4 );
 
 	_gen->popad();
 
-	_gen->pop( _gen->ebx );
 	_gen->pop( _gen->eax );
 
 	_gen->mov( _gen->esp, _gen->ebp );
