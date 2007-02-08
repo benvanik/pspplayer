@@ -20,7 +20,7 @@ namespace Noxa {
 				ref class R4000AdvancedBlockBuilder : public R4000BlockBuilder
 				{
 				protected:
-					virtual int InternalBuild( int address ) override;
+					virtual int InternalBuild( int startAddress ) override;
 
 					void GeneratePreamble();
 					void GenerateTail( bool tailJump, int targetAddress );

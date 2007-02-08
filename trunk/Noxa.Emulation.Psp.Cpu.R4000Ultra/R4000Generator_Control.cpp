@@ -25,6 +25,7 @@ GenerationResult JR( R4000GenContext^ context, int pass, int address, uint code,
 {
 	if( pass == 0 )
 	{
+		context->JumpTarget = 0x0;
 	}
 	else if( pass == 1 )
 	{
@@ -42,6 +43,7 @@ GenerationResult JALR( R4000GenContext^ context, int pass, int address, uint cod
 
 	if( pass == 0 )
 	{
+		context->JumpTarget = 0x0;
 	}
 	else if( pass == 1 )
 	{
@@ -57,15 +59,16 @@ GenerationResult JALR( R4000GenContext^ context, int pass, int address, uint cod
 GenerationResult J( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
 	//bool theEnd = ( context->LastBranchTarget <= address );
+	uint target = code & 0x3FFFFFF;
+	uint pc = ( ( uint )address & 0xF0000000 ) | ( target << 2 );
 
 	if( pass == 0 )
 	{
+		context->JumpTarget = pc;
 	}
 	else if( pass == 1 )
 	{
 		LOADCTXBASE( EDX );
-		uint target = code & 0x03FFFFFF;
-		uint pc = ( ( uint )address & 0xF0000000 ) | ( target << 2 );
 		g->mov( MPC( CTX ), pc );
 		g->mov( MPCVALID( CTX ), 1 );
 	}
@@ -75,16 +78,17 @@ GenerationResult J( R4000GenContext^ context, int pass, int address, uint code, 
 GenerationResult JAL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
 	//bool theEnd = ( context->LastBranchTarget <= address );
+	uint target = code & 0x3FFFFFF;
+	uint pc = ( ( uint )address & 0xF0000000 ) | ( target << 2 );
 
 	if( pass == 0 )
 	{
+		context->JumpTarget = pc;
 	}
 	else if( pass == 1 )
 	{
 		LOADCTXBASE( EDX );
 		g->mov( MREG( CTX, 31 ), address + 4 );
-		uint target = code & 0x3FFFFFF;
-		uint pc = ( ( uint )address & 0xF0000000 ) | ( target << 2 );
 		g->mov( MPC( CTX ), pc );
 		g->mov( MPCVALID( CTX ), 1 );
 	}

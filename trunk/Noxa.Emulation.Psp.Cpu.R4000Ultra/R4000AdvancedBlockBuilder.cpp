@@ -13,6 +13,14 @@
 #include "R4000Cache.h"
 #include "R4000Generator.h"
 
+#ifdef _DEBUG
+#ifdef GENECHOFILE
+#ifdef VERBOSEANNOTATE
+#define EMITDEBUG
+#endif
+#endif
+#endif
+
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
@@ -42,6 +50,11 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 	bool jumpDelay = false;
 	GenerationResult lastResult = GenerationResult::Success;
 
+#ifdef EMITDEBUG
+	char codeString[ 150 ];
+#endif
+	char nullDelayLabel[ 30 ];
+
 	for( int pass = 0; pass <= 1; pass++ )
 	{
 		if( pass == 1 )
@@ -58,16 +71,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 			bool inDelay = _ctx->InDelay;
 			uint code = ( uint )_memory->ReadWord( address );
 
-			if( pass == 1 )
-			{
-				g->annotate( "[%#08X]: %08X", address, code );
-			}
+			//this->EmitDebug( address, code );
 
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )
 			{
 				g->mov( EAX, MNULLDELAY( CTXP( _ctx->CtxPointer ) ) );
 				g->cmp( EAX, 1 );
-				g->je( "nullDelaySkip" );
+				sprintf_s( nullDelayLabel, 30, "l%Xnd", address );
+				g->je( nullDelayLabel );
 			}
 
 			if( pass == 0 )
@@ -109,8 +120,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 							byte shamt = ( byte )( ( code >> 6 ) & 0x1F );
 
 							GenerateInstructionR instr = R4000Generator::TableR[ function ];
-							//if( pass == 1 )
-							//	EmitDebugInfo( _ctx, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} rd:{2} shamt:{3}", rs, rt, rd, shamt ) );
+#ifdef EMITDEBUG
+							if( pass == 1 )
+							{
+								const char* name = R4000Generator::TableR_n[ function ];
+								sprintf_s( codeString, 150, "%s rs:%d rt:%d rd:%d shamt:%d", name, rs, rt, rd, shamt );
+								this->EmitDebug( address, code, codeString );
+							}
+#endif
 							result = instr( _ctx, pass, address + 4, code, ( byte )opcode, rs, rt, rd, shamt, function );
 						}
 						break;
@@ -120,8 +137,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 							uint rt = ( code >> 16 ) & 0x1F;
 
 							GenerateInstructionJ instr = R4000Generator::TableJ[ rt ];
-							//if( pass == 1 )
-								//EmitDebugInfo( _ctx, address, code, instr.Method.Name, string.Format( "imm:{0}", imm ) );
+#ifdef EMITDEBUG
+							if( pass == 1 )
+							{
+								const char* name = R4000Generator::TableJ_n[ rt ];
+								sprintf_s( codeString, 150, "%s imm:%d (%#08X)", name, imm, imm );
+								this->EmitDebug( address, code, codeString );
+							}
+#endif
 							result = instr( _ctx, pass, address + 4, code, ( byte )opcode, imm );
 						}
 						break;
@@ -133,8 +156,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 							byte rd = ( byte )( ( code >> 11 ) & 0x1F );
 
 							GenerateInstructionR instr = R4000Generator::TableAllegrex[ function ];
-							//if( pass == 1 )
-								//EmitDebugInfo( _ctx, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} rd:{2}", rs, rt, rd ) );
+#ifdef EMITDEBUG
+							if( pass == 1 )
+							{
+								const char* name = R4000Generator::TableAllegrex_n[ function ];
+								sprintf_s( codeString, 150, "%s rs:%d rt:%d rd:%d", name, rs, rt, rd );
+								this->EmitDebug( address, code, codeString );
+							}
+#endif
 							result = instr( _ctx, pass, address + 4, code, ( byte )opcode, rs, rt, rd, 0, function );
 						}
 						break;
@@ -152,8 +181,19 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 								instr = R4000Generator::TableSpecial3[ bshfl ];
 							else
 								instr = R4000Generator::TableSpecial3[ function ];
-							//if( pass == 1 )
-								//EmitDebugInfo( _ctx, address, code, instr.Method.Name, string.Format( "func:{0}", function ) );
+#ifdef EMITDEBUG
+							if( pass == 1 )
+							{
+								const char* name;
+								if( ( bshfl == 0x0 ) ||
+									( bshfl == 0x4 ) )
+									name = R4000Generator::TableSpecial3_n[ bshfl ];
+								else
+									name = R4000Generator::TableSpecial3_n[ function ];
+								sprintf_s( codeString, 150, "%s rt:%d rd:%d func:%d bshfl:%d", name, rt, rd, function, bshfl );
+								this->EmitDebug( address, code, codeString );
+							}
+#endif
 							result = instr( _ctx, pass, address + 4, code, rt, rd, function, ( ushort )bshfl );
 						}
 						break;
@@ -164,8 +204,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 							ushort imm = ( ushort )( code & 0xFFFF );
 
 							GenerateInstructionI instr = R4000Generator::TableI[ opcode ];
-							//if( pass == 1 )
-								//EmitDebugInfo( _ctx, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} imm:{2}", rs, rt, ( int )( short )imm ) );
+#ifdef EMITDEBUG
+							if( pass == 1 )
+							{
+								const char* name = R4000Generator::TableI_n[ opcode ];
+								sprintf_s( codeString, 150, "%s rs:%d rt:%d imm:%d (%#08X)", name, rs, rt, SE( imm ), SE( imm ) );
+								this->EmitDebug( address, code, codeString );
+							}
+#endif
 							result = instr( _ctx, pass, address + 4, code, ( byte )opcode, rs, rt, imm );
 						}
 						break;
@@ -173,6 +219,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 				}
 				else
 				{
+					Debugger::Break();
 					//result = CoreInstructions.Cop.HandleInstruction( _ctx, 1, address + 4, code );
 				}
 			}
@@ -180,6 +227,13 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 			{
 				// NOP
 				result = GenerationResult::Success;
+#ifdef EMITDEBUG
+				if( pass == 1 )
+				{
+					sprintf_s( codeString, 150, "NOP" );
+					this->EmitDebug( address, code, codeString );
+				}
+#endif
 			}
 
 			if( result == GenerationResult::Invalid )
@@ -191,10 +245,16 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )
 			{
-				g->jmp( "noNullDelay" );
-				g->label( "nullDelaySkip" );
+				sprintf_s( nullDelayLabel, 30, "l%Xnds", address - 4 );
+				g->jmp( nullDelayLabel );
+
+				sprintf_s( nullDelayLabel, 30, "l%Xnd", address - 4 );
+				g->label( nullDelayLabel);
+
 				g->mov( MNULLDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
-				g->label( "noNullDelay" );
+
+				sprintf_s( nullDelayLabel, 30, "l%Xnds", address - 4 );
+				g->label( nullDelayLabel );
 			}
 
 			if( pass == 0 )
@@ -224,8 +284,13 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 				// Could also be in a jump delay, which only happens on non-breakout jumps
 				if( jumpDelay == true )
 				{
-					Debug::WriteLine( "Marking jump delay tail" );
-					GenerateTail( false, 0 );
+					Debug::WriteLine( String::Format( "Marking jump delay tail - target: 0x{0:X8}", _ctx->JumpTarget ) );
+
+					// We may be doing a JR and not have a known target at gen time
+					if( _ctx->JumpTarget != NULL )
+						GenerateTail( true, _ctx->JumpTarget );
+					else
+						GenerateTail( false, 0 );
 
 					_ctx->InDelay = false;
 					jumpDelay = false;
@@ -247,7 +312,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 						Debug::Assert( lm->Address != 0 );
 
 						char noBranch[20];
-						sprintf( noBranch, "l%Xnobr", address );
+						sprintf( noBranch, "l%Xnobr", address - 4 );
 
 						g->cmp( MPCVALID( CTXP( _ctx->CtxPointer ) ), 1 );
 						//g->mov( MPCVALID(), 0 ); - keep valid because PC is set
@@ -286,12 +351,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 				// This is tricky - if lastTargetPc > currentPc, don't break out
 				if( _ctx->LastBranchTarget <= address )
 				{
+					// This is the last jump in the block - need to exit
 					Debug::WriteLine( String::Format( "Jump breakout at {0:X8}", address ) );
 					breakOut = true;
 					lastResult = result;
 				}
 				else
 				{
+					// Remaining branches and such, so we can exit
 					Debug::WriteLine( String::Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _ctx->LastBranchTarget ) );
 					if( pass == 1 )
 					{

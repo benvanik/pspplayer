@@ -88,6 +88,8 @@ int R4000Cpu::ExecuteBlock()
 		block = _context->_builder->Build( pc );
 	Debug::Assert( block != nullptr );
 
+	Debug::WriteLine( String::Format( "Executing block 0x{0:X8}", pc ) );
+
 	// Populate ctx
 	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
 	ctx->PC = pc;
