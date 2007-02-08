@@ -32,6 +32,7 @@ namespace SoftWire
 		const char *getListing() const;
 		void clearListing() const;
 		void setEchoFile(const char *echoFile, const char *mode = "wt");
+		void clearEchoFile();
 		void annotate(const char *format, ...);
 		void reset();
 		int instructionCount();

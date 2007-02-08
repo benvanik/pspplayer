@@ -48,9 +48,9 @@ void __writeMemoryThunk( int targetAddress, int width, int value )
 void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 {
 	char label1[20];
-	sprintf( label1, "l%Xs1", address );
+	sprintf( label1, "l%Xs1", address - 4 );
 	char label2[20];
-	sprintf( label2, "l%Xs2", address );
+	sprintf( label2, "l%Xs2", address - 4 );
 
 	// if < 0x0800000 && > 0x09FFFFFF, skip and do a read from method
 	g->cmp( EAX, 0x08000000 );
@@ -76,9 +76,9 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 {
 	char label1[20];
-	sprintf( label1, "l%Xs1", address );
+	sprintf( label1, "l%Xs1", address - 4 );
 	char label2[20];
-	sprintf( label2, "l%Xs2", address );
+	sprintf( label2, "l%Xs2", address - 4 );
 
 	// if < 0x0800000 && > 0x09FFFFFF, skip and do a write from method
 	g->cmp( EAX, 0x08000000 );

@@ -98,6 +98,8 @@ namespace Noxa {
 					Dictionary<int, LabelMarker^>^ BranchLabels;
 					int LastBranchTarget;
 
+					int JumpTarget;
+
 					bool InDelay;
 					LabelMarker^ BranchTarget;
 
@@ -115,6 +117,7 @@ namespace Noxa {
 						LastBranchTarget = 0;
 						InDelay = false;
 						BranchTarget = nullptr;
+						JumpTarget = 0;
 					}
 
 					bool IsBranchLocal( int address )

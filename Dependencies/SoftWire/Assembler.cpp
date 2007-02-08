@@ -290,6 +290,16 @@ namespace SoftWire
 		fclose(file);
 	}
 
+	void Assembler::clearEchoFile()
+	{
+		if(!echoFile) return;
+
+		FILE *file = fopen(echoFile, "w+");
+		const time_t t = time(0);
+		fprintf(file, "\n;%s\n", ctime(&t));
+		fclose(file);
+	}
+
 	void Assembler::reset()
 	{
 		if(!loader) return;

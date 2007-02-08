@@ -50,6 +50,29 @@ R4000BlockBuilder::~R4000BlockBuilder()
 	SAFEDELETE( _gen );
 }
 
+#ifdef RUNTIMEDEBUG
+
+void __runtimeDebugPrint( int address, int code )
+{
+	Debug::WriteLine( String::Format( "[0x{0:X8}]: {1:X8}", address, code ) );
+}
+
+#endif
+
+void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
+{
+	_gen->annotate( "[%#08X]: %08X\t\t%s", address, code, codeString );
+
+#ifdef RUNTIMEDEBUG
+	_gen->push( ( uint )code );
+	_gen->push( ( uint )address );
+
+	_gen->call( ( int )__runtimeDebugPrint );
+
+	_gen->add( _gen->esp, 8 );
+#endif
+}
+
 /* Execution:
    Blocks require that esp + 4 always point to the R4000Ctx structure. This structure contains
    everything needed for execution.
@@ -65,7 +88,11 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	Debug::Assert( _codeCache->Find( address ) == nullptr );
 #endif
 
-	_gen->annotate( "Block @ [%#08X]:", address );
+#ifdef CLEARECHOFILE
+	_gen->clearEchoFile();
+#endif
+
+	_gen->annotate( "Block @ [%#08X]: ----------------------------------------------------------", address );
 
 	block->InstructionCount = InternalBuild( address );
 
@@ -80,8 +107,8 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 
 #if _DEBUG
 	// Listing
-	const char *listing = _gen->getListing();
-	Debug::WriteLine( String::Format( "{0:X8}:\n", address ) + gcnew String( listing ) );
+	//const char *listing = _gen->getListing();
+	//Debug::WriteLine( String::Format( "{0:X8}:\n", address ) + gcnew String( listing ) );
 #endif
 
 	// Reset so the generator is usable next build
@@ -162,7 +189,7 @@ void* R4000BlockBuilder::BuildBounce()
    PUSH ESP				54					push stack pointer
    PUSH NNNNNNNN		68 NN NN NN NN		push target address
    MOV EAX, NNNNNNNN	B8 NN NN NN NN		eax = __missingBlockThunk address
-   CALL					FF D0				call eax (maybe D0?)
+   CALL					FF D0				call eax
        13 bytes [THUNKJUMPSIZE]
 
    This is replaced with the following code:

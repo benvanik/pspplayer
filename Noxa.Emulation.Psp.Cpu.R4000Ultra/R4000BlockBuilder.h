@@ -35,11 +35,13 @@ namespace Noxa {
 					R4000Generator*		_gen;
 
 				protected:
-					virtual int InternalBuild( int address ) = 0;
+					virtual int InternalBuild( int startAddress ) = 0;
 
 				public:
 					R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core );
 					~R4000BlockBuilder();
+
+					void EmitDebug( int address, int code, char* codeString );
 
 					CodeBlock^ Build( int address );
 					void* BuildBounce();
