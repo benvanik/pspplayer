@@ -201,6 +201,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 			{
 				count++;
 				endAddress = address;
+				_ctx->EndAddress = endAddress;
 			}
 
 			address += 4;

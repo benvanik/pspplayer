@@ -162,7 +162,7 @@ void* R4000BlockBuilder::BuildBounce()
    PUSH ESP				54					push stack pointer
    PUSH NNNNNNNN		68 NN NN NN NN		push target address
    MOV EAX, NNNNNNNN	B8 NN NN NN NN		eax = __missingBlockThunk address
-   CALL					FF 10				call eax (maybe D0?)
+   CALL					FF D0				call eax (maybe D0?)
        13 bytes [THUNKJUMPSIZE]
 
    This is replaced with the following code:
@@ -180,7 +180,7 @@ void R4000BlockBuilder::EmitJumpBlock( int targetAddress )
 	_gen->db( 0x54 );
 	_gen->db( 0x68 ); _gen->dd( targetAddress );				// PUSH targetAddress
 	_gen->db( 0xB8 ); _gen->dd( ( int )__missingBlockThunk );	// MOV EAX, &__missingBlockThunk
-	_gen->db( 0xFF ); _gen->db( 0x10 );							// CALL EAX
+	_gen->db( 0xFF ); _gen->db( 0xD0 );							// CALL EAX
 }
 
 // This method is really tricky. When we emit a method and a jump target is
@@ -230,7 +230,7 @@ int __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackP
 		// Found, just need to do the patchup below
 	}
 
-	int jumpTarget = targetBlock->Address;
+	int jumpTarget = ( int )targetBlock->Pointer;
 
 	__fixupBlockJump( sourceAddress, jumpTarget );
 
