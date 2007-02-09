@@ -254,16 +254,18 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )
 			{
-				sprintf_s( nullDelayLabel, 30, "l%Xnds", address - 4 );
+				sprintf_s( nullDelayLabel, 30, "l%Xnds", address );
 				g->jmp( nullDelayLabel );
 
-				sprintf_s( nullDelayLabel, 30, "l%Xnd", address - 4 );
-				g->label( nullDelayLabel);
+				sprintf_s( nullDelayLabel, 30, "l%Xnd", address );
+				g->label( nullDelayLabel );
 
 				g->mov( MNULLDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
 
-				sprintf_s( nullDelayLabel, 30, "l%Xnds", address - 4 );
+				sprintf_s( nullDelayLabel, 30, "l%Xnds", address );
 				g->label( nullDelayLabel );
+
+				checkNullDelay = false;
 			}
 
 			if( pass == 0 )

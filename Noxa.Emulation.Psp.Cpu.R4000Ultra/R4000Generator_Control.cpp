@@ -215,7 +215,7 @@ GenerationResult BEQL( R4000GenContext^ context, int pass, int address, uint cod
 		g->movzx( EAX, AL );
 		g->mov( MNULLDELAY( CTX ), EAX );
 	}
-	return GenerationResult::Branch;
+	return GenerationResult::BranchAndNullifyDelay;
 }
 
 GenerationResult BNEL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
@@ -242,7 +242,7 @@ GenerationResult BNEL( R4000GenContext^ context, int pass, int address, uint cod
 		g->movzx( EAX, AL );
 		g->mov( MNULLDELAY( CTX ), EAX );
 	}
-	return GenerationResult::Branch;
+	return GenerationResult::BranchAndNullifyDelay;
 }
 
 GenerationResult BLEZL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
