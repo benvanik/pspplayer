@@ -122,7 +122,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 
 			g->call( ( int )__syscallBounce );
 
-			g->add( EAX, 6 * 4 );
+			g->add( ESP, 6 * 4 );
 
 			if( hasReturn == true )
 				g->mov( MREG( CTX, 2 ), EAX );

@@ -133,7 +133,7 @@ void* R4000BlockBuilder::BuildBounce()
 	// Nasty, but oh well - note we do this after the above command so we can get those values first
 	_gen->pushad();
 	
-	_gen->int3();
+	//_gen->int3();
 	_gen->call( _gen->eax );
 
 	_gen->popad();

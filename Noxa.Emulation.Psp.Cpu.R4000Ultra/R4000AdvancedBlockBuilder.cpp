@@ -78,6 +78,15 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 			//this->EmitDebug( address, code );
 
+			// Debug breakpoint on instruction
+#if _DEBUG
+			if( pass == 1 )
+			{
+				if( address == 0x0890038c )
+					g->int3();
+			}
+#endif
+
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )
 			{
 				g->mov( EAX, MNULLDELAY( CTXP( _ctx->CtxPointer ) ) );
@@ -421,7 +430,8 @@ void R4000AdvancedBlockBuilder::GeneratePreamble()
 
 void __updateCorePC( int newPc )
 {
-	R4000Cpu::GlobalCpu->_core0->PC = newPc;
+	//R4000Cpu::GlobalCpu->_core0->PC = newPc;
+	//( ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx )->PC = newPc;
 }
 
 void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )

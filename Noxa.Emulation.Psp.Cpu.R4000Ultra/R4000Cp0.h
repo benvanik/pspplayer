@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "R4000Ctx.h"
+
 using namespace System;
 using namespace Noxa::Emulation::Psp;
 
@@ -36,7 +38,7 @@ namespace Noxa {
 
 				public:
 
-					R4000Cp0( int coreId )
+					R4000Cp0( R4000Ctx* ctx, int coreId )
 					{
 						_coreId = coreId;
 						Registers = gcnew array<int>( 32 );

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "R4000Ctx.h"
+
 using namespace System;
 using namespace Noxa::Emulation::Psp;
 
@@ -20,7 +22,7 @@ namespace Noxa {
 
 				public:
 
-					R4000Cp2()
+					R4000Cp2( R4000Ctx* ctx )
 					{
 					}
 

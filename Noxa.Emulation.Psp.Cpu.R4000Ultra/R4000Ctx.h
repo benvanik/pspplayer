@@ -41,6 +41,7 @@ namespace Noxa {
 					int		Cp1ConditionBit;		// +276
 					//int		Cp0Registers[ 32 ];		// + (128)
 					//int		Cp0Control[ 32 ];		// + (128)
+					int		LL; // unused
 				} R4000Ctx;
 				#pragma pack(pop)
 
