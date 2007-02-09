@@ -6,8 +6,14 @@
 
 #pragma once
 
+#include "R4000Ctx.h"
+
 using namespace System;
+using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
+
+#define Cp1RegisterCount 32
+#define Cp1RegistersSize ( Cp1RegisterCount * sizeof( float ) )
 
 namespace Noxa {
 	namespace Emulation {
@@ -36,6 +42,11 @@ namespace Noxa {
 
 				ref class R4000Cp1
 				{
+				internal:
+					int			_control;
+					int*		_conditionBit;
+					float*		_registers;
+
 				protected:
 
 					ref class R4000Cp1Context
@@ -43,20 +54,44 @@ namespace Noxa {
 					public:
 						array<float>^ GeneralRegisters;
 						int ControlRegister;
+						int ConditionBit;
 					};
 
 				public:
 
-					R4000Cp1()
+					R4000Cp1( R4000Ctx* ctx )
 					{
-						Registers = gcnew array<float>( 32 );
+						_conditionBit = &ctx->Cp1ConditionBit;
+						_registers = ctx->Cp1Registers;
 
 						this->Clear();
 					}
 
-					property int Control;
+					property int Control
+					{
+						virtual int get()
+						{
+							return _control;
+						}
+						virtual void set( int value )
+						{
+							Debug::Assert( false );
+							//_control = value;
+						}
+					}
+
 					property int Implementation;
-					property array<float>^ Registers;
+					
+					property array<float>^ Registers
+					{
+						virtual array<float>^ get()
+						{
+							array<float>^ ret = gcnew array<float>( Cp1RegisterCount );
+							pin_ptr<float> ptr = &ret[ 0 ];
+							memcpy( ptr, _registers, Cp1RegistersSize );
+							return ret;
+						}
+					}
 
 					property Object^ Context
 					{
@@ -64,27 +99,30 @@ namespace Noxa {
 						{
 							R4000Cp1Context^ context = gcnew R4000Cp1Context();
 							context->ControlRegister = Control;
-							context->GeneralRegisters = ( array<float>^ )Registers->Clone();
+							context->ConditionBit = *_conditionBit;
+							context->GeneralRegisters = Registers;
 							return context;
 						}
 						virtual void set( Object^ value )
 						{
 							R4000Cp1Context^ context = ( R4000Cp1Context^ )value;
 							Control = context->ControlRegister;
-							Registers = ( array<float>^ )context->GeneralRegisters->Clone();
+							*_conditionBit = context->ConditionBit;
+							for( int n = 0; n < Cp1RegisterCount; n++ )
+								_registers[ n ] = context->GeneralRegisters[ n ];
 						}
 					}
 
 					virtual void Clear()
 					{
-						for( int n = 0; n < Registers->Length; n++ )
-							Registers[ n ] = 0.0;
+						for( int n = 0; n < Cp1RegisterCount; n++ )
+							_registers[ n ] = 0.0f;
 
 						Implementation = ( ( 0x05 ) << 8 ) | 0x10; // 10 = 0001.0000
 						
-						this->FlushBit = false;
-						this->ConditionBit = false;
-						this->RoundingMode = R4000Cp1RoundingMode::RoundToNearest;
+						//this->FlushBit = false;
+						*_conditionBit = 0;
+						//this->RoundingMode = R4000Cp1RoundingMode::RoundToNearest;
 					}
 
 					// pg 188
@@ -107,13 +145,15 @@ namespace Noxa {
 					{
 						virtual bool get()
 						{
-							return ( ( Control & 0x00800000 ) >> 23 ) == 1 ? true : false;
+							//return ( ( Control & 0x00800000 ) >> 23 ) == 1 ? true : false;
+							return ( *_conditionBit == 1 ) ? true : false;
 						}
 						virtual void set( bool value )
 						{
-							int value1 = ( int )value;
+							/*int value1 = ( int )value;
 							Control &= 0xFF7FFFFF;
-							Control |= value1 << 23;
+							Control |= value1 << 23;*/
+							*_conditionBit = value;
 						}
 					}
 
