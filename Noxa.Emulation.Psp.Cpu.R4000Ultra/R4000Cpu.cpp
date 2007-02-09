@@ -88,7 +88,7 @@ int R4000Cpu::ExecuteBlock()
 		block = _context->_builder->Build( pc );
 	Debug::Assert( block != nullptr );
 
-	Debug::WriteLine( String::Format( "Executing block 0x{0:X8}", pc ) );
+	Debug::WriteLine( String::Format( "Executing block 0x{0:X8} (codegen at 0x{1:X8})", pc, (uint)block->Pointer ) );
 
 	// Populate ctx
 	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
@@ -111,7 +111,7 @@ int R4000Cpu::ExecuteBlock()
 	//_core0->PC = ctx->PC;
 	_core0->DelayNop = ( ctx->NullifyDelay == 1 ) ? true : false;
 	// Registers in ctx are a memory reference to core0 registers
-	//memcpy( _core0->Registers, ctx->Registers, sizeof( int ) * 32 );
+	memcpy( _core0->Registers, ctx->Registers, sizeof( int ) * 32 );
 	_core0->LO = ctx->LO;
 	_core0->HI = ctx->HI;
 	_core0->Cp1->ConditionBit = ( ctx->Cp1ConditionBit == 1 ) ? true : false;

@@ -20,7 +20,7 @@ namespace Noxa {
 				ref class R4000BasicBlockBuilder : public R4000BlockBuilder
 				{
 				protected:
-					virtual int InternalBuild( int address ) override;
+					virtual int InternalBuild( int startAddress, CodeBlock^ block ) override;
 
 				public:
 					R4000BasicBlockBuilder( R4000Cpu^ cpu, R4000Core^ core );

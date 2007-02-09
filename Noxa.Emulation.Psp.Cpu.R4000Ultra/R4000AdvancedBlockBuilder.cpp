@@ -21,6 +21,9 @@
 #endif
 #endif
 
+// If defined, a whole bunch of info will be printed out
+//#define VERBOSEBUILD
+
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
@@ -37,13 +40,15 @@ R4000AdvancedBlockBuilder::~R4000AdvancedBlockBuilder()
 
 #define MAXCODELENGTH 100
 
-int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
+int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block )
 {
 	int count = 0;
 	int endAddress = startAddress;
 	_ctx->Reset( startAddress );
 
+//#ifdef VERBOSEBUILD
 	Debug::WriteLine( String::Format( "!- Generating block at 0x{0:X8}:", startAddress ) );
+//#endif
 
 	R4000Generator *g = _gen;
 
@@ -87,7 +92,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 				LabelMarker^ lm;
 				if( _ctx->BranchLabels->TryGetValue( address, lm ) == true )
 				{
+#ifdef VERBOSEBUILD
 					Debug::WriteLine( String::Format( "Marking label for branch target {0:X8}", address ) );
+#endif
 					lm->Found = true;
 				}
 			}
@@ -97,7 +104,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 				LabelMarker^ lm;
 				if( _ctx->BranchLabels->TryGetValue( address, lm ) == true )
 				{
+#ifdef VERBOSEBUILD
 					Debug::WriteLine( String::Format( "Marking label for branch target {0:X8}", address ) );
+#endif
 					_gen->label( lm->Label );
 				}
 			}
@@ -284,7 +293,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 				// Could also be in a jump delay, which only happens on non-breakout jumps
 				if( jumpDelay == true )
 				{
+#ifdef VERBOSEBUILD
 					Debug::WriteLine( String::Format( "Marking jump delay tail - target: 0x{0:X8}", _ctx->JumpTarget ) );
+#endif
 
 					// We may be doing a JR and not have a known target at gen time
 					if( _ctx->JumpTarget != NULL )
@@ -308,7 +319,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 					}
 					else
 					{
+#ifdef VERBOSEBUILD
 						Debug::WriteLine( String::Format( "Aborting block early because branch target {0:X8} not found", lm->Address ) );
+#endif
 						Debug::Assert( lm->Address != 0 );
 
 						char noBranch[20];
@@ -352,8 +365,11 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 				if( _ctx->LastBranchTarget <= address )
 				{
 					// This is the last jump in the block - need to exit
+#ifdef VERBOSEBUILD
 					if( pass == 1 )
 						Debug::WriteLine( String::Format( "Jump breakout at {0:X8}", address ) );
+#endif
+					// Should this be in pass==1 block?
 					breakOut = true;
 					lastResult = result;
 				}
@@ -362,7 +378,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 					// Remaining branches and such, so we can exit
 					if( pass == 1 )
 					{
+#ifdef VERBOSEBUILD
 						Debug::WriteLine( String::Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _ctx->LastBranchTarget ) );
+#endif
 						jumpDelay = true;
 						_ctx->InDelay = true;
 					}
@@ -380,6 +398,12 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress )
 		if( pass == 1 )
 			GenerateTail( false, 0 );
 	}
+
+	block->EndsOnSyscall = ( lastResult == GenerationResult::Syscall );
+
+//#ifdef VERBOSEBUILD
+	Debug::WriteLine( String::Format( "!- Finished block at 0x{0:X8} ({1} instructions)", startAddress, count ) );
+//#endif
 
 	return count;
 }
@@ -431,14 +455,18 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 		CodeBlock^ block = _ctx->_builder->_codeCache->Find( targetAddress );
 		if( block == nullptr )
 		{
+#ifdef VERBOSEBUILD
 			Debug::WriteLine( String::Format( "Target block 0x{0:X8} not found, emitting jumpblock", targetAddress ) );
+#endif
 
 			// Not found - we write the missing block jump code
 			this->EmitJumpBlock( targetAddress );
 		}
 		else
 		{
+#ifdef VERBOSEBUILD
 			Debug::WriteLine( String::Format( "Target block 0x{0:X8} found, emitting direct jump", targetAddress ) );
+#endif
 
 			// Can do a direct jump to the translated block
 			g->mov( EAX, ( int )block->Pointer );

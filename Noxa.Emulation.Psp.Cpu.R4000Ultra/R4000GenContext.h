@@ -130,7 +130,7 @@ namespace Noxa {
 					{
 						if( BranchLabels->ContainsKey( address ) == false )
 						{
-							Debug::WriteLine( String::Format( "Defining branch target {0:X8}", address ) );
+							//Debug::WriteLine( String::Format( "Defining branch target {0:X8}", address ) );
 							LabelMarker^ lm = gcnew LabelMarker( address );
 							BranchLabels->Add( address, lm );
 						}
