@@ -134,7 +134,8 @@ GenerationResult LB( R4000GenContext^ context, int pass, int address, uint code,
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 
 		EmitDirectMemoryRead( context, address );
@@ -156,7 +157,8 @@ GenerationResult LH( R4000GenContext^ context, int pass, int address, uint code,
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 
 		EmitDirectMemoryRead( context, address );
@@ -189,7 +191,8 @@ GenerationResult LW( R4000GenContext^ context, int pass, int address, uint code,
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 
 		EmitDirectMemoryRead( context, address );
@@ -208,7 +211,8 @@ GenerationResult LBU( R4000GenContext^ context, int pass, int address, uint code
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 
 		EmitDirectMemoryRead( context, address );
@@ -230,7 +234,8 @@ GenerationResult LHU( R4000GenContext^ context, int pass, int address, uint code
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 
 		EmitDirectMemoryRead( context, address );
@@ -263,7 +268,8 @@ GenerationResult SB( R4000GenContext^ context, int pass, int address, uint code,
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 		g->mov( EBX, MREG( CTX, rt ) );
 
@@ -281,7 +287,8 @@ GenerationResult SH( R4000GenContext^ context, int pass, int address, uint code,
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 		g->mov( EBX, MREG( CTX, rt ) );
 
@@ -310,7 +317,8 @@ GenerationResult SW( R4000GenContext^ context, int pass, int address, uint code,
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 		g->mov( EBX, MREG( CTX, rt ) );
 
@@ -377,7 +385,8 @@ GenerationResult LWCz( R4000GenContext^ context, int pass, int address, uint cod
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 
 		EmitDirectMemoryRead( context, address );
@@ -411,7 +420,8 @@ GenerationResult SWCz( R4000GenContext^ context, int pass, int address, uint cod
 	{
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->add( EAX, SE( imm ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
 		
 		switch( cop )

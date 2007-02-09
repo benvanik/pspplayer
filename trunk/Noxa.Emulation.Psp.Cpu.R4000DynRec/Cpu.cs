@@ -5,7 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #define GENTRACE
-//#define VERBOSEEMIT // Legacy
+#define VERBOSEEMIT // Legacy
 //#define REGISTEREMIT // Legacy
 #define STATS
 #if STATS
@@ -597,7 +597,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			_context.Reset( ilgen, startAddress );
 			
 #if GENTRACE
-			Debug.WriteLine( string.Format( "Starting generate for block at 0x{0:X8}", startAddress ) );
+			Debug.WriteLine( string.Format( "!- Generating block at 0x{0:X8}:", startAddress ) );
 #endif
 
 			bool jumpDelay = false;
@@ -688,6 +688,11 @@ namespace Noxa.Emulation.Psp.Cpu
 
 					bool inDelay = _context.InDelay;
 					uint code = ( uint )_memory.ReadWord( address );
+
+#if VERBOSEEMIT
+					if( pass == 1 )
+						EmitDebugInfo( _context, address, code, null, null );
+#endif
 
 					if( code != 0 )
 					{
@@ -925,6 +930,10 @@ namespace Noxa.Emulation.Psp.Cpu
 			block.Pointer = ( DynamicCodeDelegate )method.CreateDelegate( typeof( DynamicCodeDelegate ) );
 			_codeCache.Add( block );
 
+#if GENTRACE
+			Debug.WriteLine( string.Format( "!- Finished block at 0x{0:X8} ({1} instructions)", startAddress, block.InstructionCount ) );
+#endif
+
 #if STATS
 			_stats.CodeBlocksGenerated++;
 
@@ -1087,22 +1096,22 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		#region Legacy debug code
 
-//        [Conditional( "VERBOSEEMIT" )]
-//        internal void EmitDebugInfo( GenerationContext context, int address, uint code, string name, string args )
-//        {
+		[Conditional( "VERBOSEEMIT" )]
+		internal void EmitDebugInfo( GenerationContext context, int address, uint code, string name, string args )
+		{
 //#if DEBUG
 //            if( _debug == false )
 //                return;
 //#endif
 
-//            string line = string.Format( "[0x{0:X8}] {1:X8} {2:8} {3}",
-//                address, code, name, args );
-//            //string line = string.Format( "0x{0:X8}: {1:X8}",
-//            //	address, code );
+			//string line = string.Format( "[0x{0:X8}] {1:X8} {2:8} {3}",
+			//	address, code, name, args );
+			string line = string.Format( "[0x{0:X8}]: {1:X8}",
+				address, code );
 
-//            context.ILGen.Emit( OpCodes.Ldstr, line );
-//            context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
-//        }
+			context.ILGen.Emit( OpCodes.Ldstr, line );
+			context.ILGen.Emit( OpCodes.Call, context.DebugWriteLine );
+		}
 
 //        [Conditional( "REGISTEREMIT" )]
 //        protected void EmitRegisterPrint( ILGenerator ilgen )

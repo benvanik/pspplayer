@@ -22,6 +22,14 @@ using namespace SoftWire;
 
 #define g context->Generator
 
+int __syscallBounce( int syscallId, int a0, int a1, int a2, int a3, int sp )
+{
+	BiosFunction^ function = R4000Cpu::GlobalCpu->_syscalls[ syscallId ];
+	Debug::Assert( function != nullptr );
+
+	return function->Target( R4000Cpu::GlobalCpu->_memory, a0, a1, a2, a3, sp );
+}
+
 GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
 	int syscall = ( int )( ( code >> 6 ) & 0xFFFFF );
@@ -54,111 +62,78 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		if( pass == 0 )
 			Debug::WriteLine( "R4000Generator: unregistered syscall attempt" );
 	}
-/*
-	if( pass == 0 )
-	{
-	}
-	else if( pass == 1 )
+
+	context->UseSyscalls = true;
+
+	if( pass == 1 )
 	{
 		// It's important that we save what we think is the current PC
 		// If we had an UpdatePc, it means a branch has updated it before us
 		// and we need to save it - otherwise, save the PC following us
-		context.ILGen.Emit( OpCodes.Ldarg_0 );
-		if( context.UpdatePc == true )
-			context.ILGen.Emit( OpCodes.Ldloc_2 );
+		if( context->UpdatePC == true )
+		{
+			// Already changed
+		}
 		else
-			context.ILGen.Emit( OpCodes.Ldc_I4, address + 4 );
-		context.ILGen.Emit( OpCodes.Stfld, context.Core0Pc );
+		{
+			g->mov( MPC( CTX ), address + 4 );
+			//g->mov( MPCVALID( CTX ), 1 );
+		}
 
 		if( willCall == true )
 		{
-			// Lame, but we need the object this gets called on and
-			// there is no way to communicate what we know now to the final IL
-			//context.Cpu._syscalls[ syscall ].Target.Target;
-			context.ILGen.Emit( OpCodes.Ldarg_3 );
-			context.ILGen.Emit( OpCodes.Ldc_I4, syscall );
-			context.ILGen.Emit( OpCodes.Ldelem, typeof( BiosFunction ) );
-			context.ILGen.Emit( OpCodes.Ldfld, context.BiosFunctionTarget );
-			context.ILGen.Emit( OpCodes.Call, context.DelegateTargetGet );
-			
-			// Memory
-			context.ILGen.Emit( OpCodes.Ldarg_1 );
-
+			// up to 5 registers (4-7 + 29)
 			if( paramCount > 0 )
 			{
-				EmitLoadRegister( context, 4 );
-				if( paramCount > 1 )
-				{
-					EmitLoadRegister( context, 5 );
-					if( paramCount > 2 )
-					{
-						EmitLoadRegister( context, 6 );
-						if( paramCount > 3 )
-						{
-							EmitLoadRegister( context, 7 );
-							if( paramCount > 4 )
-							{
-								// Maybe this should always go?
-								EmitLoadRegister( context, 29 );
-							}
-							else
-								context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-						}
-						else
-						{
-							context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-							context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-						}
-					}
-					else
-					{
-						context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-						context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-						context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-					}
-				}
+				if( paramCount > 4 )
+					g->push( MREG( CTX, 29 ) );
 				else
-				{
-					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-					context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-				}
+					g->push( ( uint )0 );
+
+				if( paramCount > 3 )
+					g->push( MREG( CTX, 7 ) );
+				else
+					g->push( ( uint )0 );
+
+				if( paramCount > 3 )
+					g->push( MREG( CTX, 6 ) );
+				else
+					g->push( ( uint )0 );
+
+				if( paramCount > 1 )
+					g->push( MREG( CTX, 5 ) );
+				else
+					g->push( ( uint )0 );
+
+				g->push( MREG( CTX, 4 ) );
 			}
 			else
 			{
-				context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-				context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-				context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-				context.ILGen.Emit( OpCodes.Ldc_I4_0 );
-				context.ILGen.Emit( OpCodes.Ldc_I4_0 );
+				g->push( ( uint )0 );
+				g->push( ( uint )0 );
+				g->push( ( uint )0 );
+				g->push( ( uint )0 );
+				g->push( ( uint )0 );
 			}
 
-			if( biosFunction.Target.Method.IsFinal == true )
-				context.ILGen.Emit( OpCodes.Call, biosFunction.Target.Method );
-			else
-				context.ILGen.Emit( OpCodes.Callvirt, biosFunction.Target.Method );
+			g->push( ( uint )syscall );
 
-			// Function returns a value - may need to ignore
+			// 6 ints on stack
+
+			g->call( ( int )__syscallBounce );
+
+			g->add( EAX, 6 * 4 );
+
 			if( hasReturn == true )
-				EmitStoreRegister( context, 2 );
-			else
-				context.ILGen.Emit( OpCodes.Pop );
+				g->mov( MREG( CTX, 2 ), EAX );
 		}
 		else
 		{
-			// When we fail, we need to make sure to handle the cases where
-			// the method has a return or else things could get even worse!
-			if( biosFunction != null )
-			{
-				if( hasReturn == true )
-				{
-					context.ILGen.Emit( OpCodes.Ldc_I4, -1 );
-					EmitStoreRegister( context, 2 );
-				}
-			}
+			if( hasReturn == true )
+				g->mov( MREG( CTX, 2 ), ( int )-1 );
 		}
-	}*/
+	}
+
 	return GenerationResult::Syscall;
 }
 

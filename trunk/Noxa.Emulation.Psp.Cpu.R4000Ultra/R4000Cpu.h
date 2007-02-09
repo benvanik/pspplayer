@@ -38,7 +38,6 @@ namespace Noxa {
 					R4000Capabilities^			_caps;
 					R4000Clock^					_clock;
 					R4000Statistics^			_stats;
-					R4000Memory^				_memory;
 
 					EventHandler<BreakpointEventArgs^>^ _breakpointTriggeredHandler;
 
@@ -48,6 +47,7 @@ namespace Noxa {
 #endif
 
 				internal:
+					R4000Memory^				_memory;
 					R4000Core^					_core0;
 
 					R4000Cache^					_codeCache;

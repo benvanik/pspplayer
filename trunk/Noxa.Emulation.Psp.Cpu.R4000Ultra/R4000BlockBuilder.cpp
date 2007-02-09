@@ -55,6 +55,7 @@ R4000BlockBuilder::~R4000BlockBuilder()
 void __runtimeDebugPrint( int address, int code )
 {
 	Debug::WriteLine( String::Format( "[0x{0:X8}]: {1:X8}", address, code ) );
+	//Debug::WriteLine( String::Format( "reg 31: {0:X8}", ( ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx )->Registers[ 31 ] ) );
 }
 
 #endif
@@ -94,9 +95,7 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 
 	_gen->annotate( "Block @ [%#08X]: ----------------------------------------------------------", address );
 
-	block->InstructionCount = InternalBuild( address );
-
-	// TODO: endsonsyscalls
+	block->InstructionCount = InternalBuild( address, block );
 
 	void* ptr = _gen->callable();
 	block->Pointer = ptr;
@@ -124,8 +123,6 @@ void* R4000BlockBuilder::BuildBounce()
 {
 	//int bouncefn( int targetAddress );
 
-	_gen->int3();
-
 	_gen->push( _gen->ebp );
 	_gen->mov( _gen->ebp, _gen->esp );
 
@@ -136,6 +133,7 @@ void* R4000BlockBuilder::BuildBounce()
 	// Nasty, but oh well - note we do this after the above command so we can get those values first
 	_gen->pushad();
 	
+	_gen->int3();
 	_gen->call( _gen->eax );
 
 	_gen->popad();
@@ -145,8 +143,6 @@ void* R4000BlockBuilder::BuildBounce()
 	_gen->mov( _gen->esp, _gen->ebp );
 	_gen->pop( _gen->ebp );
 
-	_gen->int3();
-	
 	// This assumes caller address on top of the stack, which it should be
 	_gen->ret();
 
