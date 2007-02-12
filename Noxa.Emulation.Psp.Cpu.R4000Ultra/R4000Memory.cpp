@@ -29,6 +29,8 @@ R4000Memory::R4000Memory()
 	MainMemory = ( byte* )malloc( MainMemorySize );
 	_scratchPad = ( byte* )malloc( ScratchPadSize );
 	_frameBufferBytes = ( byte* )malloc( FrameBufferSize );
+
+	memset( MainMemory, 0x0, MainMemorySize );
 }
 
 R4000Memory::~R4000Memory()

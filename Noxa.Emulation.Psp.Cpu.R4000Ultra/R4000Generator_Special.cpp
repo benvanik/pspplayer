@@ -27,6 +27,11 @@ int __syscallBounce( int syscallId, int a0, int a1, int a2, int a3, int sp )
 	BiosFunction^ function = R4000Cpu::GlobalCpu->_syscalls[ syscallId ];
 	Debug::Assert( function != nullptr );
 
+#ifdef SYSCALLSTATS
+	int currentStat = R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ];
+	R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ] = currentStat + 1;
+#endif
+
 	return function->Target( R4000Cpu::GlobalCpu->_memory, a0, a1, a2, a3, sp );
 }
 
@@ -95,7 +100,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				else
 					g->push( ( uint )0 );
 
-				if( paramCount > 3 )
+				if( paramCount > 2 )
 					g->push( MREG( CTX, 6 ) );
 				else
 					g->push( ( uint )0 );

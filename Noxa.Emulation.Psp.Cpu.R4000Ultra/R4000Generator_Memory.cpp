@@ -28,12 +28,7 @@ void EmitAddressTranslation( R4000Generator *gen )
 
 int __readMemoryThunk( int targetAddress )
 {
-	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
-	Debug::Assert( cpu != nullptr );
-	if( cpu != nullptr )
-		return cpu->Memory->ReadWord( targetAddress );
-	else
-		return 0;
+	return R4000Cpu::GlobalCpu->Memory->ReadWord( targetAddress );
 }
 
 void __writeMemoryThunk( int targetAddress, int width, int value )
@@ -66,8 +61,12 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	// case to handle read call
 	g->label( label1 );
 
+	g->push( EAX );
+
 	g->mov( EBX, (int)&__readMemoryThunk );
 	g->call( EBX );
+
+	g->add( ESP, 4 );
 
 	// done
 	g->label( label2 );

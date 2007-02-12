@@ -14,6 +14,7 @@
 #include "R4000Generator.h"
 
 using namespace System::Diagnostics;
+using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace SoftWire;
@@ -29,9 +30,9 @@ R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 	_codeCache = _cpu->CodeCache;
 
 	_gen = new R4000Generator();
-#ifndef _DEBUG
+//#ifndef _DEBUG
 	R4000Generator::disableListing();
-#endif
+//#endif
 
 #ifdef _DEBUG
 #ifdef GENECHOFILE
@@ -51,18 +52,29 @@ R4000BlockBuilder::~R4000BlockBuilder()
 }
 
 #ifdef RUNTIMEDEBUG
-
 void __runtimeDebugPrint( int address, int code )
 {
 	Debug::WriteLine( String::Format( "[0x{0:X8}]: {1:X8}", address, code ) );
 	//Debug::WriteLine( String::Format( "reg 31: {0:X8}", ( ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx )->Registers[ 31 ] ) );
 }
+#endif
 
+#ifdef RUNTIMEREGS
+void __runtimeRegsPrint()
+{
+	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
+	StringBuilder^ sb = gcnew StringBuilder();
+	for( int n = 0; n < 32; n++ )
+		sb->AppendFormat( "{0}={1:X8} ", n, ctx->Registers[ n ] );
+	Debug::WriteLine( sb->ToString() );
+}
 #endif
 
 void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
 {
+#ifdef GENECHOFILE
 	_gen->annotate( "[%#08X]: %08X\t\t%s", address, code, codeString );
+#endif
 
 #ifdef RUNTIMEDEBUG
 	_gen->push( ( uint )code );
@@ -71,6 +83,10 @@ void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
 	_gen->call( ( int )__runtimeDebugPrint );
 
 	_gen->add( _gen->esp, 8 );
+#endif
+
+#ifdef RUNTIMEREGS
+	_gen->call( ( int )__runtimeRegsPrint );
 #endif
 }
 
@@ -81,10 +97,14 @@ void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
 
 CodeBlock^ R4000BlockBuilder::Build( int address )
 {
+#ifdef STATISTICS
+	double blockStart = R4000Cpu::GlobalCpu->_timer->Elapsed;
+#endif
+
 	CodeBlock^ block = gcnew CodeBlock();
 	block->Address = address;
 
-#if _DEBUG
+#ifdef _DEBUG
 	// Don't try to re-add blocks
 	Debug::Assert( _codeCache->Find( address ) == nullptr );
 #endif
@@ -93,7 +113,9 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	_gen->clearEchoFile();
 #endif
 
+#ifdef GENECHOFILE
 	_gen->annotate( "Block @ [%#08X]: ----------------------------------------------------------", address );
+#endif
 
 	block->InstructionCount = InternalBuild( address, block );
 
@@ -104,7 +126,7 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	// Switch possession to us so the reset() doesn't free it
 	_gen->acquire();
 
-#if _DEBUG
+#ifdef _DEBUG
 	// Listing
 	//const char *listing = _gen->getListing();
 	//Debug::WriteLine( String::Format( "{0:X8}:\n", address ) + gcnew String( listing ) );
@@ -114,6 +136,21 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	_gen->reset();
 
 	_codeCache->Add( block );
+
+#ifdef STATISTICS
+	R4000Statistics^ stats = R4000Cpu::GlobalCpu->_stats;
+	stats->CodeBlocksGenerated++;
+
+	double genTime = R4000Cpu::GlobalCpu->_timer->Elapsed - blockStart;
+	if( genTime <= 0.0 )
+		genTime = 0.000001;
+	stats->AverageGenerationTime += genTime;
+
+	stats->AverageCodeBlockLength += block->InstructionCount;
+	if( block->InstructionCount > stats->LargestCodeBlockLength )
+		stats->LargestCodeBlockLength = block->InstructionCount;
+#endif
+
 	return block;
 }
 
@@ -241,16 +278,28 @@ int __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackP
 	R4000BlockBuilder^ builder = R4000Cpu::GlobalCpu->_context->_builder;
 	Debug::Assert( builder != nullptr );
 
+#ifdef STATISTICS
+	R4000Cpu::GlobalCpu->_stats->JumpBlockThunkCalls++;
+#endif
+
 	CodeBlock^ targetBlock = builder->_codeCache->Find( ( int )targetAddress );
 	if( targetBlock == nullptr )
 	{
 		// Not found, must build
 		targetBlock = builder->Build( ( int )targetAddress );
 		Debug::Assert( targetBlock != nullptr );
+
+#ifdef STATISTICS
+		R4000Cpu::GlobalCpu->_stats->JumpBlockThunkBuilds++;
+#endif
 	}
 	else
 	{
 		// Found, just need to do the patchup below
+
+#ifdef STATISTICS
+		R4000Cpu::GlobalCpu->_stats->JumpBlockThunkHits++;
+#endif
 	}
 
 	int jumpTarget = ( int )targetBlock->Pointer;
