@@ -4,7 +4,7 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-#define GENTRACE
+//#define GENTRACE
 //#define VERBOSEEMIT // Legacy
 //#define REGISTEREMIT // Legacy
 #define STATS

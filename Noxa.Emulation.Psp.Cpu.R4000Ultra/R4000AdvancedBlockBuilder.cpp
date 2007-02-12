@@ -46,9 +46,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 	int endAddress = startAddress;
 	_ctx->Reset( startAddress );
 
-//#ifdef VERBOSEBUILD
+#ifdef GENDEBUG
 	Debug::WriteLine( String::Format( "!- Generating block at 0x{0:X8}:", startAddress ) );
-//#endif
+#endif
 
 	R4000Generator *g = _gen;
 
@@ -430,9 +430,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 	block->EndsOnSyscall = ( lastResult == GenerationResult::Syscall );
 
-//#ifdef VERBOSEBUILD
+#ifdef GENDEBUG
 	Debug::WriteLine( String::Format( "!- Finished block at 0x{0:X8} ({1} instructions)", startAddress, count ) );
-//#endif
+#endif
 
 	return count;
 }

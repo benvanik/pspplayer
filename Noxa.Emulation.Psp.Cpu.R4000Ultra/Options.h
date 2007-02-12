@@ -28,6 +28,9 @@
 // When defined with GENECHOFILE, really verbose messages will be added to the file
 //#define VERBOSEANNOTATE
 
+// When defined, generation info will be emitted
+//#define GENDEBUG
+
 // When defined with _DEBUG, each instruction executed will print itself to debug out
 //#define RUNTIMEDEBUG
 //#define RUNTIMEREGS
