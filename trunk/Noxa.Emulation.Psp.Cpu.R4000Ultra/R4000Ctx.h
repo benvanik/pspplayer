@@ -17,9 +17,10 @@ using namespace Noxa::Emulation::Psp;
 #define CTXPC			144
 #define CTXCP1REGS		148
 #define CTXCP1CONDBIT	276
+#define CTXINSTRCOUNT	280
 //#define CTXCP0REGS	
 //#define CTXCP0CONTROL	
-#define CTXSIZE			280
+#define CTXSIZE			284
 
 namespace Noxa {
 	namespace Emulation {
@@ -39,6 +40,7 @@ namespace Noxa {
 					int		PC;						// +144
 					float	Cp1Registers[ 32 ];		// +148 (128)
 					int		Cp1ConditionBit;		// +276
+					int		InstructionCount;		// +280
 					//int		Cp0Registers[ 32 ];		// + (128)
 					//int		Cp0Control[ 32 ];		// + (128)
 					int		LL; // unused

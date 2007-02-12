@@ -13,16 +13,18 @@
 #include "R4000Cache.h"
 #include "R4000Generator.h"
 
-#ifdef _DEBUG
 #ifdef GENECHOFILE
 #ifdef VERBOSEANNOTATE
 #define EMITDEBUG
 #endif
 #endif
-#endif
 
 // If defined, a whole bunch of info will be printed out
 //#define VERBOSEBUILD
+
+// Maximum number of instructions per block - things are NOT handled
+// properly when the code hits this limit, so it should be high!
+#define MAXCODELENGTH 400
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
@@ -37,8 +39,6 @@ R4000AdvancedBlockBuilder::R4000AdvancedBlockBuilder( R4000Cpu^ cpu, R4000Core^ 
 R4000AdvancedBlockBuilder::~R4000AdvancedBlockBuilder()
 {
 }
-
-#define MAXCODELENGTH 100
 
 int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block )
 {
@@ -66,6 +66,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 			GeneratePreamble();
 
 		_ctx->InDelay = false;
+		_ctx->JumpTarget = NULL;
 		bool breakOut = false;
 		bool checkNullDelay = false;
 		int address = startAddress;
@@ -73,17 +74,24 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 		{
 			GenerationResult result = GenerationResult::Invalid;
 
+			Debug::Assert( n < MAXCODELENGTH - 1 );
+
 			bool inDelay = _ctx->InDelay;
 			uint code = ( uint )_memory->ReadWord( address );
 
 			//this->EmitDebug( address, code );
 
-			// Debug breakpoint on instruction
 #if _DEBUG
+			// Debug breakpoint on instruction
+			if( pass == 0 )
+			{
+				//if( address == 0x0890012C )
+				//	Debugger::Break();
+			}
 			if( pass == 1 )
 			{
-				if( address == 0x0890038c )
-					g->int3();
+				//if( address == 0x08900390 )
+				//	g->int3();
 			}
 #endif
 
@@ -119,6 +127,15 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 					_gen->label( lm->Label );
 				}
 			}
+
+#ifdef STATISTICS
+			if( pass == 1 )
+			{
+				// Instruction counter increment - note that it has to be here cause
+				// of null delay and the label marker above
+				g->inc( MINSTRCOUNT( CTXP( _ctx->CtxPointer ) ) );
+			}
+#endif
 
 			if( code != 0 )
 			{
@@ -314,6 +331,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 					else
 						GenerateTail( false, 0 );
 
+					_ctx->JumpTarget = NULL;
 					_ctx->InDelay = false;
 					jumpDelay = false;
 				}
@@ -473,6 +491,10 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 
 			// Not found - we write the missing block jump code
 			this->EmitJumpBlock( targetAddress );
+
+#ifdef STATISTICS
+			R4000Cpu::GlobalCpu->_stats->JumpBlockThunkCount++;
+#endif
 		}
 		else
 		{
@@ -483,6 +505,10 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 			// Can do a direct jump to the translated block
 			g->mov( EAX, ( int )block->Pointer );
 			g->jmp( EAX );
+
+#ifdef STATISTICS
+			R4000Cpu::GlobalCpu->_stats->JumpBlockInlineCount++;
+#endif
 		}
 	}
 	else
@@ -490,5 +516,9 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 		// Return (to bounce)
 		g->mov( EAX, 0 );
 		g->ret();
+
+#ifdef STATISTICS
+		R4000Cpu::GlobalCpu->_stats->CodeBlockRetCount++;
+#endif
 	}
 }

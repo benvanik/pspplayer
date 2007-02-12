@@ -56,7 +56,7 @@ namespace Noxa {
 						Cp2 = gcnew R4000Cp2( ctx );
 
 						PC = &ctx->PC;
-						Registers = ctx->Registers;
+						Registers = &ctx->Registers[ 0 ];
 						HI = &ctx->HI;
 						LO = &ctx->LO;
 						LL = &ctx->LL;

@@ -15,6 +15,8 @@
 #include "R4000Ctx.h"
 
 using namespace System::Diagnostics;
+using namespace System::Reflection;
+using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 
@@ -33,13 +35,15 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_core0 = gcnew R4000Core( this, ( R4000Ctx* )_ctx );
 	_codeCache = gcnew R4000Cache();
 
-#ifdef _DEBUG
+	_stats = gcnew R4000Statistics();
+#ifdef STATISTICS
 	_timer = gcnew PerformanceTimer();
 	_timeSinceLastIpsPrint = 0.0;
 #endif
 
 	_lastSyscall = -1;
 	_syscalls = gcnew array<BiosFunction^>( 1024 );
+	_syscallCounts = gcnew array<int>( 1024 );
 
 	R4000AdvancedBlockBuilder^ builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	R4000Generator* gen = new R4000Generator();
@@ -75,11 +79,11 @@ void R4000Cpu::Cleanup()
 
 int R4000Cpu::ExecuteBlock()
 {
-#ifdef _DEBUG
+#ifdef STATISTICS
 	double blockStart = _timer->Elapsed;
+	if( _stats->RunTime == 0.0 )
+		_stats->RunTime = _timer->Elapsed;
 #endif
-
-	int instructionsExecuted = 0;
 
 	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
 	//if( ctx->PC == 0 )
@@ -89,41 +93,51 @@ int R4000Cpu::ExecuteBlock()
 	int pc = ctx->PC;
 	CodeBlock^ block = _codeCache->Find( pc );
 	if( block == nullptr )
+	{
 		block = _context->_builder->Build( pc );
+#ifdef STATISTICS
+		_stats->CodeCacheMisses++;
+#endif
+	}
+	else
+	{
+#ifdef STATISTICS
+		_stats->CodeCacheHits++;
+#endif
+	}
 	Debug::Assert( block != nullptr );
+
+#ifdef STATISTICS
+	_stats->CodeBlocksExecuted++;
+
+	block->ExecutionCount++;
+#endif
 
 	//Debug::WriteLine( String::Format( "Executing block 0x{0:X8} (codegen at 0x{1:X8})", pc, (uint)block->Pointer ) );
 
 	// Populate ctx
 	//ctx->PCValid = false;
 	//ctx->NullifyDelay = false;
-	//memcpy( ctx->Registers, _core0->Registers, sizeof( int ) * 32 );
-	//ctx->LO = _core0->LO;
-	//ctx->HI = _core0->HI;
-	//ctx->Cp1ConditionBit = _core0->Cp1->ConditionBit;
-	// TODO: fixup cp1 to use float* so memcpy can happen
-	//pin_ptr<float> cp1r = &_core0->Cp1->Registers[ 0 ];
-	//memcpy( ctx->Cp1Registers, ( void* )cp1r, sizeof( float ) * 32 );
+	ctx->InstructionCount = 0;
 
 	// Bounce in to it
 	bouncefn bounce = ( bouncefn )_bounce;
 	int x = bounce( ( int )block->Pointer );
 
 	// PC updated via __updateCorePC
-	//_core0->PC = ctx->PC;
 	_core0->DelayNop = ( ctx->NullifyDelay == 1 ) ? true : false;
-	// Registers in ctx are a memory reference to core0 registers
-	//memcpy( _core0->Registers, ctx->Registers, sizeof( int ) * 32 );
-	//_core0->LO = ctx->LO;
-	//_core0->HI = ctx->HI;
-	//_core0->Cp1->ConditionBit = ( ctx->Cp1ConditionBit == 1 ) ? true : false;
-	// TODO: make cp1 registers in ctx a ref to cp1 registers (fix cp1 registers first)
-	//memcpy( ( void* )cp1r, ctx->Cp1Registers, sizeof( float ) * 32 );
 
-#ifdef _DEBUG
+	int instructionsExecuted = ctx->InstructionCount;
+
+#ifdef STATISTICS
+
+	_stats->InstructionsExecuted += instructionsExecuted;
+
 	double blockTime = _timer->Elapsed - blockStart;
 	if( blockTime <= 0.0 )
 		blockTime = 0.000001;
+
+	_stats->IPS = ( _stats->IPS * .8 ) + ( ( ( double )instructionsExecuted / blockTime ) * .2 );
 	
 	_timeSinceLastIpsPrint += blockTime;
 	if( _timeSinceLastIpsPrint > 1.0 )
@@ -135,4 +149,24 @@ int R4000Cpu::ExecuteBlock()
 #endif
 
 	return instructionsExecuted;
+}
+
+void R4000Cpu::PrintStatistics()
+{
+#ifdef STATISTICS
+		if( _stats->InstructionsExecuted == 0 )
+			return;
+		_stats->AverageCodeBlockLength /= _stats->CodeBlocksGenerated;
+		_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
+		_stats->RunTime = _timer->Elapsed - _stats->RunTime;
+		_stats->IPS = _stats->InstructionsExecuted / _stats->RunTime;
+		StringBuilder^ sb = gcnew StringBuilder();
+		array<FieldInfo^>^ fields = ( R4000Statistics::typeid )->GetFields();
+		for( int n = 0; n < fields->Length; n++ )
+		{
+			Object^ value = fields[ n ]->GetValue( _stats );
+			sb->AppendFormat( "{0}: {1}\n", fields[ n ]->Name, value );
+		}
+		Debug::WriteLine( sb->ToString() );
+#endif
 }

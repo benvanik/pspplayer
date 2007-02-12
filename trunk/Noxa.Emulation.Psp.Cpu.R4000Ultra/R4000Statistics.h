@@ -19,11 +19,35 @@ namespace Noxa {
 				public:
 					R4000Statistics(){}
 
+					int InstructionsExecuted;
+					int CodeBlocksExecuted;
+					int CodeBlocksGenerated;
+
+					int CodeCacheHits;
+					int CodeCacheMisses;
+
+					int AverageCodeBlockLength;
+					int LargestCodeBlockLength;
+
+					int JumpBlockInlineCount;					// # of code blocks ended with an inline jump
+					int JumpBlockThunkCount;					// # of code blocks ended with a jump block thunk
+					int CodeBlockRetCount;						// # of code blocks returned with ret
+
+					int JumpBlockThunkCalls;					// # of times thunks were called
+					int JumpBlockThunkBuilds;					// # of times thunks built new blocks
+					int JumpBlockThunkHits;						// # of times thunks had code cache hits and just did fixups
+
+					double AverageCodeSizeRatio;				// Ratio of MIPS code size to x86 code size
+
+					double AverageGenerationTime;
+					double IPS;
+					double RunTime;
+
 					property int InstructionsPerSecond
 					{
 						virtual int get()
 						{
-							return 0;
+							return ( int )IPS;
 						}
 					}
 				};

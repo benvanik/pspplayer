@@ -37,11 +37,12 @@ namespace Noxa {
 					ComponentParameters^		_params;
 					R4000Capabilities^			_caps;
 					R4000Clock^					_clock;
-					R4000Statistics^			_stats;
-
+					
 					EventHandler<BreakpointEventArgs^>^ _breakpointTriggeredHandler;
 
-#ifdef _DEBUG
+				internal:
+					R4000Statistics^			_stats;
+#ifdef STATISTICS
 					PerformanceTimer^			_timer;
 					double						_timeSinceLastIpsPrint;
 #endif
@@ -59,6 +60,9 @@ namespace Noxa {
 				internal:
 					int							_lastSyscall;
 					array<BiosFunction^>^		_syscalls;
+#ifdef SYSCALLSTATS
+					array<int>^					_syscallCounts;
+#endif
 
 				public:
 
@@ -258,7 +262,7 @@ namespace Noxa {
 
 					virtual int ExecuteBlock();
 
-					virtual void PrintStatistics(){}
+					virtual void PrintStatistics();
 				};
 
 			}
