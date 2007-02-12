@@ -104,10 +104,8 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	CodeBlock^ block = gcnew CodeBlock();
 	block->Address = address;
 
-#ifdef _DEBUG
 	// Don't try to re-add blocks
 	Debug::Assert( _codeCache->Find( address ) == nullptr );
-#endif
 
 #ifdef CLEARECHOFILE
 	_gen->clearEchoFile();
@@ -140,6 +138,9 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 #ifdef STATISTICS
 	R4000Statistics^ stats = R4000Cpu::GlobalCpu->_stats;
 	stats->CodeBlocksGenerated++;
+
+	double ratio = block->Size / ( block->InstructionCount * 4 );
+	stats->AverageCodeSizeRatio = ( stats->AverageCodeSizeRatio * .8 ) + ( ratio * .2 );
 
 	double genTime = R4000Cpu::GlobalCpu->_timer->Elapsed - blockStart;
 	if( genTime <= 0.0 )
