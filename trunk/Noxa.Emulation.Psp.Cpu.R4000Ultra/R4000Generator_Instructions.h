@@ -2,6 +2,7 @@
 #define DEFI( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm );
 #define DEFJ( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte opcode, uint imm );
 #define DEFSP3( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl );
+#define DEFFPU( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function );
 
 // Arithmetic
 DEFR( SLL );
@@ -97,3 +98,26 @@ DEFI( LL );
 DEFI( LWCz );
 DEFI( SC );
 DEFI( SWCz );
+
+// FPU
+DEFFPU( FADD );
+DEFFPU( FSUB );
+DEFFPU( FMUL );
+DEFFPU( FDIV );
+DEFFPU( FSQRT );
+DEFFPU( FABS );
+DEFFPU( FMOV );
+DEFFPU( FNEG );
+DEFFPU( ROUNDL );
+DEFFPU( TRUNCL );
+DEFFPU( CEILL );
+DEFFPU( FLOORL );
+DEFFPU( ROUNDW );
+DEFFPU( TRUNCW );
+DEFFPU( CEILW );
+DEFFPU( FLOORW );
+DEFFPU( CVTS );
+DEFFPU( CVTD );
+DEFFPU( CVTW );
+DEFFPU( CVTL );
+DEFFPU( FCOMPARE );

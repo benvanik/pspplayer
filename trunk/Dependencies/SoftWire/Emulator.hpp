@@ -12,7 +12,7 @@ namespace SoftWire
 		static void enableEmulateSSE();   // Default off
 		static void disableEmulateSSE();
 
-	protected:
+	public:
 		Emulator(bool x64);
 
 		virtual ~Emulator();

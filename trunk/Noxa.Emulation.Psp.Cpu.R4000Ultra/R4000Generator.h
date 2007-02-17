@@ -26,6 +26,8 @@ using namespace SoftWire;
 #define AL g->al
 #define BL g->bl
 #define CL g->cl
+#define XMM0 g->xmm0
+#define XMM1 g->xmm1
 
 #define ZE( x ) ((int)(uint)x)
 #define SE( x ) ((int)(short)x)
@@ -39,7 +41,7 @@ using namespace SoftWire;
 #define MNULLDELAY( xr )	g->dword_ptr[ xr + CTXNULLDELAY ]
 #define MPCVALID( xr )		g->dword_ptr[ xr + CTXPCVALID ]
 #define MPC( xr )			g->dword_ptr[ xr + CTXPC ]
-#define MCP1REG( xr, r )	g->dword_ptr[ xr + CTXCP1REGS + ( r << 2 ) ]
+#define MCP1REG( xr, r, fmt )	g->dword_ptr[ xr + CTXCP1REGS + ( r << 4 ) ]
 #define MCP1CONDBIT( xr )	g->dword_ptr[ xr + CTXCP1CONDBIT ]
 #define MINSTRCOUNT( xr )	g->dword_ptr[ xr + CTXINSTRCOUNT ]
 
@@ -69,12 +71,14 @@ namespace Noxa {
 					static GenerateInstructionJ TableJ[ 64 ];
 					static GenerateInstructionR TableAllegrex[ 64 ];
 					static GenerateInstructionSpecial3 TableSpecial3[ 64 ];
+					static GenerateInstructionFpu TableFpu[ 64 ];
 
 					static const char* TableR_n[ 64 ];
 					static const char* TableI_n[ 64 ];
 					static const char* TableJ_n[ 64 ];
 					static const char* TableAllegrex_n[ 64 ];
 					static const char* TableSpecial3_n[ 64 ];
+					static const char* TableFpu_n[ 64 ];
 				};
 
 			}
