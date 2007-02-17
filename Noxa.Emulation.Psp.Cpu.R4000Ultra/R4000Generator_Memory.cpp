@@ -396,7 +396,7 @@ GenerationResult LWCz( R4000GenContext^ context, int pass, int address, uint cod
 			//g->mov( MCP0REG( rt ), EAX );
 			break;
 		case 1:
-			g->mov( MCP1REG( CTX, rt ), EAX );
+			g->mov( MCP1REG( CTX, rt, 0 ), EAX );
 			break;
 		case 2:
 			//g->mov( MCP2REG( rt ), EAX );
@@ -428,7 +428,7 @@ GenerationResult SWCz( R4000GenContext^ context, int pass, int address, uint cod
 		case 0:
 			break;
 		case 1:
-			g->mov( EBX, MCP1REG( CTX, rt ) );
+			g->mov( EBX, MCP1REG( CTX, rt, 0 ) );
 			break;
 		case 2:
 			break;

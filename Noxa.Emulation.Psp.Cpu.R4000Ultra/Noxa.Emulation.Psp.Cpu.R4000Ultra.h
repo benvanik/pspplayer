@@ -84,14 +84,11 @@ namespace Noxa {
 					{
 						virtual bool get()
 						{
-							return false;
+							return true;
 						}
 					}
 
-					virtual IList<ComponentIssue^>^ Test( ComponentParameters^ parameters )
-					{
-						return nullptr;
-					}
+					virtual IList<ComponentIssue^>^ Test( ComponentParameters^ parameters );
 
 					virtual String^ ToString() override
 					{

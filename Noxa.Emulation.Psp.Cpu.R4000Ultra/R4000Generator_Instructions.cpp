@@ -23,12 +23,14 @@ GenerateInstructionI R4000Generator::TableI[ 64 ];
 GenerateInstructionJ R4000Generator::TableJ[ 64 ];
 GenerateInstructionR R4000Generator::TableAllegrex[ 64 ];
 GenerateInstructionSpecial3 R4000Generator::TableSpecial3[ 64 ];
+GenerateInstructionFpu R4000Generator::TableFpu[ 64 ];
 
 const char* R4000Generator::TableR_n[ 64 ];
 const char* R4000Generator::TableI_n[ 64 ];
 const char* R4000Generator::TableJ_n[ 64 ];
 const char* R4000Generator::TableAllegrex_n[ 64 ];
 const char* R4000Generator::TableSpecial3_n[ 64 ];
+const char* R4000Generator::TableFpu_n[ 64 ];
 
 GenerationResult UnknownR( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
@@ -71,12 +73,14 @@ void R4000Generator::Setup()
 		TableJ[ n ] = UnknownJ;
 		TableAllegrex[ n ] = UnknownR;
 		TableSpecial3[ n ] = UnknownSpecial3;
+		TableFpu[ n ] = UnknownFpu;
 
 		TableR_n[ n ] = NULL;
 		TableI_n[ n ] = NULL;
 		TableJ_n[ n ] = NULL;
 		TableAllegrex_n[ n ] = NULL;
 		TableSpecial3_n[ n ] = NULL;
+		TableFpu_n[ n ] = NULL;
 	}
 
 	TableR[ 0 ] = SLL;
@@ -266,4 +270,50 @@ void R4000Generator::Setup()
 	TableSpecial3_n[ 4 ] = "INS";
 	TableSpecial3_n[ 16 ] = "SEB";
 	TableSpecial3_n[ 24 ] = "SEH";
+
+	TableFpu[ 0 ] = FADD;
+	TableFpu[ 1 ] = FSUB;
+	TableFpu[ 2 ] = FMUL;
+	TableFpu[ 3 ] = FDIV;
+	TableFpu[ 4 ] = FSQRT;
+	TableFpu[ 5 ] = FABS;
+	TableFpu[ 6 ] = FMOV;
+	TableFpu[ 7 ] = FNEG;
+	TableFpu[ 8 ] = ROUNDL;
+	TableFpu[ 9 ] = TRUNCL;
+	TableFpu[ 10 ] = CEILL;
+	TableFpu[ 11 ] = FLOORL;
+	TableFpu[ 12 ] = ROUNDW;
+	TableFpu[ 13 ] = TRUNCW;
+	TableFpu[ 14 ] = CEILW;
+	TableFpu[ 15 ] = FLOORW;
+	TableFpu[ 32 ] = CVTS;
+	TableFpu[ 33 ] = CVTD;
+	TableFpu[ 36 ] = CVTW;
+	TableFpu[ 37 ] = CVTL;
+	for( int n = 48; n <= 63; n++ )
+		TableFpu[ n ] = FCOMPARE;
+
+	TableFpu_n[ 0 ] = "FADD";
+	TableFpu_n[ 1 ] = "FSUB";
+	TableFpu_n[ 2 ] = "FMUL";
+	TableFpu_n[ 3 ] = "FDIV";
+	TableFpu_n[ 4 ] = "FSQRT";
+	TableFpu_n[ 5 ] = "FABS";
+	TableFpu_n[ 6 ] = "FMOV";
+	TableFpu_n[ 7 ] = "FNEG";
+	TableFpu_n[ 8 ] = "ROUNDL";
+	TableFpu_n[ 9 ] = "TRUNCL";
+	TableFpu_n[ 10 ] = "CEILL";
+	TableFpu_n[ 11 ] = "FLOORL";
+	TableFpu_n[ 12 ] = "ROUNDW";
+	TableFpu_n[ 13 ] = "TRUNCW";
+	TableFpu_n[ 14 ] = "CEILW";
+	TableFpu_n[ 15 ] = "FLOORW";
+	TableFpu_n[ 32 ] = "CVTS";
+	TableFpu_n[ 33 ] = "CVTD";
+	TableFpu_n[ 36 ] = "CVTW";
+	TableFpu_n[ 37 ] = "CVTL";
+	for( int n = 48; n <= 63; n++ )
+		TableFpu_n[ n ] = "FCOMPARE";
 }

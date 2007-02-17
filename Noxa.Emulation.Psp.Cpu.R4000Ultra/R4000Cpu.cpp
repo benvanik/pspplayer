@@ -25,7 +25,8 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	GlobalCpu = this;
 
 	// Ugly: has to be above the block builder constructor!
-	_ctx = new R4000Ctx();
+	_ctx = ( R4000Ctx* )_aligned_malloc( sizeof( R4000Ctx ), 16 );
+	memset( _ctx, 0, sizeof( R4000Ctx ) );
 
 	_emu = emulator;
 	_params = parameters;
@@ -55,7 +56,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 R4000Cpu::~R4000Cpu()
 {
 	if( _ctx != NULL )
-		delete ( R4000Ctx* )_ctx;
+		_aligned_free( _ctx );
 	_ctx = NULL;
 	SAFEFREE( _bounce );
 }
