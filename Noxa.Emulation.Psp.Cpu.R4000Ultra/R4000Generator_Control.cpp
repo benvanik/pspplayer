@@ -211,8 +211,7 @@ GenerationResult BEQL( R4000GenContext^ context, int pass, int address, uint cod
 		g->sete( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
-		g->setne( AL );
-		g->movzx( EAX, AL );
+		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
 		g->mov( MNULLDELAY( CTX ), EAX );
 	}
 	return GenerationResult::BranchAndNullifyDelay;
@@ -238,8 +237,7 @@ GenerationResult BNEL( R4000GenContext^ context, int pass, int address, uint cod
 		g->setne( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
-		g->sete( AL );
-		g->movzx( EAX, AL );
+		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
 		g->mov( MNULLDELAY( CTX ), EAX );
 	}
 	return GenerationResult::BranchAndNullifyDelay;
@@ -265,8 +263,7 @@ GenerationResult BLEZL( R4000GenContext^ context, int pass, int address, uint co
 		g->setle( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
-		g->setnle( AL );
-		g->movzx( EAX, AL );
+		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
 		g->mov( MNULLDELAY( CTX ), EAX );
 	}
 	return GenerationResult::BranchAndNullifyDelay;
@@ -292,8 +289,7 @@ GenerationResult BGTZL( R4000GenContext^ context, int pass, int address, uint co
 		g->setg( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
-		g->setng( AL );
-		g->movzx( EAX, AL );
+		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
 		g->mov( MNULLDELAY( CTX ), EAX );
 	}
 	return GenerationResult::BranchAndNullifyDelay;
@@ -370,8 +366,7 @@ GenerationResult BLTZL( R4000GenContext^ context, int pass, int address, uint co
 		g->setl( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
-		g->setnl( AL );
-		g->movzx( EAX, AL );
+		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
 		g->mov( MNULLDELAY( CTX ), EAX );
 	}
 	return GenerationResult::BranchAndNullifyDelay;
@@ -398,8 +393,7 @@ GenerationResult BGEZL( R4000GenContext^ context, int pass, int address, uint co
 		g->setge( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
-		g->setnge( AL );
-		g->movzx( EAX, AL );
+		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
 		g->mov( MNULLDELAY( CTX ), EAX );
 	}
 	return GenerationResult::BranchAndNullifyDelay;
@@ -494,8 +488,7 @@ GenerationResult BLTZALL( R4000GenContext^ context, int pass, int address, uint 
 		g->setl( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
-		g->setnl( AL );
-		g->movzx( EAX, AL );
+		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
 		g->mov( MNULLDELAY( CTX ), EAX );
 		g->cmovl( EAX, address + 4 );
 		g->cmovnl( EAX, MREG( CTX, 31 ) );
@@ -531,8 +524,7 @@ GenerationResult BGEZALL( R4000GenContext^ context, int pass, int address, uint 
 		g->setge( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
-		g->setnge( AL );
-		g->movzx( EAX, AL );
+		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
 		g->mov( MNULLDELAY( CTX ), EAX );
 		g->cmovge( EAX, address + 4 );
 		g->cmovnge( EAX, MREG( CTX, 31 ) );

@@ -99,6 +99,16 @@ DEFI( LWCz );
 DEFI( SC );
 DEFI( SWCz );
 
+// COP
+DEFI( BCzF );
+DEFI( BCzFL );
+DEFI( BCzT );
+DEFI( BCzTL );
+DEFI( MFCz );
+DEFI( MTCz );
+DEFI( CFCz );
+DEFI( CTCz );
+
 // FPU
 DEFFPU( FADD );
 DEFFPU( FSUB );
