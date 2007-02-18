@@ -24,7 +24,7 @@
 
 // Maximum number of instructions per block - things are NOT handled
 // properly when the code hits this limit, so it should be high!
-#define MAXCODELENGTH 10000
+#define MAXCODELENGTH 200
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
@@ -74,7 +74,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 		{
 			GenerationResult result = GenerationResult::Invalid;
 
-			Debug::Assert( n < MAXCODELENGTH - 1 );
+			//Debug::Assert( n < MAXCODELENGTH - 1 );
 
 			bool inDelay = _ctx->InDelay;
 			uint code = ( uint )_memory->ReadWord( address );
@@ -552,9 +552,9 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 	{
 		// Store ctx PC back in to real ctx
 		// This is only needed when we aren't tail jumping
-		g->push( MPC( CTXP( _ctx->CtxPointer ) ) );
-		g->call( (int)__updateCorePC );
-		g->add( g->esp, 4 );
+		//g->push( MPC( CTXP( _ctx->CtxPointer ) ) );
+		//g->call( (int)__updateCorePC );
+		//g->add( g->esp, 4 );
 	}
 
 	if( tailJump == true )
