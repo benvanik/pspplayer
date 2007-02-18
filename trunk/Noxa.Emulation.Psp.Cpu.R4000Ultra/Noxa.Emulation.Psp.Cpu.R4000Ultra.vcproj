@@ -231,6 +231,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Generator_Cop.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Generator_Fpu.cpp"
 				>
 			</File>

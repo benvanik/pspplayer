@@ -254,8 +254,86 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 				}
 				else
 				{
-					Debugger::Break();
-					//result = CoreInstructions.Cop.HandleInstruction( _ctx, 1, address + 4, code );
+					// COP instructions
+
+					uint copop = code >> 28;
+					byte cop = ( byte )( ( code >> 26 ) & 0x3 ); // cop0, cop1, or cop2
+					byte rs = ( byte )( ( code >> 21 ) & 0x1F );
+					byte rt = ( byte )( ( code >> 16 ) & 0x1F );
+					byte rd = ( byte )( ( code >> 11 ) & 0x1F );
+					ushort imm = ( ushort )( code & 0xFFFF );
+
+					// rs = bc sub-opcode
+					// rt = branch condition
+
+					switch( opcode )
+					{
+					case 0x4:
+						if( ( ( code >> 25 ) & 0x1 ) == 1 )	// COPz
+						{
+							uint cofun = code & 0x1FFFFFF;
+
+							if( cop == 1 )
+							{
+								byte fmt = ( byte )( ( cofun >> 21 ) & 0x1F );
+								// 0 = S = single binary fp
+								// 1 = D = double binary fp
+								// 4 = W = single 32 binary fixed point
+								// 5 = L = longword 64 binary fixed point
+								Debug::Assert( ( fmt != 1 ) && ( fmt != 5 ) );
+								byte ft = rt; // source 2
+								byte fs = rd; // source 1
+								byte fd = ( byte )( ( code >> 6 ) & 0x1F ); // dest
+								byte func = ( byte )( code & 0x3F );
+
+								GenerateInstructionFpu instr = R4000Generator::TableFpu[ func ];
+#ifdef EMITDEBUG
+								if( pass == 1 )
+								{
+									const char* name = R4000Generator::TableFpu_n[ func ];
+									sprintf_s( codeString, 150, "%s fmt:%d fs:%d ft:%d fd:%d ", name, fmt, fs, ft, fd );
+									this->EmitDebug( address, code, codeString );
+								}
+#endif
+								result = instr( _ctx, pass, address + 4, code, fmt, fs, ft, fd, func );
+							}
+							else
+							{
+								Debug::WriteLine( String::Format( "Cpu: attempted COP{0} function {1:X8}", cop, cofun ) );
+								result =  GenerationResult::Invalid;
+							}
+						}
+						else
+						{
+							if( rs == 0x08 )
+							{
+								GenerateInstructionI instr = R4000Generator::TableCopB[ rt ];
+#ifdef EMITDEBUG
+								if( pass == 1 )
+								{
+									const char* name = R4000Generator::TableCopB_n[ rt ];
+									sprintf_s( codeString, 150, "%s cop:%d imm:%d ", name, cop, SE( imm ) );
+									this->EmitDebug( address, code, codeString );
+								}
+#endif
+								result = instr( _ctx, pass, address + 4, code, cop, rs, rt, imm );
+							}
+							else
+							{
+								GenerateInstructionI instr = R4000Generator::TableCopA[ rs ];
+#ifdef EMITDEBUG
+								if( pass == 1 )
+								{
+									const char* name = R4000Generator::TableCopA_n[ rs ];
+									sprintf_s( codeString, 150, "%s cop:%d rd:%d rt:%d imm:%d ", name, cop, rd, rt, SE( imm ) );
+									this->EmitDebug( address, code, codeString );
+								}
+#endif
+								result = instr( _ctx, pass, address + 4, code, cop, rd, rt, imm );
+							}
+						}
+						break;
+					}
 				}
 			}
 			else

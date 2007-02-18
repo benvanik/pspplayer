@@ -399,6 +399,7 @@ GenerationResult FCOMPARE( R4000GenContext^ context, int pass, int address, uint
 		LOADCTXBASE( EDX );
 #ifdef SSE
 		// TODO: support all FPU compare ops (ordered, etc)
+		// NOTE: could do this with COMISS and SETcc instead!
 		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
 		if( un == true )
 		{

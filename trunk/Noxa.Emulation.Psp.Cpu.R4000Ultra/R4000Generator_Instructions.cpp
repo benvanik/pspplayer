@@ -23,6 +23,8 @@ GenerateInstructionI R4000Generator::TableI[ 64 ];
 GenerateInstructionJ R4000Generator::TableJ[ 64 ];
 GenerateInstructionR R4000Generator::TableAllegrex[ 64 ];
 GenerateInstructionSpecial3 R4000Generator::TableSpecial3[ 64 ];
+GenerateInstructionI R4000Generator::TableCopA[ 64 ];
+GenerateInstructionI R4000Generator::TableCopB[ 64 ];
 GenerateInstructionFpu R4000Generator::TableFpu[ 64 ];
 
 const char* R4000Generator::TableR_n[ 64 ];
@@ -30,35 +32,43 @@ const char* R4000Generator::TableI_n[ 64 ];
 const char* R4000Generator::TableJ_n[ 64 ];
 const char* R4000Generator::TableAllegrex_n[ 64 ];
 const char* R4000Generator::TableSpecial3_n[ 64 ];
+const char* R4000Generator::TableCopA_n[ 64 ];
+const char* R4000Generator::TableCopB_n[ 64 ];
 const char* R4000Generator::TableFpu_n[ 64 ];
 
 GenerationResult UnknownR( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
+	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownI( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
+	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownJ( R4000GenContext^ context, int pass, int address, uint code, byte opcode, uint imm )
 {
+	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownCop0( R4000GenContext^ context, int pass, int address, uint code, byte function )
 {
+	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownSpecial3( R4000GenContext^ context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
 {
+	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownFpu( R4000GenContext^ context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function )
 {
+	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
@@ -73,6 +83,8 @@ void R4000Generator::Setup()
 		TableJ[ n ] = UnknownJ;
 		TableAllegrex[ n ] = UnknownR;
 		TableSpecial3[ n ] = UnknownSpecial3;
+		TableCopA[ n ] = UnknownI;
+		TableCopB[ n ] = UnknownI;
 		TableFpu[ n ] = UnknownFpu;
 
 		TableR_n[ n ] = NULL;
@@ -80,6 +92,8 @@ void R4000Generator::Setup()
 		TableJ_n[ n ] = NULL;
 		TableAllegrex_n[ n ] = NULL;
 		TableSpecial3_n[ n ] = NULL;
+		TableCopA_n[ n ] = NULL;
+		TableCopB_n[ n ] = NULL;
 		TableFpu_n[ n ] = NULL;
 	}
 
@@ -270,6 +284,26 @@ void R4000Generator::Setup()
 	TableSpecial3_n[ 4 ] = "INS";
 	TableSpecial3_n[ 16 ] = "SEB";
 	TableSpecial3_n[ 24 ] = "SEH";
+
+	TableCopA[ 0 ] = MFCz;
+	TableCopA[ 4 ] = MTCz;
+	TableCopA[ 2 ] = CFCz;
+	TableCopA[ 6 ] = CTCz;
+
+	TableCopA_n[ 0 ] = "MFCz";
+	TableCopA_n[ 4 ] = "MTCz";
+	TableCopA_n[ 2 ] = "CFCz";
+	TableCopA_n[ 6 ] = "CTCz";
+
+	TableCopB[ 0 ] = BCzF;
+	TableCopB[ 1 ] = BCzT;
+	TableCopB[ 2 ] = BCzFL;
+	TableCopB[ 3 ] = BCzTL;
+
+	TableCopB_n[ 0 ] = "BCzF";
+	TableCopB_n[ 1 ] = "BCzT";
+	TableCopB_n[ 2 ] = "BCzFL";
+	TableCopB_n[ 3 ] = "BCzTL";
 
 	TableFpu[ 0 ] = FADD;
 	TableFpu[ 1 ] = FSUB;

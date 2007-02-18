@@ -71,6 +71,8 @@ namespace Noxa {
 					static GenerateInstructionJ TableJ[ 64 ];
 					static GenerateInstructionR TableAllegrex[ 64 ];
 					static GenerateInstructionSpecial3 TableSpecial3[ 64 ];
+					static GenerateInstructionI TableCopA[ 64 ];
+					static GenerateInstructionI TableCopB[ 64 ];
 					static GenerateInstructionFpu TableFpu[ 64 ];
 
 					static const char* TableR_n[ 64 ];
@@ -78,6 +80,8 @@ namespace Noxa {
 					static const char* TableJ_n[ 64 ];
 					static const char* TableAllegrex_n[ 64 ];
 					static const char* TableSpecial3_n[ 64 ];
+					static const char* TableCopA_n[ 64 ];
+					static const char* TableCopB_n[ 64 ];
 					static const char* TableFpu_n[ 64 ];
 				};
 
