@@ -67,10 +67,10 @@ GenerationResult SRA( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EBX );
-		g->mov( EAX, MREG( EBX, rt ) );
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rt ) );
 		g->sar( EAX, shamt );
-		g->mov( MREG( EBX, rd ), EAX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }

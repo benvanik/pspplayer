@@ -24,7 +24,7 @@
 
 // Maximum number of instructions per block - things are NOT handled
 // properly when the code hits this limit, so it should be high!
-#define MAXCODELENGTH 400
+#define MAXCODELENGTH 10000
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
@@ -266,7 +266,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 					// rs = bc sub-opcode
 					// rt = branch condition
 
-					switch( opcode )
+					switch( copop )
 					{
 					case 0x4:
 						if( ( ( code >> 25 ) & 0x1 ) == 1 )	// COPz

@@ -32,7 +32,7 @@
 #define GENDEBUG
 
 // When defined with _DEBUG, each instruction executed will print itself to debug out
-#define RUNTIMEDEBUG
+//#define RUNTIMEDEBUG
 //#define RUNTIMEREGS
 
 // Gather and print out statistics about syscalls
