@@ -218,7 +218,7 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			_presentParams = new PresentParameters();
 			_presentParams.PresentationInterval = PresentInterval.One;
 			_presentParams.PresentFlag = PresentFlag.LockableBackBuffer;
-			_presentParams.SwapEffect = SwapEffect.Flip;
+			_presentParams.SwapEffect = SwapEffect.Copy;
 			_presentParams.Windowed = true;
 			_presentParams.BackBufferFormat = Format.A8R8G8B8;
 

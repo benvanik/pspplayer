@@ -215,6 +215,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Cache.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Cpu.cpp"
 				>
 			</File>

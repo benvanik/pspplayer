@@ -30,14 +30,12 @@ R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 	_codeCache = _cpu->CodeCache;
 
 	_gen = new R4000Generator();
-//#ifndef _DEBUG
+#ifndef GENECHOFILE
 	R4000Generator::disableListing();
-//#endif
+#endif
 
-#ifdef _DEBUG
 #ifdef GENECHOFILE
 	_gen->setEchoFile( GENECHOFILE );
-#endif
 #endif
 
 	_ctx = gcnew R4000GenContext( this, _gen );
@@ -249,6 +247,7 @@ void R4000BlockBuilder::EmitJumpBlock( int targetAddress )
 // been generated we don't want to be calling the thunk every time. This
 // method will go and replace the callers thunk call with a direct jump
 // to the generated block.
+#pragma unmanaged
 void __fixupBlockJump( void* sourceAddress, int newTarget )
 {
 	// Starting point is 15 bytes back (before all instructions)
@@ -270,6 +269,7 @@ void __fixupBlockJump( void* sourceAddress, int newTarget )
 	*startPtr = 0xE0; // ModRM = source EAX
 	//startPtr++;
 }
+#pragma managed
 
 // This method is called by generated code when the target block is not found.
 // Here we try to look it up and see if we can find the block, and if not we
@@ -303,11 +303,7 @@ int __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackP
 #endif
 	}
 
-	int jumpTarget = ( int )targetBlock->Pointer;
-
-	__fixupBlockJump( sourceAddress, jumpTarget );
-
-	return jumpTarget;
+	return ( int )targetBlock->Pointer;
 }
 
 #ifdef __cplusplus
@@ -323,12 +319,28 @@ EXTERNC void * _ReturnAddress ( void );
 #pragma intrinsic ( _ReturnAddress )
 
 // Unmanaged portion of the thunk
-#pragma warning(disable:4793)
+//#pragma warning(disable:4793)
+#pragma unmanaged
 void __missingBlockThunk( void* targetAddress, void* stackPointer )
 {
 	void* sourceAddress = _ReturnAddress();
 
-	int jumpTarget = __missingBlockThunkM( sourceAddress, targetAddress, stackPointer );
+	// We try to use the unmanaged fast QPL in the code cache first
+	int jumpTarget = QuickPointerLookup( ( int )targetAddress );
+	if( jumpTarget == NULL )
+	{
+		// If we failed to get the pointer, it probably doesn't exist
+		jumpTarget = __missingBlockThunkM( sourceAddress, targetAddress, stackPointer );
+	}
+	else
+	{
+//#ifdef STATISTICS
+//		R4000Cpu::GlobalCpu->_stats->JumpBlockThunkHits++;
+//#endif
+	}
+
+	// Fixup to target
+	__fixupBlockJump( sourceAddress, jumpTarget );
 
 	// We cannot do RET, so need to do jump, but must fix up stack pointer first
 	__asm
@@ -338,4 +350,5 @@ void __missingBlockThunk( void* targetAddress, void* stackPointer )
 		jmp eax
 	}
 }
-#pragma warning(default:4793)
+#pragma managed
+//#pragma warning(default:4793)

@@ -20,7 +20,7 @@
 // When enabled and _DEBUG is defined, an assembly listing for each block generated will be
 // written to the defined path. It is overwritten during each block gen, so make sure to
 // set a breakpoint at the end!
-#define GENECHOFILE "C:\\Dev\\Noxa.Emulation\\trunk\\debug\\gen.txt"
+//#define GENECHOFILE "C:\\Dev\\Noxa.Emulation\\trunk\\debug\\gen.txt"
 
 // When defined, the echo file will be cleared after each generated block
 #define CLEARECHOFILE
@@ -38,4 +38,13 @@
 // Gather and print out statistics about syscalls
 #define SYSCALLSTATS
 
+#endif
+
+// -- macro hacks --
+#ifndef GENECHOFILE
+#undef CLEARECHOFILE
+#undef VERBOSEANNOTATE
+#endif
+#ifndef RUNTIMEDEBUG
+#undef RUNTIMEREGS
 #endif
