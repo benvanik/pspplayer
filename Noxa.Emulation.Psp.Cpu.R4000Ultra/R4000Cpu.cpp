@@ -44,7 +44,9 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 
 	_lastSyscall = -1;
 	_syscalls = gcnew array<BiosFunction^>( 1024 );
+#ifdef SYSCALLSTATS
 	_syscallCounts = gcnew array<int>( 1024 );
+#endif
 
 	R4000AdvancedBlockBuilder^ builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	R4000Generator* gen = new R4000Generator();
