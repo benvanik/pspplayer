@@ -118,8 +118,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="$(SolutionDir)\Dependencies\SoftWire"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -135,8 +140,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit)"
+				AdditionalDependencies="$(SolutionDir)\Dependencies\SoftWire\Debug\SoftWire.lib $(NOINHERIT)"
 				LinkIncremental="1"
+				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>

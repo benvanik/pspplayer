@@ -28,7 +28,7 @@
 
 // Maximum number of instructions per block - things are NOT handled
 // properly when the code hits this limit, so it should be high!
-#define MAXCODELENGTH 400
+#define MAXCODELENGTH 200
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
@@ -525,15 +525,23 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 		if( pass == 1 )
 		{
-			if( _ctx->JumpTarget != 0 )
-				GenerateTail( address - 4, true, _ctx->JumpTarget );
-			else if( _ctx->JumpRegister != 0 )
+			if( lastResult == GenerationResult::Syscall )
 			{
-				g->mov( EAX, MREG( CTXP( _ctx->CtxPointer ), _ctx->JumpRegister ) );
-				GenerateTail( address - 4, true, -1 );
+				// We always return to the execution loop on syscalls
+				GenerateTail( address - 4, false, 0 );
 			}
 			else
-				GenerateTail( address - 4, false, 0 );
+			{
+				if( _ctx->JumpTarget != 0 )
+					GenerateTail( address - 4, true, _ctx->JumpTarget );
+				else if( _ctx->JumpRegister != 0 )
+				{
+					g->mov( EAX, MREG( CTXP( _ctx->CtxPointer ), _ctx->JumpRegister ) );
+					GenerateTail( address - 4, true, -1 );
+				}
+				else
+					GenerateTail( address - 4, false, 0 );
+			}
 		}
 	}
 
