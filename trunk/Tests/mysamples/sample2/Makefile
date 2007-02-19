@@ -1,4 +1,4 @@
-TARGET = sample1
+TARGET = sample2
 OBJS = main.o
 
 INCDIR = 
@@ -10,7 +10,7 @@ LIBDIR =
 LDFLAGS =
 
 EXTRA_TARGETS = EBOOT.PBP
-PSP_EBOOT_TITLE = Sample 1 - main()
+PSP_EBOOT_TITLE = Sample 2 - Loops & printf
 
 PSPSDK=$(shell psp-config --pspsdk-path)
 include $(PSPSDK)/lib/build.mak
