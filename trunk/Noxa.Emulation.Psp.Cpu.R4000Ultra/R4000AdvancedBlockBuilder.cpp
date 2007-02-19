@@ -13,8 +13,12 @@
 #include "R4000Cache.h"
 #include "R4000Generator.h"
 
+// #ifdef GENECHOFILE || VERBOSEANNOTATE
 #ifdef GENECHOFILE
+#define EMITDEBUG
+#endif
 #ifdef VERBOSEANNOTATE
+#ifndef EMITDEBUG
 #define EMITDEBUG
 #endif
 #endif
@@ -24,12 +28,16 @@
 
 // Maximum number of instructions per block - things are NOT handled
 // properly when the code hits this limit, so it should be high!
-#define MAXCODELENGTH 200
+#define MAXCODELENGTH 400
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace SoftWire;
+
+extern int _codeBlocksExecuted;
+extern int _jumpBlockInlineHits;
+extern int _jumpBlockInlineMisses;
 
 R4000AdvancedBlockBuilder::R4000AdvancedBlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 	: R4000BlockBuilder( cpu, core )
@@ -67,6 +75,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 		_ctx->InDelay = false;
 		_ctx->JumpTarget = NULL;
+		_ctx->JumpRegister = 0;
 		bool breakOut = false;
 		bool checkNullDelay = false;
 		int address = startAddress;
@@ -405,11 +414,23 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 					// We may be doing a JR and not have a known target at gen time
 					if( _ctx->JumpTarget != NULL )
-						GenerateTail( true, _ctx->JumpTarget );
+						GenerateTail( address - 4, true, _ctx->JumpTarget );
+					else if( _ctx->JumpRegister != 0 )
+					{
+						//Debug::WriteLine( "Would be doing a tail gen w/o jump thunk, but doing new jump instead!" );
+						g->mov( EAX, MREG( CTXP( _ctx->CtxPointer ), _ctx->JumpRegister ) );
+						GenerateTail( address - 4, true, -1 );
+					}
 					else
-						GenerateTail( false, 0 );
+					{
+						// Cannot do jump because we don't know and can't know where we are going ---- why?
+						//Debug::Assert( false );
+						Debug::WriteLine( String::Format( "Full tail (no jumptarget/jumpregister) at 0x{0:X8}", address - 4 ) );
+						GenerateTail( address - 4, false, 0 );
+					}
 
 					_ctx->JumpTarget = NULL;
+					_ctx->JumpRegister = 0;
 					_ctx->InDelay = false;
 					jumpDelay = false;
 				}
@@ -440,7 +461,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 						g->mov( MPC( CTXP( _ctx->CtxPointer ) ), lm->Address );
 
 						// Generate tail to bounce to target block (jump block/etc)
-						GenerateTail( true, lm->Address );
+						GenerateTail( address - 4, true, lm->Address );
 
 						g->label( noBranch );
 					}
@@ -489,8 +510,8 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 						Debug::WriteLine( String::Format( "Ignoring jump breakout at {0:X8} because last target is {1:X8}", address, _ctx->LastBranchTarget ) );
 #endif
 						jumpDelay = true;
-						_ctx->InDelay = true;
 					}
+					_ctx->InDelay = true;
 				}
 				break;
 			case GenerationResult::BranchAndNullifyDelay:
@@ -503,7 +524,17 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 		}
 
 		if( pass == 1 )
-			GenerateTail( false, 0 );
+		{
+			if( _ctx->JumpTarget != 0 )
+				GenerateTail( address - 4, true, _ctx->JumpTarget );
+			else if( _ctx->JumpRegister != 0 )
+			{
+				g->mov( EAX, MREG( CTXP( _ctx->CtxPointer ), _ctx->JumpRegister ) );
+				GenerateTail( address - 4, true, -1 );
+			}
+			else
+				GenerateTail( address - 4, false, 0 );
+		}
 	}
 
 	block->EndsOnSyscall = ( lastResult == GenerationResult::Syscall );
@@ -522,6 +553,11 @@ void R4000AdvancedBlockBuilder::GeneratePreamble()
 	g->mov( MPC( CTXP( _ctx->CtxPointer ) ), _ctx->StartAddress );
 	g->mov( MPCVALID( CTXP( _ctx->CtxPointer ) ), 0 );
 	g->mov( MNULLDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
+
+#ifdef STATISTICS
+	// Block count
+	g->inc( g->dword_ptr[ &_codeBlocksExecuted ] );
+#endif
 }
 
 void __updateCorePC( int newPc )
@@ -530,9 +566,12 @@ void __updateCorePC( int newPc )
 	//( ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx )->PC = newPc;
 }
 
-void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
+// If tailJump == true, targetAddress must either be a valid address or -1 - -1 implies that EAX has the address to jump to
+void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int targetAddress )
 {
 	R4000Generator *g = _gen;
+
+	// NOTE: EAX has jump target address if tailJump==true && targetAddress==-1 - DO NOT OVERWRITE
 
 	// 1 = pc updated, 0 = pc update needed
 	if( _ctx->UpdatePC == true )
@@ -559,34 +598,72 @@ void R4000AdvancedBlockBuilder::GenerateTail( bool tailJump, int targetAddress )
 
 	if( tailJump == true )
 	{
-		// Bounce out
-		CodeBlock^ block = _ctx->_builder->_codeCache->Find( targetAddress );
-		if( block == nullptr )
+		if( targetAddress == -1 )
 		{
-#ifdef VERBOSEBUILD
-			Debug::WriteLine( String::Format( "Target block 0x{0:X8} not found, emitting jumpblock", targetAddress ) );
-#endif
+			char nullPtrLabel[ 30 ];
+			sprintf_s( nullPtrLabel, 30, "nullPtr%X", address );
 
-			// Not found - we write the missing block jump code
-			this->EmitJumpBlock( targetAddress );
+			g->push( EAX );
+			g->call( (int)QuickPointerLookup );
+			g->add( ESP, 4 );
+
+			// EAX = NULL or address to jump to
+			g->test( EAX, 0xFFFFFFFF );
+			g->jz( nullPtrLabel );
 
 #ifdef STATISTICS
-			R4000Cpu::GlobalCpu->_stats->JumpBlockThunkCount++;
+			g->inc( g->dword_ptr[ &_jumpBlockInlineHits ] );
+#endif
+
+			// Jump!
+			g->jmp( EAX );
+
+			// NULL, so just return
+			g->label( nullPtrLabel );
+
+#ifdef STATISTICS
+			g->inc( g->dword_ptr[ &_jumpBlockInlineMisses ] );
+#endif
+
+			g->mov( EAX, 0 );
+			g->ret();
+			//Debug::WriteLine( "returning when could build jump block" );
+
+#ifdef STATISTICS
+			R4000Cpu::GlobalCpu->_stats->JumpBlockLookupCount++;
 #endif
 		}
 		else
 		{
+			// Bounce out
+			CodeBlock^ block = _ctx->_builder->_codeCache->Find( targetAddress );
+			if( block == nullptr )
+			{
 #ifdef VERBOSEBUILD
-			Debug::WriteLine( String::Format( "Target block 0x{0:X8} found, emitting direct jump", targetAddress ) );
+				Debug::WriteLine( String::Format( "Target block 0x{0:X8} not found, emitting jumpblock", targetAddress ) );
 #endif
 
-			// Can do a direct jump to the translated block
-			g->mov( EAX, ( int )block->Pointer );
-			g->jmp( EAX );
+				// Not found - we write the missing block jump code
+				this->EmitJumpBlock( targetAddress );
 
 #ifdef STATISTICS
-			R4000Cpu::GlobalCpu->_stats->JumpBlockInlineCount++;
+				R4000Cpu::GlobalCpu->_stats->JumpBlockThunkCount++;
 #endif
+			}
+			else
+			{
+#ifdef VERBOSEBUILD
+				Debug::WriteLine( String::Format( "Target block 0x{0:X8} found, emitting direct jump", targetAddress ) );
+#endif
+
+				// Can do a direct jump to the translated block
+				g->mov( EAX, ( int )block->Pointer );
+				g->jmp( EAX );
+
+#ifdef STATISTICS
+				R4000Cpu::GlobalCpu->_stats->JumpBlockInlineCount++;
+#endif
+			}
 		}
 	}
 	else

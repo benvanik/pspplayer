@@ -99,6 +99,7 @@ namespace Noxa {
 					int LastBranchTarget;
 
 					int JumpTarget;
+					int JumpRegister;
 
 					bool InDelay;
 					LabelMarker^ BranchTarget;
@@ -118,6 +119,7 @@ namespace Noxa {
 						InDelay = false;
 						BranchTarget = nullptr;
 						JumpTarget = 0;
+						JumpRegister = 0;
 					}
 
 					bool IsBranchLocal( int address )
