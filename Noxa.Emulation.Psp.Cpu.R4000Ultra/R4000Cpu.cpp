@@ -172,5 +172,28 @@ void R4000Cpu::PrintStatistics()
 			sb->AppendFormat( "{0}: {1}\n", fields[ n ]->Name, value );
 		}
 		Debug::WriteLine( sb->ToString() );
+
+#ifdef SYSCALLSTATS
+		// Syscall stats
+		int callCount = 0;
+		for( int n = 0; n < _syscallCounts->Length; n++ )
+		{
+			int value = _syscallCounts[ n ];
+			callCount += value;
+		}
+
+		Debug::WriteLine( "Syscall statistics (in percent of all calls):" );
+		for( int n = 0; n < _syscallCounts->Length; n++ )
+		{
+			int value = _syscallCounts[ n ];
+			if( value == 0 )
+				continue;
+			BiosFunction^ func = _syscalls[ n ];
+			float p = value / ( float )callCount;
+			p *= 100.0f;
+			Debug::WriteLine( String::Format( "{0,-50} {1,10}x, {2,3}%",
+				String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p ) );
+		}
+#endif
 #endif
 }
