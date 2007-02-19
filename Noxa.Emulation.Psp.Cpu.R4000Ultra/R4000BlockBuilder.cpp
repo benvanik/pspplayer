@@ -19,6 +19,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace SoftWire;
 
+extern int _jumpBlockThunkHits;
+
 void __fixupBlockJump( void* sourceAddress, int newTarget );
 void __missingBlockThunk( void* targetAddress, void* stackPointer );
 
@@ -50,9 +52,17 @@ R4000BlockBuilder::~R4000BlockBuilder()
 }
 
 #ifdef RUNTIMEDEBUG
+static bool debugToggle = false;
 void __runtimeDebugPrint( int address, int code )
 {
-	Debug::WriteLine( String::Format( "[0x{0:X8}]: {1:X8}", address, code ) );
+	// Controller
+	//if( address == 0x089062B4 ) // after video mode change
+	//	debugToggle = true;
+	//if( address == 0x08900694 ) // after screen clear
+	//	debugToggle = true;
+
+	if( debugToggle == true )
+		Debug::WriteLine( String::Format( "[0x{0:X8}]: {1:X8}", address, code ) );
 	//Debug::WriteLine( String::Format( "reg 31: {0:X8}", ( ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx )->Registers[ 31 ] ) );
 }
 #endif
@@ -319,7 +329,6 @@ EXTERNC void * _ReturnAddress ( void );
 #pragma intrinsic ( _ReturnAddress )
 
 // Unmanaged portion of the thunk
-//#pragma warning(disable:4793)
 #pragma unmanaged
 void __missingBlockThunk( void* targetAddress, void* stackPointer )
 {
@@ -334,9 +343,9 @@ void __missingBlockThunk( void* targetAddress, void* stackPointer )
 	}
 	else
 	{
-//#ifdef STATISTICS
-//		R4000Cpu::GlobalCpu->_stats->JumpBlockThunkHits++;
-//#endif
+#ifdef STATISTICS
+		_jumpBlockThunkHits++;
+#endif
 	}
 
 	// Fixup to target
@@ -351,4 +360,3 @@ void __missingBlockThunk( void* targetAddress, void* stackPointer )
 	}
 }
 #pragma managed
-//#pragma warning(default:4793)

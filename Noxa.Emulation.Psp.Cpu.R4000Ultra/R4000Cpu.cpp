@@ -109,7 +109,7 @@ int R4000Cpu::ExecuteBlock()
 	Debug::Assert( block != nullptr );
 
 #ifdef STATISTICS
-	_stats->CodeBlocksExecuted++;
+	_stats->ExecutionLoops++;
 
 	block->ExecutionCount++;
 #endif
@@ -157,6 +157,7 @@ void R4000Cpu::PrintStatistics()
 #ifdef STATISTICS
 		if( _stats->InstructionsExecuted == 0 )
 			return;
+		_stats->GatherStats();
 		_stats->AverageCodeBlockLength /= _stats->CodeBlocksGenerated;
 		_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
 		_stats->RunTime = _timer->Elapsed - _stats->RunTime;

@@ -182,6 +182,8 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 
 				//dirtyRect = new Rectangle( 0, 0, 480, 272 );
 				int count = dirtyRect.Width * dirtyRect.Height;
+				if( count <= 0 )
+					return;
 				//surface.GetData<uint>( dirtyRect, _localBuffer, 0, count );
 				Array.Clear( _localBuffer, 0, count );
 

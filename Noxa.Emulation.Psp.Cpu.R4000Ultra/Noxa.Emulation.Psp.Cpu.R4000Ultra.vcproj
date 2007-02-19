@@ -259,6 +259,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Statistics.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stdafx.cpp"
 				>
 				<FileConfiguration

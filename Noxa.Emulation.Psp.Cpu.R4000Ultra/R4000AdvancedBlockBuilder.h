@@ -23,7 +23,7 @@ namespace Noxa {
 					virtual int InternalBuild( int startAddress, CodeBlock^ block ) override;
 
 					void GeneratePreamble();
-					void GenerateTail( bool tailJump, int targetAddress );
+					void GenerateTail( int address, bool tailJump, int targetAddress );
 
 				public:
 					R4000AdvancedBlockBuilder( R4000Cpu^ cpu, R4000Core^ core );

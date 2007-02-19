@@ -37,7 +37,10 @@ int Noxa::Emulation::Psp::Cpu::QuickPointerLookup( int address )
 	int* pblock1 = *( pblock0 + b1 );
 	if( pblock1 == NULL )
 		return 0;
-	return *( pblock1 + b2 );
+	int ret = *( pblock1 + b2 );
+	if( ret == 0xCCCCCCCC )
+		return 0;
+	return ret;
 }
 #pragma managed
 

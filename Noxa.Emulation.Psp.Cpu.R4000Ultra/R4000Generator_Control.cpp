@@ -23,9 +23,11 @@ using namespace SoftWire;
 
 GenerationResult JR( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
+	context->JumpTarget = 0x0;
+	context->JumpRegister = rs;
+
 	if( pass == 0 )
 	{
-		context->JumpTarget = 0x0;
 	}
 	else if( pass == 1 )
 	{
@@ -41,9 +43,11 @@ GenerationResult JALR( R4000GenContext^ context, int pass, int address, uint cod
 {
 	//bool theEnd = ( context->LastBranchTarget <= address );
 
+	context->JumpTarget = 0x0;
+	context->JumpRegister = rs;
+
 	if( pass == 0 )
 	{
-		context->JumpTarget = 0x0;
 	}
 	else if( pass == 1 )
 	{
@@ -62,9 +66,10 @@ GenerationResult J( R4000GenContext^ context, int pass, int address, uint code, 
 	uint target = code & 0x3FFFFFF;
 	uint pc = ( ( uint )address & 0xF0000000 ) | ( target << 2 );
 
+	context->JumpTarget = pc;
+
 	if( pass == 0 )
 	{
-		context->JumpTarget = pc;
 	}
 	else if( pass == 1 )
 	{
@@ -81,9 +86,10 @@ GenerationResult JAL( R4000GenContext^ context, int pass, int address, uint code
 	uint target = code & 0x3FFFFFF;
 	uint pc = ( ( uint )address & 0xF0000000 ) | ( target << 2 );
 
+	context->JumpTarget = pc;
+
 	if( pass == 0 )
 	{
-		context->JumpTarget = pc;
 	}
 	else if( pass == 1 )
 	{
