@@ -55,14 +55,14 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 					if( mi.GetCustomAttributes( typeof( BiosStubIncompleteAttribute ), false ).Length > 0 )
 						isImplemented = false;
 
-					bool isOverridable = false;
-					if( mi.GetCustomAttributes( typeof( BiosStubOverridableAttribute ), false ).Length > 0 )
-						isOverridable = true;
+					bool isAtomic = false;
+					if( mi.GetCustomAttributes( typeof( BiosStubAtomicAttribute ), false ).Length > 0 )
+						isAtomic = true;
 					
 					BiosStubDelegate del = Delegate.CreateDelegate( typeof( BiosStubDelegate ), module, mi ) as BiosStubDelegate;
 
 					this.RegisterFunction( new BiosFunction( module,
-						isImplemented, isOverridable,
+						isImplemented, isAtomic,
 						attr.NID, attr.Name, del, attr.HasReturn, attr.ParameterCount ) );
 				}
 			}

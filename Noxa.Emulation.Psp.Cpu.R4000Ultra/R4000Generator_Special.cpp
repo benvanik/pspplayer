@@ -94,18 +94,22 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		{
 			// Override if we can
 			bool emitted = false;
-			if( biosFunction->IsOverridable == true )
+			context->LastSyscallAtomic = biosFunction->IsAtomic;
+			if( biosFunction->IsAtomic == true )
 			{
+				// Note we may not emit here!
+				emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, biosFunction->NID );
+			}
+
+			if( emitted == true  )
+			{
+				// Everything handled for us by our overrides
+				if( hasReturn == true )
+					g->mov( MREG( CTX, 2 ), EAX );
+
 #ifdef STATISTICS
 				g->inc( g->dword_ptr[ &_nativeSyscallCount ] );
 #endif
-				emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, biosFunction->NID );
-			}
-			if( emitted == true  )
-			{
-				// Everything handled for us by our overrides?
-				if( hasReturn == true )
-					g->mov( MREG( CTX, 2 ), EAX );
 			}
 			else
 			{
