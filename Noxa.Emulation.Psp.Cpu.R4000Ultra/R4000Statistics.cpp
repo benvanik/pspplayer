@@ -16,6 +16,8 @@ int _jumpBlockThunkHits;
 int _jumpBlockInlineHits;
 int _jumpBlockInlineMisses;
 
+int _nativeSyscallCount;
+
 void R4000Statistics::GatherStats()
 {
 	CodeBlocksExecuted = _codeBlocksExecuted;
@@ -23,8 +25,12 @@ void R4000Statistics::GatherStats()
 	JumpBlockInlineHits = _jumpBlockInlineHits;
 	JumpBlockInlineMisses = _jumpBlockInlineMisses;
 
+	NativeSyscallCount = _nativeSyscallCount;
+
 	_codeBlocksExecuted = 0;
 	_jumpBlockThunkHits = 0;
 	_jumpBlockInlineHits = 0;
 	_jumpBlockInlineMisses = 0;
+
+	_nativeSyscallCount = 0;
 }

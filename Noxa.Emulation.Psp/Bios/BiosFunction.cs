@@ -78,12 +78,25 @@ namespace Noxa.Emulation.Psp.Bios
 
 	#endregion
 
+	#region BiosStubOverridableAttribute
+
+	[global::System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
+	public sealed class BiosStubOverridableAttribute : Attribute
+	{
+		public BiosStubOverridableAttribute()
+		{
+		}
+	}
+
+	#endregion
+
 	public delegate int BiosStubDelegate( IMemory memory, int a0, int a1, int a2, int a3, int sp );
 
 	public class BiosFunction
 	{
 		public IModule Module;
 		public bool IsImplemented;
+		public bool IsOverridable;
 		public uint NID;
 		public string Name;
 		public BiosStubDelegate Target;
@@ -92,10 +105,11 @@ namespace Noxa.Emulation.Psp.Bios
 
 		// Could have other stuff here
 
-		public BiosFunction( IModule module, bool isImplemented, uint nid, string name, BiosStubDelegate target, bool hasReturn, int parameterCount )
+		public BiosFunction( IModule module, bool isImplemented, bool isOverridable, uint nid, string name, BiosStubDelegate target, bool hasReturn, int parameterCount )
 		{
 			this.Module = module;
 			this.IsImplemented = isImplemented;
+			this.IsOverridable = isOverridable;
 			this.NID = nid;
 			this.Name = name;
 			this.Target = target;

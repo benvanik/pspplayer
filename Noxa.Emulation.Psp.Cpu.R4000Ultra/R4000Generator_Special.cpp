@@ -10,6 +10,7 @@
 #include "R4000Core.h"
 #include "R4000Memory.h"
 #include "R4000GenContext.h"
+#include "R4000BiosStubs.h"
 
 #include "Loader.hpp"
 #include "CodeGenerator.hpp"
@@ -20,6 +21,8 @@ using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace SoftWire;
 
+extern int _nativeSyscallCount;
+
 #define g context->Generator
 
 int __syscallBounce( int syscallId, int a0, int a1, int a2, int a3, int sp )
@@ -28,6 +31,8 @@ int __syscallBounce( int syscallId, int a0, int a1, int a2, int a3, int sp )
 	Debug::Assert( function != nullptr );
 
 #ifdef SYSCALLSTATS
+	R4000Cpu::GlobalCpu->_stats->BiosSyscallCount++;
+
 	int currentStat = R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ];
 	R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ] = currentStat + 1;
 #endif
@@ -87,50 +92,70 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 
 		if( willCall == true )
 		{
-			// up to 5 registers (4-7 + 29)
-			if( paramCount > 0 )
+			// Override if we can
+			bool emitted = false;
+			if( biosFunction->IsOverridable == true )
 			{
-				if( paramCount > 4 )
-					g->push( MREG( CTX, 29 ) );
-				else
-					g->push( ( uint )0 );
-
-				if( paramCount > 3 )
-					g->push( MREG( CTX, 7 ) );
-				else
-					g->push( ( uint )0 );
-
-				if( paramCount > 2 )
-					g->push( MREG( CTX, 6 ) );
-				else
-					g->push( ( uint )0 );
-
-				if( paramCount > 1 )
-					g->push( MREG( CTX, 5 ) );
-				else
-					g->push( ( uint )0 );
-
-				g->push( MREG( CTX, 4 ) );
+#ifdef STATISTICS
+				g->inc( g->dword_ptr[ &_nativeSyscallCount ] );
+#endif
+				emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, biosFunction->NID );
+			}
+			if( emitted == true  )
+			{
+				// Everything handled for us by our overrides?
+				if( hasReturn == true )
+					g->mov( MREG( CTX, 2 ), EAX );
 			}
 			else
 			{
-				g->push( ( uint )0 );
-				g->push( ( uint )0 );
-				g->push( ( uint )0 );
-				g->push( ( uint )0 );
-				g->push( ( uint )0 );
+				// Otherwise we use the thunk
+
+				// up to 5 registers (4-7 + 29)
+				if( paramCount > 0 )
+				{
+					if( paramCount > 4 )
+						g->push( MREG( CTX, 29 ) );
+					else
+						g->push( ( uint )0 );
+
+					if( paramCount > 3 )
+						g->push( MREG( CTX, 7 ) );
+					else
+						g->push( ( uint )0 );
+
+					if( paramCount > 2 )
+						g->push( MREG( CTX, 6 ) );
+					else
+						g->push( ( uint )0 );
+
+					if( paramCount > 1 )
+						g->push( MREG( CTX, 5 ) );
+					else
+						g->push( ( uint )0 );
+
+					g->push( MREG( CTX, 4 ) );
+				}
+				else
+				{
+					g->push( ( uint )0 );
+					g->push( ( uint )0 );
+					g->push( ( uint )0 );
+					g->push( ( uint )0 );
+					g->push( ( uint )0 );
+				}
+
+				g->push( ( uint )syscall );
+
+				// 6 ints on stack
+
+				g->call( ( int )__syscallBounce );
+
+				g->add( ESP, 6 * 4 );
+				
+				if( hasReturn == true )
+					g->mov( MREG( CTX, 2 ), EAX );
 			}
-
-			g->push( ( uint )syscall );
-
-			// 6 ints on stack
-
-			g->call( ( int )__syscallBounce );
-
-			g->add( ESP, 6 * 4 );
-
-			if( hasReturn == true )
-				g->mov( MREG( CTX, 2 ), EAX );
 		}
 		else
 		{

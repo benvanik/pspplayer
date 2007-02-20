@@ -41,6 +41,9 @@ namespace Noxa {
 					int JumpBlockInlineHits;					// # of times inline block was able to find target
 					int JumpBlockInlineMisses;					// # of times inline block had to return from bounce
 
+					int BiosSyscallCount;						// # of syscalls that go to the BIOS (managed)
+					int NativeSyscallCount;						// # of syscalls that use overriden stubs (native)
+
 					double AverageCodeSizeRatio;				// Ratio of MIPS code size to x86 code size
 
 					double AverageGenerationTime;
