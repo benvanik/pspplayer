@@ -78,12 +78,12 @@ namespace Noxa.Emulation.Psp.Bios
 
 	#endregion
 
-	#region BiosStubOverridableAttribute
+	#region BiosStubAtomicAttribute
 
 	[global::System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
-	public sealed class BiosStubOverridableAttribute : Attribute
+	public sealed class BiosStubAtomicAttribute : Attribute
 	{
-		public BiosStubOverridableAttribute()
+		public BiosStubAtomicAttribute()
 		{
 		}
 	}
@@ -96,7 +96,7 @@ namespace Noxa.Emulation.Psp.Bios
 	{
 		public IModule Module;
 		public bool IsImplemented;
-		public bool IsOverridable;
+		public bool IsAtomic;
 		public uint NID;
 		public string Name;
 		public BiosStubDelegate Target;
@@ -105,11 +105,11 @@ namespace Noxa.Emulation.Psp.Bios
 
 		// Could have other stuff here
 
-		public BiosFunction( IModule module, bool isImplemented, bool isOverridable, uint nid, string name, BiosStubDelegate target, bool hasReturn, int parameterCount )
+		public BiosFunction( IModule module, bool isImplemented, bool isAtomic, uint nid, string name, BiosStubDelegate target, bool hasReturn, int parameterCount )
 		{
 			this.Module = module;
 			this.IsImplemented = isImplemented;
-			this.IsOverridable = isOverridable;
+			this.IsAtomic = isAtomic;
 			this.NID = nid;
 			this.Name = name;
 			this.Target = target;
