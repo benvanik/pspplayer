@@ -26,6 +26,7 @@ namespace Noxa {
 			namespace Cpu {
 
 				ref class UltraCpu;
+				ref class R4000BiosStubs;
 
 				ref class R4000Cpu : ICpu
 				{
@@ -53,6 +54,7 @@ namespace Noxa {
 
 					R4000Cache^					_codeCache;
 					R4000GenContext^			_context;
+					R4000BiosStubs^				_biosStubs;
 
 					void*						_ctx;
 					void*						_bounce;

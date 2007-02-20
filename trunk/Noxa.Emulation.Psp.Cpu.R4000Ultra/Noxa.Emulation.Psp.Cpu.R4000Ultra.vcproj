@@ -217,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000BiosStubs.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000BlockBuilder.cpp"
 				>
 			</File>
@@ -308,6 +312,10 @@
 			</File>
 			<File
 				RelativePath=".\R4000BasicBlockBuilder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000BiosStubs.h"
 				>
 			</File>
 			<File

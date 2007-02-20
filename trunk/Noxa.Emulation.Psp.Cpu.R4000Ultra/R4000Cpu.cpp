@@ -13,6 +13,7 @@
 #include "R4000AdvancedBlockBuilder.h"
 #include "R4000Generator.h"
 #include "R4000Ctx.h"
+#include "R4000BiosStubs.h"
 
 using namespace System::Diagnostics;
 using namespace System::Reflection;
@@ -51,6 +52,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	R4000AdvancedBlockBuilder^ builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	R4000Generator* gen = new R4000Generator();
 	_context = gcnew R4000GenContext( builder, gen );
+	_biosStubs = gcnew R4000BiosStubs();
 
 	_bounce = builder->BuildBounce();
 }
