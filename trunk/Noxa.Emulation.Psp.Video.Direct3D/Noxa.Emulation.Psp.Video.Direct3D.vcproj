@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="Noxa.Emulation.Psp.Cpu.R4000Ultra"
-	ProjectGUID="{F8A92180-DC91-4FCB-8F69-9B3594C75A7D}"
-	RootNamespace="NoxaEmulationPspCpuR4000Ultra"
+	Name="Noxa.Emulation.Psp.Video.Direct3D"
+	ProjectGUID="{8B085E71-3588-440E-94D9-2483E1E9FE2C}"
+	RootNamespace="NoxaEmulationPspVideoDirect3D"
 	Keyword="ManagedCProj"
 	>
 	<Platforms>
@@ -41,11 +41,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\Dependencies\SoftWire&quot;;&quot;$(SolutionDir)Shared\Include&quot;"
+				AdditionalIncludeDirectories="$(SolutionDir)Shared\Include"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
-				BrowseInformation="1"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -60,9 +59,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)\Dependencies\SoftWire\Debug\SoftWire.lib $(NOINHERIT)"
+				AdditionalDependencies="$(NoInherit)"
 				LinkIncremental="2"
-				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
 				TargetMachine="1"
@@ -118,13 +116,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				EnableIntrinsicFunctions="true"
-				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\Dependencies\SoftWire&quot;;&quot;$(SolutionDir)Shared\Include&quot;"
+				AdditionalIncludeDirectories="$(SolutionDir)Shared\Include"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
-				BufferSecurityCheck="false"
-				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -140,9 +134,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)\Dependencies\SoftWire\Debug\SoftWire.lib $(NOINHERIT)"
+				AdditionalDependencies="$(NoInherit)"
 				LinkIncremental="1"
-				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -189,10 +182,6 @@
 			ReferencedProjectIdentifier="{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}"
 			RelativePathToProject=".\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj"
 		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{7609D1BE-23AC-4E67-AD44-9D1E637FB202}"
-			RelativePathToProject=".\Noxa.Utilities\Noxa.Utilities.csproj"
-		/>
 	</References>
 	<Files>
 		<Filter
@@ -205,71 +194,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Noxa.Emulation.Psp.Cpu.R4000Ultra.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000AdvancedBlockBuilder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000BasicBlockBuilder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000BiosStubs.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000BlockBuilder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Cache.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Cpu.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator_Arithmetic.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator_Control.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator_Cop.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator_Fpu.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator_Instructions.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator_Memory.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator_Special.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Memory.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Statistics.cpp"
+				RelativePath=".\Noxa.Emulation.Psp.Video.Direct3D.cpp"
 				>
 			</File>
 			<File
@@ -299,83 +224,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\Noxa.Emulation.Psp.Cpu.R4000Ultra.h"
+				RelativePath=".\Noxa.Emulation.Psp.Video.Direct3D.h"
 				>
 			</File>
 			<File
 				RelativePath=".\Options.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000AdvancedBlockBuilder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000BasicBlockBuilder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000BiosStubs.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000BlockBuilder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Cache.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Capabilities.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Clock.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Core.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Cp0.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Cp1.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Cp2.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Cpu.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Ctx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000GenContext.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Generator_Instructions.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Memory.h"
-				>
-			</File>
-			<File
-				RelativePath=".\R4000Statistics.h"
 				>
 			</File>
 			<File
