@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\D3dDriver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Noxa.Emulation.Psp.Video.Direct3D.cpp"
 				>
 			</File>
@@ -224,6 +228,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\D3dDriver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Noxa.Emulation.Psp.Video.Direct3D.h"
 				>
 			</File>
@@ -244,6 +252,22 @@
 				>
 				<File
 					RelativePath="..\Shared\Include\NoxaShared.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoApi.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoCommands.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoDisplayList.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoPacket.h"
 					>
 				</File>
 			</Filter>

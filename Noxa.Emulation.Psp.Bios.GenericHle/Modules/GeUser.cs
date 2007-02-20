@@ -63,6 +63,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			public int Base;
 		}
 
+		[BiosStubAtomic]
 		[BiosStub( 0x1f6752ad, "sceGeEdramGetSize", true, 0 )]
 		public int sceGeEdramGetSize( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -70,6 +71,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0x001fffff;
 		}
 
+		[BiosStubAtomic]
 		[BiosStub( 0xe47e40e4, "sceGeEdramGetAddr", true, 0 )]
 		public int sceGeEdramGetAddr( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -256,7 +258,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				_outstandingLists.Add( list );
 			}
 
-			bool success = _video.Enqueue( list, false );
+			bool success = _video.Enqueue( list, true );
 
 			// int - ID of the queue
 			if( success == true )
