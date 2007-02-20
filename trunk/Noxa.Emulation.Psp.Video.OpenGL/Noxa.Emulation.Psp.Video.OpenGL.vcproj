@@ -198,6 +198,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglDriver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stdafx.cpp"
 				>
 				<FileConfiguration
@@ -225,6 +229,10 @@
 			>
 			<File
 				RelativePath=".\Noxa.Emulation.Psp.Video.OpenGL.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OglDriver.h"
 				>
 			</File>
 			<File

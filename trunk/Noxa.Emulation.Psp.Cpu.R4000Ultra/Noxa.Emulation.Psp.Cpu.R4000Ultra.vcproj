@@ -273,6 +273,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000VideoInterface.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stdafx.cpp"
 				>
 				<FileConfiguration
@@ -298,6 +302,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\MemoryPool.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Noxa.Emulation.Psp.Cpu.R4000Ultra.h"
 				>
@@ -379,6 +387,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000VideoInterface.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource.h"
 				>
 			</File>
@@ -391,6 +403,22 @@
 				>
 				<File
 					RelativePath="..\Shared\Include\NoxaShared.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoApi.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoCommands.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoDisplayList.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoPacket.h"
 					>
 				</File>
 			</Filter>

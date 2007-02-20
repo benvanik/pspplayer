@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "OglDriver.h"
+
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace Noxa::Emulation::Psp;
@@ -108,8 +110,7 @@ namespace Noxa {
 
 					virtual IComponentInstance^ CreateInstance( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 					{
-						//return gcnew R4000Cpu( emulator, parameters );
-						return nullptr;
+						return gcnew OglDriver( emulator, parameters );
 					}
 				};
 
