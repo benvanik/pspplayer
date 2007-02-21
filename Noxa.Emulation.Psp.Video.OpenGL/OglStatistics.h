@@ -20,6 +20,8 @@ namespace Noxa {
 					OglStatistics(){}
 
 					float FPS;								// Frames per second
+					int ProcessedFrames;					// # of frames processed
+					int SkippedFrames;						// # of frames skipped
 
 					void GatherStats();
 

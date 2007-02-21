@@ -32,13 +32,14 @@ OglDriver::OglDriver( IEmulationInstance^ emulator, ComponentParameters^ paramet
 
 	_nativeInterface = malloc( sizeof( VideoApi ) );
 	memset( _nativeInterface, 0, sizeof( VideoApi ) );
-	this->FillNativeInterface();
+	this->SetupNativeInterface();
 
 	_vcount = 0;
 }
 
 OglDriver::~OglDriver()
 {
+	this->DestroyNativeInterface();
 	SAFEFREE( _nativeInterface );
 }
 
@@ -53,6 +54,9 @@ void OglDriver::Suspend()
 
 bool OglDriver::Resume()
 {
+	if( _thread == nullptr )
+		this->StartThread();
+
 	if( _props->HasChanged == false )
 		return true;
 

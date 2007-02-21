@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#include <string>
 #include "OglDriver.h"
 #include "VideoApi.h"
 
@@ -15,6 +16,10 @@ using namespace Noxa::Emulation::Psp::Video;
 using namespace Noxa::Emulation::Psp::Video::Native;
 
 extern uint _vcount;
+
+// NativeInterface
+VdlRef* GetNextListBatch();
+void FreeList( VideoDisplayList* list );
 
 void WorkerThreadThunk( Object^ object );
 
@@ -49,11 +54,27 @@ void OglDriver::WorkerThread()
 	{
 		while( _shutdown == false )
 		{
-			//
+			// Try to get a batch of lists to draw (as a frame)
+			VdlRef* batch = GetNextListBatch();
+			if( batch != NULL )
+			{
+				VdlRef* ref = batch;
+				while( ref != NULL )
+				{
+					//Debug::WriteLine( "Would process list" );
 
-			_vcount++;
+					// Move to next while freeing old - since we are
+					// done with it we also need to free the list
+					FreeList( ref->List );
+					VdlRef* next = ref->Next;
+					SAFEFREE( ref );
+					ref = next;
+				}
 
-			Thread::Sleep( 100 );
+				_vcount++;
+			}
+
+			//Thread::Sleep( 100 );
 		}
 	}
 	catch( ThreadAbortException^ )

@@ -31,6 +31,12 @@ namespace Noxa {
 						int				Base;
 					} VideoDisplayList;
 
+					typedef struct VdlRef_t
+					{
+						VideoDisplayList*	List;
+						VdlRef_t*			Next;
+					} VdlRef;
+
 				}
 			}
 		}

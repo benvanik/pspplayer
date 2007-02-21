@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#include <Windows.h>
 #include "OglDriver.h"
 #include "VideoApi.h"
 #include "MemoryPool.h"
@@ -16,26 +17,165 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Video;
 using namespace Noxa::Emulation::Psp::Video::Native;
 
-typedef struct VdlRef_t
-{
-	VideoDisplayList*	List;
-	VdlRef_t*			Next;
-} VdlRef;
+// This interface works by adding lists to a linked list of waiting lists.
+// When Sync is called, the pending lists are set to _pendingBatch and the
+// _lists/etc are reset to wait for more lists. When the video worker calls
+// GetNextListBatch() it will grab _pendingBatch if possible. If there is
+// already a batch in _pendingBatch when Sync is called, the existing
+// _pendingBatch is cleared - effectively implementing frame skipping (for
+// the case when the video worker cannot grab batches fast enough).
+// If frameskipping is not desired, if Sync is called and _pendingBatch has
+// data it should wait until GetNextListBatch() is called.
+
+// After this many lists have been allocated, break - it means we probably have an issue
+#define LISTCOUNTALERTTHRESHOLD 100
+
+#ifdef _DEBUG
+#define BREAK __break
+#else
+#define BREAK
+#endif
+
+CRITICAL_SECTION _cs;
+HANDLE _hSyncEvent;
+#define LOCK EnterCriticalSection( &_cs )
+#define UNLOCK LeaveCriticalSection( &_cs )
 
 VdlRef* _lists;
 VdlRef* _listsTail;
 int _nextListId;
+int _listCount;
+
+VdlRef* _pendingBatch;
+int _pendingCount;
 
 MemoryPool* _pool;
 
+// Statistics
+extern int _processedFrames;
+extern int _skippedFrames;
+
 void __break()
 {
-#ifdef _DEBUG
 	Debugger::Break();
-#endif
 }
 
+void MigrateBatch( bool waitIfPending );
+VdlRef* GetNextListBatch();
+void FreeList( VideoDisplayList* list );
+
 #pragma unmanaged
+
+VdlRef* GetNextListBatch()
+{
+	LOCK;
+
+	MigrateBatch( false );
+
+	VdlRef* batch = _pendingBatch;
+	_pendingBatch = NULL;
+	_pendingCount = 0;
+
+	if( batch != NULL )
+		_processedFrames++;
+
+	UNLOCK;
+
+	PulseEvent( _hSyncEvent );
+
+	return batch;
+}
+
+void FreeList( VideoDisplayList* list )
+{
+	// Should we be locked here?
+
+	_pool->Release( list->Packets );
+#ifdef _DEBUG
+	memset( list, 0, sizeof( VideoDisplayList ) );
+#endif
+	SAFEFREE( list );
+}
+
+// Caller needs to lock!
+void MigrateBatch( bool waitIfPending )
+{
+	VdlRef* batch = NULL;
+	VdlRef* batchTail = NULL;
+	int fetched = 0;
+
+	VdlRef* ref;
+
+	// Remove old batch if needed or wait on it
+	if( _pendingBatch != NULL )
+	{
+		if( waitIfPending == true )
+			WaitForSingleObject( _hSyncEvent, INFINITE );
+		else
+		{
+			// Clear old list
+			ref = _pendingBatch;
+			while( ref != NULL )
+			{
+				VdlRef* next = ref->Next;
+
+				FreeList( ref->List );
+				SAFEFREE( ref );
+
+				ref = next;
+			}
+
+#ifdef STATISTICS
+			_skippedFrames++;
+#endif
+		}
+	}
+
+	_pendingCount = 0;
+
+	ref = _lists;
+	VdlRef* prev = NULL;
+	while( ref != NULL )
+	{
+		if( ref->List->Ready == true )
+		{
+			VdlRef* next = ref->Next;
+			if( prev != NULL )
+				prev->Next = next;
+
+			if( batch == NULL )
+				batch = ref;
+			if( batchTail != NULL )
+				batchTail->Next = ref;
+			batchTail = ref;
+
+			if( ref == _lists )
+				_lists = next;
+			if( ref == _listsTail )
+			{
+				if( next == NULL )
+					_listsTail = prev;
+				else
+					_listsTail = next;
+			}
+
+			fetched++;
+
+			// prev stays what it is as it is the previous still in the list
+			ref = next;
+		}
+		else
+		{
+			prev = ref;
+			ref = ref->Next;
+		}
+	}
+
+	_listCount -= fetched;
+	_pendingCount = fetched;
+
+	_pendingBatch = batch;
+}
 
 void niSetup( MemoryPool* pool )
 {
@@ -43,28 +183,43 @@ void niSetup( MemoryPool* pool )
 	_lists = NULL;
 	_listsTail = NULL;
 	_nextListId = 1;
+	_listCount = 0;
 }
 
 VideoDisplayList* niFindList( int listId )
 {
+	LOCK;
+
 	VdlRef* ref = _lists;
 	if( ref == NULL )
+	{
+		UNLOCK;
 		return NULL;
+	}
 
 	// Check tail first - we often get called when updating the last list
 	if( _listsTail != NULL )
 	{
 		if( _listsTail->List->ID == listId )
-			return _listsTail->List;
+		{
+			VideoDisplayList* vdl = _listsTail->List;
+			UNLOCK;
+			return vdl;
+		}
 	}
 
 	while( ref != NULL )
 	{
 		if( ref->List->ID == listId )
-			return ref->List;
+		{
+			VideoDisplayList* vdl = ref->List;
+			UNLOCK;
+			return vdl;
+		}
 		ref = ref->Next;
 	}
 
+	UNLOCK;
 	return NULL;
 }
 
@@ -75,6 +230,8 @@ int niEnqueueList( VideoDisplayList* list, bool immediate )
 
 	VdlRef* ref = ( VdlRef* )malloc( sizeof( VdlRef ) );
 	ref->List = list;
+
+	LOCK;
 
 	if( immediate == true )
 	{
@@ -95,34 +252,54 @@ int niEnqueueList( VideoDisplayList* list, bool immediate )
 			_lists = ref;
 	}
 
+	_listCount++;
+
+	UNLOCK;
+
+	if( _listCount > LISTCOUNTALERTTHRESHOLD )
+		BREAK();
+
 	return listId;
 }
 
 void niDequeueList( int listId )
 {
+	LOCK;
+
 	VdlRef* ref = _lists;
 	if( ref == NULL )
+	{
+		UNLOCK;
 		return;
+	}
 
-	VdlRef* last = NULL;
+	VdlRef* prev = NULL;
 	while( ref != NULL )
 	{
 		if( ref->List->ID == listId )
 		{
-			if( last != NULL )
-				last->Next = ref->Next;
-			_pool->Release( ref->List->Packets );
-#ifdef _DEBUG
-			memset( ref->List, 0, sizeof( VideoDisplayList ) );
-#endif
-			SAFEFREE( ref->List );
+			VdlRef* next = ref->Next;
+			if( prev != NULL )
+				prev->Next = next;
+
+			if( ref == _lists )
+				_lists = next;
+			if( ref == _listsTail )
+				_listsTail = prev;
+
+			FreeList( ref->List );
 			SAFEFREE( ref );
 
+			_listCount--;
+
+			UNLOCK;
 			return;
 		}
-		last = ref;
+		prev = ref;
 		ref = ref->Next;
 	}
+
+	UNLOCK;
 }
 
 void niSyncList( int listId )
@@ -131,11 +308,20 @@ void niSyncList( int listId )
 
 void niSync()
 {
+	LOCK;
+
+#ifdef FRAMESKIPPING
+	MigrateBatch( false );
+#else
+	MigrateBatch( true );
+#endif
+
+	UNLOCK;
 }
 
 #pragma managed
 
-void OglDriver::FillNativeInterface()
+void OglDriver::SetupNativeInterface()
 {
 	VideoApi* ni = ( VideoApi* )_nativeInterface;
 
@@ -145,4 +331,16 @@ void OglDriver::FillNativeInterface()
 	ni->DequeueList = &niDequeueList;
 	ni->SyncList = &niSyncList;
 	ni->Sync = &niSync;
+
+	InitializeCriticalSection( &_cs );
+
+	_hSyncEvent = CreateEvent( NULL, false, false, NULL );
+}
+
+void OglDriver::DestroyNativeInterface()
+{
+	CloseHandle( _hSyncEvent );
+	_hSyncEvent = NULL;
+
+	DeleteCriticalSection( &_cs );
 }
