@@ -45,6 +45,11 @@ namespace Noxa.Emulation.Psp.Video
 			get;
 		}
 
+		IntPtr NativeInterface
+		{
+			get;
+		}
+
 		DisplayList FindDisplayList( int displayListId );
 		bool Enqueue( DisplayList displayList, bool immediate );
 		void Abort( int displayListId );

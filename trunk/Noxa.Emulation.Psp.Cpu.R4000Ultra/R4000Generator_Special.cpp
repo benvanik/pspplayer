@@ -105,6 +105,10 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 
 			if( emitted == true  )
 			{
+#ifdef GENDEBUG
+				Debug::WriteLine( String::Format( "Overrode {0} with native method", biosFunction->Name ) );
+#endif
+
 				// Everything handled for us by our overrides
 				if( hasReturn == true )
 					g->mov( MREG( CTX, 2 ), EAX );

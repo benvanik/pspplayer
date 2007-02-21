@@ -16,14 +16,19 @@ namespace Noxa {
 		namespace Psp {
 			namespace Cpu {
 
-				class R4000VideoInterface
+				ref class R4000Cpu;
+
+				ref class R4000VideoInterface
 				{
 				protected:
+					R4000Cpu^			_cpu;
 					MemoryPool*			_pool;
 
 				public:
-					R4000VideoInterface();
+					R4000VideoInterface( R4000Cpu^ cpu );
 					~R4000VideoInterface();
+
+					void Prepare();
 				};
 
 			}

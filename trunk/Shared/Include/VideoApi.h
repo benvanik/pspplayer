@@ -18,8 +18,11 @@ namespace Noxa {
 
 					typedef struct VideoApi_t
 					{
+						// Find an enqueued display list
+						VideoDisplayList* (*FindList)( int listId );
+
 						// Enqueue a new display list
-						int (*EnqueueList)( VideoDisplayList* list );
+						int (*EnqueueList)( VideoDisplayList* list, bool immediate );
 
 						// Dequeue an existing list (abort)
 						void (*DequeueList)( int listId );

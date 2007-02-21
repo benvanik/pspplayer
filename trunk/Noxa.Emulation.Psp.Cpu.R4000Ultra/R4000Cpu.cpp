@@ -14,6 +14,7 @@
 #include "R4000Generator.h"
 #include "R4000Ctx.h"
 #include "R4000BiosStubs.h"
+#include "R4000VideoInterface.h"
 
 using namespace System::Diagnostics;
 using namespace System::Reflection;
@@ -49,10 +50,13 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_syscallCounts = gcnew array<int>( 1024 );
 #endif
 
+	_hasExecuted = false;
+
 	R4000AdvancedBlockBuilder^ builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	R4000Generator* gen = new R4000Generator();
 	_context = gcnew R4000GenContext( builder, gen );
 	_biosStubs = gcnew R4000BiosStubs();
+	_videoInterface = gcnew R4000VideoInterface( this );
 
 	_bounce = builder->BuildBounce();
 }
@@ -89,6 +93,15 @@ int R4000Cpu::ExecuteBlock()
 	if( _stats->RunTime == 0.0 )
 		_stats->RunTime = _timer->Elapsed;
 #endif
+
+	if( _hasExecuted == false )
+	{
+		// Has to happen late in the game because we need to
+		// make sure the video subsystem is ready
+		_videoInterface->Prepare();
+
+		_hasExecuted = true;
+	}
 
 	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
 	//if( ctx->PC == 0 )
