@@ -13,6 +13,9 @@
 // Runtime statistic generation - will slow things down
 #define STATISTICS
 
+// Allow the CPU to drop entire frames if the worker thread cannot keep up
+#define FRAMESKIPPING
+
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG
 

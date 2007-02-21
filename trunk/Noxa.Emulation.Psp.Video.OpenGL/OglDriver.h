@@ -140,7 +140,8 @@ namespace Noxa {
 					virtual void Sync();
 
 				protected:
-					void FillNativeInterface();
+					void SetupNativeInterface();
+					void DestroyNativeInterface();
 
 					void StartThread();
 					void StopThread();

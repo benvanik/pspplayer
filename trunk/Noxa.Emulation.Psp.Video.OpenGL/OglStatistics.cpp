@@ -11,6 +11,14 @@ using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Video;
 
+int _processedFrames;
+int _skippedFrames;
+
 void OglStatistics::GatherStats()
 {
+	ProcessedFrames = _processedFrames;
+	SkippedFrames = _skippedFrames;
+
+	_processedFrames = 0;
+	_skippedFrames = 0;
 }

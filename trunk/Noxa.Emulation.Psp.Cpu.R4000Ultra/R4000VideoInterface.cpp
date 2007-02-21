@@ -14,22 +14,29 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace Noxa::Emulation::Psp::Video::Native;
 
-#define DEFAULTPACKETCAPACITY 200000
+#ifdef _DEBUG
+#define BREAK __break
+#else
+#define BREAK
+#endif
 
-#define OUTSTANDINGLISTCOUNT 50
-VideoDisplayList* _outstandingLists[ OUTSTANDINGLISTCOUNT ];
-int _maxOutstandingList;
+#define DEFAULTPACKETCAPACITY 50000
+
+VdlRef* _outstandingLists;
+VdlRef* _outstandingListsTail;
 
 void* _memoryAddress;
 VideoApi* _videoApi;
 MemoryPool* _memoryPool;
 
+void ClearOutstandingLists();
+
 R4000VideoInterface::R4000VideoInterface( R4000Cpu^ cpu )
 {
 	_cpu = cpu;
 
-	memset( _outstandingLists, 0, OUTSTANDINGLISTCOUNT * sizeof( VideoDisplayList* ) );
-	_maxOutstandingList = -1;
+	_outstandingLists = NULL;
+	_outstandingListsTail = NULL;
 
 	_pool = new MemoryPool();
 	_memoryPool = _pool;
@@ -37,6 +44,8 @@ R4000VideoInterface::R4000VideoInterface( R4000Cpu^ cpu )
 
 R4000VideoInterface::~R4000VideoInterface()
 {
+	ClearOutstandingLists();
+
 	_memoryPool = NULL;
 	SAFEDELETE( _pool );
 }
@@ -51,42 +60,40 @@ void R4000VideoInterface::Prepare()
 
 void __break()
 {
-#ifdef _DEBUG
 	Debugger::Break();
-#endif
 }
 
 #pragma unmanaged
 
 void AddOutstandingList( VideoDisplayList* list )
 {
-	for( int n = 0; n < OUTSTANDINGLISTCOUNT; n++ )
-	{
-		if( _outstandingLists[ n ] == NULL )
-		{
-			if( n > _maxOutstandingList )
-				_maxOutstandingList = n;
-			_outstandingLists[ n ] = list;
-			return;
-		}
-	}
+	VdlRef* ref = ( VdlRef* )malloc( sizeof( VdlRef ) );
+	ref->List = list;
+	ref->Next = NULL;
 
-	// If here, we ran out of room
-	__break();
+	if( _outstandingLists == NULL )
+		_outstandingLists = ref;
+	if( _outstandingListsTail != NULL )
+		_outstandingListsTail->Next = ref;
+	_outstandingListsTail = ref;
 }
 
 VideoDisplayList* FindOutstandingList( int listId )
 {
-	for( int n = 0; n < OUTSTANDINGLISTCOUNT; n++ )
-	{
-		VideoDisplayList* list = _outstandingLists[ n ];
-		if( list == NULL )
-			continue;
-		if( n > _maxOutstandingList )
-			break;
+	VdlRef* ref = _outstandingLists;
 
-		if( list->ID == listId )
-			return list;
+	// Check tail first
+	if( _outstandingListsTail != NULL )
+	{
+		if( _outstandingListsTail->List->ID == listId )
+			return _outstandingListsTail->List;
+	}
+
+	while( ref != NULL )
+	{
+		if( ref->List->ID == listId )
+			return ref->List;
+		ref = ref->Next;
 	}
 
 	return NULL;
@@ -94,22 +101,38 @@ VideoDisplayList* FindOutstandingList( int listId )
 
 void RemoveOutstandingList( VideoDisplayList* list )
 {
-	int lastMax = 0;
-	for( int n = 0; n < OUTSTANDINGLISTCOUNT; n++ )
+	VdlRef* ref = _outstandingLists;
+	VdlRef* prev = NULL;
+
+	while( ref != NULL )
 	{
-		if( _outstandingLists[ n ] == list )
+		if( ref->List == list )
 		{
-			_outstandingLists[ n ] = NULL;
-			if( _maxOutstandingList == n )
-				_maxOutstandingList = lastMax;
+			if( prev != NULL )
+				prev->Next = ref->Next;
+			if( ref == _outstandingLists )
+				_outstandingLists = ref->Next;
+			if( ref == _outstandingListsTail )
+				_outstandingListsTail = prev;
+			SAFEFREE( ref );
 			return;
 		}
-		else if( _outstandingLists[ n ] != NULL )
-			lastMax = n;
+		prev = ref;
+		ref = ref->Next;
 	}
+}
 
-	// Not found
-	__break();
+void ClearOutstandingLists()
+{
+	VdlRef* ref = _outstandingLists;
+	while( ref != NULL )
+	{
+		VdlRef* next = ref->Next;
+		SAFEFREE( ref );
+		ref = next;
+	}
+	_outstandingLists = NULL;
+	_outstandingListsTail = NULL;
 }
 
 void __inline GetVideoPacket( int code, int baseAddress, VideoPacket* packet )
@@ -147,7 +170,7 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 		{
 			// Ran out of space! No clue what to do! Ack!
 			// Could we use MemoryPool to realloc and such?
-			__break();
+			BREAK();
 		}
 
 		int code = *( ( int* )( ( byte* )memptr + ( pointer - 0x08000000 ) ) );
@@ -170,7 +193,7 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 		case CALL:
 		case RET:
 		case BJUMP:
-			__break();
+			BREAK();
 			break;
 
 			// Stop conditions?
@@ -192,8 +215,6 @@ bool ReadMorePackets( void* memoryAddress, VideoDisplayList* vdl, uint newStallA
 	vdl->StallAddress = newStallAddress;
 	bool done = ReadPackets( memoryAddress, oldStallAddress, vdl->StallAddress, vdl );
 	vdl->Ready = done;
-	if( done == true )
-		RemoveOutstandingList( vdl );
 	return done;
 }
 
@@ -219,7 +240,7 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 		// Read all now
 		bool done = ReadPackets( _memoryAddress, list, 0, vdl );
 		if( done == false )
-			__break();
+			BREAK();
 	}
 	else
 	{
@@ -229,7 +250,7 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 		// Rest will follow
 		bool done = ReadPackets( _memoryAddress, list, stall, vdl );
 		if( done == true )
-			__break();
+			BREAK();
 
 		AddOutstandingList( vdl );
 	}
@@ -244,8 +265,7 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 
 int sceGeListDeQueue( int qid )
 {
-	// TODO: get api from someplace
-	VideoApi* ni = NULL;
+	VideoApi* ni = _videoApi;
 	ni->DequeueList( qid );
 
 	return 0;
@@ -258,7 +278,7 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 	VideoDisplayList* vdl = ni->FindList( qid );
 	if( vdl == NULL )
 	{
-		__break();
+		BREAK();
 		return -1;
 	}
 
@@ -266,7 +286,10 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 	{
 		bool done = ReadMorePackets( _memoryAddress, vdl, stall );
 		if( done == true )
+		{
+			RemoveOutstandingList( vdl );
 			ni->SyncList( vdl->ID );
+		}
 	}
 
 	return 0;
@@ -287,9 +310,12 @@ int sceGeListSync( int qid, int syncType )
 	{
 		bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
 		if( done == false )
-			__break();
-
-		ni->SyncList( vdl->ID );
+			BREAK();
+		else
+		{
+			RemoveOutstandingList( vdl );
+			ni->SyncList( vdl->ID );
+		}
 	}
 
 	return 0;
@@ -299,22 +325,22 @@ int sceGeDrawSync( int syncType )
 {
 	// Can only handle syncType == 0
 	if( syncType != 0 )
-		__break();
+		BREAK();
 
 	// This a full sync - we need to finish all lists
-	for( int n = 0; n < _maxOutstandingList; n++ )
+	VdlRef* ref = _outstandingLists;
+	while( ref != NULL )
 	{
-		VideoDisplayList* vdl = _outstandingLists[ n ];
-		if( vdl == NULL )
-			continue;
-
+		VideoDisplayList* vdl = ref->List;
 		if( vdl->Ready == false )
 		{
 			bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
 			if( done == false )
-				__break();
+				BREAK();
 		}
 	}
+
+	ClearOutstandingLists();
 
 	VideoApi* ni = _videoApi;
 	ni->Sync();
