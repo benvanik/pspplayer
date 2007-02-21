@@ -77,3 +77,23 @@ void OglDriver::Cleanup()
 
 	_threadSync = nullptr;
 }
+
+void OglDriver::PrintStatistics()
+{
+#ifdef STATISTICS
+		_stats->GatherStats();
+		//_stats->AverageCodeBlockLength /= _stats->CodeBlocksGenerated;
+		//_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
+		//_stats->RunTime = _timer->Elapsed - _stats->RunTime;
+		//_stats->IPS = _stats->InstructionsExecuted / _stats->RunTime;
+		StringBuilder^ sb = gcnew StringBuilder();
+		array<FieldInfo^>^ fields = ( OglStatistics::typeid )->GetFields();
+		for( int n = 0; n < fields->Length; n++ )
+		{
+			Object^ value = fields[ n ]->GetValue( _stats );
+			sb->AppendFormat( "{0}: {1}\n", fields[ n ]->Name, value );
+		}
+		Debug::WriteLine( "OpenGL Video Driver Statistics: -----------------------------" );
+		Debug::WriteLine( sb->ToString() );
+#endif
+}

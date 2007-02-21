@@ -6,9 +6,9 @@
 
 #include "StdAfx.h"
 #include <Windows.h>
+#include "MemoryPool.h"
 #include "OglDriver.h"
 #include "VideoApi.h"
-#include "MemoryPool.h"
 #include <string>
 
 using namespace System::Diagnostics;
@@ -52,8 +52,8 @@ int _pendingCount;
 MemoryPool* _pool;
 
 // Statistics
-extern int _processedFrames;
-extern int _skippedFrames;
+extern uint _processedFrames;
+extern uint _skippedFrames;
 
 void __break()
 {
@@ -76,8 +76,10 @@ VdlRef* GetNextListBatch()
 	_pendingBatch = NULL;
 	_pendingCount = 0;
 
+#ifdef STATISTICS
 	if( batch != NULL )
 		_processedFrames++;
+#endif
 
 	UNLOCK;
 

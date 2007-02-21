@@ -6,10 +6,10 @@
 
 #pragma once
 
+#include "MemoryPool.h"
+
 using namespace System;
 using namespace Noxa::Emulation::Psp;
-
-#include "MemoryPool.h"
 
 namespace Noxa {
 	namespace Emulation {

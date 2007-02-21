@@ -341,6 +341,8 @@ namespace Noxa.Emulation.Psp.Player
 			this.OnStateChanged();
 
 			_cpu.PrintStatistics();
+			if( _video != null )
+				_video.PrintStatistics();
 
 			this.Destroy();
 		}

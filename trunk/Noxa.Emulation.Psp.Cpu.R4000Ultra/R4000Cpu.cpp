@@ -186,6 +186,7 @@ void R4000Cpu::PrintStatistics()
 			Object^ value = fields[ n ]->GetValue( _stats );
 			sb->AppendFormat( "{0}: {1}\n", fields[ n ]->Name, value );
 		}
+		Debug::WriteLine( "Ultra CPU Statistics: ---------------------------------------" );
 		Debug::WriteLine( sb->ToString() );
 
 #ifdef SYSCALLSTATS
