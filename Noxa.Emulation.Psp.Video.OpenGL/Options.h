@@ -16,6 +16,9 @@
 // Allow the CPU to drop entire frames if the worker thread cannot keep up
 #define FRAMESKIPPING
 
+// Double buffer the display surface
+//#define VSYNC
+
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG
 

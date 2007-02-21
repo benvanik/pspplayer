@@ -43,6 +43,10 @@ namespace Noxa {
 
 					void*						_nativeInterface;
 
+					void*						_handle;
+					void*						_hDC;
+					void*						_hRC;
+
 				public:
 
 					property ComponentParameters^ Parameters
@@ -81,10 +85,11 @@ namespace Noxa {
 					{
 						virtual IntPtr get()
 						{
-							return IntPtr::Zero;
+							return IntPtr::IntPtr( ( void* )_handle );
 						}
 						virtual void set( IntPtr value )
 						{
+							_handle = ( void* )value.ToPointer();
 						}
 					}
 
@@ -139,12 +144,16 @@ namespace Noxa {
 					virtual void Sync( DisplayList^ displayList );
 					virtual void Sync();
 
+					virtual void PrintStatistics();
+
 				protected:
 					void SetupNativeInterface();
 					void DestroyNativeInterface();
 
 					void StartThread();
 					void StopThread();
+					void SetupOpenGL();
+					void DestroyOpenGL();
 
 				internal:
 					void WorkerThread();

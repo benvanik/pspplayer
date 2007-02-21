@@ -6,7 +6,12 @@
 
 #pragma once
 
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 #include <string>
+
+#define LOCK EnterCriticalSection( &_cs )
+#define UNLOCK LeaveCriticalSection( &_cs )
 
 namespace Noxa {
 	namespace Emulation {
@@ -23,8 +28,9 @@ namespace Noxa {
 				} ObjectPointer;
 
 			protected:
-				int			_free;
-				int			_used;
+				int					_free;
+				int					_used;
+				CRITICAL_SECTION	_cs;
 				
 				ObjectPointer*	_freeList;
 				ObjectPointer*	_usedList;
@@ -35,11 +41,15 @@ namespace Noxa {
 					_free = _used = 0;
 					_freeList = NULL;
 					_usedList = NULL;
+
+					InitializeCriticalSection( &_cs );
 				}
 
 				~MemoryPool()
 				{
 					this->Clear();
+
+					DeleteCriticalSection( &_cs );
 				}
 
 				int GetFreeCount()
@@ -62,6 +72,8 @@ namespace Noxa {
 					if( size == 0 )
 						return NULL;
 
+					LOCK;
+
 					// Try to find a free item
 					ObjectPointer* p = _freeList;
 					ObjectPointer* q = NULL;
@@ -82,7 +94,9 @@ namespace Noxa {
 							_used++;
 							_free--;
 
-							return p->Target;
+							void* target = p->Target;
+							UNLOCK;
+							return target;
 						}
 						q = p;
 						p = p->Next;
@@ -93,6 +107,7 @@ namespace Noxa {
 					if( p == NULL )
 					{
 						// Couldn't allocate - too large?
+						UNLOCK;
 						return NULL;
 					}
 
@@ -101,11 +116,15 @@ namespace Noxa {
 
 					_used++;
 
-					return p->Target;
+					void* target = p->Target;
+					UNLOCK;
+					return target;
 				}
 
 				void Release( void* ptr )
 				{
+					LOCK;
+
 					ObjectPointer* p = _usedList;
 					ObjectPointer* q = NULL;
 					while( p != NULL )
@@ -125,6 +144,7 @@ namespace Noxa {
 							_free++;
 							_used--;
 
+							UNLOCK;
 							return;
 						}
 						q = p;
@@ -132,10 +152,13 @@ namespace Noxa {
 					}
 
 					// Not found in used list!
+					UNLOCK;
 				}
 
 				void Clear()
 				{
+					LOCK;
+
 					this->FreeList( _freeList );
 					_freeList = NULL;
 
@@ -148,6 +171,8 @@ namespace Noxa {
 
 					_free = 0;
 					_used = 0;
+
+					UNLOCK;
 				}
 
 			protected:

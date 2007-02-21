@@ -219,6 +219,10 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			_threadSync = null;
 		}
 
+		public void PrintStatistics()
+		{
+		}
+
 		#region Device Management
 
 		private bool CreateDevice()

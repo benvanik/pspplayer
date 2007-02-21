@@ -59,5 +59,7 @@ namespace Noxa.Emulation.Psp.Video
 
 		void Suspend();
 		bool Resume();
+
+		void PrintStatistics();
 	}
 }
