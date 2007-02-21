@@ -155,6 +155,14 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 			}
 		}
 
+		public IntPtr NativeInterface
+		{
+			get
+			{
+				return IntPtr.Zero;
+			}
+		}
+
 		public void Suspend()
 		{
 		}

@@ -6,26 +6,33 @@
 
 #pragma once
 
-#include "VideoCommands.h"
+using namespace System;
+using namespace Noxa::Emulation::Psp;
 
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
 			namespace Video {
-				namespace Native {
 
-					#pragma pack(push)
-					#pragma pack(1)
-					typedef struct VideoPacket_t
+				ref class OglStatistics : public IVideoStatistics
+				{
+				public:
+					OglStatistics(){}
+
+					float FPS;								// Frames per second
+
+					void GatherStats();
+
+					property int FramesPerSecond
 					{
-						int			Argument : 24;
-						int			Command : 8;
-					} VideoPacket;
-					#pragma pack(pop)
+						virtual int get()
+						{
+							return ( int )FPS;
+						}
+					}
 
-					#define ARGF( argument ) ( float )( ( void* )( argument << 8 ) )
+				};
 
-				}
 			}
 		}
 	}

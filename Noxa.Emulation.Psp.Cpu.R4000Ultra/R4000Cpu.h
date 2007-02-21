@@ -27,6 +27,7 @@ namespace Noxa {
 
 				ref class UltraCpu;
 				ref class R4000BiosStubs;
+				ref class R4000VideoInterface;
 
 				ref class R4000Cpu : ICpu
 				{
@@ -40,6 +41,8 @@ namespace Noxa {
 					R4000Clock^					_clock;
 					
 					EventHandler<BreakpointEventArgs^>^ _breakpointTriggeredHandler;
+
+					bool						_hasExecuted;
 
 				internal:
 					R4000Statistics^			_stats;
@@ -55,6 +58,7 @@ namespace Noxa {
 					R4000Cache^					_codeCache;
 					R4000GenContext^			_context;
 					R4000BiosStubs^				_biosStubs;
+					R4000VideoInterface^		_videoInterface;
 
 					void*						_ctx;
 					void*						_bounce;

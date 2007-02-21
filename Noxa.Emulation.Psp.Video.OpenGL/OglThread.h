@@ -6,26 +6,11 @@
 
 #pragma once
 
-#include "VideoCommands.h"
-
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
 			namespace Video {
-				namespace Native {
 
-					#pragma pack(push)
-					#pragma pack(1)
-					typedef struct VideoPacket_t
-					{
-						int			Argument : 24;
-						int			Command : 8;
-					} VideoPacket;
-					#pragma pack(pop)
-
-					#define ARGF( argument ) ( float )( ( void* )( argument << 8 ) )
-
-				}
 			}
 		}
 	}

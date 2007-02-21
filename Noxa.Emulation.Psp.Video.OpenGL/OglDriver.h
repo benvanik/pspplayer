@@ -6,6 +6,9 @@
 
 #pragma once
 
+#include "OglCapabilities.h"
+#include "OglStatistics.h"
+
 using namespace System;
 using namespace System::Threading;
 using namespace Noxa::Emulation::Psp;
@@ -26,8 +29,19 @@ namespace Noxa {
 					static OglDriver^			GlobalDriver;
 
 				protected:
+					Thread^						_thread;
+					AutoResetEvent^				_threadSync;
+					bool						_shutdown;
+
+				internal:
 					IEmulationInstance^			_emu;
 					ComponentParameters^		_params;
+					DisplayProperties^			_props;
+					DisplayProperties^			_currentProps;
+					OglCapabilities^			_caps;
+					OglStatistics^				_stats;
+
+					void*						_nativeInterface;
 
 				public:
 
@@ -59,7 +73,7 @@ namespace Noxa {
 					{
 						virtual DisplayProperties^ get()
 						{
-							return nullptr;
+							return _props;
 						}
 					}
 
@@ -82,19 +96,16 @@ namespace Noxa {
 						}
 					}
 
-					property uint Vcount
+					property uint OglDriver::Vcount
 					{
-						virtual uint get()
-						{
-							return 0;
-						}
+						virtual uint get();
 					}
 
 					property IVideoCapabilities^ Capabilities
 					{
 						virtual IVideoCapabilities^ get()
 						{
-							return nullptr;
+							return _caps;
 						}
 					}
 
@@ -102,7 +113,15 @@ namespace Noxa {
 					{
 						virtual IVideoStatistics^ get()
 						{
-							return nullptr;
+							return _stats;
+						}
+					}
+
+					property IntPtr NativeInterface
+					{
+						virtual IntPtr get()
+						{
+							return IntPtr::IntPtr( _nativeInterface );
 						}
 					}
 
@@ -114,11 +133,20 @@ namespace Noxa {
 
 					virtual void Cleanup();
 
-					virtual DisplayList^ FindDisplayList( int displayListId ){ return nullptr; }
-					virtual bool Enqueue( DisplayList^ displayList, bool immediate ){ return false; }
-					virtual void Abort( int displayListId ){}
-					virtual void Sync( DisplayList^ displayList ){}
-					virtual void Sync(){}
+					virtual DisplayList^ FindDisplayList( int displayListId );
+					virtual bool Enqueue( DisplayList^ displayList, bool immediate );
+					virtual void Abort( int displayListId );
+					virtual void Sync( DisplayList^ displayList );
+					virtual void Sync();
+
+				protected:
+					void FillNativeInterface();
+
+					void StartThread();
+					void StopThread();
+
+				internal:
+					void WorkerThread();
 				};
 
 			}

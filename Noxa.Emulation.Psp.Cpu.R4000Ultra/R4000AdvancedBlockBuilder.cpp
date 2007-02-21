@@ -101,6 +101,8 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 			{
 				//if( address == 0x08900390 )
 				//	g->int3();
+				//if( address == 0x08909C98 )
+				//	g->int3();
 			}
 #endif
 

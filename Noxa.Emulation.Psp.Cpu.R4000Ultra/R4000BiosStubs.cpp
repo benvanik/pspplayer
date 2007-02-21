@@ -23,12 +23,11 @@ void sceRtcGetCurrentTick( LARGE_INTEGER* address );
 // sceGeUser -------------------------------------------
 //int sceGeEdramGetSize(); <-- inlined
 //int sceGeEdramGetAddr(); <-- inlined
-int sceGeListEnQueue( const void* list, const void* stall, int cbid, const void* arg );
-int sceGeListEnQueueHead( const void* list, const void* stall, int cbid, const void* arg );
-int sceGeListDeQueue( int qid );
-int sceGeListUpdateStallAddr( int qid, const void* stall );
-int sceGeListSync( int qid, int syncType );
-int sceGeDrawSync( int syncType );
+extern int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head );
+extern int sceGeListDeQueue( int qid );
+extern int sceGeListUpdateStallAddr( int qid, uint stall );
+extern int sceGeListSync( int qid, int syncType );
+extern int sceGeDrawSync( int syncType );
 
 #pragma managed
 
@@ -49,6 +48,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->mov( EAX, 0 );
 		return true;
 
+#ifdef NATIVEVIDEOINTERFACE
 	// sceGeUser -------------------------------------------
 	case 0x1f6752ad:		// sceGeEdramGetSize
 		g->mov( EAX, 0x001fffff );
@@ -57,20 +57,22 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g-> mov( EAX, 0x04000000 );
 		return true;
 	case 0xab49e76a:		// sceGeListEnQueue
+		g->push( ( uint )0 ); // head = false
 		g->push( MREG( CTX, 7 ) );
 		g->push( MREG( CTX, 6 ) );
 		g->push( MREG( CTX, 5 ) );
 		g->push( MREG( CTX, 4 ) );
 		g->call( ( int )sceGeListEnQueue );
-		g->add( ESP, 16 );
+		g->add( ESP, 20 );
 		return true;
 	case 0x1c0d95a6:		// sceGeListEnQueueHead
+		g->push( ( uint )1 ); // head = true
 		g->push( MREG( CTX, 7 ) );
 		g->push( MREG( CTX, 6 ) );
 		g->push( MREG( CTX, 5 ) );
 		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )sceGeListEnQueueHead );
-		g->add( ESP, 16 );
+		g->call( ( int )sceGeListEnQueue );
+		g->add( ESP, 20 );
 		return true;
 	case 0x5fb86ab0:		// sceGeListDeQueue
 		g->push( MREG( CTX, 4 ) );
@@ -94,6 +96,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->call( ( int )sceGeDrawSync );
 		g->add( ESP, 4 );
 		return true;
+#endif
 	}
 
 	return false;
@@ -113,38 +116,6 @@ int sceRtcGetTickResolution()
 void sceRtcGetCurrentTick( LARGE_INTEGER* address )
 {
 	QueryPerformanceCounter( address );
-}
-
-// sceGeUser -------------------------------------------
-
-int sceGeListEnQueue( const void* list, const void* stall, int cbid, const void* arg )
-{
-	return 0;
-}
-
-int sceGeListEnQueueHead( const void* list, const void* stall, int cbid, const void* arg )
-{
-	return 0;
-}
-
-int sceGeListDeQueue( int qid )
-{
-	return 0;
-}
-
-int sceGeListUpdateStallAddr( int qid, const void* stall )
-{
-	return 0;
-}
-
-int sceGeListSync( int qid, int syncType )
-{
-	return 0;
-}
-
-int sceGeDrawSync( int syncType )
-{
-	return 0;
 }
 
 #pragma managed

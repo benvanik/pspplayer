@@ -16,8 +16,11 @@
 
 // When defined the native syscalls implemented in R4000BiosStubs.cpp will be used
 // when allowed by the loaded BIOS. This may cause bugs, but should be a big
-// win for performance.
+// win for performance
 #define OVERRIDESYSCALLS
+
+// Define to support the native video interface
+#define NATIVEVIDEOINTERFACE
 
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG

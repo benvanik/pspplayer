@@ -202,6 +202,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglDriver_ManagedInterface.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OglDriver_NativeInterface.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OglDriver_Worker.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OglStatistics.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stdafx.cpp"
 				>
 				<FileConfiguration
@@ -232,7 +248,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglCapabilities.h"
+				>
+			</File>
+			<File
 				RelativePath=".\OglDriver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OglStatistics.h"
 				>
 			</File>
 			<File
@@ -252,6 +276,22 @@
 				>
 				<File
 					RelativePath="..\Shared\Include\NoxaShared.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoApi.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoCommands.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoDisplayList.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\VideoPacket.h"
 					>
 				</File>
 			</Filter>
