@@ -45,6 +45,8 @@ void R4000VideoInterface::Prepare()
 {
 	_memoryAddress = _cpu->_memory->MainMemory;
 	_videoApi = ( VideoApi* )_cpu->Emulator->Video->NativeInterface.ToPointer();
+
+	_videoApi->Setup( _pool );
 }
 
 void __break()
@@ -184,9 +186,10 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 	return false;
 }
 
-bool ReadMorePackets( void* memoryAddress, VideoDisplayList* vdl )
+bool ReadMorePackets( void* memoryAddress, VideoDisplayList* vdl, uint newStallAddress )
 {
 	int oldStallAddress = vdl->StallAddress;
+	vdl->StallAddress = newStallAddress;
 	bool done = ReadPackets( memoryAddress, oldStallAddress, vdl->StallAddress, vdl );
 	vdl->Ready = done;
 	if( done == true )
@@ -261,8 +264,7 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 
 	if( vdl->Ready == false )
 	{
-		vdl->StallAddress = stall;
-		bool done = ReadMorePackets( _memoryAddress, vdl );
+		bool done = ReadMorePackets( _memoryAddress, vdl, stall );
 		if( done == true )
 			ni->SyncList( vdl->ID );
 	}
@@ -283,8 +285,7 @@ int sceGeListSync( int qid, int syncType )
 
 	if( vdl->Ready == false )
 	{
-		vdl->StallAddress = 0;
-		bool done = ReadMorePackets( _memoryAddress, vdl );
+		bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
 		if( done == false )
 			__break();
 
@@ -309,8 +310,7 @@ int sceGeDrawSync( int syncType )
 
 		if( vdl->Ready == false )
 		{
-			vdl->StallAddress = 0;
-			bool done = ReadMorePackets( _memoryAddress, vdl );
+			bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
 			if( done == false )
 				__break();
 		}

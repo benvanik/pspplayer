@@ -275,6 +275,10 @@
 				Name="Shared"
 				>
 				<File
+					RelativePath="..\Shared\Include\MemoryPool.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Shared\Include\NoxaShared.h"
 					>
 				</File>
