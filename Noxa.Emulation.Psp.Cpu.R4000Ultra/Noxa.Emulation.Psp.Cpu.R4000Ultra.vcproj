@@ -303,10 +303,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\MemoryPool.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Noxa.Emulation.Psp.Cpu.R4000Ultra.h"
 				>
 			</File>
@@ -401,6 +397,10 @@
 			<Filter
 				Name="Shared"
 				>
+				<File
+					RelativePath="..\Shared\Include\MemoryPool.h"
+					>
+				</File>
 				<File
 					RelativePath="..\Shared\Include\NoxaShared.h"
 					>

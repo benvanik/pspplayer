@@ -13,11 +13,17 @@
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
+
+			class MemoryPool;
+
 			namespace Video {
 				namespace Native {
 
 					typedef struct VideoApi_t
 					{
+						// Setup
+						void (*Setup)( MemoryPool* pool );
+
 						// Find an enqueued display list
 						VideoDisplayList* (*FindList)( int listId );
 
