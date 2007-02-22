@@ -801,8 +801,8 @@ namespace Noxa.Emulation.Psp.Cpu
 					}
 					else
 					{
-						//if( pass == 1 )
-							//EmitDebugInfo( _context, address, code, "NOP", "" );
+						if( pass == 1 )
+							EmitTrace( _context, address, code, "NOP", "" );
 					}
 
 					// This will print out NOP's when we are in a null delay slot

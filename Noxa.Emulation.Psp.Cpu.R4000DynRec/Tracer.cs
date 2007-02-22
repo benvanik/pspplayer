@@ -21,8 +21,8 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public static void OpenFile( string fileName )
 		{
-			_stream = File.OpenWrite( fileName );
-			_writer = new StreamWriter( _stream );
+			_writer = File.CreateText( fileName );
+			//_writer = new StreamWriter( _stream );
 		}
 
 		public static void CloseFile()
