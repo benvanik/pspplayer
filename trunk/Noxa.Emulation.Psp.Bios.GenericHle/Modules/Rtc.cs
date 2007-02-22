@@ -48,7 +48,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 		#endregion
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0xc41c2853, "sceRtcGetTickResolution", true, 0 )]
 		public int sceRtcGetTickResolution( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -67,7 +67,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return unchecked( ( int )TimeSpan.TicksPerSecond );
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0x3f7ad767, "sceRtcGetCurrentTick", true, 1 )]
 		public int sceRtcGetCurrentTick( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{

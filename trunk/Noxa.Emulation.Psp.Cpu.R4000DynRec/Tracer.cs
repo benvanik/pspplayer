@@ -16,13 +16,11 @@ namespace Noxa.Emulation.Psp.Cpu
 {
 	static class Tracer
 	{
-		private static FileStream _stream;
 		private static StreamWriter _writer;
 
 		public static void OpenFile( string fileName )
 		{
 			_writer = File.CreateText( fileName );
-			//_writer = new StreamWriter( _stream );
 		}
 
 		public static void CloseFile()
@@ -30,7 +28,6 @@ namespace Noxa.Emulation.Psp.Cpu
 			if( _writer != null )
 				_writer.Dispose();
 			_writer = null;
-			_stream = null;
 		}
 
 		public static void WriteLine( string line )

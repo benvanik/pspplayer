@@ -8,6 +8,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#include "R4000Cpu.h"
 #include "R4000BiosStubs.h"
 #include "R4000Generator.h"
 
@@ -48,57 +49,66 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->add( ESP, 4 );
 		g->mov( EAX, 0 );
 		return true;
+	}
 
 #ifdef NATIVEVIDEOINTERFACE
-	// sceGeUser -------------------------------------------
-	case 0x1f6752ad:		// sceGeEdramGetSize
-		g->mov( EAX, 0x001fffff );
-		return true;
-	case 0xe47e40e4:		// sceGeEdramGetAddr
-		g-> mov( EAX, 0x04000000 );
-		return true;
-	case 0xab49e76a:		// sceGeListEnQueue
-		g->push( ( uint )0 ); // head = false
-		g->push( MREG( CTX, 7 ) );
-		g->push( MREG( CTX, 6 ) );
-		g->push( MREG( CTX, 5 ) );
-		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )sceGeListEnQueue );
-		g->add( ESP, 20 );
-		return true;
-	case 0x1c0d95a6:		// sceGeListEnQueueHead
-		g->push( ( uint )1 ); // head = true
-		g->push( MREG( CTX, 7 ) );
-		g->push( MREG( CTX, 6 ) );
-		g->push( MREG( CTX, 5 ) );
-		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )sceGeListEnQueue );
-		g->add( ESP, 20 );
-		return true;
-	case 0x5fb86ab0:		// sceGeListDeQueue
-		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )sceGeListDeQueue );
-		g->add( ESP, 4 );
-		return true;
-	case 0xe0d68148:		// sceGeListUpdateStallAddr
-		g->push( MREG( CTX, 5 ) );
-		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )sceGeListUpdateStallAddr );
-		g->add( ESP, 8 );
-		return true;
-	case 0x03444eb4:		// sceGeListSync
-		g->push( MREG( CTX, 5 ) );
-		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )sceGeListSync );
-		g->add( ESP, 8 );
-		return true;
-	case 0xb287bd61:		// sceGeDrawSync
-		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )sceGeDrawSync );
-		g->add( ESP, 4 );
-		return true;
-#endif
+	// Note for video stuff: we must have a native video inteface for it to work!
+	bool nativeVideoInterface = ( R4000Cpu::GlobalCpu->Emulator->Video->NativeInterface != IntPtr::Zero );
+
+	if( nativeVideoInterface == true )
+	{
+		switch( nid )
+		{
+		// sceGeUser -------------------------------------------
+		case 0x1f6752ad:		// sceGeEdramGetSize
+			g->mov( EAX, 0x001fffff );
+			return true;
+		case 0xe47e40e4:		// sceGeEdramGetAddr
+			g-> mov( EAX, 0x04000000 );
+			return true;
+		case 0xab49e76a:		// sceGeListEnQueue
+			g->push( ( uint )0 ); // head = false
+			g->push( MREG( CTX, 7 ) );
+			g->push( MREG( CTX, 6 ) );
+			g->push( MREG( CTX, 5 ) );
+			g->push( MREG( CTX, 4 ) );
+			g->call( ( int )sceGeListEnQueue );
+			g->add( ESP, 20 );
+			return true;
+		case 0x1c0d95a6:		// sceGeListEnQueueHead
+			g->push( ( uint )1 ); // head = true
+			g->push( MREG( CTX, 7 ) );
+			g->push( MREG( CTX, 6 ) );
+			g->push( MREG( CTX, 5 ) );
+			g->push( MREG( CTX, 4 ) );
+			g->call( ( int )sceGeListEnQueue );
+			g->add( ESP, 20 );
+			return true;
+		case 0x5fb86ab0:		// sceGeListDeQueue
+			g->push( MREG( CTX, 4 ) );
+			g->call( ( int )sceGeListDeQueue );
+			g->add( ESP, 4 );
+			return true;
+		case 0xe0d68148:		// sceGeListUpdateStallAddr
+			g->push( MREG( CTX, 5 ) );
+			g->push( MREG( CTX, 4 ) );
+			g->call( ( int )sceGeListUpdateStallAddr );
+			g->add( ESP, 8 );
+			return true;
+		case 0x03444eb4:		// sceGeListSync
+			g->push( MREG( CTX, 5 ) );
+			g->push( MREG( CTX, 4 ) );
+			g->call( ( int )sceGeListSync );
+			g->add( ESP, 8 );
+			return true;
+		case 0xb287bd61:		// sceGeDrawSync
+			g->push( MREG( CTX, 4 ) );
+			g->call( ( int )sceGeDrawSync );
+			g->add( ESP, 4 );
+			return true;
+		}
 	}
+#endif
 
 	return false;
 }

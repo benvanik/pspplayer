@@ -94,9 +94,9 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		{
 			// Override if we can
 			bool emitted = false;
-			context->LastSyscallAtomic = biosFunction->IsAtomic;
+			context->LastSyscallStateless = biosFunction->IsStateless;
 #ifdef OVERRIDESYSCALLS
-			if( biosFunction->IsAtomic == true )
+			if( biosFunction->IsStateless == true )
 			{
 				// Note we may not emit here!
 				emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, biosFunction->NID );

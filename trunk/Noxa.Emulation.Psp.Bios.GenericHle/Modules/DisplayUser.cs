@@ -38,7 +38,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 		#endregion
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0x0e20f177, "sceDisplaySetMode", true, 3 )]
 		public int sceDisplaySetMode( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -60,7 +60,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0xdea197d4, "sceDisplayGetMode", true, 3 )]
 		public int sceDisplayGetMode( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -102,7 +102,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0x289d82fe, "sceDisplaySetFrameBuf", false, 4 )]
 		public int sceDisplaySetFrameBuf( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -134,7 +134,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0xeeda2e54, "sceDisplayGetFrameBuf", true, 4 )]
 		public int sceDisplayGetFrameBuf( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -200,7 +200,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0x984c27e7, "sceDisplayWaitVblankStart", true, 0 )]
 		public int sceDisplayWaitVblankStart( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
