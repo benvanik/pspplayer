@@ -31,7 +31,7 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 #define LISTCOUNTALERTTHRESHOLD 100
 
 #ifdef _DEBUG
-#define BREAK __break
+#define BREAK __break()
 #else
 #define BREAK
 #endif
@@ -259,7 +259,7 @@ int niEnqueueList( VideoDisplayList* list, bool immediate )
 	UNLOCK;
 
 	if( _listCount > LISTCOUNTALERTTHRESHOLD )
-		BREAK();
+		BREAK;
 
 	return listId;
 }

@@ -35,9 +35,10 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace SoftWire;
 
-extern int _codeBlocksExecuted;
-extern int _jumpBlockInlineHits;
-extern int _jumpBlockInlineMisses;
+extern uint _instructionsExecuted;
+extern uint _codeBlocksExecuted;
+extern uint _jumpBlockInlineHits;
+extern uint _jumpBlockInlineMisses;
 
 R4000AdvancedBlockBuilder::R4000AdvancedBlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 	: R4000BlockBuilder( cpu, core )
@@ -144,7 +145,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 			{
 				// Instruction counter increment - note that it has to be here cause
 				// of null delay and the label marker above
-				g->inc( MINSTRCOUNT( CTXP( _ctx->CtxPointer ) ) );
+				g->inc( g->dword_ptr[ &_instructionsExecuted ] );
 			}
 #endif
 
@@ -310,7 +311,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 							}
 							else
 							{
-								Debug::WriteLine( String::Format( "Cpu: attempted COP{0} function {1:X8}", cop, cofun ) );
+								Debug::WriteLine( String::Format( "InternalBuild(0x{2:X8}): attempted COP{0} function {1:X8}", cop, cofun, address ) );
 								result =  GenerationResult::Invalid;
 							}
 						}
@@ -427,7 +428,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 					{
 						// Cannot do jump because we don't know and can't know where we are going ---- why?
 						//Debug::Assert( false );
-						Debug::WriteLine( String::Format( "Full tail (no jumptarget/jumpregister) at 0x{0:X8}", address - 4 ) );
+#ifdef GENDEBUG
+						Debug::WriteLine( String::Format( "InternalBuild(0x{0:X8}): Full tail (no jumptarget/jumpregister)", address - 4 ) );
+#endif
 						GenerateTail( address - 4, false, 0 );
 					}
 

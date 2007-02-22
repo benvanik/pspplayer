@@ -19,7 +19,7 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace SoftWire;
 
-extern int _jumpBlockThunkHits;
+extern uint _jumpBlockThunkHits;
 
 void __fixupBlockJump( void* sourceAddress, int newTarget );
 void __missingBlockThunk( void* targetAddress, void* stackPointer );

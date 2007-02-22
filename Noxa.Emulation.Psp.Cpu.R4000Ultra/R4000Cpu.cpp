@@ -22,6 +22,8 @@ using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 
+extern uint _instructionsExecuted;
+
 R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 {
 	GlobalCpu = this;
@@ -136,7 +138,10 @@ int R4000Cpu::ExecuteBlock()
 	// Populate ctx
 	//ctx->PCValid = false;
 	//ctx->NullifyDelay = false;
-	ctx->InstructionCount = 0;
+
+#ifdef STATISTICS
+	uint startInstrExec = _instructionsExecuted;
+#endif
 
 	// Bounce in to it
 	bouncefn bounce = ( bouncefn )_bounce;
@@ -145,16 +150,13 @@ int R4000Cpu::ExecuteBlock()
 	// PC updated via __updateCorePC
 	_core0->DelayNop = ( ctx->NullifyDelay == 1 ) ? true : false;
 
-	int instructionsExecuted = ctx->InstructionCount;
-
 #ifdef STATISTICS
-
-	_stats->InstructionsExecuted += instructionsExecuted;
 
 	double blockTime = _timer->Elapsed - blockStart;
 	if( blockTime <= 0.0 )
 		blockTime = 0.000001;
 
+	uint instructionsExecuted = _instructionsExecuted - startInstrExec;
 	_stats->IPS = ( _stats->IPS * .8 ) + ( ( ( double )instructionsExecuted / blockTime ) * .2 );
 	
 	_timeSinceLastIpsPrint += blockTime;
@@ -164,17 +166,19 @@ int R4000Cpu::ExecuteBlock()
 		//Debug::WriteLine( String::Format( "IPS: {0}", ( long )ips ) );
 		_timeSinceLastIpsPrint = 0.0;
 	}
-#endif
 
 	return instructionsExecuted;
+#else
+	return 1;
+#endif
 }
 
 void R4000Cpu::PrintStatistics()
 {
 #ifdef STATISTICS
+		_stats->GatherStats();
 		if( _stats->InstructionsExecuted == 0 )
 			return;
-		_stats->GatherStats();
 		_stats->AverageCodeBlockLength /= _stats->CodeBlocksGenerated;
 		_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
 		_stats->RunTime = _timer->Elapsed - _stats->RunTime;
@@ -211,5 +215,6 @@ void R4000Cpu::PrintStatistics()
 				String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p ) );
 		}
 #endif
+		Debug::WriteLine( "" );
 #endif
 }
