@@ -535,7 +535,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 		if( pass == 1 )
 		{
 			if( ( lastResult == GenerationResult::Syscall ) &&
-				( _ctx->LastSyscallAtomic == false ) )
+				( _ctx->LastSyscallStateless == false ) )
 			{
 				// We always return to the execution loop on syscalls
 				GenerateTail( address - 4, false, 0 );

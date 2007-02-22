@@ -56,8 +56,8 @@ void R4000VideoInterface::Prepare()
 {
 	_memoryAddress = _cpu->_memory->MainMemory;
 	_videoApi = ( VideoApi* )_cpu->Emulator->Video->NativeInterface.ToPointer();
-
-	_videoApi->Setup( _pool );
+	if( _videoApi != NULL )
+		_videoApi->Setup( _pool );
 }
 
 void __break()

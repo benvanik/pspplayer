@@ -94,7 +94,7 @@ namespace Noxa {
 
 					bool UpdatePC;
 					bool UseSyscalls;
-					bool LastSyscallAtomic;
+					bool LastSyscallStateless;
 
 					Dictionary<int, LabelMarker^>^ BranchLabels;
 					int LastBranchTarget;

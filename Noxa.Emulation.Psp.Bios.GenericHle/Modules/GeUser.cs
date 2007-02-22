@@ -63,7 +63,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			public int Base;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0x1f6752ad, "sceGeEdramGetSize", true, 0 )]
 		public int sceGeEdramGetSize( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -71,7 +71,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0x001fffff;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0xe47e40e4, "sceGeEdramGetAddr", true, 0 )]
 		public int sceGeEdramGetAddr( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -169,7 +169,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return false;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0xab49e76a, "sceGeListEnQueue", true, 4 )]
 		public int sceGeListEnQueue( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -219,7 +219,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				return -1;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0x1c0d95a6, "sceGeListEnQueueHead", true, 4 )]
 		public int sceGeListEnQueueHead( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -269,7 +269,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 				return -1;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0x5fb86ab0, "sceGeListDeQueue", true, 1 )]
 		public int sceGeListDeQueue( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -284,7 +284,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0xe0d68148, "sceGeListUpdateStallAddr", true, 2 )]
 		public int sceGeListUpdateStallAddr( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -324,7 +324,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0x03444eb4, "sceGeListSync", true, 2 )]
 		public int sceGeListSync( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -362,7 +362,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStubAtomic]
+		[BiosStubStateless]
 		[BiosStub( 0xb287bd61, "sceGeDrawSync", true, 1 )]
 		public int sceGeDrawSync( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{

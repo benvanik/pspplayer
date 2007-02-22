@@ -78,12 +78,12 @@ namespace Noxa.Emulation.Psp.Bios
 
 	#endregion
 
-	#region BiosStubAtomicAttribute
+	#region BiosStubStatelessAttribute
 
 	[global::System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
-	public sealed class BiosStubAtomicAttribute : Attribute
+	public sealed class BiosStubStatelessAttribute : Attribute
 	{
-		public BiosStubAtomicAttribute()
+		public BiosStubStatelessAttribute()
 		{
 		}
 	}
@@ -96,7 +96,7 @@ namespace Noxa.Emulation.Psp.Bios
 	{
 		public IModule Module;
 		public bool IsImplemented;
-		public bool IsAtomic;
+		public bool IsStateless;
 		public uint NID;
 		public string Name;
 		public BiosStubDelegate Target;
@@ -105,11 +105,11 @@ namespace Noxa.Emulation.Psp.Bios
 
 		// Could have other stuff here
 
-		public BiosFunction( IModule module, bool isImplemented, bool isAtomic, uint nid, string name, BiosStubDelegate target, bool hasReturn, int parameterCount )
+		public BiosFunction( IModule module, bool isImplemented, bool isStateless, uint nid, string name, BiosStubDelegate target, bool hasReturn, int parameterCount )
 		{
 			this.Module = module;
 			this.IsImplemented = isImplemented;
-			this.IsAtomic = isAtomic;
+			this.IsStateless = isStateless;
 			this.NID = nid;
 			this.Name = name;
 			this.Target = target;
