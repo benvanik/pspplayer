@@ -101,6 +101,29 @@ VideoDisplayList* FindOutstandingList( int listId )
 	return NULL;
 }
 
+void RemoveOutstandingList( int listId )
+{
+	VdlRef* ref = _outstandingLists;
+	VdlRef* prev = NULL;
+
+	while( ref != NULL )
+	{
+		if( ref->List->ID == listId )
+		{
+			if( prev != NULL )
+				prev->Next = ref->Next;
+			if( ref == _outstandingLists )
+				_outstandingLists = ref->Next;
+			if( ref == _outstandingListsTail )
+				_outstandingListsTail = prev;
+			SAFEFREE( ref );
+			return;
+		}
+		prev = ref;
+		ref = ref->Next;
+	}
+}
+
 void RemoveOutstandingList( VideoDisplayList* list )
 {
 	VdlRef* ref = _outstandingLists;
@@ -266,6 +289,8 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 int sceGeListDeQueue( int qid )
 {
 	VideoApi* ni = _videoApi;
+
+	RemoveOutstandingList( qid );
 	ni->DequeueList( qid );
 
 	return 0;
@@ -275,7 +300,8 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 {
 	VideoApi* ni = _videoApi;
 
-	VideoDisplayList* vdl = ni->FindList( qid );
+	//VideoDisplayList* vdl = ni->FindList( qid );
+	VideoDisplayList* vdl = FindOutstandingList( qid );
 	if( vdl == NULL )
 	{
 		BREAK;
@@ -299,7 +325,8 @@ int sceGeListSync( int qid, int syncType )
 {
 	VideoApi* ni = _videoApi;
 
-	VideoDisplayList* vdl = ni->FindList( qid );
+	//VideoDisplayList* vdl = ni->FindList( qid );
+	VideoDisplayList* vdl = FindOutstandingList( qid );
 	if( vdl == NULL )
 	{
 		// Could have been processed already
@@ -336,6 +363,7 @@ int sceGeDrawSync( int syncType )
 			bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
 			BREAKIF( done == false );
 		}
+		ref = ref->Next;
 	}
 
 	ClearOutstandingLists();
