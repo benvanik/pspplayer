@@ -148,6 +148,10 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 				g->inc( g->dword_ptr[ &_instructionsExecuted ] );
 			}
 #endif
+#ifdef TRACE
+			if( pass == 1 )
+				this->EmitTrace( address, code );
+#endif
 
 			if( code != 0 )
 			{

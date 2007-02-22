@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#include "Tracer.h"
 #include "R4000BlockBuilder.h"
 #include "R4000Cpu.h"
 #include "R4000Core.h"
@@ -77,6 +78,23 @@ void __runtimeRegsPrint()
 	Debug::WriteLine( sb->ToString() );
 }
 #endif
+
+#pragma unmanaged
+void __traceLine( int address, int code )
+{
+	char buffer[ 50 ];
+	sprintf_s( buffer, 50, "[0x%08X]: %08X\r\n", address, code );
+	Tracer::WriteLine( buffer );
+}
+#pragma managed
+
+void R4000BlockBuilder::EmitTrace( int address, int code )
+{
+	_gen->push( ( uint )code );
+	_gen->push( ( uint )address );
+	_gen->call( ( int )__traceLine );
+	_gen->add( _gen->esp, 8 );
+}
 
 void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
 {
