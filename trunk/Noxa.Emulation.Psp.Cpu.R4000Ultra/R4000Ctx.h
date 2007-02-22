@@ -15,7 +15,7 @@ using namespace Noxa::Emulation::Psp;
 #define CTXNULLDELAY	136
 #define CTXPCVALID		140
 #define CTXPC			144
-#define CTXINSTRCOUNT	148
+#define CTXUNUSED0		148
 #define CTXLL			152
 #define CTXCP1CONDBIT	156
 #define CTXCP1REGS		160
@@ -44,7 +44,7 @@ namespace Noxa {
 					int		NullifyDelay;			// +136
 					int		PCValid;				// +140
 					int		PC;						// +144
-					int		InstructionCount;		// +148
+					int		Unused0;				// +148
 					int		LL;						// +152
 					int		Cp1ConditionBit;		// +156
 					SSE_ALIGN

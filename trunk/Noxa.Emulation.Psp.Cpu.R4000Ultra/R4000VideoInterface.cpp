@@ -15,9 +15,11 @@ using namespace Noxa::Emulation::Psp::Cpu;
 using namespace Noxa::Emulation::Psp::Video::Native;
 
 #ifdef _DEBUG
-#define BREAK __break
+#define BREAK __break()
+#define BREAKIF( cond ) if( cond ) __break();
 #else
 #define BREAK
+#define BREAKIF( cond )
 #endif
 
 #define DEFAULTPACKETCAPACITY 50000
@@ -170,7 +172,7 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 		{
 			// Ran out of space! No clue what to do! Ack!
 			// Could we use MemoryPool to realloc and such?
-			BREAK();
+			BREAK;
 		}
 
 		int code = *( ( int* )( ( byte* )memptr + ( pointer - 0x08000000 ) ) );
@@ -193,7 +195,7 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 		case CALL:
 		case RET:
 		case BJUMP:
-			BREAK();
+			BREAK;
 			break;
 
 			// Stop conditions?
@@ -239,8 +241,7 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 
 		// Read all now
 		bool done = ReadPackets( _memoryAddress, list, 0, vdl );
-		if( done == false )
-			BREAK();
+		BREAKIF( done == false );
 	}
 	else
 	{
@@ -249,8 +250,7 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 
 		// Rest will follow
 		bool done = ReadPackets( _memoryAddress, list, stall, vdl );
-		if( done == true )
-			BREAK();
+		BREAKIF( done == true );
 
 		AddOutstandingList( vdl );
 	}
@@ -278,7 +278,7 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 	VideoDisplayList* vdl = ni->FindList( qid );
 	if( vdl == NULL )
 	{
-		BREAK();
+		BREAK;
 		return -1;
 	}
 
@@ -310,7 +310,7 @@ int sceGeListSync( int qid, int syncType )
 	{
 		bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
 		if( done == false )
-			BREAK();
+			BREAK;
 		else
 		{
 			RemoveOutstandingList( vdl );
@@ -324,8 +324,7 @@ int sceGeListSync( int qid, int syncType )
 int sceGeDrawSync( int syncType )
 {
 	// Can only handle syncType == 0
-	if( syncType != 0 )
-		BREAK();
+	BREAKIF( syncType != 0 );
 
 	// This a full sync - we need to finish all lists
 	VdlRef* ref = _outstandingLists;
@@ -335,8 +334,7 @@ int sceGeDrawSync( int syncType )
 		if( vdl->Ready == false )
 		{
 			bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
-			if( done == false )
-				BREAK();
+			BREAKIF( done == false );
 		}
 	}
 

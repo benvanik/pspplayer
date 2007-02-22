@@ -95,5 +95,6 @@ void OglDriver::PrintStatistics()
 		}
 		Debug::WriteLine( "OpenGL Video Driver Statistics: -----------------------------" );
 		Debug::WriteLine( sb->ToString() );
+		Debug::WriteLine( "" );
 #endif
 }

@@ -21,7 +21,7 @@ using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace SoftWire;
 
-extern int _nativeSyscallCount;
+extern uint _nativeSyscallCount;
 
 #define g context->Generator
 
@@ -70,7 +70,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		paramCount = 0;
 
 		if( pass == 0 )
-			Debug::WriteLine( "R4000Generator: unregistered syscall attempt" );
+			Debug::WriteLine( String::Format( "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address ) );
 	}
 
 	context->UseSyscalls = true;
@@ -181,7 +181,7 @@ GenerationResult BREAK( R4000GenContext^ context, int pass, int address, uint co
 {
 	if( pass == 0 )
 	{
-		Debug::WriteLine( "R4000Generator: BREAK not implemented" );
+		Debug::WriteLine( String::Format( "R4000Generator: BREAK not implemented (at 0x{0:X8})", address ) );
 	}
 	else if( pass == 1 )
 	{
@@ -194,7 +194,7 @@ GenerationResult SYNC( R4000GenContext^ context, int pass, int address, uint cod
 	// pg 629 - not needed?
 	if( pass == 0 )
 	{
-		Debug::WriteLine( "R4000Generator: SYNC not implemented" );
+		Debug::WriteLine( String::Format( "R4000Generator: SYNC not implemented (at 0x{0:X8})", address ) );
 	}
 	else if( pass == 1 )
 	{
@@ -228,7 +228,7 @@ GenerationResult HALT( R4000GenContext^ context, int pass, int address, uint cod
 {
 	if( pass == 0 )
 	{
-		Debug::WriteLine( "R4000Generator: HALT not implemented" );
+		Debug::WriteLine( String::Format( "R4000Generator: HALT not implemented (at 0x{0:X8})", address ) );
 	}
 	else if( pass == 1 )
 	{
@@ -240,7 +240,7 @@ GenerationResult MFIC( R4000GenContext^ context, int pass, int address, uint cod
 {
 	if( pass == 0 )
 	{
-		Debug::WriteLine( "R4000Generator: MFIC not implemented" );
+		Debug::WriteLine( String::Format( "R4000Generator: MFIC not implemented (at 0x{0:X8})", address ) );
 	}
 	else if( pass == 1 )
 	{
@@ -252,7 +252,7 @@ GenerationResult MTIC( R4000GenContext^ context, int pass, int address, uint cod
 {
 	if( pass == 0 )
 	{
-		Debug::WriteLine( "R4000Generator: MTIC not implemented" );
+		Debug::WriteLine( String::Format( "R4000Generator: MTIC not implemented (at 0x{0:X8})", address ) );
 	}
 	else if( pass == 1 )
 	{

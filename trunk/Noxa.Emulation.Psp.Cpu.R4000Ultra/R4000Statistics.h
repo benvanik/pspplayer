@@ -19,30 +19,30 @@ namespace Noxa {
 				public:
 					R4000Statistics(){}
 
-					int InstructionsExecuted;
-					int ExecutionLoops;							// # of times the execution loop has run
-					int CodeBlocksExecuted;
-					int CodeBlocksGenerated;
+					uint InstructionsExecuted;
+					uint ExecutionLoops;						// # of times the execution loop has run
+					uint CodeBlocksExecuted;
+					uint CodeBlocksGenerated;
 
-					int CodeCacheHits;
-					int CodeCacheMisses;
+					uint CodeCacheHits;
+					uint CodeCacheMisses;
 
 					int AverageCodeBlockLength;
 					int LargestCodeBlockLength;
 
-					int JumpBlockInlineCount;					// # of inline jumps
-					int JumpBlockThunkCount;					// # of jump block thunks
-					int JumpBlockLookupCount;					// # of jump lookup bounces
-					int CodeBlockRetCount;						// # of rets
+					uint JumpBlockInlineCount;					// # of inline jumps
+					uint JumpBlockThunkCount;					// # of jump block thunks
+					uint JumpBlockLookupCount;					// # of jump lookup bounces
+					uint CodeBlockRetCount;						// # of rets
 
-					int JumpBlockThunkCalls;					// # of times thunks were called
-					int JumpBlockThunkBuilds;					// # of times thunks built new blocks
-					int JumpBlockThunkHits;						// # of times thunks had code cache hits and just did fixups
-					int JumpBlockInlineHits;					// # of times inline block was able to find target
-					int JumpBlockInlineMisses;					// # of times inline block had to return from bounce
+					uint JumpBlockThunkCalls;					// # of times thunks were called
+					uint JumpBlockThunkBuilds;					// # of times thunks built new blocks
+					uint JumpBlockThunkHits;					// # of times thunks had code cache hits and just did fixups
+					uint JumpBlockInlineHits;					// # of times inline block was able to find target
+					uint JumpBlockInlineMisses;					// # of times inline block had to return from bounce
 
-					int BiosSyscallCount;						// # of syscalls that go to the BIOS (managed)
-					int NativeSyscallCount;						// # of syscalls that use overriden stubs (native)
+					uint BiosSyscallCount;						// # of syscalls that go to the BIOS (managed)
+					uint NativeSyscallCount;					// # of syscalls that use overriden stubs (native)
 
 					double AverageCodeSizeRatio;				// Ratio of MIPS code size to x86 code size
 
