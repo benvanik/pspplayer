@@ -41,6 +41,7 @@ namespace Noxa {
 					R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core );
 					~R4000BlockBuilder();
 
+					void EmitTrace( int address, int code );
 					void EmitDebug( int address, int code, char* codeString );
 
 					CodeBlock^ Build( int address );

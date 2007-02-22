@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include "MemoryPool.h"
 #include "OglDriver.h"

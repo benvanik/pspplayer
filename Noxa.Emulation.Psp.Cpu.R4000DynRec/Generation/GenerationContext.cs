@@ -104,6 +104,7 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 		public MethodInfo DebugWriteLine;
 		public MethodInfo StringFormat1;
 		public MethodInfo DebugBreak;
+		public MethodInfo TraceLine;
 
 		public GenerationContext()
 		{
@@ -136,6 +137,8 @@ namespace Noxa.Emulation.Psp.Cpu.Generation
 			StringFormat1 = typeof( String ).GetMethod( "Format", new Type[] { typeof( string ), typeof( object ) } );
 
 			DebugBreak = typeof( Cpu ).GetMethod( "DebugBreak", new Type[] { typeof( int ) } );
+
+			TraceLine = typeof( Tracer ).GetMethod( "WriteLine", new Type[] { typeof( string ) } );
 		}
 
 		public void Reset( ILGenerator ilgen, int startAddress )

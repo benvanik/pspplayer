@@ -7,6 +7,8 @@
 //#define GENTRACE
 //#define VERBOSEEMIT // Legacy
 //#define REGISTEREMIT // Legacy
+#define TRACE
+
 #define STATS
 #if STATS
 // note that instruction count will be wrong without this, but it's slow
@@ -32,6 +34,7 @@ namespace Noxa.Emulation.Psp.Cpu
 	partial class Cpu : ICpu
 	{
 		public const int DefaultBlockCount = 5000;
+		public const string TraceFileName = "Trace-DynaRec.txt";
 
 		protected IEmulationInstance _emulator;
 		protected ComponentParameters _params;
@@ -443,14 +446,19 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			// This happens after syscall
 
-			if( _debugging == true )
+			if( _firstExecute == true )
 			{
-				// Always break on the first execute
-				if( _firstExecute == true )
+#if TRACE
+				Tracer.OpenFile( TraceFileName );
+#endif
+
+				if( _debugging == true )
 				{
-					_firstExecute = false;
+					// Always break on the first execute
 					_debugWait.WaitOne();
 				}
+
+				_firstExecute = false;
 			}
 
 #if STATS
@@ -541,6 +549,10 @@ namespace Noxa.Emulation.Psp.Cpu
 
 		public void PrintStatistics()
 		{
+#if TRACE
+			Tracer.CloseFile();
+#endif
+
 #if STATS
 			if( _stats.InstructionsExecuted == 0 )
 				return;
@@ -712,8 +724,8 @@ namespace Noxa.Emulation.Psp.Cpu
 										byte shamt = ( byte )( ( code >> 6 ) & 0x1F );
 
 										GenerateInstructionR instr = CoreInstructions.TableR[ function ];
-										//if( pass == 1 )
-										//	EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} rd:{2} shamt:{3}", rs, rt, rd, shamt ) );
+										if( pass == 1 )
+											EmitTrace( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} rd:{2} shamt:{3}", rs, rt, rd, shamt ) );
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, shamt, function );
 									}
 									break;
@@ -723,8 +735,8 @@ namespace Noxa.Emulation.Psp.Cpu
 										uint rt = ( code >> 16 ) & 0x1F;
 
 										GenerateInstructionJ instr = CoreInstructions.TableJ[ rt ];
-										//if( pass == 1 )
-											//EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "imm:{0}", imm ) );
+										if( pass == 1 )
+											EmitTrace( _context, address, code, instr.Method.Name, string.Format( "imm:{0}", imm ) );
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, imm );
 									}
 									break;
@@ -736,8 +748,8 @@ namespace Noxa.Emulation.Psp.Cpu
 										byte rd = ( byte )( ( code >> 11 ) & 0x1F );
 
 										GenerateInstructionR instr = CoreInstructions.TableAllegrex[ function ];
-										//if( pass == 1 )
-											//EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} rd:{2}", rs, rt, rd ) );
+										if( pass == 1 )
+											EmitTrace( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} rd:{2}", rs, rt, rd ) );
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, rd, 0, function );
 									}
 									break;
@@ -755,8 +767,8 @@ namespace Noxa.Emulation.Psp.Cpu
 											instr = CoreInstructions.TableSpecial3[ bshfl ];
 										else
 											instr = CoreInstructions.TableSpecial3[ function ];
-										//if( pass == 1 )
-											//EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "func:{0}", function ) );
+										if( pass == 1 )
+											EmitTrace( _context, address, code, instr.Method.Name, string.Format( "func:{0}", function ) );
 										result = instr( _context, pass, address + 4, code, rt, rd, function, ( ushort )bshfl );
 									}
 									break;
@@ -767,8 +779,8 @@ namespace Noxa.Emulation.Psp.Cpu
 										ushort imm = ( ushort )( code & 0xFFFF );
 
 										GenerateInstructionI instr = CoreInstructions.TableI[ opcode ];
-										//if( pass == 1 )
-											//EmitDebugInfo( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} imm:{2}", rs, rt, ( int )( short )imm ) );
+										if( pass == 1 )
+											EmitTrace( _context, address, code, instr.Method.Name, string.Format( "rs:{0} rt:{1} imm:{2}", rs, rt, ( int )( short )imm ) );
 										result = instr( _context, pass, address + 4, code, ( byte )opcode, rs, rt, imm );
 									}
 									break;
@@ -1092,6 +1104,16 @@ namespace Noxa.Emulation.Psp.Cpu
 			if( bp.Type == BreakpointType.Stepping )
 				_debugger.Control.RemoveBreakpoint( bp.Address );
 			_debugWait.WaitOne();
+		}
+
+		[Conditional( "TRACE" )]
+		internal void EmitTrace( GenerationContext context, int address, uint code, string name, string args )
+		{
+			//string line = string.Format( "[0x{0:X8}] {1:X8} {2:8} {3}", address, code, name, args );
+			string line = string.Format( "[0x{0:X8}]: {1:X8}", address, code );
+
+			context.ILGen.Emit( OpCodes.Ldstr, line );
+			context.ILGen.Emit( OpCodes.Call, context.TraceLine );
 		}
 
 		#region Legacy debug code

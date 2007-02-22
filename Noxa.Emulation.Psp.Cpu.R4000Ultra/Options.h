@@ -22,6 +22,10 @@
 // Define to support the native video interface
 #define NATIVEVIDEOINTERFACE
 
+// Emit trace file
+#define TRACE
+#define TRACEFILE "Trace-Ultra.txt"
+
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG
 

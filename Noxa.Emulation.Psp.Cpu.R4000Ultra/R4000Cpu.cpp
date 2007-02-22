@@ -9,6 +9,7 @@
 #include "R4000Core.h"
 #include "R4000Memory.h"
 #include "R4000Cache.h"
+#include "Tracer.h"
 
 #include "R4000AdvancedBlockBuilder.h"
 #include "R4000Generator.h"
@@ -98,6 +99,11 @@ int R4000Cpu::ExecuteBlock()
 
 	if( _hasExecuted == false )
 	{
+		// Prepare tracer
+#ifdef TRACE
+		Tracer::OpenFile( TRACEFILE );
+#endif
+
 		// Has to happen late in the game because we need to
 		// make sure the video subsystem is ready
 		_videoInterface->Prepare();
@@ -175,46 +181,50 @@ int R4000Cpu::ExecuteBlock()
 
 void R4000Cpu::PrintStatistics()
 {
+#ifdef TRACE
+	Tracer::CloseFile();
+#endif
+
 #ifdef STATISTICS
-		_stats->GatherStats();
-		if( _stats->InstructionsExecuted == 0 )
-			return;
-		_stats->AverageCodeBlockLength /= _stats->CodeBlocksGenerated;
-		_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
-		_stats->RunTime = _timer->Elapsed - _stats->RunTime;
-		_stats->IPS = _stats->InstructionsExecuted / _stats->RunTime;
-		StringBuilder^ sb = gcnew StringBuilder();
-		array<FieldInfo^>^ fields = ( R4000Statistics::typeid )->GetFields();
-		for( int n = 0; n < fields->Length; n++ )
-		{
-			Object^ value = fields[ n ]->GetValue( _stats );
-			sb->AppendFormat( "{0}: {1}\n", fields[ n ]->Name, value );
-		}
-		Debug::WriteLine( "Ultra CPU Statistics: ---------------------------------------" );
-		Debug::WriteLine( sb->ToString() );
+	_stats->GatherStats();
+	if( _stats->InstructionsExecuted == 0 )
+		return;
+	_stats->AverageCodeBlockLength /= _stats->CodeBlocksGenerated;
+	_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
+	_stats->RunTime = _timer->Elapsed - _stats->RunTime;
+	_stats->IPS = _stats->InstructionsExecuted / _stats->RunTime;
+	StringBuilder^ sb = gcnew StringBuilder();
+	array<FieldInfo^>^ fields = ( R4000Statistics::typeid )->GetFields();
+	for( int n = 0; n < fields->Length; n++ )
+	{
+		Object^ value = fields[ n ]->GetValue( _stats );
+		sb->AppendFormat( "{0}: {1}\n", fields[ n ]->Name, value );
+	}
+	Debug::WriteLine( "Ultra CPU Statistics: ---------------------------------------" );
+	Debug::WriteLine( sb->ToString() );
 
 #ifdef SYSCALLSTATS
-		// Syscall stats
-		int callCount = 0;
-		for( int n = 0; n < _syscallCounts->Length; n++ )
-		{
-			int value = _syscallCounts[ n ];
-			callCount += value;
-		}
+	// Syscall stats
+	int callCount = 0;
+	for( int n = 0; n < _syscallCounts->Length; n++ )
+	{
+		int value = _syscallCounts[ n ];
+		callCount += value;
+	}
 
-		Debug::WriteLine( "Syscall statistics (in percent of all calls):" );
-		for( int n = 0; n < _syscallCounts->Length; n++ )
-		{
-			int value = _syscallCounts[ n ];
-			if( value == 0 )
-				continue;
-			BiosFunction^ func = _syscalls[ n ];
-			float p = value / ( float )callCount;
-			p *= 100.0f;
-			Debug::WriteLine( String::Format( "{0,-50} {1,10}x, {2,3}%",
-				String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p ) );
-		}
+	Debug::WriteLine( "Syscall statistics (in percent of all calls):" );
+	for( int n = 0; n < _syscallCounts->Length; n++ )
+	{
+		int value = _syscallCounts[ n ];
+		if( value == 0 )
+			continue;
+		BiosFunction^ func = _syscalls[ n ];
+		float p = value / ( float )callCount;
+		p *= 100.0f;
+		Debug::WriteLine( String::Format( "{0,-50} {1,10}x, {2,3}%",
+			String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p ) );
+	}
 #endif
-		Debug::WriteLine( "" );
+	Debug::WriteLine( "" );
 #endif
 }

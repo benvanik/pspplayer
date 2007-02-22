@@ -296,6 +296,14 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<Filter
+				Name="Shared"
+				>
+				<File
+					RelativePath="..\Shared\Source\Tracer.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -403,6 +411,10 @@
 				</File>
 				<File
 					RelativePath="..\Shared\Include\NoxaShared.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\Tracer.h"
 					>
 				</File>
 				<File
