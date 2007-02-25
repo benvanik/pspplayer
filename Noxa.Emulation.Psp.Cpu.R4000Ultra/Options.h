@@ -23,7 +23,7 @@
 #define NATIVEVIDEOINTERFACE
 
 // Emit trace file
-#define TRACE
+//#define TRACE
 #define TRACEFILE "Trace-Ultra.txt"
 
 // ---------------------- Debug options -------------------------------------

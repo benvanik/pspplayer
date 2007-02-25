@@ -18,12 +18,10 @@ namespace Noxa {
 					#pragma pack(1)
 					typedef struct VideoPacket_t
 					{
-						int			Argument : 24;
-						int			Command : 8;
+						uint		Argument : 24;
+						uint		Command : 8;
 					} VideoPacket;
 					#pragma pack(pop)
-
-					#define ARGF( argument ) ( float )( ( void* )( argument << 8 ) )
 
 				}
 			}
