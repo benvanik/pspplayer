@@ -52,15 +52,15 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		[BiosStub( 0xc41c2853, "sceRtcGetTickResolution", true, 0 )]
 		public int sceRtcGetTickResolution( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
-			long temp = 0;
+			//long temp = 0;
 
 			// Get timer frequency
-			if( ( QueryPerformanceFrequency( out temp ) == false ) ||
-			    ( temp == 0 ) )
-			{
-			    // Uh oh - performance counter not avail?
-			    Debug.WriteLine( "sceRtcGetTickResolution: could not query frequency of the performance counter" );
-			}
+			//if( ( QueryPerformanceFrequency( out temp ) == false ) ||
+			//    ( temp == 0 ) )
+			//{
+			//    // Uh oh - performance counter not avail?
+			//    Debug.WriteLine( "sceRtcGetTickResolution: could not query frequency of the performance counter" );
+			//}
 
 			// u32 - ticks per second
 			//return ( int )( unchecked( ( uint )temp ) );

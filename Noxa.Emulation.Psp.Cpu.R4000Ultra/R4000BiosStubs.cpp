@@ -44,7 +44,11 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->call( ( int )sceRtcGetTickResolution );
 		return true;
 	case 0x3f7ad767:		// sceRtcGetCurrentTick
-		g->push( MREG( CTX, 4 ) );
+		g->mov( EAX, MREG( CTX, 4 ) );
+		g->and( EAX, 0x3FFFFFFF );
+		g->sub( EAX, 0x08000000 );
+		g->add( EAX, ( int )context->Memory->MainMemory );
+		g->push( EAX );
 		g->call( ( int )sceRtcGetCurrentTick );
 		g->add( ESP, 4 );
 		g->mov( EAX, 0 );
@@ -127,6 +131,10 @@ int sceRtcGetTickResolution()
 void sceRtcGetCurrentTick( LARGE_INTEGER* address )
 {
 	QueryPerformanceCounter( address );
+	//LARGE_INTEGER li;
+	//QueryPerformanceCounter( &li );
+	//address->LowPart = li.LowPart;
+	//address->HighPart = li.HighPart;
 }
 
 #pragma managed

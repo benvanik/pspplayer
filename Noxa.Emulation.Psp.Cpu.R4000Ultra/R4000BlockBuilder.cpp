@@ -15,6 +15,7 @@
 #include "R4000Generator.h"
 
 using namespace System::Diagnostics;
+using namespace System::Runtime::InteropServices;
 using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
@@ -79,6 +80,32 @@ void __runtimeRegsPrint()
 }
 #endif
 
+void __traceRegs()
+{
+	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
+	StringBuilder^ sb = gcnew StringBuilder();
+	for( int n = 0; n < 32; n++ )
+		sb->AppendFormat( "{0}={1:X8} ", n, ctx->Registers[ n ] );
+	sb->AppendLine();
+	String^ str = sb->ToString();
+	const char* str2 = ( char* )( void* )Marshal::StringToHGlobalAnsi( str );
+	Tracer::WriteLine( str2 );
+	Marshal::FreeHGlobal( ( IntPtr )( void* )str2 );
+}
+
+void __traceFpuRegs()
+{
+	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
+	StringBuilder^ sb = gcnew StringBuilder();
+	for( int n = 0; n < 32; n++ )
+		sb->AppendFormat( "{0}={1} ", n, ctx->Cp1Registers[ n * 4 ] );
+	sb->AppendLine();
+	String^ str = sb->ToString();
+	const char* str2 = ( char* )( void* )Marshal::StringToHGlobalAnsi( str );
+	Tracer::WriteLine( str2 );
+	Marshal::FreeHGlobal( ( IntPtr )( void* )str2 );
+}
+
 #pragma unmanaged
 static bool traceToggle = false;
 void __traceLine( int address, int code )
@@ -92,6 +119,8 @@ void __traceLine( int address, int code )
 	char buffer[ 50 ];
 	sprintf_s( buffer, 50, "[0x%08X]: %08X\r\n", address, code );
 	Tracer::WriteLine( buffer );
+	__traceRegs();
+	__traceFpuRegs();
 }
 #pragma managed
 
