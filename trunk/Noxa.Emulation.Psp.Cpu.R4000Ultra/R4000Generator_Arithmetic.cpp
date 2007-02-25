@@ -540,7 +540,8 @@ GenerationResult SLTU( R4000GenContext^ context, int pass, int address, uint cod
 		g->xor( EBX, EBX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->cmp( EAX, MREG( CTX, rt ) );
-		g->setb( BL );
+		//g->setb( BL );
+		g->setl( BL );
 		g->mov( MREG( CTX, rd ), EBX );
 	}
 	return GenerationResult::Success;
@@ -656,7 +657,8 @@ GenerationResult SLTIU( R4000GenContext^ context, int pass, int address, uint co
 		g->xor( EBX, EBX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->cmp( EAX, SE( imm ) );
-		g->setb( BL );
+		//g->setb( BL );
+		g->setl( BL );
 		g->mov( MREG( CTX, rt ), EBX );
 	}
 	return GenerationResult::Success;
