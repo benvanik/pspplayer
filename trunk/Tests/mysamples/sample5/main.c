@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	{
 		dt = timer.GetDeltaTime( );
 		DrawScene();
-		FPS();
+		//FPS();
 
 		//sceDisplayWaitVblankStart();
 		fbp0 = sceGuSwapBuffers();
@@ -174,8 +174,10 @@ void DrawScene( void )
 	sceGumDrawArray( GU_TRIANGLE_STRIP, GU_COLOR_8888|GU_VERTEX_32BITF|GU_TRANSFORM_3D,
 					4, 0, quad );
 
-	rtri += (1.0f * dt);
-	rquad-= (1.0f * dt);
+	//rtri += (1.0f * dt);
+	//rquad-= (1.0f * dt);
+	rtri += 0.1f;
+	rquad -= 0.1f;
 	sceGuFinish();
 	sceGuSync(0,0);	
 

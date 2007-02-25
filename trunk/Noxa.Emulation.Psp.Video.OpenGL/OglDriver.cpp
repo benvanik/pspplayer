@@ -86,6 +86,9 @@ void OglDriver::PrintStatistics()
 		//_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
 		//_stats->RunTime = _timer->Elapsed - _stats->RunTime;
 		//_stats->IPS = _stats->InstructionsExecuted / _stats->RunTime;
+		TimeSpan elapsed = DateTime::Now - _startTime;
+		_stats->FPS = _stats->ProcessedFrames / ( float )elapsed.TotalSeconds;
+		_stats->AttemptedFPS = ( _stats->ProcessedFrames + _stats->SkippedFrames ) / ( float )elapsed.TotalSeconds;
 		StringBuilder^ sb = gcnew StringBuilder();
 		array<FieldInfo^>^ fields = ( OglStatistics::typeid )->GetFields();
 		for( int n = 0; n < fields->Length; n++ )

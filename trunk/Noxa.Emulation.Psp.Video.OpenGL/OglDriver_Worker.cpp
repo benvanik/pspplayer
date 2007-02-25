@@ -100,8 +100,6 @@ void NativeWorker( HDC hDC, OglContext* context )
 				ref = next;
 			}
 
-			//glFlush();
-
 			//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 			
 			/*glMatrixMode( GL_MODELVIEW );
@@ -190,6 +188,8 @@ void OglDriver::WorkerThread()
 	Debug::Assert( supportInternalMemoryPointer == true );
 	_context->MemoryPointer = ( byte* )_emu->Cpu->InternalMemoryPointer.ToPointer();
 	_context->MemoryBaseAddress = _emu->Cpu->InternalMemoryBaseAddress;
+
+	_startTime = DateTime::Now;
 
 	try
 	{

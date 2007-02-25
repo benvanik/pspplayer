@@ -40,6 +40,7 @@ namespace Noxa {
 					DisplayProperties^			_currentProps;
 					OglCapabilities^			_caps;
 					OglStatistics^				_stats;
+					DateTime					_startTime;
 
 					void*						_nativeInterface;
 
