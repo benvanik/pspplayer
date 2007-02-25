@@ -23,9 +23,9 @@ namespace Noxa {
 
 					// Matrices
 					float			ProjectionMatrix[ 16 ];
-					float			ViewMatrix[ 12 ];
-					float			WorldMatrix[ 12 ];
-					float			TextureMatrix[ 12 ];
+					float			ViewMatrix[ 16 ];
+					float			WorldMatrix[ 16 ];
+					float			TextureMatrix[ 16 ];
 
 					// Textures
 					bool			SwizzleTextures;

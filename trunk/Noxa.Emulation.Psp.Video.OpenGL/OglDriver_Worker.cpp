@@ -79,13 +79,6 @@ void NativeWorker( HDC hDC, OglContext* context )
 		VdlRef* batch = GetNextListBatch();
 		if( batch != NULL )
 		{
-			glMatrixMode( GL_PROJECTION );
-			glLoadIdentity();
-			glMatrixMode( GL_MODELVIEW );
-			glLoadIdentity();
-			//glRotatef( theta, 0.0f, 1.0f, 0.0f );
-			//gluLookAt( 0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f );
-
 			VdlRef* ref = batch;
 			while( ref != NULL )
 			{
@@ -107,10 +100,11 @@ void NativeWorker( HDC hDC, OglContext* context )
 				ref = next;
 			}
 
-			glFlush();
+			//glFlush();
 
-			/*glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+			//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 			
+			/*glMatrixMode( GL_MODELVIEW );
 			glPushMatrix();
 			glRotatef( theta, 0.0f, 0.0f, 1.0f );
 			glBegin( GL_TRIANGLES );
@@ -119,6 +113,8 @@ void NativeWorker( HDC hDC, OglContext* context )
 			glColor3f( 0.0f, 0.0f, 1.0f ); glVertex2f( -0.87f, -0.5f );
 			glEnd();
 			glPopMatrix();*/
+
+			glFlush();
 			
 			theta += 0.3f;
 
