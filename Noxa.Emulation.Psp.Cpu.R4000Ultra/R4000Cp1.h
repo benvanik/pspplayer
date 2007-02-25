@@ -106,7 +106,7 @@ namespace Noxa {
 						virtual void set( Object^ value )
 						{
 							R4000Cp1Context^ context = ( R4000Cp1Context^ )value;
-							Control = context->ControlRegister;
+							//Control = context->ControlRegister;
 							*_conditionBit = context->ConditionBit;
 							for( int n = 0; n < Cp1RegisterCount; n++ )
 								_registers[ n ] = context->GeneralRegisters[ n ];

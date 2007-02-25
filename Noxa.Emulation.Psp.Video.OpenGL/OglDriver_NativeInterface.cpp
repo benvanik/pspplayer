@@ -61,8 +61,8 @@ void __break()
 	Debugger::Break();
 }
 
-void MigrateBatch( bool waitIfPending );
 VdlRef* GetNextListBatch();
+void MigrateBatch( bool waitIfPending );
 void FreeList( VideoDisplayList* list );
 
 #pragma unmanaged
@@ -127,6 +127,7 @@ void MigrateBatch( bool waitIfPending )
 
 				ref = next;
 			}
+			_pendingBatch = NULL;
 
 #ifdef STATISTICS
 			_skippedFrames++;
@@ -145,6 +146,7 @@ void MigrateBatch( bool waitIfPending )
 			VdlRef* next = ref->Next;
 			if( prev != NULL )
 				prev->Next = next;
+			ref->Next = NULL;
 
 			if( batch == NULL )
 				batch = ref;
@@ -187,6 +189,9 @@ void niSetup( MemoryPool* pool )
 	_listsTail = NULL;
 	_nextListId = 1;
 	_listCount = 0;
+
+	_pendingBatch = NULL;
+	_pendingCount = 0;
 }
 
 VideoDisplayList* niFindList( int listId )
