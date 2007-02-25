@@ -26,8 +26,7 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 
 #define COLORSWIZZLE( bgra ) bgra
 
-__inline void TransposeMatrix4x4( float src[ 16 ], float dest[ 16 ] );
-__inline void TransposeMatrix3x4( float src[ 16 ], float dest[ 16 ] );
+__inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
 int DetermineVertexSize( int vertexType );
 void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCount, int vertexType, int vertexCount, int vertexSize, byte* ptr );
 
@@ -111,7 +110,6 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 {
 	int temp;
 	float matrixTemp[ 16 ];
-	float matrixTemp2[ 16 ];
 	float color3[ 3 ] = { 0.0f, 0.0f, 0.0f };
 	float color4[ 4 ] = { 0.0f, 0.0f, 0.0f };
 
@@ -149,7 +147,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 					temp |= GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT; // stencil/alpha
 				if( ( argi & 0x400 ) != 0 )
 					temp |= GL_DEPTH_BUFFER_BIT; // zbuffer
-				//glClear( temp );
+				glClear( temp );
 			}
 			break;
 			
@@ -398,22 +396,22 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			matrixTemp[ temp++ ] = argf;
 			if( temp == 12 )
 			{
-				TransposeMatrix3x4( matrixTemp, matrixTemp2 );
+				WidenMatrix( matrixTemp, context->ViewMatrix );
 				temp = 0;
-				//context->ViewMatrix = matrixTemp;
 				glMatrixMode( GL_MODELVIEW );
-				glMultMatrixf( matrixTemp2 );
+				glLoadMatrixf( context->ViewMatrix );
 			}
 			break;
 		case WORLD: // 3x4
 			matrixTemp[ temp++ ] = argf;
 			if( temp == 12 )
 			{
-				TransposeMatrix3x4( matrixTemp, matrixTemp2 );
+				WidenMatrix( matrixTemp, context->WorldMatrix );
 				temp = 0;
 				//context->WorldMatrix = matrixTemp;
 				glMatrixMode( GL_MODELVIEW );
-				glLoadMatrixf( matrixTemp2 );
+				glLoadMatrixf( context->ViewMatrix );
+				glMultMatrixf( context->WorldMatrix );
 			}
 			break;
 		case TMATRIX: // 3x4
@@ -442,45 +440,24 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 	}
 }
 
-// TODO: a faster transpose 4x4
-__inline void TransposeMatrix4x4( float src[ 16 ], float dest[ 16 ] )
+// TODO: a faster widen matrix 3x4->4x4
+__inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] )
 {
 	dest[0] = src[0];
-	dest[1] = src[4];
-	dest[2] = src[8];
-	dest[3] = src[12];
-	dest[4] = src[1];
-	dest[5] = src[5];
-	dest[6] = src[9];
-	dest[7] = src[13];
-	dest[8] = src[2];
-	dest[9] = src[6];
-	dest[10] = src[10];
-	dest[11] = src[14];
-	dest[12] = src[3];
-	dest[13] = src[7];
-	dest[14] = src[11];
-	dest[15] = src[15];
-}
-
-// TODO: a faster transpose 3x4
-__inline void TransposeMatrix3x4( float src[ 16 ], float dest[ 16 ] )
-{
-	dest[0] = src[0];
-	dest[1] = src[3];
-	dest[2] = src[6];
-	dest[3] = src[9];
-	dest[4] = src[1];
+	dest[1] = src[1];
+	dest[2] = src[2];
+	dest[3] = 0.0f;
+	dest[4] = src[3];
 	dest[5] = src[4];
-	dest[6] = src[7];
-	dest[7] = src[10];
-	dest[8] = src[2];
-	dest[9] = src[5];
+	dest[6] = src[5];
+	dest[7] = 0.0f;
+	dest[8] = src[6];
+	dest[9] = src[7];
 	dest[10] = src[8];
-	dest[11] = src[11];
-	dest[12] = 0.0f;
-	dest[13] = 0.0f;
-	dest[14] = 0.0f;
+	dest[11] = 0.0f;
+	dest[12] = src[9];
+	dest[13] = src[10];
+	dest[14] = src[11];
 	dest[15] = 1.0f;
 }
 
