@@ -28,7 +28,7 @@
 // Emit trace file
 //#define TRACE
 #define TRACEFILE "Trace-Ultra.txt"
-#define TRACEAFTER 0x8900928
+//#define TRACEAFTER 0x0890099c
 
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG

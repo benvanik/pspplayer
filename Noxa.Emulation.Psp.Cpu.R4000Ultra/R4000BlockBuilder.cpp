@@ -120,7 +120,7 @@ void __traceLine( int address, int code )
 	sprintf_s( buffer, 50, "[0x%08X]: %08X\r\n", address, code );
 	Tracer::WriteLine( buffer );
 	__traceRegs();
-	__traceFpuRegs();
+	//__traceFpuRegs();
 }
 #pragma managed
 
