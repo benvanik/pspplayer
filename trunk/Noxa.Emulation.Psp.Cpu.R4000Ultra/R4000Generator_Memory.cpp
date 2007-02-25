@@ -46,8 +46,10 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	sprintf( label1, "l%Xs1", address - 4 );
 	char label2[20];
 	sprintf( label2, "l%Xs2", address - 4 );
+	char label3[20];
+	sprintf( label3, "l%Xs3", address - 4 );
 
-	// if < 0x0800000 && > 0x09FFFFFF, skip and do a read from method
+	// if < 0x0800000 && > 0x09FFFFFF, skip and check framebuffer or do a read from method
 	g->cmp( EAX, 0x08000000 );
 	g->jb( label1 );
 	g->cmp( EAX, 0x09FFFFFF );
@@ -56,10 +58,26 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	// else, do a direct read
 	g->sub( EAX, 0x08000000 ); // get to offset in main memory
 	g->mov( EAX, g->dword_ptr[ EAX + (int)context->Memory->MainMemory ] );
-	g->jmp( label2 );
+	g->jmp( label3 );
 
 	// case to handle read call
 	g->label( label1 );
+
+	// if < 0x0400000 && > 0x041FFFFF, skip and do a read from method
+	g->cmp( EAX, 0x04000000 );
+	g->jb( label2 );
+	g->cmp( EAX, 0x041FFFFF );
+	g->ja( label2 );
+	
+	// else, do a direct fb read
+#ifdef IGNOREFRAMEBUFFER
+	// Don't do anything!
+	g->jmp( label3 );
+#else
+	// Not implemented! Fall through to memory call
+#endif
+
+	g->label( label2 );
 
 	g->push( EAX );
 
@@ -69,7 +87,7 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	g->add( ESP, 4 );
 
 	// done
-	g->label( label2 );
+	g->label( label3 );
 }
 
 void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )

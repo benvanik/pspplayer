@@ -2,7 +2,7 @@ TARGET = sample5
 OBJS = main.o CTimer.o
 
 INCDIR = 
-CFLAGS = -O2 -G0 -Wall
+CFLAGS = -g -O2 -G0 -Wall
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 ASFLAGS = $(CFLAGS)
 

@@ -181,10 +181,11 @@ GenerationResult BREAK( R4000GenContext^ context, int pass, int address, uint co
 {
 	if( pass == 0 )
 	{
-		Debug::WriteLine( String::Format( "R4000Generator: BREAK not implemented (at 0x{0:X8})", address ) );
+		//Debug::WriteLine( String::Format( "R4000Generator: BREAK not implemented (at 0x{0:X8})", address ) );
 	}
 	else if( pass == 1 )
 	{
+		g->int3();
 	}
 	return GenerationResult::Success;
 }

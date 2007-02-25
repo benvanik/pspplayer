@@ -82,7 +82,7 @@ void assertXmm0( int address )
 	__asm movd [x], xmm0;
 	__asm movd [y], xmm0;
 	assert( _finite( x ) != 0 );
-	assert( y != 0x80000000 );
+	//assert( y != 0x80000000 );
 	//assert( x < 1003741824 );
 #ifdef TRACE
 	sprintf_s( assertLine, 150, "xmm0=%f (0x%0X)\r\n", x, y );
@@ -104,7 +104,7 @@ void assertFpu( int address )
 }
 void printEax( int address, int eax )
 {
-	assert( eax != 0x80000000 );
+	//assert( eax != 0x80000000 );
 #ifdef TRACE
 	sprintf_s( assertLine, 150, "eax=%d (0x%0X)\r\n", eax, eax );
 	Tracer::WriteLine( assertLine );
@@ -223,6 +223,12 @@ GenerationResult FDIV( R4000GenContext^ context, int pass, int address, uint cod
 	{
 		LOADCTXBASE( EDX );
 #ifdef SSE
+#ifdef DEBUGFPU
+		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		ASSERTXMM0VALID();
+		g->movd( XMM0, MCP1REG( CTX, ft, fmt ) );
+		ASSERTXMM0VALID();
+#endif
 		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->divss( XMM0, MCP1REG( CTX, ft, fmt ) );
 #ifdef CAUTIOUSFPU
