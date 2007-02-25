@@ -149,7 +149,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 					temp |= GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT; // stencil/alpha
 				if( ( argi & 0x400 ) != 0 )
 					temp |= GL_DEPTH_BUFFER_BIT; // zbuffer
-				glClear( temp );
+				//glClear( temp );
 			}
 			break;
 			
@@ -413,7 +413,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				temp = 0;
 				//context->WorldMatrix = matrixTemp;
 				glMatrixMode( GL_MODELVIEW );
-				glMultMatrixf( matrixTemp2 );
+				glLoadMatrixf( matrixTemp2 );
 			}
 			break;
 		case TMATRIX: // 3x4

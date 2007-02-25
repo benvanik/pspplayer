@@ -7,6 +7,7 @@
 #include "StdAfx.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <assert.h>
 #pragma unmanaged
 #include <gl/gl.h>
 #include <gl/glu.h>
@@ -81,13 +82,16 @@ void NativeWorker( HDC hDC, OglContext* context )
 			glMatrixMode( GL_PROJECTION );
 			glLoadIdentity();
 			glMatrixMode( GL_MODELVIEW );
-			glPushMatrix();
 			glLoadIdentity();
 			//glRotatef( theta, 0.0f, 1.0f, 0.0f );
+			//gluLookAt( 0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f );
 
 			VdlRef* ref = batch;
 			while( ref != NULL )
 			{
+				// I've actually seen this happen!
+				assert( ref->List->Ready == true );
+
 				// Actually process the list
 				ProcessList( context, ref->List );
 
@@ -103,7 +107,6 @@ void NativeWorker( HDC hDC, OglContext* context )
 				ref = next;
 			}
 
-			glPopMatrix();
 			glFlush();
 
 			/*glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
