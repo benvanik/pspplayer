@@ -125,6 +125,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 	int primitiveCount;
 
 	glDisable( GL_LIGHTING );
+	//glDisable( GL_CULL_FACE );
 
 	for( int n = 0; n < list->PacketCount; n++ )
 	{
@@ -159,15 +160,15 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 		case BCE:
 			// cull enable
-			/*if( argi == 1 )
+			if( argi == 1 )
 				glEnable( GL_CULL_FACE );
 			else
-				glDisable( GL_CULL_FACE );*/
-			glDisable( GL_CULL_FACE );
+				glDisable( GL_CULL_FACE );
 			break;
 		case FFACE:
 			// 0 = clockwise visible, 1 = cclockwise visible
-			//glFrontFace( ( argi == 0 ) ? GL_CW : GL_CCW );
+			// or maybe the inverse?
+			glFrontFace( ( argi == 1 ) ? GL_CW : GL_CCW );
 			break;
 		case AAE:
 			// antialiasing enable
@@ -404,6 +405,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 		case WORLD: // 3x4
 			matrixTemp[ temp++ ] = argf;
+			assert( argf == argf );
 			if( temp == 12 )
 			{
 				WidenMatrix( matrixTemp, context->WorldMatrix );
@@ -575,7 +577,7 @@ void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCoun
 			src += 2;
 			break;
 		case VTColorABGR8888:
-			glColor3f( 1.0f, 1.0f, 1.0f );
+			glColor3ubv( src );
 			src += 4;
 			break;
 		}

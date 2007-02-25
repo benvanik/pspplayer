@@ -20,6 +20,7 @@ namespace Noxa {
 					OglStatistics(){}
 
 					float FPS;								// Frames per second
+					float AttemptedFPS;						// Attempted frames per second (if skipping were disabled)
 					uint ProcessedFrames;					// # of frames processed
 					uint SkippedFrames;						// # of frames skipped
 					uint DisplayListsProcessed;				// # of display lists processed

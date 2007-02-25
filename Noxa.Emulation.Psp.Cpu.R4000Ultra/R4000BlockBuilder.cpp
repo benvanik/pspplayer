@@ -80,8 +80,15 @@ void __runtimeRegsPrint()
 #endif
 
 #pragma unmanaged
+static bool traceToggle = false;
 void __traceLine( int address, int code )
 {
+#ifdef TRACEAFTER
+	if( address == TRACEAFTER )
+		traceToggle = true;
+	else if( traceToggle == false )
+		return;
+#endif
 	char buffer[ 50 ];
 	sprintf_s( buffer, 50, "[0x%08X]: %08X\r\n", address, code );
 	Tracer::WriteLine( buffer );

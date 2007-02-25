@@ -28,6 +28,7 @@ using namespace SoftWire;
 #define CL g->cl
 #define XMM0 g->xmm0
 #define XMM1 g->xmm1
+#define XMM2 g->xmm2
 
 #define ZE( x ) ((int)(uint)x)
 #define SE( x ) ((int)(short)x)
