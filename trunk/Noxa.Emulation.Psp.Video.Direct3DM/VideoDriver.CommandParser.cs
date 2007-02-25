@@ -222,7 +222,6 @@ namespace Noxa.Emulation.Psp.Video.Direct3DM
 					//case VideoCommand.LTE3:
 					//case VideoCommand.CPE:
 					//case VideoCommand.TME:
-					//case VideoCommand.FGE:
 					//case VideoCommand.DTE:
 					//case VideoCommand.ABE:
 					//case VideoCommand.ATE:

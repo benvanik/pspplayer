@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglDriver_Processing.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OglDriver_Worker.cpp"
 				>
 			</File>
@@ -249,6 +253,10 @@
 			</File>
 			<File
 				RelativePath=".\OglCapabilities.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OglContext.h"
 				>
 			</File>
 			<File

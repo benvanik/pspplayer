@@ -15,12 +15,15 @@
 #include <string>
 #include "OglDriver.h"
 #include "VideoApi.h"
+#include "OglContext.h"
 
 using namespace System::Diagnostics;
 using namespace System::Threading;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Video;
 using namespace Noxa::Emulation::Psp::Video::Native;
+
+bool _shutdown;
 
 // Statistics
 extern uint _vcount;
@@ -30,12 +33,18 @@ extern uint _displayListsProcessed;
 VdlRef* GetNextListBatch();
 void FreeList( VideoDisplayList* list );
 
+// Processing
+void ProcessList( OglContext* context, VideoDisplayList* list );
+
 void WorkerThreadThunk( Object^ object );
 
 void OglDriver::StartThread()
 {
 	_shutdown = false;
 	_threadSync = gcnew AutoResetEvent( true );
+
+	_context = ( OglContext* )malloc( sizeof( OglContext ) );
+	memset( _context, 0, sizeof( OglContext ) );
 
 	_thread = gcnew Thread( gcnew ParameterizedThreadStart( &WorkerThreadThunk ) );
 	_thread->Name = "Video worker";
@@ -54,48 +63,66 @@ void OglDriver::StopThread()
 		if( _thread->Join( 500 ) == false )
 			_thread->Abort();
 		_thread = nullptr;
+
+		SAFEFREE( _context );
 	}
 }
 
 #pragma unmanaged
-float theta = 0.0f;
-void NativeWorker( HDC hDC )
+void NativeWorker( HDC hDC, OglContext* context )
 {
-	// Try to get a batch of lists to draw (as a frame)
-	VdlRef* batch = GetNextListBatch();
-	if( batch != NULL )
+	float theta = 0.0f;
+	while( _shutdown == false )
 	{
-		VdlRef* ref = batch;
-		while( ref != NULL )
+		// Try to get a batch of lists to draw (as a frame)
+		VdlRef* batch = GetNextListBatch();
+		if( batch != NULL )
 		{
+			glMatrixMode( GL_PROJECTION );
+			glLoadIdentity();
+			glMatrixMode( GL_MODELVIEW );
+			glPushMatrix();
+			glLoadIdentity();
+			//glRotatef( theta, 0.0f, 1.0f, 0.0f );
+
+			VdlRef* ref = batch;
+			while( ref != NULL )
+			{
+				// Actually process the list
+				ProcessList( context, ref->List );
+
 #ifdef STATISTICS
-			_displayListsProcessed++;
+				_displayListsProcessed++;
 #endif
 
-			// Move to next while freeing old - since we are
-			// done with it we also need to free the list
-			FreeList( ref->List );
-			VdlRef* next = ref->Next;
-			SAFEFREE( ref );
-			ref = next;
+				// Move to next while freeing old - since we are
+				// done with it we also need to free the list
+				FreeList( ref->List );
+				VdlRef* next = ref->Next;
+				SAFEFREE( ref );
+				ref = next;
+			}
+
+			glPopMatrix();
+			glFlush();
+
+			/*glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+			
+			glPushMatrix();
+			glRotatef( theta, 0.0f, 0.0f, 1.0f );
+			glBegin( GL_TRIANGLES );
+			glColor3f( 1.0f, 0.0f, 0.0f ); glVertex2f( 0.0f, 1.0f );
+			glColor3f( 0.0f, 1.0f, 0.0f ); glVertex2f( 0.87f, -0.5f );
+			glColor3f( 0.0f, 0.0f, 1.0f ); glVertex2f( -0.87f, -0.5f );
+			glEnd();
+			glPopMatrix();*/
+			
+			theta += 0.3f;
+
+			_vcount++;
+
+			SwapBuffers( hDC );
 		}
-
-		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-		
-		glPushMatrix();
-		glRotatef( theta, 0.0f, 0.0f, 1.0f );
-		glBegin( GL_TRIANGLES );
-		glColor3f( 1.0f, 0.0f, 0.0f ); glVertex2f( 0.0f, 1.0f );
-		glColor3f( 0.0f, 1.0f, 0.0f ); glVertex2f( 0.87f, -0.5f );
-		glColor3f( 0.0f, 0.0f, 1.0f ); glVertex2f( -0.87f, -0.5f );
-		glEnd();
-		glPopMatrix();
-		
-		theta += 1.0f;
-
-		_vcount++;
-
-		SwapBuffers( hDC );
 	}
 }
 #pragma managed
@@ -157,14 +184,17 @@ void OglDriver::WorkerThread()
 {
 	this->SetupOpenGL();
 
+	// Setup the context
+	bool supportInternalMemory = _emu->Cpu->Capabilities->InternalMemorySupported;
+	bool supportInternalMemoryPointer = supportInternalMemory && ( _emu->Cpu->InternalMemoryPointer != IntPtr::Zero );
+	// TODO: support non-pointer based internal memory
+	Debug::Assert( supportInternalMemoryPointer == true );
+	_context->MemoryPointer = ( byte* )_emu->Cpu->InternalMemoryPointer.ToPointer();
+	_context->MemoryBaseAddress = _emu->Cpu->InternalMemoryBaseAddress;
+
 	try
 	{
-		while( _shutdown == false )
-		{
-			NativeWorker( ( HDC )_hDC );
-
-			//Thread::Sleep( 100 );
-		}
+		NativeWorker( ( HDC )_hDC, _context );
 	}
 	catch( ThreadAbortException^ )
 	{

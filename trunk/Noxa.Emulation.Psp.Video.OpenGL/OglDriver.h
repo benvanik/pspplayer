@@ -8,6 +8,7 @@
 
 #include "OglCapabilities.h"
 #include "OglStatistics.h"
+#include "OglContext.h"
 
 using namespace System;
 using namespace System::Threading;
@@ -31,7 +32,6 @@ namespace Noxa {
 				protected:
 					Thread^						_thread;
 					AutoResetEvent^				_threadSync;
-					bool						_shutdown;
 
 				internal:
 					IEmulationInstance^			_emu;
@@ -46,6 +46,8 @@ namespace Noxa {
 					void*						_handle;
 					void*						_hDC;
 					void*						_hRC;
+
+					OglContext*					_context;
 
 				public:
 

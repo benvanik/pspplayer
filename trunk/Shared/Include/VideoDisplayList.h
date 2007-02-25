@@ -19,7 +19,7 @@ namespace Noxa {
 					{
 						int				ID;
 
-						VideoPacket*	Packets;
+						Native::VideoPacket*	Packets;
 						int				PacketCount;
 						int				PacketCapacity;
 
