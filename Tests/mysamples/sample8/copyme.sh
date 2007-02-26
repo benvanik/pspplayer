@@ -1,3 +1,3 @@
 #! /bin/bash
 ../copy.sh sample8
-../copydir.sh sample8 Data
+#../copydir.sh sample8 Data
