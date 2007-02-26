@@ -25,6 +25,7 @@ using namespace SoftWire;
 #define CX g->cx
 #define AL g->al
 #define BL g->bl
+#define BH g->bh
 #define CL g->cl
 #define XMM0 g->xmm0
 #define XMM1 g->xmm1

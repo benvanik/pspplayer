@@ -243,6 +243,13 @@ bool ReadMorePackets( void* memoryAddress, VideoDisplayList* vdl, uint newStallA
 	return done;
 }
 
+int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int syncMode )
+{
+	VideoApi* ni = _videoApi;
+	ni->SwitchFrameBuffer( address, bufferWidth, pixelFormat, syncMode );
+	return 0;
+}
+
 // sceGeUser -------------------------------------------
 
 int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )

@@ -24,6 +24,9 @@ namespace Noxa {
 						// Setup
 						void (*Setup)( MemoryPool* pool );
 
+						// Switch framebuffer (used to doublebuffer, etc)
+						void (*SwitchFrameBuffer)( int address, int bufferWidth, int pixelFormat, int syncMode );
+
 						// Find an enqueued display list
 						VideoDisplayList* (*FindList)( int listId );
 

@@ -269,6 +269,8 @@ void R4000Memory::WriteBytes( int address, array<byte>^ bytes, int index, int co
 
 void R4000Memory::WriteStream( int address, Stream^ source, int count )
 {
+	if( count == 0 )
+		return;
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
 		//long pos = source.Position;

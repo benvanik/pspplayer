@@ -194,6 +194,11 @@ void niSetup( MemoryPool* pool )
 	_pendingCount = 0;
 }
 
+void niSwitchFrameBuffer( int address, int bufferWidth, int pixelFormat, int syncMode )
+{
+	// TODO: switch frame buffer
+}
+
 VideoDisplayList* niFindList( int listId )
 {
 	LOCK;
@@ -334,6 +339,7 @@ void OglDriver::SetupNativeInterface()
 	VideoApi* ni = ( VideoApi* )_nativeInterface;
 
 	ni->Setup = &niSetup;
+	ni->SwitchFrameBuffer = &niSwitchFrameBuffer;
 	ni->FindList = &niFindList;
 	ni->EnqueueList = &niEnqueueList;
 	ni->DequeueList = &niDequeueList;
