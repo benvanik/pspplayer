@@ -22,6 +22,9 @@ using namespace Noxa::Emulation::Psp::Cpu;
 int sceRtcGetTickResolution();
 void sceRtcGetCurrentTick( LARGE_INTEGER* address );
 
+// sceDisplayUser --------------------------------------
+extern int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int syncMode );
+
 // sceGeUser -------------------------------------------
 //int sceGeEdramGetSize(); <-- inlined
 //int sceGeEdramGetAddr(); <-- inlined
@@ -63,6 +66,15 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 	{
 		switch( nid )
 		{
+		// sceDisplayUser --------------------------------------
+		case 0x289d82fe:		// sceDisplaySetFrameBuf
+			g->push( MREG( CTX, 7 ) );
+			g->push( MREG( CTX, 6 ) );
+			g->push( MREG( CTX, 5 ) );
+			g->push( MREG( CTX, 4 ) );
+			g->call( ( int )sceDisplaySetFrameBuf );
+			g->add( ESP, 16 );
+			return true;
 		// sceGeUser -------------------------------------------
 		case 0x1f6752ad:		// sceGeEdramGetSize
 			g->mov( EAX, 0x001fffff );

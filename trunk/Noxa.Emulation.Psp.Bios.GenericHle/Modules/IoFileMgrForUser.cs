@@ -407,7 +407,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStub( 0x27eb27b8, "sceIoLseek", true, 3 )]
+		[BiosStub( 0x27eb27b8, "sceIoLseek", true, 3, true )]
 		public int sceIoLseek( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = SceUID fd
@@ -426,12 +426,20 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			{
 				case 1:
 					seekOrigin = System.IO.SeekOrigin.Current;
+					Debug.Assert( handle.Stream.Position + a1 < handle.Stream.Length );
 					break;
 				case 2:
 					seekOrigin = System.IO.SeekOrigin.End;
+					Debug.Assert( handle.Stream.Length + a1 < handle.Stream.Length );
 					break;
 				case 0:
 					seekOrigin = System.IO.SeekOrigin.Begin;
+					//Debug.Assert( a1 < handle.Stream.Length );
+					if( a1 > handle.Stream.Length )
+					{
+						a1 = 0;
+						//return ( int )handle.Stream.Position;
+					}
 					break;
 			}
 
@@ -824,20 +832,70 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		}
 
 		[BiosStub( 0xace946e8, "sceIoGetstat", true, 2 )]
-		[BiosStubIncomplete]
 		public int sceIoGetstat( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = const char *file
 			// a1 = SceIoStat *stat
 
-			// COULD BE FOLDER
+			int address = a1;
+
 			string path = Kernel.ReadString( memory, a0 );
-			IMediaFile file = this.FindPath( path ) as IMediaFile;
-			if( file == null )
+			IMediaItem item = this.FindPath( path );
+			if( item == null )
 			{
 				Debug.WriteLine( string.Format( "sceIoGetstat: could not find path '{0}'", path ) );
 				return -1;
 			}
+
+			int mode = 0;
+			int attr = 0;
+
+			if( item.IsSymbolicLink == true )
+			{
+				mode |= 0x4000;
+				attr |= 0x0008;
+			}
+
+			//if( ( item.Attributes & MediaItemAttributes.Hidden ) == MediaItemAttributes.Hidden )
+			mode |= 0x0100 | 0x0020 | 0x004; // read user / group /others
+			attr |= 0x0004; // read
+
+			if( ( item.Attributes & MediaItemAttributes.ReadOnly ) == 0 )
+			{
+				mode |= 0x0080 | 0x0010 | 0x0002; // write user / group / others
+				attr |= 0x0002; // write
+			}
+
+			mode |= 0x0040 | 0x0008 | 0x0001; // exec user / group / others
+			attr |= 0x0001; // execute
+
+			uint size = 0;
+			if( item is IMediaFile )
+			{
+				IMediaFile file = item as IMediaFile;
+				mode |= 0x2000; // file
+				attr |= 0x0020; // file
+				size = ( uint )file.Length;
+			}
+			else if( item is IMediaFolder )
+			{
+				mode |= 0x1000; // dir
+				attr |= 0x0010; // directory
+			}
+
+			memory.WriteWord( address, 4, mode );
+			address += 4;
+			memory.WriteWord( address, 4, attr );
+			address += 4;
+			// Is this the right order for 64 bit?
+			memory.WriteWord( address, 4, ( int )size );
+			memory.WriteWord( address + 0, 4, 0 );
+			address += 8;
+			address += Kernel.WriteTime( memory, address, item.CreationTime );
+			address += Kernel.WriteTime( memory, address, item.AccessTime );
+			address += Kernel.WriteTime( memory, address, item.ModificationTime );
+			
+			// + 6 words of garbage
 
 			// int
 			return 0;

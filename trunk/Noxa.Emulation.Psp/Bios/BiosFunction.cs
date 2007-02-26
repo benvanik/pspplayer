@@ -21,14 +21,20 @@ namespace Noxa.Emulation.Psp.Bios
 		private readonly string _name;
 		private readonly bool _hasReturn;
 		private readonly int _parameterCount;
+		private readonly bool _doubleWordReturn;
 
-		// This is a positional argument.
 		public BiosStubAttribute( uint nid, string name, bool hasReturn, int parameterCount )
+			: this( nid, name, hasReturn, parameterCount, false )
+		{
+		}
+
+		public BiosStubAttribute( uint nid, string name, bool hasReturn, int parameterCount, bool doubleWordReturn )
 		{
 			_nid = nid;
 			_name = name;
 			_hasReturn = hasReturn;
 			_parameterCount = parameterCount;
+			_doubleWordReturn = doubleWordReturn;
 		}
 
 		public uint NID
@@ -60,6 +66,14 @@ namespace Noxa.Emulation.Psp.Bios
 			get
 			{
 				return _parameterCount;
+			}
+		}
+
+		public bool DoubleWordReturn
+		{
+			get
+			{
+				return _doubleWordReturn;
 			}
 		}
 	}
@@ -102,10 +116,16 @@ namespace Noxa.Emulation.Psp.Bios
 		public BiosStubDelegate Target;
 		public bool HasReturn;
 		public int ParameterCount;
+		public bool DoubleWordReturn;
 
 		// Could have other stuff here
 
 		public BiosFunction( IModule module, bool isImplemented, bool isStateless, uint nid, string name, BiosStubDelegate target, bool hasReturn, int parameterCount )
+			: this( module, isImplemented, isStateless, nid, name, target, hasReturn, parameterCount, false )
+		{
+		}
+
+		public BiosFunction( IModule module, bool isImplemented, bool isStateless, uint nid, string name, BiosStubDelegate target, bool hasReturn, int parameterCount, bool doubleWordReturn )
 		{
 			this.Module = module;
 			this.IsImplemented = isImplemented;
@@ -115,6 +135,7 @@ namespace Noxa.Emulation.Psp.Bios
 			this.Target = target;
 			this.HasReturn = hasReturn;
 			this.ParameterCount = parameterCount;
+			this.DoubleWordReturn = doubleWordReturn;
 		}
 	}
 }

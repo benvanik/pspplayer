@@ -23,12 +23,20 @@ using namespace SoftWire;
 
 extern uint _nativeSyscallCount;
 
+//#define LOGSYSCALLS
+
 #define g context->Generator
 
-int __syscallBounce( int syscallId, int a0, int a1, int a2, int a3, int sp )
+int __syscallBounce( int address, int syscallId, int a0, int a1, int a2, int a3, int sp )
 {
 	BiosFunction^ function = R4000Cpu::GlobalCpu->_syscalls[ syscallId ];
 	Debug::Assert( function != nullptr );
+
+#ifdef LOGSYSCALLS
+	String^ log = String::Format( "{0}::{1}( {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8} ) from 0x{7:X8}",
+		function->Module->Name, function->Name, a0, a1, a2, a3, sp, address - 4 );
+	Debug::WriteLine( log );
+#endif
 
 #ifdef SYSCALLSTATS
 	R4000Cpu::GlobalCpu->_stats->BiosSyscallCount++;
@@ -48,11 +56,13 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 	bool willCall;
 	bool hasReturn;
 	int paramCount;
+	bool doubleWordReturn;
 	if( biosFunction != nullptr )
 	{
 		willCall = biosFunction->IsImplemented;
 		hasReturn = biosFunction->HasReturn;
 		paramCount = biosFunction->ParameterCount;
+		doubleWordReturn = biosFunction->DoubleWordReturn;
 
 		if( biosFunction->IsImplemented == false )
 		{
@@ -68,6 +78,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		willCall = false;
 		hasReturn = false;
 		paramCount = 0;
+		doubleWordReturn = false;
 
 		if( pass == 0 )
 			Debug::WriteLine( String::Format( "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address ) );
@@ -156,21 +167,35 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				}
 
 				g->push( ( uint )syscall );
+				// We push $ra as the address cause it is where the stub will go back to
+				g->push( MREG( CTX, 31 ) );
 
-				// 6 ints on stack
+				// 7 ints on stack
 
 				g->call( ( int )__syscallBounce );
 
-				g->add( ESP, 6 * 4 );
+				g->add( ESP, 7 * 4 );
 				
 				if( hasReturn == true )
-					g->mov( MREG( CTX, 2 ), EAX );
+				{
+					if( doubleWordReturn == true )
+					{
+						g->mov( MREG( CTX, 2 ), EAX );
+						g->mov( MREG( CTX, 3 ), ( int )0 );
+					}
+					else
+						g->mov( MREG( CTX, 2 ), EAX );
+				}
 			}
 		}
 		else
 		{
 			if( hasReturn == true )
+			{
 				g->mov( MREG( CTX, 2 ), ( int )-1 );
+				if( doubleWordReturn == true )
+						g->mov( MREG( CTX, 3 ), ( int )-1 );
+			}
 		}
 	}
 

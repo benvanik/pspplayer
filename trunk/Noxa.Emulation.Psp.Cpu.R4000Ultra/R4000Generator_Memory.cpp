@@ -40,14 +40,15 @@ void __writeMemoryThunk( int targetAddress, int width, int value )
 	return;
 }
 
+// EAX = address, result in EAX
 void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 {
 	char label1[20];
-	sprintf( label1, "l%Xs1", address - 4 );
+	sprintf_s( label1, 20, "l%Xs1r", address - 4 );
 	char label2[20];
-	sprintf( label2, "l%Xs2", address - 4 );
+	sprintf_s( label2, 20, "l%Xs2r", address - 4 );
 	char label3[20];
-	sprintf( label3, "l%Xs3", address - 4 );
+	sprintf_s( label3, 20, "l%Xs3r", address - 4 );
 
 	// if < 0x0800000 && > 0x09FFFFFF, skip and check framebuffer or do a read from method
 	g->cmp( EAX, 0x08000000 );
@@ -79,6 +80,16 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 
 	g->label( label2 );
 
+	// TEST
+#if 0
+	char skipTest[20];
+	sprintf_s( skipTest, 20, "l%Xt", address - 4 );
+	g->cmp( EAX, 0x8bff28 );
+	g->jne( skipTest );
+	g->int3();
+	g->label( skipTest );
+#endif
+
 	g->push( EAX );
 
 	g->mov( EBX, (int)&__readMemoryThunk );
@@ -90,12 +101,13 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	g->label( label3 );
 }
 
+// EAX = address, EBX = data
 void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 {
 	char label1[20];
-	sprintf( label1, "l%Xs1", address - 4 );
+	sprintf( label1, "l%Xs1w", address - 4 );
 	char label2[20];
-	sprintf( label2, "l%Xs2", address - 4 );
+	sprintf( label2, "l%Xs2w", address - 4 );
 
 	// if < 0x0800000 && > 0x09FFFFFF, skip and do a write from method
 	g->cmp( EAX, 0x08000000 );
@@ -195,8 +207,90 @@ GenerationResult LWL( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
+		EmitAddressTranslation( g );
+		g->mov( ECX, EAX ); // store address in ECX
+
+		// Read existing data in to EAX - dword aligned
+		g->and( EAX, 0xFFFFFFFC );
+		EmitDirectMemoryRead( context, address );
+
+		// Build final data - done as follows:
+		/*if( ebx == 0 )
+			final = ( oldreg & 0x000000FF ) | ( ( mem & 0x00FFFFFF ) << 8 );
+		else if( ebx == 1 )
+			final = ( oldreg & 0x0000FFFF ) | ( ( mem & 0x0000FFFF ) << 16 );
+		else if( ebx == 2 )
+			final = ( oldreg & 0x00FFFFFF ) | ( ( mem & 0x000000FF ) << 24 );
+		else if( ebx == 3 )
+			final = mem;*/
+		char ebx0[20], ebx1[20], ebx2[20], done[20];
+		sprintf_s( ebx0, 20, "l%0Xx0", address - 4 );
+		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
+		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
+		sprintf_s( done, 20, "l%0Xd", address - 4 );
+
+		g->mov( EBX, ECX );
+		g->and( EBX, 0x3 ); // ebx = address & 0x3
+
+		// We use bl as byte offset and bh as comparer for switch
+		// if bl == 0
+		g->mov( BH, 0 );
+		g->cmp( BL, BH );
+		g->je( ebx0 );
+
+		// if bl == 1
+		g->inc( BH );
+		g->cmp( BL, BH );
+		g->je( ebx1 );
+
+		// if bl == 2
+		g->inc( BH );
+		g->cmp( BL, BH );
+		g->je( ebx2 );
+
+		// EAX = memory value
+		// EBX = put data to write here
+		
+		// case ebx == 3 (fallthrough from above) final = mem;
+		g->mov( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 0 final = ( oldreg & 0x000000FF ) | ( ( mem & 0x00FFFFFF ) << 8 );
+		g->label( ebx0 );
+		g->and( EAX, 0x00FFFFFF );
+		g->shl( EAX, 8 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->and( EBX, 0x000000FF );
+		g->or( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 1 final = ( oldreg & 0x0000FFFF ) | ( ( mem & 0x0000FFFF ) << 16 );
+		g->label( ebx1 );
+		g->and( EAX, 0x0000FFFF );
+		g->shl( EAX, 16 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->and( EBX, 0x0000FFFF );
+		g->or( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 2 final = ( oldreg & 0x00FFFFFF ) | ( ( mem & 0x000000FF ) << 24 );
+		g->label( ebx2 );
+		g->and( EAX, 0x000000FF );
+		g->shl( EAX, 24 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->and( EBX, 0x00FFFFFF );
+		g->or( EBX, EAX );
+		// No jump - fall through
+
+		// Store data back
+		g->label( done );
+		g->mov( MREG( CTX, rt ), EBX );
 	}
-	return GenerationResult::Invalid;
+	return GenerationResult::Success;
 }
 
 GenerationResult LW( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
@@ -272,8 +366,90 @@ GenerationResult LWR( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
+		EmitAddressTranslation( g );
+		g->mov( ECX, EAX ); // store address in ECX
+
+		// Read existing data in to EAX - dword aligned
+		g->and( EAX, 0xFFFFFFFC );
+		EmitDirectMemoryRead( context, address );
+
+		// Build final data - done as follows:
+		/*if( ebx == 0 )
+			final = mem;
+		else if( ebx == 1 )
+			final = ( oldreg & 0xFF000000 ) | ( ( mem & 0xFFFFFF00 ) >> 8 );
+		else if( ebx == 2 )
+			final = ( oldreg & 0xFFFF0000 ) | ( ( mem & 0xFFFF0000 ) >> 16 );
+		else if( ebx == 3 )
+			final = ( oldreg & 0xFFFFFF00 ) | ( ( mem & 0xFF000000 ) >> 24 );*/
+		char ebx3[20], ebx2[20], ebx1[20], done[20];
+		sprintf_s( ebx3, 20, "l%0Xx3", address - 4 );
+		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
+		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
+		sprintf_s( done, 20, "l%0Xd", address - 4 );
+
+		g->mov( EBX, ECX );
+		g->and( EBX, 0x3 ); // ebx = address & 0x3
+
+		// We use bl as byte offset and bh as comparer for switch
+		// if bl == 3
+		g->mov( BH, 3 );
+		g->cmp( BL, BH );
+		g->je( ebx3 );
+
+		// if bl == 2
+		g->dec( BH );
+		g->cmp( BL, BH );
+		g->je( ebx2 );
+
+		// if bl == 1
+		g->dec( BH );
+		g->cmp( BL, BH );
+		g->je( ebx1 );
+
+		// EAX = memory value
+		// EBX = put data to write here
+		
+		// case ebx == 0 (fallthrough from above) final = mem;
+		g->mov( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 3 final = ( oldreg & 0xFF000000 ) | ( ( mem & 0xFFFFFF00 ) >> 8 );
+		g->label( ebx3 );
+		g->and( EAX, 0xFFFFFF00 );
+		g->shr( EAX, 8 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->and( EBX, 0xFF000000 );
+		g->or( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 2 final = ( oldreg & 0xFFFF0000 ) | ( ( mem & 0xFFFF0000 ) >> 16 );
+		g->label( ebx2 );
+		g->and( EAX, 0xFFFF0000 );
+		g->shr( EAX, 16 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->and( EBX, 0xFFFF0000 );
+		g->or( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 1 final = ( oldreg & 0xFFFFFF00 ) | ( ( mem & 0xFF000000 ) >> 24 );
+		g->label( ebx1 );
+		g->and( EAX, 0xFF000000 );
+		g->shr( EAX, 24 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->and( EBX, 0xFFFFFF00 );
+		g->or( EBX, EAX );
+		// No jump - fall through
+
+		// Store data back
+		g->label( done );
+		g->mov( MREG( CTX, rt ), EBX );
 	}
-	return GenerationResult::Invalid;
+	return GenerationResult::Success;
 }
 
 GenerationResult SB( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
@@ -321,8 +497,94 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
+		EmitAddressTranslation( g );
+		g->mov( ECX, EAX ); // store address in ECX
+
+		// Read existing data in to EAX - dword aligned
+		g->and( EAX, 0xFFFFFFFC );
+		EmitDirectMemoryRead( context, address );
+
+		// Build final data - done as follows:
+		/*if( ebx == 0 )
+			final = ( mem & 0xFFFFFF00 ) | ( ( source >> 24 ) & 0x000000FF );
+		else if( ebx == 1 )
+			final = ( mem & 0xFFFF0000 ) | ( ( source >> 16 ) & 0x0000FFFF );
+		else if( ebx == 2 )
+			final = ( mem & 0xFF000000 ) | ( ( source >> 8 ) & 0x00FFFFFF );
+		else if( ebx == 3 )
+			final = source;*/
+		char ebx0[20], ebx1[20], ebx2[20], done[20];
+		sprintf_s( ebx0, 20, "l%0Xx0", address - 4 );
+		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
+		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
+		sprintf_s( done, 20, "l%0Xd", address - 4 );
+
+		g->mov( EBX, ECX );
+		g->and( EBX, 0x3 ); // ebx = address & 0x3
+
+		// We use bl as byte offset and bh as comparer for switch
+		// if bl == 0
+		g->mov( BH, 0 );
+		g->cmp( BL, BH );
+		g->je( ebx0 );
+
+		// if bl == 1
+		g->inc( BH );
+		g->cmp( BL, BH );
+		g->je( ebx1 );
+
+		// if bl == 2
+		g->inc( BH );
+		g->cmp( BL, BH );
+		g->je( ebx2 );
+
+		// EAX = memory value
+		// EBX = put data to write here
+		// ECX = address
+		
+		// case ebx == 3 (fallthrough from above)
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->jmp( done );
+
+		// case ebx == 0
+		g->label( ebx0 );
+		g->and( EAX, 0xFFFFFF00 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->shr( EBX, 24 );
+		g->and( EBX, 0x000000FF );
+		g->or( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 1
+		g->label( ebx1 );
+		g->and( EAX, 0xFFFF0000 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->shr( EBX, 16 );
+		g->and( EBX, 0x0000FFFF );
+		g->or( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 2
+		g->label( ebx2 );
+		g->and( EAX, 0xFF000000 );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->shr( EBX, 8 );
+		g->and( EBX, 0x00FFFFFF );
+		g->or( EBX, EAX );
+		// No jump - fall through
+
+		// Store data back
+		g->label( done );
+		g->mov( EAX, ECX );
+		g->and( EAX, 0xFFFFFFFC );
+		// Write EBX to address EAX
+		EmitDirectMemoryWrite( context, address, 4 );
 	}
-	return GenerationResult::Invalid;
+	return GenerationResult::Success;
 }
 
 GenerationResult SW( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
@@ -351,8 +613,96 @@ GenerationResult SWR( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
+		LOADCTXBASE( EDX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
+		EmitAddressTranslation( g );
+		g->mov( ECX, EAX ); // store address in ECX
+
+		// Read existing data in to EAX - dword aligned
+		g->and( EAX, 0xFFFFFFFC );
+		EmitDirectMemoryRead( context, address );
+
+		// Build final data - done as follows:
+		/*if( ebx == 0 )
+			final = source;
+		else if( ebx == 1 )
+			final = ( mem & 0x000000FF ) | ( ( source << 8 ) & 0xFFFFFF00 );
+		else if( ebx == 2 )
+			final = ( mem & 0x0000FFFF ) | ( ( source << 16 ) & 0xFFFF0000 );
+		else if( ebx == 3 )
+			final = ( mem & 0x00FFFFFF ) | ( ( source << 24 ) & 0xFF000000 );
+			*/
+		char ebx3[20], ebx2[20], ebx1[20], done[20];
+		sprintf_s( ebx3, 20, "l%0Xx3", address - 4 );
+		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
+		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
+		sprintf_s( done, 20, "l%0Xd", address - 4 );
+
+		g->mov( EBX, ECX );
+		g->and( EBX, 0x3 ); // ebx = address & 0x3
+
+		// We use bl as byte offset and bh as comparer for switch
+		// REVERSE OF SWL as we want fallthrough case to be the same
+		// if bl == 3
+		g->mov( BH, 3 );
+		g->cmp( BL, BH );
+		g->je( ebx3 );
+
+		// if bl == 2
+		g->dec( BH );
+		g->cmp( BL, BH );
+		g->je( ebx2 );
+
+		// if bl == 1
+		g->dec( BH );
+		g->cmp( BL, BH );
+		g->je( ebx1 );
+
+		// EAX = memory value
+		// EBX = put data to write here
+		// ECX = address
+		
+		// case ebx == 0 (fallthrough from above)
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->jmp( done );
+
+		// case ebx == 3
+		g->label( ebx3 );
+		g->and( EAX, 0x000000FF );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->shl( EBX, 8 );
+		g->and( EBX, 0xFFFFFF00 );
+		g->or( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 2
+		g->label( ebx2 );
+		g->and( EAX, 0x0000FFFF );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->shr( EBX, 16 );
+		g->and( EBX, 0xFFFF0000 );
+		g->or( EBX, EAX );
+		g->jmp( done );
+
+		// case ebx == 1
+		g->label( ebx1 );
+		g->and( EAX, 0x00FFFFFF );
+		g->mov( EBX, MREG( CTX, rt ) );
+		g->shr( EBX, 24 );
+		g->and( EBX, 0xFF000000 );
+		g->or( EBX, EAX );
+		// No jump - fall through
+
+		// Store data back
+		g->label( done );
+		g->mov( EAX, ECX );
+		g->and( EAX, 0xFFFFFFFC );
+		// Write EBX to address EAX
+		EmitDirectMemoryWrite( context, address, 4 );
 	}
-	return GenerationResult::Invalid;
+	return GenerationResult::Success;
 }
 
 GenerationResult CACHE( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
