@@ -74,6 +74,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 			g->push( MREG( CTX, 4 ) );
 			g->call( ( int )sceDisplaySetFrameBuf );
 			g->add( ESP, 16 );
+			g->mov( EAX, 0 );
 			return true;
 		// sceGeUser -------------------------------------------
 		case 0x1f6752ad:		// sceGeEdramGetSize
@@ -143,10 +144,6 @@ int sceRtcGetTickResolution()
 void sceRtcGetCurrentTick( LARGE_INTEGER* address )
 {
 	QueryPerformanceCounter( address );
-	//LARGE_INTEGER li;
-	//QueryPerformanceCounter( &li );
-	//address->LowPart = li.LowPart;
-	//address->HighPart = li.HighPart;
 }
 
 #pragma managed

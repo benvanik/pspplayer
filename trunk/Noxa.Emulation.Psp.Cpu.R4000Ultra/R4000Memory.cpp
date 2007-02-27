@@ -5,9 +5,9 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+//#include <Windows.h>
 #include "R4000Memory.h"
 #include <string>
-//#include "MemorySegment.h"
 
 using namespace System::Diagnostics;
 using namespace System::IO;
@@ -277,8 +277,17 @@ void R4000Memory::WriteStream( int address, Stream^ source, int count )
 		array<byte>^ buffer = gcnew array<byte>( count );
 		source->Read( buffer, 0, count );
 		pin_ptr<byte> ptr = &buffer[ 0 ];
-		memcpy( MainMemory + ( address - MainMemoryBase ), ptr, count );
+		byte* bp = ptr;
+		memcpy( MainMemory + ( address - MainMemoryBase ), bp, count );
 		//source.Position = pos;
+
+#if 0
+		// DEBUG DUMP
+		HANDLE f = CreateFileA( "dump.bin", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
+		int dummy1;
+		WriteFile( f, ( void* )( MainMemory + ( address - MainMemoryBase ) ), count, ( LPDWORD )&dummy1, NULL );
+		CloseHandle( f );
+#endif
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 		throw gcnew NotImplementedException();
