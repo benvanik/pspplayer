@@ -141,9 +141,23 @@ int sceRtcGetTickResolution()
 	return ( uint )frequency.LowPart;
 }
 
+#if 1
 void sceRtcGetCurrentTick( LARGE_INTEGER* address )
 {
 	QueryPerformanceCounter( address );
 }
+#else
+// This alternate version will start the app at time 0
+LARGE_INTEGER startTick;
+void sceRtcGetCurrentTick( LARGE_INTEGER* address )
+{
+	if( startTick.QuadPart == 0 )
+	{
+		QueryPerformanceCounter( &startTick );
+	}
+	QueryPerformanceCounter( address );
+	address->QuadPart -= startTick.QuadPart;
+}
+#endif
 
 #pragma managed
