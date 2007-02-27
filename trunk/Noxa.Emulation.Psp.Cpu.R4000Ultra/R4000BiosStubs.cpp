@@ -49,7 +49,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 	case 0x3f7ad767:		// sceRtcGetCurrentTick
 		g->mov( EAX, MREG( CTX, 4 ) );
 		g->and( EAX, 0x3FFFFFFF );
-		g->sub( EAX, 0x08000000 );
+		g->sub( EAX, MainMemoryBase );
 		g->add( EAX, ( int )context->Memory->MainMemory );
 		g->push( EAX );
 		g->call( ( int )sceRtcGetCurrentTick );
@@ -78,10 +78,10 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 			return true;
 		// sceGeUser -------------------------------------------
 		case 0x1f6752ad:		// sceGeEdramGetSize
-			g->mov( EAX, 0x001fffff );
+			g->mov( EAX, FrameBufferSize );
 			return true;
 		case 0xe47e40e4:		// sceGeEdramGetAddr
-			g-> mov( EAX, 0x04000000 );
+			g-> mov( EAX, FrameBufferBase );
 			return true;
 		case 0xab49e76a:		// sceGeListEnQueue
 			g->push( ( uint )0 ); // head = false

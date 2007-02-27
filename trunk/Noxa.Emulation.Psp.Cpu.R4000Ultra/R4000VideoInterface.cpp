@@ -198,7 +198,7 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 			BREAK;
 		}
 
-		int code = *( ( int* )( ( byte* )memptr + ( pointer - 0x08000000 ) ) );
+		int code = *( ( int* )( ( byte* )memptr + ( pointer - MainMemoryBase ) ) );
 		VideoPacket* packet = list->Packets + packetCount;
 		GetVideoPacket( code, list->Base, packet );
 		packetCount++;
