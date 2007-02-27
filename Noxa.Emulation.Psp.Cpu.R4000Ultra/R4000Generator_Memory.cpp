@@ -231,7 +231,7 @@ GenerationResult LWL( R4000GenContext^ context, int pass, int address, uint code
 		sprintf_s( ebx0, 20, "l%0Xx0", address - 4 );
 		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
 		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
-		sprintf_s( done, 20, "l%0Xd", address - 4 );
+		sprintf_s( done, 20, "l%0Xxd", address - 4 );
 
 		g->mov( EBX, ECX );
 		g->and( EBX, 0x3 ); // ebx = address & 0x3
@@ -390,7 +390,7 @@ GenerationResult LWR( R4000GenContext^ context, int pass, int address, uint code
 		sprintf_s( ebx3, 20, "l%0Xx3", address - 4 );
 		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
 		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
-		sprintf_s( done, 20, "l%0Xd", address - 4 );
+		sprintf_s( done, 20, "l%0Xxd", address - 4 );
 
 		g->mov( EBX, ECX );
 		g->and( EBX, 0x3 ); // ebx = address & 0x3
@@ -521,7 +521,7 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 		sprintf_s( ebx0, 20, "l%0Xx0", address - 4 );
 		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
 		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
-		sprintf_s( done, 20, "l%0Xd", address - 4 );
+		sprintf_s( done, 20, "l%0Xxd", address - 4 );
 
 		g->mov( EBX, ECX );
 		g->and( EBX, 0x3 ); // ebx = address & 0x3
@@ -546,11 +546,11 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 		// EBX = put data to write here
 		// ECX = address
 		
-		// case ebx == 3 (fallthrough from above)
+		// case ebx == 3 (fallthrough from above) final = source;
 		g->mov( EBX, MREG( CTX, rt ) );
 		g->jmp( done );
 
-		// case ebx == 0
+		// case ebx == 0 final = ( mem & 0xFFFFFF00 ) | ( ( source >> 24 ) & 0x000000FF );
 		g->label( ebx0 );
 		g->and( EAX, 0xFFFFFF00 );
 		g->mov( EBX, MREG( CTX, rt ) );
@@ -559,7 +559,7 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 		g->or( EBX, EAX );
 		g->jmp( done );
 
-		// case ebx == 1
+		// case ebx == 1 final = ( mem & 0xFFFF0000 ) | ( ( source >> 16 ) & 0x0000FFFF );
 		g->label( ebx1 );
 		g->and( EAX, 0xFFFF0000 );
 		g->mov( EBX, MREG( CTX, rt ) );
@@ -568,7 +568,7 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 		g->or( EBX, EAX );
 		g->jmp( done );
 
-		// case ebx == 2
+		// case ebx == 2 final = ( mem & 0xFF000000 ) | ( ( source >> 8 ) & 0x00FFFFFF );
 		g->label( ebx2 );
 		g->and( EAX, 0xFF000000 );
 		g->mov( EBX, MREG( CTX, rt ) );
@@ -638,7 +638,7 @@ GenerationResult SWR( R4000GenContext^ context, int pass, int address, uint code
 		sprintf_s( ebx3, 20, "l%0Xx3", address - 4 );
 		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
 		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
-		sprintf_s( done, 20, "l%0Xd", address - 4 );
+		sprintf_s( done, 20, "l%0Xxd", address - 4 );
 
 		g->mov( EBX, ECX );
 		g->and( EBX, 0x3 ); // ebx = address & 0x3
@@ -664,12 +664,12 @@ GenerationResult SWR( R4000GenContext^ context, int pass, int address, uint code
 		// EBX = put data to write here
 		// ECX = address
 		
-		// case ebx == 0 (fallthrough from above)
+		// case ebx == 0 (fallthrough from above) final = source;
 		g->mov( EBX, MREG( CTX, rt ) );
 		g->jmp( done );
 
-		// case ebx == 3
-		g->label( ebx3 );
+		// case ebx == 1 final = ( mem & 0x000000FF ) | ( ( source << 8 ) & 0xFFFFFF00 );
+		g->label( ebx1 );
 		g->and( EAX, 0x000000FF );
 		g->mov( EBX, MREG( CTX, rt ) );
 		g->shl( EBX, 8 );
@@ -677,20 +677,20 @@ GenerationResult SWR( R4000GenContext^ context, int pass, int address, uint code
 		g->or( EBX, EAX );
 		g->jmp( done );
 
-		// case ebx == 2
+		// case ebx == 2 final = ( mem & 0x0000FFFF ) | ( ( source << 16 ) & 0xFFFF0000 );
 		g->label( ebx2 );
 		g->and( EAX, 0x0000FFFF );
 		g->mov( EBX, MREG( CTX, rt ) );
-		g->shr( EBX, 16 );
+		g->shl( EBX, 16 );
 		g->and( EBX, 0xFFFF0000 );
 		g->or( EBX, EAX );
 		g->jmp( done );
 
-		// case ebx == 1
-		g->label( ebx1 );
+		// case ebx == 3 final = ( mem & 0x00FFFFFF ) | ( ( source << 24 ) & 0xFF000000 );
+		g->label( ebx3 );
 		g->and( EAX, 0x00FFFFFF );
 		g->mov( EBX, MREG( CTX, rt ) );
-		g->shr( EBX, 24 );
+		g->shl( EBX, 24 );
 		g->and( EBX, 0xFF000000 );
 		g->or( EBX, EAX );
 		// No jump - fall through

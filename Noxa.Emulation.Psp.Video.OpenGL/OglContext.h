@@ -11,6 +11,16 @@ namespace Noxa {
 		namespace Psp {
 			namespace Video {
 
+				typedef struct OglTexture_t
+				{
+					int				PixelStorage;
+					int				Address;
+					int				LineWidth;
+					int				Width;
+					int				Height;
+					int				TextureID;
+				} OglTexture;
+
 				typedef struct OglContext_t
 				{
 					// Memory from the CPU
@@ -28,9 +38,11 @@ namespace Noxa {
 					float			TextureMatrix[ 16 ];
 
 					// Textures
-					bool			SwizzleTextures;
+					bool			TexturesEnabled;
+					bool			TexturesSwizzled;
 					int				MipMapLevel;
 					int				TextureStorageMode;
+					OglTexture		Textures[ 8 ];
 
 					// Stuff
 				} OglContext;

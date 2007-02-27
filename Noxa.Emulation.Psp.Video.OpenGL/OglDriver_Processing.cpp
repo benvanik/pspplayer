@@ -8,6 +8,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <assert.h>
+#include <cmath>
 #pragma unmanaged
 #include <gl/gl.h>
 #include <gl/glu.h>
@@ -29,6 +30,9 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
 int DetermineVertexSize( int vertexType );
 void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCount, int vertexType, int vertexCount, int vertexSize, byte* ptr );
+
+__inline bool IsTextureValid( OglTexture* texture );
+void SetTexture( OglContext* context, int stage );
 
 enum VertexType
 {
@@ -103,6 +107,20 @@ enum VertexType
 	//    1: Raw Coordinates
 };
 
+enum TexturePixelStorage
+{
+	TPSBGR5650 = 0,
+	TPSABGR5551 = 1,
+	TPSABGR4444 = 2,
+	TPSABGR8888 = 3,
+	TPSIndexed4 = 4,
+	TPSIndexed8 = 5,
+	TPSIndexed16 = 6,
+	TPSIndexed32 = 7,
+	TPSDXT1 = 8,
+	TPSDXT3 = 9,
+	TPSDXT5 = 10,
+};
 
 #pragma unmanaged
 
@@ -274,6 +292,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				int offset = vertexBufferAddress - context->MemoryBaseAddress;
 				assert( offset > 0 );
 				byte* ptr = context->MemoryPointer + offset;
+				SetTexture( context, 0 );
 				DrawVertexBuffer( context, primitiveType, primitiveCount, vertexType, vertexCount, vertexSize, ptr );
 			}
 			else
@@ -283,11 +302,11 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 
 		case TMODE:
-			context->SwizzleTextures = ( argi & 0x1 ) == 1 ? true : false;
+			context->TexturesSwizzled = ( argi & 0x1 ) == 1 ? true : false;
 			context->MipMapLevel = ( argi >> 16 ) & 0x4;
 			break;
 		case TPSM:
-			// TexturePixelStorage
+			// TexturePixelStorage (TPS*)
 			context->TextureStorageMode = argi;
 			break;
 		case TEC:
@@ -354,27 +373,27 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			// texturesvalid = false
 			break;
 		case USCALE:
-			// (float)
+			// (float) should be 1
 			break;
 		case VSCALE:
-			// (float)
+			// (float) should be 1
 			break;
 		case UOFFSET:
-			// (float)
+			// (float) should be 0
 			break;
 		case VOFFSET:
-			// (float)
+			// (float) should be 0
 			break;
 		case TBP0:
-			//_context.Textures[ 0 ].Address = packet.Argument;
+			context->Textures[ 0 ].Address = argi;
 			break;
 		case TBW0:
-			//_context.Textures[ 0 ].Address |= ( packet.Argument << 8 ) & unchecked( ( int )0xFF000000 ); // | with bufferPointer from TBP
-			//_context.Textures[ 0 ].LineWidth = packet.Argument & 0xFFFF;
+			context->Textures[ 0 ].Address |= ( argi << 8 ) & 0xFF000000;
+			context->Textures[ 0 ].LineWidth = argi & 0x0000FFFF;
 			break;
 		case TSIZE0:
-			//_context.Textures[ 0 ].Width = ( int )Math.Pow( 2, ( packet.Argument & 0xFF ) );
-			//_context.Textures[ 0 ].Height = ( int )Math.Pow( 2, ( ( packet.Argument >> 8 ) & 0xFF ) );
+			context->Textures[ 0 ].Width = power( 2, argi & 0x000000FF );
+			context->Textures[ 0 ].Height = power( 2, ( argi >> 8 ) & 0x000000FF );
 			break;
 
 		case PMS:
@@ -544,11 +563,11 @@ void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCoun
 	byte* src = ptr;
 	for( int n = 0; n < vertexCount; n++ )
 	{
-		switch( weightType )
+		/*switch( weightType )
 		{
 		default:
 			break;
-		}
+		}*/
 
 		switch( textureType )
 		{
@@ -618,6 +637,86 @@ void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCoun
 	}
 
 	glEnd();
+}
+
+__inline bool IsTextureValid( OglTexture* texture )
+{
+	if( ( texture->Address == 0x0 ) ||
+		( texture->LineWidth == 0 ) ||
+		( texture->Width == 0 ) ||
+		( texture->Height == 0 ) )
+		return false;
+
+#if 0
+	// This is a special case - something to do with the framebuffer being set as the texture?
+	if( ( texture->Address == 0x04000000 ) &&
+		( texture->LineWidth == 0x4 ) &&
+		( texture->Width == 0x2 ) &&
+		( texture->Height == 0x2 ) )
+		return false;
+#endif
+
+	return true;
+}
+
+void Unswizzle( byte* address, int size, int bpp )
+{
+}
+
+void SetTexture( OglContext* context, int stage )
+{
+	OglTexture* texture = &context->Textures[ stage ];
+
+	bool textureValid = IsTextureValid( texture );
+	if( textureValid == false )
+		return;
+
+	if( context->TexturesEnabled == false )
+	{
+		glEnable( GL_TEXTURE_2D );
+		context->TexturesEnabled = true;
+	}
+
+	if( texture->TextureID > 0 )
+	{
+		// Texture has been generated, so we just set
+		//glBindTexture( GL_TEXTURE_2D, texture->TextureID );
+	}
+	else
+	{
+		// Grab and decode texture, then create in OGL
+
+		uint textureId;
+		glGenTextures( 1, &textureId );
+		glBindTexture( GL_TEXTURE_2D, textureId );
+		texture->TextureID = textureId;
+		
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+		glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
+
+		byte* address = context->MemoryPointer + ( texture->Address - context->MemoryBaseAddress );
+
+		int bpp = 4;
+		int size = texture->LineWidth * texture->Height * bpp;
+
+		if( context->TexturesSwizzled == true )
+		{
+			Unswizzle( address, size, bpp );
+		}
+
+		HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
+		int dummy1;
+		WriteFile( f, ( void* )address, size, ( LPDWORD )&dummy1, NULL );
+		CloseHandle( f );
+
+		glTexImage2D( GL_TEXTURE_2D, 0, 3,
+			texture->Width, texture->Height,
+			0, GL_RGBA, GL_UNSIGNED_BYTE,
+			( void* )address );
+
+		// ??
+		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
+	}
 }
 
 #pragma managed
