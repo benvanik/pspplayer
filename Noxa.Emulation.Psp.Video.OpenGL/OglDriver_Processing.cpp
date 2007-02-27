@@ -688,11 +688,8 @@ void SetTexture( OglContext* context, int stage )
 
 		uint textureId;
 		glGenTextures( 1, &textureId );
-		glBindTexture( GL_TEXTURE_2D, textureId );
+		//glBindTexture( GL_TEXTURE_2D, textureId );
 		texture->TextureID = textureId;
-		
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-		glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
 
 		byte* address = context->MemoryPointer + ( texture->Address - MainMemoryBase );
 
@@ -704,18 +701,18 @@ void SetTexture( OglContext* context, int stage )
 			Unswizzle( address, size, bpp );
 		}
 
-		HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
+		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+		glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
+
+		/*HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
 		int dummy1;
 		WriteFile( f, ( void* )address, size, ( LPDWORD )&dummy1, NULL );
-		CloseHandle( f );
+		CloseHandle( f );*/
 
-		glTexImage2D( GL_TEXTURE_2D, 0, 3,
+		glTexImage2D( GL_TEXTURE_2D, 0, 4,
 			texture->Width, texture->Height,
 			0, GL_RGBA, GL_UNSIGNED_BYTE,
 			( void* )address );
-
-		// ??
-		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL );
 	}
 }
 
