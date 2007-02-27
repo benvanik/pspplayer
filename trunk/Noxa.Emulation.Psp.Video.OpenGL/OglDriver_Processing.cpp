@@ -289,7 +289,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			{
 				// Tris/etc
 				int vertexSize = DetermineVertexSize( vertexType );
-				int offset = vertexBufferAddress - context->MemoryBaseAddress;
+				int offset = vertexBufferAddress - MainMemoryBase;
 				assert( offset > 0 );
 				byte* ptr = context->MemoryPointer + offset;
 				SetTexture( context, 0 );
@@ -694,7 +694,7 @@ void SetTexture( OglContext* context, int stage )
 		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
 
-		byte* address = context->MemoryPointer + ( texture->Address - context->MemoryBaseAddress );
+		byte* address = context->MemoryPointer + ( texture->Address - MainMemoryBase );
 
 		int bpp = 4;
 		int size = texture->LineWidth * texture->Height * bpp;
