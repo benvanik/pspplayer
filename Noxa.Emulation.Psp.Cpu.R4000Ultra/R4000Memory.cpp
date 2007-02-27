@@ -14,16 +14,6 @@ using namespace System::IO;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 
-#define MainMemoryBase			0x08000000
-#define MainMemorySize			0x01FFFFFF
-#define MainMemoryBound			( MainMemoryBase + MainMemorySize )
-#define ScratchPadBase			0x00010000
-#define ScratchPadSize			0x00003FFF
-#define ScratchPadBound			( ScratchPadBase + ScratchPadSize )
-#define FrameBufferBase			0x04000000
-#define FrameBufferSize			0x001FFFFF
-#define FrameBufferBound		( FrameBufferBase + FrameBufferSize )
-
 R4000Memory::R4000Memory()
 {
 	MainMemory = ( byte* )malloc( MainMemorySize );

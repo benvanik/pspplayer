@@ -24,3 +24,15 @@ __inline int power( int base, int exponent )
 	else
 		return base * power( base, exponent - 1 );
 }
+
+// Memory ---------------------------------------------------------------------
+// These are some useful constants dealing with memory addresses
+#define MainMemoryBase			0x08000000
+#define MainMemorySize			0x01FFFFFF
+#define MainMemoryBound			( MainMemoryBase + MainMemorySize )
+#define ScratchPadBase			0x00010000
+#define ScratchPadSize			0x00003FFF
+#define ScratchPadBound			( ScratchPadBase + ScratchPadSize )
+#define FrameBufferBase			0x04000000
+#define FrameBufferSize			0x001FFFFF
+#define FrameBufferBound		( FrameBufferBase + FrameBufferSize )

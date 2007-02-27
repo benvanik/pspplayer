@@ -200,7 +200,7 @@ namespace Noxa {
 					{
 						virtual int get()
 						{
-							return 0x08000000;
+							return MainMemoryBase;
 						}
 					}
 
