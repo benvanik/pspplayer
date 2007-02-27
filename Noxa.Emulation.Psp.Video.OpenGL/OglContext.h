@@ -25,7 +25,6 @@ namespace Noxa {
 				{
 					// Memory from the CPU
 					byte*			MemoryPointer;
-					int				MemoryBaseAddress;
 
 					// FrameBuffer
 					uint			FrameBufferPointer;
