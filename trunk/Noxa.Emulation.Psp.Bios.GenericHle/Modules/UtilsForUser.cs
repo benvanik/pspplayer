@@ -40,6 +40,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		// NOTE: we don't do any caching, so all the invalidate stuff can be nop'ed - unfortunately
 		// I don't think we can do the same thing with the reads
 
+		[BiosStubStateless]
 		[BiosStub( 0xbfa98062, "sceKernelDcacheInvalidateRange", false, 2 )]
 		public int sceKernelDcacheInvalidateRange( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -205,6 +206,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x79d1c3fa, "sceKernelDcacheWritebackAll", false, 1 )]
 		public int sceKernelDcacheWritebackAll( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -213,6 +215,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0xb435dec5, "sceKernelDcacheWritebackInvalidateAll", false, 1 )]
 		public int sceKernelDcacheWritebackInvalidateAll( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -221,6 +224,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x3ee30821, "sceKernelDcacheWritebackRange", false, 2 )]
 		public int sceKernelDcacheWritebackRange( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -230,6 +234,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x34b9fa9e, "sceKernelDcacheWritebackInvalidateRange", false, 2 )]
 		public int sceKernelDcacheWritebackInvalidateRange( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -274,15 +279,18 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x920f104a, "sceKernelIcacheInvalidateAll", false, 0 )]
 		public int sceKernelIcacheInvalidateAll( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0xc2df770e, "sceKernelIcacheInvalidateRange", false, 0 )]
 		public int sceKernelIcacheInvalidateRange( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
-			return 0;		}
+			return 0;
+		}
 	}
 }

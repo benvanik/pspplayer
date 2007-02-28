@@ -8,16 +8,17 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <assert.h>
+#include <string>
 #include <cmath>
 #pragma unmanaged
 #include <gl/gl.h>
 #include <gl/glu.h>
 #pragma managed
 
-#include <string>
 #include "OglDriver.h"
 #include "VideoApi.h"
 #include "OglContext.h"
+#include "OglTextures.h"
 
 using namespace System::Diagnostics;
 using namespace System::Threading;
@@ -31,7 +32,6 @@ __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
 int DetermineVertexSize( int vertexType );
 void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCount, int vertexType, int vertexCount, int vertexSize, byte* ptr );
 
-__inline bool IsTextureValid( OglTexture* texture );
 void SetTexture( OglContext* context, int stage );
 
 enum VertexType
@@ -639,30 +639,6 @@ void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCoun
 	glEnd();
 }
 
-__inline bool IsTextureValid( OglTexture* texture )
-{
-	if( ( texture->Address == 0x0 ) ||
-		( texture->LineWidth == 0 ) ||
-		( texture->Width == 0 ) ||
-		( texture->Height == 0 ) )
-		return false;
-
-#if 0
-	// This is a special case - something to do with the framebuffer being set as the texture?
-	if( ( texture->Address == 0x04000000 ) &&
-		( texture->LineWidth == 0x4 ) &&
-		( texture->Width == 0x2 ) &&
-		( texture->Height == 0x2 ) )
-		return false;
-#endif
-
-	return true;
-}
-
-void Unswizzle( byte* address, int size, int bpp )
-{
-}
-
 void SetTexture( OglContext* context, int stage )
 {
 	OglTexture* texture = &context->Textures[ stage ];
@@ -686,33 +662,10 @@ void SetTexture( OglContext* context, int stage )
 	{
 		// Grab and decode texture, then create in OGL
 
-		uint textureId;
-		glGenTextures( 1, &textureId );
-		//glBindTexture( GL_TEXTURE_2D, textureId );
-		texture->TextureID = textureId;
-
-		byte* address = context->MemoryPointer + ( texture->Address - MainMemoryBase );
-
-		int bpp = 4;
-		int size = texture->LineWidth * texture->Height * bpp;
-
-		if( context->TexturesSwizzled == true )
+		if( GenerateTexture( context, texture ) == false )
 		{
-			Unswizzle( address, size, bpp );
+			// Failed? Not much we can do...
 		}
-
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-		glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
-
-		/*HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
-		int dummy1;
-		WriteFile( f, ( void* )address, size, ( LPDWORD )&dummy1, NULL );
-		CloseHandle( f );*/
-
-		glTexImage2D( GL_TEXTURE_2D, 0, 4,
-			texture->Width, texture->Height,
-			0, GL_RGBA, GL_UNSIGNED_BYTE,
-			( void* )address );
 	}
 }
 
