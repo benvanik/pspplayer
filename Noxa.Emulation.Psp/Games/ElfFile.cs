@@ -883,6 +883,14 @@ namespace Noxa.Emulation.Psp.Games
 
 			foreach( ElfSection section in _allocSections )
 			{
+				// Sanity check for broken ELFs
+				if( ( baseAddress != 0 ) && ( baseAddress == section.Address ) )
+				{
+					// Fuckers lied - no relocation needed!
+					_needsRelocation = false;
+					baseAddress = 0;
+				}
+
 				uint address = baseAddress + section.Address;
 
 				section.Address = address;
