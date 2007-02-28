@@ -14,6 +14,9 @@
 // information and such
 #define STATISTICS
 
+// Gather and print out statistics about syscalls
+#define SYSCALLSTATS
+
 // When defined the native syscalls implemented in R4000BiosStubs.cpp will be used
 // when allowed by the loaded BIOS. This may cause bugs, but should be a big
 // win for performance
@@ -51,12 +54,12 @@
 //#define RUNTIMEDEBUG
 //#define RUNTIMEREGS
 
-// Gather and print out statistics about syscalls
-#define SYSCALLSTATS
-
 #endif
 
 // -- macro hacks --
+#ifndef STATISTICS
+#undef SYSCALLSTATS
+#endif
 #ifndef GENECHOFILE
 #undef CLEARECHOFILE
 #undef VERBOSEANNOTATE

@@ -54,7 +54,7 @@ namespace SoftWire
 		thirdOperand = Operand::OPERAND_VOID;
 
 		char string[256];
-		strncpy(string, syntax, 255);
+		strncpy_s(string, 256, syntax, 255);
 		const char *token = strtok(string, " ,");
 
 		if(!token)

@@ -26,5 +26,6 @@ R4000Generator::R4000Generator()
 
 int R4000Generator::getCodeLength()
 {
-	return loader->codeLength() + 64;
+	// Pad is cause the returned value may be bogus?
+	return loader->codeLength() - 64;
 }

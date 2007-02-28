@@ -42,6 +42,8 @@ namespace Noxa {
 						// Sync the video system
 						void (*Sync)();
 
+						void (*WaitForVsync)();
+
 					} VideoApi;
 
 				}

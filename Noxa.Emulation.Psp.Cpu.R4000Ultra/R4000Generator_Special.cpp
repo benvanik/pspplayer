@@ -38,9 +38,11 @@ int __syscallBounce( int address, int syscallId, int a0, int a1, int a2, int a3,
 	Debug::WriteLine( log );
 #endif
 
-#ifdef SYSCALLSTATS
-	R4000Cpu::GlobalCpu->_stats->BiosSyscallCount++;
+#ifdef STATISTICS
+	R4000Cpu::GlobalCpu->_stats->ManagedSyscallCount++;
+#endif
 
+#ifdef SYSCALLSTATS
 	int currentStat = R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ];
 	R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ] = currentStat + 1;
 #endif

@@ -194,21 +194,21 @@ namespace SoftWire
 		echoFile = 0;
 	}
 
-	void (*Assembler::callable(const char *entryLabel))()
+	void (*Assembler::callable(const char *entryLabel, int* codeSize))()
 	{
 		if(!loader) return 0;
 
 		if(entryLabel)
 		{
-			return loader->callable(entryLabel);
+			return loader->callable(entryLabel, codeSize);
 		}
 		else
 		{
-			return loader->callable(this->entryLabel);
+			return loader->callable(this->entryLabel, codeSize);
 		}
 	}
 
-	void (*Assembler::finalize(const char *entryLabel))()
+	void (*Assembler::finalize(const char *entryLabel, int* codeSize))()
 	{
 		if(!loader) throw Error("Assembler could not be finalized (cannot re-finalize)");
 
@@ -226,11 +226,11 @@ namespace SoftWire
 			delete[] this->entryLabel;
 			this->entryLabel = 0;
 
-			return loader->finalize(entryLabel);
+			return loader->finalize(entryLabel, codeSize);
 		}
 		else
 		{
-			return loader->finalize(this->entryLabel);
+			return loader->finalize(this->entryLabel, codeSize);
 		}
 	}
 

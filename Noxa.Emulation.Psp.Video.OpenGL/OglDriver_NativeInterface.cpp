@@ -332,6 +332,10 @@ void niSync()
 	UNLOCK;
 }
 
+void niWaitForVsync()
+{
+}
+
 #pragma managed
 
 void OglDriver::SetupNativeInterface()
@@ -345,6 +349,7 @@ void OglDriver::SetupNativeInterface()
 	ni->DequeueList = &niDequeueList;
 	ni->SyncList = &niSyncList;
 	ni->Sync = &niSync;
+	ni->WaitForVsync = &niWaitForVsync;
 
 	InitializeCriticalSection( &_cs );
 

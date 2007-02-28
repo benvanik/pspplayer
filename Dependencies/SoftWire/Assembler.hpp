@@ -24,8 +24,8 @@ namespace SoftWire
 		#include "Intrinsics.hpp"
 
 		// Retrieve binary code
-		void (*callable(const char *entryLabel = 0))();
-		void (*finalize(const char *entryLable = 0))();
+		void (*callable(const char *entryLabel = 0, int* codeSize = 0x0))();
+		void (*finalize(const char *entryLable = 0, int* codeSize = 0x0))();
 		void *acquire();
 
 		// Error and debugging methods

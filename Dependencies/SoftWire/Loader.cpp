@@ -39,13 +39,15 @@ namespace SoftWire
 		listing = 0;
 	}
 
-	void (*Loader::callable(const char *entryLabel))()
+	void (*Loader::callable(const char *entryLabel, int* codeSize))()
 	{
 		if(finalized) throw Error("Cannot retrieve callable from finalized code");
 
 		if(!machineCode)
 		{
-			loadCode();
+			int length = loadCode();
+			if( codeSize != 0x0 )
+				*codeSize = length;
 		}
 
 		if(!entryLabel)
@@ -63,11 +65,13 @@ namespace SoftWire
 		return (void(*)())entryPoint;
 	}
 
-	void (*Loader::finalize(const char *entryLabel))()
+	void (*Loader::finalize(const char *entryLabel, int* codeSize))()
 	{
 		if(!machineCode)
 		{
-			loadCode();
+			int length = loadCode();
+			if( codeSize != 0x0 )
+				*codeSize = length;
 		}
 
 		finalized = true;
@@ -109,7 +113,7 @@ namespace SoftWire
 		return instructions->tail();
 	}
 
-	void Loader::loadCode(const char *entryLabel)
+	int Loader::loadCode(const char *entryLabel)
 	{
 		int length = codeLength() + 64;   // NOTE: Code length is not accurate due to alignment issues
 
@@ -161,7 +165,7 @@ namespace SoftWire
 			else if(encoding.hasImmediate() && encoding.relativeReference())
 			{
 				__int64 offset = encoding.getImmediate() - (__int64)currentCode - encoding.length(currentCode);
-				encoding.setCallOffset(offset);
+				encoding.setCallOffset((int)offset);
 			}
 
 			if(x64 && encoding.isRipRelative())
@@ -174,6 +178,8 @@ namespace SoftWire
 
 			instruction = instruction->next();
 		}
+
+		return length;
 	}
 
 	const unsigned char *Loader::resolveReference(const char *name, const Instruction *position) const
