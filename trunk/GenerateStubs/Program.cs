@@ -23,6 +23,8 @@ namespace GenerateStubs
 			else
 				outFile = args[ 1 ];
 
+			int unknownIndex = 0;
+
 			using( StreamReader reader = File.OpenText( args[ 0 ] ) )
 			{
 				//5,0xe81caf8f,int,sceKernelCreateCallback,"const char *name,SceKernelCallbackFunction func,void *arg"
@@ -36,6 +38,17 @@ namespace GenerateStubs
 				{
 					string[] cols = line.Split( new char[] { ',' }, 5 );
 					string name = cols[ 3 ];
+
+					string nid = cols[ 1 ];
+					nid = "0x" + nid.Substring( 2 ).ToUpperInvariant();
+
+					string funcName = name;
+					if( name.Length == 0 )
+					{
+						name = string.Format( "Unknown_{0}", nid );
+						funcName = string.Format( "Unknown{0}", unknownIndex );
+						unknownIndex++;
+					}
 
 					string psBase = cols[ 4 ].Trim( '\"' );
 					string[] ps;
@@ -51,7 +64,7 @@ namespace GenerateStubs
 
 					//[BiosStub( 0x0, "name", false, 4 )]
 					string attribute = string.Format( "[BiosStub( {0}, \"{1}\", {2}, {3} )]",
-						cols[ 1 ], name,
+						nid, name,
 						( returns != null ) ? "true" : "false",
 						ps.Length );
 
@@ -59,7 +72,7 @@ namespace GenerateStubs
 					StringBuilder function = new StringBuilder();
 					function.AppendLine( attribute );
 					function.AppendLine( "[BiosStubIncomplete]" );
-					function.AppendFormat( "public int {0}( IMemory memory, int a0, int a1, int a2, int a3, int sp )", name );
+					function.AppendFormat( "public int {0}( IMemory memory, int a0, int a1, int a2, int a3, int sp )", funcName );
 					function.AppendLine();
 					function.AppendLine( "{" );
 					for( int n = 0; n < ps.Length; n++ )

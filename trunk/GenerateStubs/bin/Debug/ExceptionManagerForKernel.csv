@@ -1,0 +1,10 @@
+,NID,Return,Function,Params
+1,0x3fb264fc,int,sceKernelRegisterExceptionHandler,"int exno,void *func"
+2,0x5a837ad4,int,sceKernelRegisterPriorityExceptionHandler,"int exno,int priority,void *func"
+3,0x565c0b0e,int,sceKernelRegisterDefaultExceptionHandler,void *func
+4,0x1aa6cffa,,sceKernelReleaseExceptionHandler,
+5,0xdf83875e,,sceKernelGetActiveDefaultExceptionHandler,
+6,0x291ff031,,sceKernelReleaseDefaultExceptionHandler,
+7,0x15adc862,,sceKernelRegisterNmiHandler,
+8,0xb15357c9,,sceKernelReleaseNmiHandler,
+9,0xfc26c354,,,

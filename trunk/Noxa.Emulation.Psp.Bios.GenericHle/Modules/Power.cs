@@ -37,6 +37,11 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 
 		#endregion
 
+		// Size of 10 is just a guess
+		private KernelCallback[] _callbacks = new KernelCallback[ 10 ];
+
+		// Callback looks like: void cb( int unknown, int flags ), where flags are PSP_POWER_CB_POWER_SWITCH etc
+
 		[BiosStub( 0x2b51fe2f, "", false, 0 )]
 		[BiosStubIncomplete]
 		public int Unknown1( IMemory memory, int a0, int a1, int a2, int a3, int sp )
@@ -51,6 +56,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0xefd3c963, "scePowerTick", true, 1 )]
 		public int scePowerTick( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -342,20 +348,31 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 		}
 
 		[BiosStub( 0x04b7766e, "scePowerRegisterCallback", true, 2 )]
-		[BiosStubIncomplete]
 		public int scePowerRegisterCallback( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = int slot
 			// a1 = SceUID cbid
 
+			KernelCallback cb = _kernel.GetHandle( a1 ) as KernelCallback;
+			if( cb == null )
+				return -1;
+
+			Debug.WriteLine( string.Format( "scePowerRegisterCallback: registering in slot {0}", a0 ) );
+			Debug.Assert( a0 < _callbacks.Length );
+
+			_callbacks[ a0 ] = cb;
+
 			// int
 			return 0;
 		}
 
-		[BiosStub( 0xdfa8baf8, "scePowerUnregisterCallback", false, 0 )]
-		[BiosStubIncomplete]
+		[BiosStub( 0xdfa8baf8, "scePowerUnregisterCallback", true, 1 )]
 		public int scePowerUnregisterCallback( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
+			// a0 = int slot
+
+			_callbacks[ a0 ] = null;
+
 			return 0;
 		}
 
@@ -373,8 +390,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x843fbf43, "scePowerSetCpuClockFrequency", true, 1 )]
-		[BiosStubIncomplete]
 		public int scePowerSetCpuClockFrequency( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = int cpufreq
@@ -383,8 +400,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0xb8d7b3fb, "scePowerSetBusClockFrequency", true, 1 )]
-		[BiosStubIncomplete]
 		public int scePowerSetBusClockFrequency( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = int busfreq
@@ -393,20 +410,22 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0xfee03a2f, "scePowerGetCpuClockFrequency", true, 0 )]
-		[BiosStubIncomplete]
 		public int scePowerGetCpuClockFrequency( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// int
-			return 0;
+			return 222;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x478fe6f5, "scePowerGetBusClockFrequency", true, 0 )]
-		[BiosStubIncomplete]
 		public int scePowerGetBusClockFrequency( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
+			// Don't know default bus clock
+
 			// int
-			return 0;
+			return 111;
 		}
 
 		[BiosStub( 0xfdb5bfe9, "scePowerGetCpuClockFrequencyInt", true, 0 )]
@@ -441,8 +460,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x737486f2, "scePowerSetClockFrequency", true, 3 )]
-		[BiosStubIncomplete]
 		public int scePowerSetClockFrequency( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = int cpufreq

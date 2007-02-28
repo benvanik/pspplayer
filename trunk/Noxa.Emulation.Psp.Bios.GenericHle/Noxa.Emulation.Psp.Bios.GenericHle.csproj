@@ -47,9 +47,12 @@
     <Compile Include="Modules\Audio.cs" />
     <Compile Include="Modules\Ctrl.cs" />
     <Compile Include="Modules\DisplayUser.cs" />
+    <Compile Include="Modules\ExceptionManagerForKernel.cs" />
     <Compile Include="Modules\GeUser.cs" />
     <Compile Include="Modules\InterruptManager.cs" />
+    <Compile Include="Modules\KDebugForKernel.cs" />
     <Compile Include="Modules\KernelLibrary.cs" />
+    <Compile Include="Modules\LoadCoreForKernel.cs" />
     <Compile Include="Modules\LoadExecForUser.cs" />
     <Compile Include="Modules\Mpeg.cs" />
     <Compile Include="Modules\Power.cs" />

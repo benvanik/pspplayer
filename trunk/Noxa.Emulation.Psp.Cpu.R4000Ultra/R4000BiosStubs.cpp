@@ -22,6 +22,12 @@ using namespace Noxa::Emulation::Psp::Cpu;
 int sceRtcGetTickResolution();
 void sceRtcGetCurrentTick( LARGE_INTEGER* address );
 
+// scePower --------------------------------------------
+//void scePowerTick(); <-- inlined
+int scePowerSetClockFrequency( int cpuFreq, int ramFreq, int busFreq );
+int scePowerSetBusClockFrequency( int busFreq );
+int scePowerSetCpuClockFrequency( int cpuFreq );
+
 // sceDisplayUser --------------------------------------
 extern int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int syncMode );
 extern void sceDisplayWaitVblankStart();
@@ -59,6 +65,28 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->call( ( int )sceRtcGetCurrentTick );
 		g->add( ESP, 4 );
 		g->mov( EAX, 0 );
+		return true;
+
+	// scePower --------------------------------------------
+	case 0xefd3c963:		// scePowerTick
+		g->mov( EAX, 0 );
+		return true;
+	case 0x737486f2:		// scePowerSetClockFrequency
+		g->push( MREG( CTX, 6 ) );
+		g->push( MREG( CTX, 5 ) );
+		g->push( MREG( CTX, 4 ) );
+		g->call( ( int )scePowerSetClockFrequency );
+		g->add( ESP, 12 );
+		return true;
+	case 0xb8d7b3fb:		// scePowerSetBusClockFrequency
+		g->push( MREG( CTX, 4 ) );
+		g->call( ( int )scePowerSetBusClockFrequency );
+		g->add( ESP, 4 );
+		return true;
+	case 0x843fbf43:		// scePowerSetCpuClockFrequency
+		g->push( MREG( CTX, 4 ) );
+		g->call( ( int )scePowerSetCpuClockFrequency );
+		g->add( ESP, 4 );
 		return true;
 
 	// sceUtilsForUser -------------------------------------
@@ -179,5 +207,35 @@ void sceRtcGetCurrentTick( LARGE_INTEGER* address )
 	address->QuadPart -= startTick.QuadPart;
 }
 #endif
+
+// scePower --------------------------------------------
+
+//void scePowerTick(); <-- inlined
+
+int scePowerSetClockFrequency( int cpuFreq, int ramFreq, int busFreq )
+{
+	bool valid =
+		( cpuFreq >= 1 ) && ( cpuFreq <= 333 ) &&
+		( ramFreq >= 1 ) && ( ramFreq <= 333 ) &&
+		( busFreq >= 1 ) && ( busFreq <= 166 );
+	if( valid == false )
+		return -1;
+
+	return 0;
+}
+
+int scePowerSetBusClockFrequency( int busFreq )
+{
+	if( ( busFreq < 1 ) || ( busFreq > 166 )
+		return -1;
+	return 0;
+}
+
+int scePowerSetCpuClockFrequency( int cpuFreq )
+{
+	if( ( cpuFreq < 1 ) || ( cpuFreq > 333 )
+		return -1;
+	return 0;
+}
 
 #pragma managed

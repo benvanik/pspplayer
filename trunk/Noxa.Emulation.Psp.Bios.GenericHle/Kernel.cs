@@ -22,8 +22,10 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 		protected HleInstance _hle;
 		protected GameInformation _game;
 		protected AutoResetEvent _gameEvent = new AutoResetEvent( false );
+
 		protected PerformanceTimer _timer = new PerformanceTimer();
 		protected double _startTime;
+		protected uint _startTick;
 		protected DateTime _unixBaseTime = new DateTime( 1970, 1, 1, 0, 0, 0, DateTimeKind.Utc );
 
 		protected Dictionary<int, KernelThread> _threads = new Dictionary<int, KernelThread>();
@@ -323,6 +325,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 		{
 			_timer.Reset();
 			_startTime = 0.0;
+			_startTick = ( uint )Environment.TickCount;
 
 			_deviceMap.Clear();
 			_devices.Clear();
@@ -507,6 +510,17 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 				// 10000000 ticks per second
 				TimeSpan elapsed = DateTime.UtcNow - _unixBaseTime;
 				return ( uint )( elapsed.Ticks / 10 );
+			}
+		}
+
+		/// <summary>
+		/// The tick at which the game was started.
+		/// </summary>
+		public uint StartTick
+		{
+			get
+			{
+				return _startTick;
 			}
 		}
 

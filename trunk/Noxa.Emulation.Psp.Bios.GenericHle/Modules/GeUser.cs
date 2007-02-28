@@ -430,6 +430,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			_kernel.AddHandle( cb );
 
 			_callbacks.Add( cb );
+
+			Debug.WriteLine( "sceGeSetCallback: callback set - not good!" );
 			
 			// int - the callback ID
 			return cb.Uid;
