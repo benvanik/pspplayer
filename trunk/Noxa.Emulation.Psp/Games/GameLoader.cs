@@ -153,7 +153,11 @@ namespace Noxa.Emulation.Psp.Games
 
 				string fileName;
 				if( game.GameType == GameType.Eboot )
-					fileName = string.Format( "LoadResult-Eboot-{0}.xml", game.Parameters.Title );
+				{
+					string title = game.Parameters.Title;
+					title = title.Replace( "\n", "" ); // All it takes is one moron
+					fileName = string.Format( "LoadResult-Eboot-{0}.xml", title );
+				}
 				else
 					fileName = string.Format( "LoadResult-{0}.xml", game.Parameters.DiscID );
 				using( FileStream stream = File.Open( fileName, FileMode.Create ) )

@@ -167,6 +167,8 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	double blockStart = R4000Cpu::GlobalCpu->_timer->Elapsed;
 #endif
 
+	address &= 0x3FFFFFFF;
+
 	CodeBlock^ block = gcnew CodeBlock();
 	block->Address = address;
 

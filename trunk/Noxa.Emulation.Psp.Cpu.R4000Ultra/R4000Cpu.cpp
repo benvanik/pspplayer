@@ -116,7 +116,7 @@ int R4000Cpu::ExecuteBlock()
 	//	ctx->PC = _core0->PC;
 
 	// Get/build block
-	int pc = ctx->PC;
+	int pc = ctx->PC & 0x3FFFFFFF;
 	CodeBlock^ block = _codeCache->Find( pc );
 	if( block == nullptr )
 	{
