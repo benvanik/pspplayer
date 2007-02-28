@@ -78,6 +78,8 @@ namespace Noxa.Emulation.Psp.Player.Development
 			CpuPane pane = new CpuPane( this );
 			pane.Show( this.dockPanel );
 			Method m = _debugger.DebugData.FindMethod( 0x08900000 );
+			if( m == null )
+				m = _debugger.DebugData.FindMethod( 0x08900018 );
 			foreach( int addr in m.Instructions.Keys )
 				_debugger.Control.AddBreakpoint( addr );
 			this.CleanupBreakpoint();
