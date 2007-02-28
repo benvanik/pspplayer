@@ -53,8 +53,10 @@ namespace SoftWire
 	inline char *strdup(const char *string)
 	{
 		if(!string) return 0;
-		char *duplicate = new char[strlen(string) + 1];
-		return strcpy(duplicate, string);
+		int length = strlen(string) + 1;
+		char *duplicate = new char[length];
+		strcpy_s(duplicate, length, string);
+		return duplicate;
 	}
 }
 

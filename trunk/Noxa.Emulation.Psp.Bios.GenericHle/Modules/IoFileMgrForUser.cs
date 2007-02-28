@@ -327,6 +327,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		// This is stateless so that we don't break execution
+		[BiosStubStateless]
 		[BiosStub( 0x6a638d83, "sceIoRead", true, 3 )]
 		public int sceIoRead( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -368,6 +370,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x42ec03ac, "sceIoWrite", true, 3 )]
 		public int sceIoWrite( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -407,6 +410,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x27eb27b8, "sceIoLseek", true, 3, true )]
 		public int sceIoLseek( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -469,6 +473,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x68963324, "sceIoLseek32", true, 3 )]
 		public int sceIoLseek32( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
@@ -494,6 +499,11 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 					break;
 				case 0:
 					seekOrigin = System.IO.SeekOrigin.Begin;
+					if( a1 > handle.Stream.Length )
+					{
+						a1 = 0;
+						//return ( int )handle.Stream.Position;
+					}
 					break;
 			}
 

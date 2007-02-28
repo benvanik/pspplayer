@@ -19,6 +19,10 @@ namespace Noxa {
 				public:
 					R4000Statistics(){}
 
+					// We have this master #if here not so much cause it matters, but to ensure that
+					// I'm not recording stats when I shouldn't be
+#ifdef STATISTICS
+
 					uint InstructionsExecuted;
 					uint ExecutionLoops;						// # of times the execution loop has run
 					uint CodeBlocksExecuted;
@@ -41,12 +45,18 @@ namespace Noxa {
 					uint JumpBlockInlineHits;					// # of times inline block was able to find target
 					uint JumpBlockInlineMisses;					// # of times inline block had to return from bounce
 
-					uint BiosSyscallCount;						// # of syscalls that go to the BIOS (managed)
+					uint ManagedMemoryReadCount;				// # of times R4000Memory was used to read instead of the inline code
+					uint ManagedMemoryWriteCount;				// # of times R4000Memory was used to write instead of the inline code
+
+					uint ManagedSyscallCount;						// # of syscalls that go to the BIOS (managed)
 					uint NativeSyscallCount;					// # of syscalls that use overriden stubs (native)
 
 					double AverageCodeSizeRatio;				// Ratio of MIPS code size to x86 code size
 
 					double AverageGenerationTime;
+
+#endif
+
 					double IPS;
 					double RunTime;
 

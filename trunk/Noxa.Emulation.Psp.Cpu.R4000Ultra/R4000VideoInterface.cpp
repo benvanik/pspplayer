@@ -243,11 +243,19 @@ bool ReadMorePackets( void* memoryAddress, VideoDisplayList* vdl, uint newStallA
 	return done;
 }
 
+// sceDisplayForUser -----------------------------------
+
 int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int syncMode )
 {
 	VideoApi* ni = _videoApi;
 	ni->SwitchFrameBuffer( address, bufferWidth, pixelFormat, syncMode );
 	return 0;
+}
+
+void sceDisplayWaitVblankStart()
+{
+	VideoApi* ni = _videoApi;
+	ni->WaitForVsync();
 }
 
 // sceGeUser -------------------------------------------

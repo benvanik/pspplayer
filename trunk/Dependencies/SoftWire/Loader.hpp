@@ -15,8 +15,8 @@ namespace SoftWire
 
 		virtual ~Loader();
 
-		void (*callable(const char *entryLabel = 0))();
-		void (*finalize(const char *entryLabel = 0))();
+		void (*callable(const char *entryLabel = 0, int* codeSize = 0x0))();
+		void (*finalize(const char *entryLabel = 0, int* codeSize = 0x0))();
 		void *acquire();
 
 		Encoding *appendEncoding(const Encoding &encoding);
@@ -40,7 +40,7 @@ namespace SoftWire
 		bool possession;
 		bool finalized;
 
-		void loadCode(const char *entryLabel = 0);
+		int loadCode(const char *entryLabel = 0);
 		const unsigned char *resolveReference(const char *name, const Instruction *position) const;
 		const unsigned char *resolveLocal(const char *name, const Instruction *position) const;
 		const unsigned char *resolveExternal(const char *name) const;

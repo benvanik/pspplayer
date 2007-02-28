@@ -24,6 +24,7 @@ void sceRtcGetCurrentTick( LARGE_INTEGER* address );
 
 // sceDisplayUser --------------------------------------
 extern int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int syncMode );
+extern void sceDisplayWaitVblankStart();
 
 // sceGeUser -------------------------------------------
 //int sceGeEdramGetSize(); <-- inlined
@@ -59,6 +60,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->add( ESP, 4 );
 		g->mov( EAX, 0 );
 		return true;
+
 	// sceUtilsForUser -------------------------------------
 	case 0xbfa98062:		// sceKernelDcacheInvalidateRange
 	case 0x79d1c3fa:		// sceKernelDcacheWritebackAll
@@ -89,6 +91,11 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 			g->add( ESP, 16 );
 			g->mov( EAX, 0 );
 			return true;
+		case 0x984c27e7:		// sceDisplayWaitVblankStart
+			g->call( ( int )sceDisplayWaitVblankStart );
+			g->mov( EAX, 0 );
+			return true;
+
 		// sceGeUser -------------------------------------------
 		case 0x1f6752ad:		// sceGeEdramGetSize
 			g->mov( EAX, FrameBufferSize );

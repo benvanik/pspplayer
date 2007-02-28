@@ -80,6 +80,7 @@ void __runtimeRegsPrint()
 }
 #endif
 
+#ifdef TRACE
 void __traceRegs()
 {
 	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
@@ -123,13 +124,16 @@ void __traceLine( int address, int code )
 	//__traceFpuRegs();
 }
 #pragma managed
+#endif /* TRACE */
 
 void R4000BlockBuilder::EmitTrace( int address, int code )
 {
+#ifdef TRACE
 	_gen->push( ( uint )code );
 	_gen->push( ( uint )address );
 	_gen->call( ( int )__traceLine );
 	_gen->add( _gen->esp, 8 );
+#endif
 }
 
 void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
@@ -179,9 +183,10 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 
 	block->InstructionCount = InternalBuild( address, block );
 
-	void* ptr = _gen->callable();
+	int codeLength;
+	void* ptr = _gen->callable( 0, &codeLength );
 	block->Pointer = ptr;
-	block->Size = _gen->getCodeLength();
+	block->Size = codeLength; //_gen->getCodeLength();
 
 	// Switch possession to us so the reset() doesn't free it
 	_gen->acquire();
@@ -202,12 +207,14 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	stats->CodeBlocksGenerated++;
 
 	double ratio = block->Size / ( block->InstructionCount * 4 );
-	stats->AverageCodeSizeRatio = ( stats->AverageCodeSizeRatio * .8 ) + ( ratio * .2 );
+	stats->AverageCodeSizeRatio = ( stats->AverageCodeSizeRatio * .5 ) + ( ratio * .5 );
 
 	double genTime = R4000Cpu::GlobalCpu->_timer->Elapsed - blockStart;
 	if( genTime <= 0.0 )
 		genTime = 0.000001;
 	stats->AverageGenerationTime += genTime;
+
+	//Debug::WriteLine( String::Format( "gen block at 0x{0:X8} took {1}s ({2} instructions)", address, genTime, block->InstructionCount ) );
 
 	stats->AverageCodeBlockLength += block->InstructionCount;
 	if( block->InstructionCount > stats->LargestCodeBlockLength )

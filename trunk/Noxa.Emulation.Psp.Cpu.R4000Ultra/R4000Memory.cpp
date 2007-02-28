@@ -14,6 +14,9 @@ using namespace System::IO;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 
+extern uint _managedMemoryReadCount;
+extern uint _managedMemoryWriteCount;
+
 R4000Memory::R4000Memory()
 {
 	MainMemory = ( byte* )_aligned_malloc( MainMemorySize, 4 );
@@ -76,6 +79,10 @@ IMemorySegment^ R4000Memory::FindSegment( int baseAddress )
 
 int R4000Memory::ReadWord( int address )
 {
+#ifdef STATISTICS
+	_managedMemoryReadCount++;
+#endif
+
 	//Debug::WriteLine( String::Format( "RW @ 0x{0:X8}", address ) );
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
@@ -143,6 +150,10 @@ int R4000Memory::ReadStream( int address, Stream^ destination, int count )
 
 void R4000Memory::WriteWord( int address, int width, int value )
 {
+#ifdef STATISTICS
+	_managedMemoryWriteCount++;
+#endif
+
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
 		byte* ptr = MainMemory + ( address - MainMemoryBase );
