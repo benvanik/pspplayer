@@ -39,7 +39,7 @@ bool Noxa::Emulation::Psp::Video::IsTextureValid( OglTexture* texture )
 		( texture->Height == 0 ) )
 		return false;
 
-#if 0
+#if 1
 	// This is a special case - something to do with the framebuffer being set as the texture?
 	if( ( texture->Address == 0x04000000 ) &&
 		( texture->LineWidth == 0x4 ) &&
