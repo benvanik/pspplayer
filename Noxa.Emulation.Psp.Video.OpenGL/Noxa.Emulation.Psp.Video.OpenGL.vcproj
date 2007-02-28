@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglTextures.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Stdafx.cpp"
 				>
 				<FileConfiguration
@@ -265,6 +269,10 @@
 			</File>
 			<File
 				RelativePath=".\OglStatistics.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OglTextures.h"
 				>
 			</File>
 			<File

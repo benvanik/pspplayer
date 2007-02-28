@@ -34,6 +34,9 @@ extern int sceGeListUpdateStallAddr( int qid, uint stall );
 extern int sceGeListSync( int qid, int syncType );
 extern int sceGeDrawSync( int syncType );
 
+// sceUtilsForUser -------------------------------------
+// All D(ata) and I(nstruction) cache inval calls are nop'ed
+
 #pragma managed
 
 bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int address, int nid )
@@ -54,6 +57,16 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->push( EAX );
 		g->call( ( int )sceRtcGetCurrentTick );
 		g->add( ESP, 4 );
+		g->mov( EAX, 0 );
+		return true;
+	// sceUtilsForUser -------------------------------------
+	case 0xbfa98062:		// sceKernelDcacheInvalidateRange
+	case 0x79d1c3fa:		// sceKernelDcacheWritebackAll
+	case 0xb435dec5:		// sceKernelDcacheWritebackInvalidateAll
+	case 0x3ee30821:		// sceKernelDcacheWritebackRange
+	case 0x34b9fa9e:		// sceKernelDcacheWritebackInvalidateRange
+	case 0x920f104a:		// sceKernelIcacheInvalidateAll
+	case 0xc2df770e:		// sceKernelIcacheInvalidateRange
 		g->mov( EAX, 0 );
 		return true;
 	}

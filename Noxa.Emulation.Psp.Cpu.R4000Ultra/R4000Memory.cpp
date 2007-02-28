@@ -16,9 +16,9 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 R4000Memory::R4000Memory()
 {
-	MainMemory = ( byte* )malloc( MainMemorySize );
-	_scratchPad = ( byte* )malloc( ScratchPadSize );
-	_frameBufferBytes = ( byte* )malloc( FrameBufferSize );
+	MainMemory = ( byte* )_aligned_malloc( MainMemorySize, 4 );
+	_scratchPad = ( byte* )_aligned_malloc( ScratchPadSize, 4 );
+	_frameBufferBytes = ( byte* )_aligned_malloc( FrameBufferSize, 4 );
 
 	memset( MainMemory, 0x0, MainMemorySize );
 }
@@ -35,9 +35,15 @@ R4000Memory::!R4000Memory()
 
 void R4000Memory::Clear()
 {
-	SAFEFREE( MainMemory );
-	SAFEFREE( _scratchPad );
-	SAFEFREE( _frameBufferBytes );
+	if( MainMemory != NULL )
+		_aligned_free( MainMemory );
+	MainMemory = NULL;
+	if( _scratchPad != NULL )
+		_aligned_free( _scratchPad );
+	_scratchPad = NULL;
+	if( _frameBufferBytes != NULL )
+		_aligned_free( _frameBufferBytes );
+	_frameBufferBytes = NULL;
 }
 
 IMemorySegment^ R4000Memory::DefineSegment( MemoryType type, String^ name, int baseAddress, int length )

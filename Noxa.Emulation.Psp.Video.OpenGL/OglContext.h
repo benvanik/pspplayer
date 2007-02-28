@@ -6,20 +6,12 @@
 
 #pragma once
 
+#include "OglTextures.h"
+
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
 			namespace Video {
-
-				typedef struct OglTexture_t
-				{
-					int				PixelStorage;
-					int				Address;
-					int				LineWidth;
-					int				Width;
-					int				Height;
-					int				TextureID;
-				} OglTexture;
 
 				typedef struct OglContext_t
 				{
