@@ -172,6 +172,7 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x9c6eaad7, "sceDisplayGetVcount", true, 0 )]
 		public int sceDisplayGetVcount( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{

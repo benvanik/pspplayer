@@ -175,32 +175,74 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			return 0;
 		}
 
-		[BiosStub( 0x91e4f6a7, "sceKernelLibcClock", true, 1 )]
-		[BiosStubIncomplete]
+		// _CLOCKS_PER_SEC_ - 1000000 - clock ticks per second, I think (microseconds)
+
+		[BiosStubStateless]
+		[BiosStub( 0x91e4f6a7, "sceKernelLibcClock", true, 0 )]
 		public int sceKernelLibcClock( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
-			// a0 = void
+			// Get the processor clock used since the start of the process.
+
+			uint tick = ( uint )Environment.TickCount - _kernel.StartTick;
+			double totalus = TimeSpan.FromTicks( tick ).TotalMilliseconds / 1000.0;
 			
-			// clock_t
-			return 0;
+			// clock_t (uint)
+			return ( int )( ( uint )totalus );
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x27cc57f0, "sceKernelLibcTime", true, 1 )]
-		[BiosStubIncomplete]
 		public int sceKernelLibcTime( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
-			// a0 = time_t *t
+			// a0 = time_t *t (uint)
+
+			// Get the time in seconds since the epoc (1st Jan 1970).
+
+			int time = ( int )_kernel.ClockTime;
+			if( a0 != 0x0 )
+				memory.WriteWord( a0, 4, time );
 			
-			// time_t
-			return 0;
+			// time_t (uint)
+			return time;
 		}
 
+		[BiosStubStateless]
 		[BiosStub( 0x71ec4271, "sceKernelLibcGettimeofday", true, 2 )]
-		[BiosStubIncomplete]
 		public int sceKernelLibcGettimeofday( IMemory memory, int a0, int a1, int a2, int a3, int sp )
 		{
 			// a0 = struct timeval *tp
 			// a1 = struct timezone *tzp
+
+			// timeval: int sec, int usec
+			// timezone:
+			//	int tz_minuteswest - This is the number of minutes west of UTC.
+			//	int tz_dsttime - If nonzero, Daylight Saving Time applies during some part of the year.
+			// timezone is supposedly obsolete? unused? good!
+
+			if( a0 != 0x0 )
+			{
+				// usec = 1000000 per sec
+				uint time = _kernel.ClockTime;
+				uint tsec = time / 1000000;
+				uint tusec = time % 1000000;
+				memory.WriteWord( a0, 4, ( int )tsec );
+				memory.WriteWord( a0 + 4, 4, ( int )tusec );
+			}
+			else
+				return -1;
+
+			if( a1 != 0x0 )
+			{
+				int minutesWest = ( int )TimeZone.CurrentTimeZone.GetUtcOffset( DateTime.Today ).TotalMinutes;
+				if( minutesWest < 0 )
+				{
+					// We wrap, so we don't return negative offsets
+					minutesWest = -minutesWest + ( 12 * 60 );
+				}
+				int dst = DateTime.Today.IsDaylightSavingTime() == true ? 1 : 0;
+				memory.WriteWord( a1, 4, minutesWest );
+				memory.WriteWord( a1 + 4, 4, dst );
+			}
 			
 			// int
 			return 0;
