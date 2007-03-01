@@ -194,6 +194,40 @@ void niSetup( MemoryPool* pool )
 	_pendingCount = 0;
 }
 
+void FreeLL( VdlRef* head )
+{
+	VdlRef* ref = head;
+	while( ref != NULL )
+	{
+		VdlRef* next = ref->Next;
+
+		FreeList( ref->List );
+		SAFEFREE( ref );
+
+		ref = next;
+	}
+}
+
+void niCleanup()
+{
+	LOCK;
+
+	FreeLL( _pendingBatch );
+	_pendingBatch = NULL;
+
+	_listsTail = NULL;
+	FreeLL( _lists );
+	_lists = NULL;
+
+	_nextListId = 1;
+	_listCount = 0;
+	_pendingCount = 0;
+
+	_pool = NULL;
+
+	UNLOCK;
+}
+
 void niSwitchFrameBuffer( int address, int bufferWidth, int pixelFormat, int syncMode )
 {
 	// TODO: switch frame buffer
@@ -343,6 +377,7 @@ void OglDriver::SetupNativeInterface()
 	VideoApi* ni = ( VideoApi* )_nativeInterface;
 
 	ni->Setup = &niSetup;
+	ni->Cleanup = &niCleanup;
 	ni->SwitchFrameBuffer = &niSwitchFrameBuffer;
 	ni->FindList = &niFindList;
 	ni->EnqueueList = &niEnqueueList;

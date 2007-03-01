@@ -23,31 +23,92 @@ using namespace SoftWire;
 
 extern uint _nativeSyscallCount;
 
-//#define LOGSYSCALLS
+#define LOGSYSCALLS
 
 #define g context->Generator
 
-int __syscallBounce( int address, int syscallId, int a0, int a1, int a2, int a3, int sp )
+void __syscallBounce( int address, int syscallId )
 {
-	BiosFunction^ function = R4000Cpu::GlobalCpu->_syscalls[ syscallId ];
-	Debug::Assert( function != nullptr );
-
 #ifdef LOGSYSCALLS
-	String^ log = String::Format( "{0}::{1}( {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8} ) from 0x{7:X8}",
-		function->Module->Name, function->Name, a0, a1, a2, a3, sp, address - 4 );
-	Debug::WriteLine( log );
+	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
+
+	BiosFunction^ function = cpu->_syscalls[ syscallId ];
+	Debug::Assert( function != nullptr );
+	if( function != nullptr )
+	{
+		R4000Ctx* ctx = ( R4000Ctx* )cpu->_ctx;
+
+		String^ args;
+		Debug::Assert( function->ParameterCount <= 12 );
+		switch( function->ParameterCount )
+		{
+		case 1:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ] );
+			break;
+		case 2:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ] );
+			break;
+		case 3:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ] );
+			break;
+		case 4:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ] );
+			break;
+		case 5:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ] );
+			break;
+		case 6:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ] );
+			break;
+		case 7:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ] );
+			break;
+		case 8:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ] );
+			break;
+		case 9:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1 );
+			break;
+		case 10:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1 );
+			break;
+		case 11:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1 );
+			break;
+		case 12:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1, -1 );
+			break;
+		default:
+			args = "";
+			break;
+		}
+		String^ log = String::Format( "{0}::{1}({2}) from 0x{3:X8}",
+			function->Module->Name, function->Name, args, address - 4 );
+		Debug::WriteLine( log );
+	}
+	else
+	{
+		String^ log = String::Format( "Syscall attempt to undefined syscall {0} (0x{0:X8}) from 0x{1:X8}", syscallId, address - 4 );
+		Debug::WriteLine( log );
+		Debugger::Break();
+	}
 #endif
 
 #ifdef STATISTICS
 	R4000Cpu::GlobalCpu->_stats->ManagedSyscallCount++;
 #endif
 
+	BiosShim^ shim = R4000Cpu::GlobalCpu->_syscallShims[ syscallId ];
+	Debug::Assert( shim != nullptr );
+	if( shim == nullptr )
+		return;
+
 #ifdef SYSCALLSTATS
 	int currentStat = R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ];
 	R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ] = currentStat + 1;
 #endif
 
-	return function->Target( R4000Cpu::GlobalCpu->_memory, a0, a1, a2, a3, sp );
+	shim();
 }
 
 GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
@@ -56,18 +117,24 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 
 	BiosFunction^ biosFunction = R4000Cpu::GlobalCpu->_syscalls[ syscall ];
 	bool willCall;
-	bool hasReturn;
-	int paramCount;
-	bool doubleWordReturn;
+	bool canEmit;
 	if( biosFunction != nullptr )
 	{
 		willCall = biosFunction->IsImplemented;
-		hasReturn = biosFunction->HasReturn;
-		paramCount = biosFunction->ParameterCount;
-		doubleWordReturn = biosFunction->DoubleWordReturn;
 
-		if( biosFunction->IsImplemented == false )
+		// Take its word on its statelessness
+		context->LastSyscallStateless = biosFunction->IsStateless;
+		
+		if( biosFunction->IsImplemented == true )
 		{
+			// If it is implemented we can only emit if it is also stateless
+			canEmit = biosFunction->IsStateless;
+		}
+		else
+		{
+			// If not implemented we can always emit
+			canEmit = true;
+
 			if( pass == 0 )
 			{
 				Debug::WriteLine( String::Format( "R4000Generator: NID 0x{0:X8} {1} is not implemented",
@@ -78,9 +145,10 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 	else
 	{
 		willCall = false;
-		hasReturn = false;
-		paramCount = 0;
-		doubleWordReturn = false;
+
+		// Assume stateless and we can emit
+		canEmit = true;
+		context->LastSyscallStateless = true;
 
 		if( pass == 0 )
 			Debug::WriteLine( String::Format( "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address ) );
@@ -103,100 +171,62 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 			//g->mov( MPCVALID( CTX ), 1 );
 		}
 
-		if( willCall == true )
-		{
-			// Override if we can
-			bool emitted = false;
-			context->LastSyscallStateless = biosFunction->IsStateless;
+		// Override if we can - we do this regardless of whether or not the BIOS implements it
 #ifdef OVERRIDESYSCALLS
-			if( biosFunction->IsStateless == true )
-			{
-				// Note we may not emit here!
-				emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, biosFunction->NID );
-			}
-#endif
-
+		if( canEmit == true )
+		{
+			// Note we may not emit here!
+			bool emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, biosFunction->NID );
 			if( emitted == true  )
 			{
+				// If we emitted then we must be stateless
+				context->LastSyscallStateless = true;
+
 #ifdef GENDEBUG
 				Debug::WriteLine( String::Format( "Overrode {0} with native method", biosFunction->Name ) );
 #endif
 
 				// Everything handled for us by our overrides
-				if( hasReturn == true )
-					g->mov( MREG( CTX, 2 ), EAX );
+				g->mov( MREG( CTX, 2 ), EAX );
 
 #ifdef STATISTICS
 				g->inc( g->dword_ptr[ &_nativeSyscallCount ] );
 #endif
+
+				return GenerationResult::Syscall;
 			}
-			else
-			{
-				// Otherwise we use the thunk
+		}
+#endif
+		
+		if( willCall == true )
+		{
+			// Couldn't do a native stub, so use the thunk
 
-				// up to 5 registers (4-7 + 29)
-				if( paramCount > 0 )
-				{
-					if( paramCount > 4 )
-						g->push( MREG( CTX, 29 ) );
-					else
-						g->push( ( uint )0 );
+			g->push( ( uint )syscall );
+			// We push $ra as the address cause it is where the stub will go back to
+			g->push( MREG( CTX, 31 ) );
 
-					if( paramCount > 3 )
-						g->push( MREG( CTX, 7 ) );
-					else
-						g->push( ( uint )0 );
+			g->call( ( int )__syscallBounce );
 
-					if( paramCount > 2 )
-						g->push( MREG( CTX, 6 ) );
-					else
-						g->push( ( uint )0 );
-
-					if( paramCount > 1 )
-						g->push( MREG( CTX, 5 ) );
-					else
-						g->push( ( uint )0 );
-
-					g->push( MREG( CTX, 4 ) );
-				}
-				else
-				{
-					g->push( ( uint )0 );
-					g->push( ( uint )0 );
-					g->push( ( uint )0 );
-					g->push( ( uint )0 );
-					g->push( ( uint )0 );
-				}
-
-				g->push( ( uint )syscall );
-				// We push $ra as the address cause it is where the stub will go back to
-				g->push( MREG( CTX, 31 ) );
-
-				// 7 ints on stack
-
-				g->call( ( int )__syscallBounce );
-
-				g->add( ESP, 7 * 4 );
-				
-				if( hasReturn == true )
-				{
-					if( doubleWordReturn == true )
-					{
-						g->mov( MREG( CTX, 2 ), EAX );
-						g->mov( MREG( CTX, 3 ), ( int )0 );
-					}
-					else
-						g->mov( MREG( CTX, 2 ), EAX );
-				}
-			}
+			g->add( ESP, 8 );
 		}
 		else
 		{
-			if( hasReturn == true )
+			// No native stub AND not implemented - uh oh!
+
+			if( biosFunction != nullptr )
 			{
-				g->mov( MREG( CTX, 2 ), ( int )-1 );
-				if( doubleWordReturn == true )
+				if( biosFunction->HasReturn == true )
+				{
+					g->mov( MREG( CTX, 2 ), ( int )-1 );
+					if( biosFunction->DoubleWordReturn == true )
 						g->mov( MREG( CTX, 3 ), ( int )-1 );
+				}
+			}
+			else
+			{
+				// We don't even have a freaking function - just put -1 in $v0 and call it a day
+				g->mov( MREG( CTX, 2 ), ( int )-1 );
 			}
 		}
 	}

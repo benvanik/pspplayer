@@ -21,8 +21,9 @@ namespace Noxa {
 
 					typedef struct VideoApi_t
 					{
-						// Setup
+						// Setup & tear-down
 						void (*Setup)( MemoryPool* pool );
+						void (*Cleanup)();
 
 						// Switch framebuffer (used to doublebuffer, etc)
 						void (*SwitchFrameBuffer)( int address, int bufferWidth, int pixelFormat, int syncMode );

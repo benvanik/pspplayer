@@ -16,5 +16,9 @@ namespace Noxa.Emulation.Psp.Bios
 		{
 			get;
 		}
+
+		void Start();
+		void Stop();
+		void Clear();
 	}
 }

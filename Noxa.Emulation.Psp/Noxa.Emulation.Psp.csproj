@@ -46,10 +46,10 @@
   <ItemGroup>
     <Compile Include="Audio\IAudioDriver.cs" />
     <Compile Include="Bios\BiosFunction.cs" />
+    <Compile Include="Bios\BiosFunctionAttribute.cs" />
     <Compile Include="Bios\IBios.cs" />
     <Compile Include="Bios\IKernel.cs" />
     <Compile Include="Bios\IModule.cs" />
-    <Compile Include="Bios\IStatefulModule.cs" />
     <Compile Include="ComponentIssue.cs" />
     <Compile Include="ComponentParameters.cs" />
     <Compile Include="Cpu\CoreState.cs" />
