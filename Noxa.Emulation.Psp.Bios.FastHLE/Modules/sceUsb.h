@@ -42,47 +42,47 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0xAE5DE6AF, "sceUsbStart" )] [Stateless]
-						// /usb/pspusb.h:35: int sceUsbStart(const char* driverName, int size, void *args);
+						// int sceUsbStart(const char* driverName, int size, void *args); (/usb/pspusb.h:35)
 						int sceUsbStart( int driverName, int size, int args ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xC2464FA0, "sceUsbStop" )] [Stateless]
-						// /usb/pspusb.h:46: int sceUsbStop(const char* driverName, int size, void *args);
+						// int sceUsbStop(const char* driverName, int size, void *args); (/usb/pspusb.h:46)
 						int sceUsbStop( int driverName, int size, int args ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xC21645A4, "sceUsbGetState" )] [Stateless]
-						// /usb/pspusb.h:71: int sceUsbGetState();
+						// int sceUsbGetState(); (/usb/pspusb.h:71)
 						int sceUsbGetState(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x4E537366, "sceUsbGetDrvList" )] [Stateless]
-						// /usb/pspusb.h:83: int sceUsbGetDrvList(u32 r4one, u32* r5ret, u32 r6one);
+						// int sceUsbGetDrvList(u32 r4one, u32* r5ret, u32 r6one); (/usb/pspusb.h:83)
 						int sceUsbGetDrvList( int r4one, int r5ret, int r6one ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x112CC951, "sceUsbGetDrvState" )] [Stateless]
-						// /usb/pspusb.h:80: int sceUsbGetDrvState(const char* driverName);
+						// int sceUsbGetDrvState(const char* driverName); (/usb/pspusb.h:80)
 						int sceUsbGetDrvState( int driverName ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x586DB82C, "sceUsbActivate" )] [Stateless]
-						// /usb/pspusb.h:55: int sceUsbActivate(u32 pid);
+						// int sceUsbActivate(u32 pid); (/usb/pspusb.h:55)
 						int sceUsbActivate( int pid ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xC572A9C8, "sceUsbDeactivate" )] [Stateless]
-						// /usb/pspusb.h:64: int sceUsbDeactivate(u32 pid);
+						// int sceUsbDeactivate(u32 pid); (/usb/pspusb.h:64)
 						int sceUsbDeactivate( int pid ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x5BE0E002, "sceUsbWaitState" )] [Stateless]
-						// /usb/pspusb.h:84: int sceUsbWaitState(u32 state, s32 waitmode, u32 *timeout);
+						// int sceUsbWaitState(u32 state, s32 waitmode, u32 *timeout); (/usb/pspusb.h:84)
 						int sceUsbWaitState( int state, int waitmode, int timeout ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x1C360735, "sceUsbWaitCancel" )] [Stateless]
-						// /usb/pspusb.h:85: int sceUsbWaitCancel();
+						// int sceUsbWaitCancel(); (/usb/pspusb.h:85)
 						int sceUsbWaitCancel(){ return NISTUBRETURN; }
 
 					};
@@ -93,4 +93,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - DDA5C6BD */
+/* GenerateStubsV2: auto-generated - F97B73EB */

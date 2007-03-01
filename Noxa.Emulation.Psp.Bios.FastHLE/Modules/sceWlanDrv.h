@@ -42,27 +42,27 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x93440B11, "sceWlanDevIsPowerOn" )] [Stateless]
-						// /wlan/pspwlan.h:24: int sceWlanDevIsPowerOn();
+						// int sceWlanDevIsPowerOn(); (/wlan/pspwlan.h:24)
 						int sceWlanDevIsPowerOn(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xD7763699, "sceWlanGetSwitchState" )] [Stateless]
-						// /wlan/pspwlan.h:31: int sceWlanGetSwitchState();
+						// int sceWlanGetSwitchState(); (/wlan/pspwlan.h:31)
 						int sceWlanGetSwitchState(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x0C622081, "sceWlanGetEtherAddr" )] [Stateless]
-						// /wlan/pspwlan.h:39: int sceWlanGetEtherAddr(char *etherAddr);
+						// int sceWlanGetEtherAddr(char *etherAddr); (/wlan/pspwlan.h:39)
 						int sceWlanGetEtherAddr( int etherAddr ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x482CAE9A, "sceWlanDevAttach" )] [Stateless]
-						// /wlan/pspwlan.h:46: int sceWlanDevAttach();
+						// int sceWlanDevAttach(); (/wlan/pspwlan.h:46)
 						int sceWlanDevAttach(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xC9A8CAB7, "sceWlanDevDetach" )] [Stateless]
-						// /wlan/pspwlan.h:53: int sceWlanDevDetach();
+						// int sceWlanDevDetach(); (/wlan/pspwlan.h:53)
 						int sceWlanDevDetach(){ return NISTUBRETURN; }
 
 					};
@@ -73,4 +73,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 2730379C */
+/* GenerateStubsV2: auto-generated - 2A7D2524 */

@@ -42,52 +42,52 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0xB7F46618, "sceKernelLoadModuleByID" )] [Stateless]
-						// /user/pspmodulemgr.h:91: SceUID sceKernelLoadModuleByID(SceUID fid, int flags, SceKernelLMOption *option);
+						// SceUID sceKernelLoadModuleByID(SceUID fid, int flags, SceKernelLMOption *option); (/user/pspmodulemgr.h:91)
 						int sceKernelLoadModuleByID( int fid, int flags, int option ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x977DE386, "sceKernelLoadModule" )] [Stateless]
-						// /user/pspmodulemgr.h:68: SceUID sceKernelLoadModule(const char *path, int flags, SceKernelLMOption *option);
+						// SceUID sceKernelLoadModule(const char *path, int flags, SceKernelLMOption *option); (/user/pspmodulemgr.h:68)
 						int sceKernelLoadModule( int path, int flags, int option ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x710F61B5, "sceKernelLoadModuleMs" )] [Stateless]
-						// /user/pspmodulemgr.h:80: SceUID sceKernelLoadModuleMs(const char *path, int flags, SceKernelLMOption *option);
+						// SceUID sceKernelLoadModuleMs(const char *path, int flags, SceKernelLMOption *option); (/user/pspmodulemgr.h:80)
 						int sceKernelLoadModuleMs( int path, int flags, int option ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xF9275D98, "sceKernelLoadModuleBufferUsbWlan" )] [Stateless]
-						// /user/pspmodulemgr.h:106: SceUID sceKernelLoadModuleBufferUsbWlan(SceSize bufsize, void *buf, int flags, SceKernelLMOption *option);
+						// SceUID sceKernelLoadModuleBufferUsbWlan(SceSize bufsize, void *buf, int flags, SceKernelLMOption *option); (/user/pspmodulemgr.h:106)
 						int sceKernelLoadModuleBufferUsbWlan( int bufsize, int buf, int flags, int option ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x50F0C1EC, "sceKernelStartModule" )] [Stateless]
-						// /user/pspmodulemgr.h:119: int sceKernelStartModule(SceUID modid, SceSize argsize, void *argp, int *status, SceKernelSMOption *option);
+						// int sceKernelStartModule(SceUID modid, SceSize argsize, void *argp, int *status, SceKernelSMOption *option); (/user/pspmodulemgr.h:119)
 						int sceKernelStartModule( int modid, int argsize, int argp, int status, int option ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xD1FF982A, "sceKernelStopModule" )] [Stateless]
-						// /user/pspmodulemgr.h:132: int sceKernelStopModule(SceUID modid, SceSize argsize, void *argp, int *status, SceKernelSMOption *option);
+						// int sceKernelStopModule(SceUID modid, SceSize argsize, void *argp, int *status, SceKernelSMOption *option); (/user/pspmodulemgr.h:132)
 						int sceKernelStopModule( int modid, int argsize, int argp, int status, int option ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x2E0911AA, "sceKernelUnloadModule" )] [Stateless]
-						// /user/pspmodulemgr.h:141: int sceKernelUnloadModule(SceUID modid);
+						// int sceKernelUnloadModule(SceUID modid); (/user/pspmodulemgr.h:141)
 						int sceKernelUnloadModule( int modid ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xD675EBB8, "sceKernelSelfStopUnloadModule" )] [Stateless]
-						// /user/pspmodulemgr.h:152: int sceKernelSelfStopUnloadModule(int unknown, SceSize argsize, void *argp);
+						// int sceKernelSelfStopUnloadModule(int unknown, SceSize argsize, void *argp); (/user/pspmodulemgr.h:152)
 						int sceKernelSelfStopUnloadModule( int unknown, int argsize, int argp ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xCC1D3699, "sceKernelStopUnloadSelfModule" )] [Stateless]
-						// /user/pspmodulemgr.h:164: int sceKernelStopUnloadSelfModule(SceSize argsize, void *argp, int *status, SceKernelSMOption *option);
+						// int sceKernelStopUnloadSelfModule(SceSize argsize, void *argp, int *status, SceKernelSMOption *option); (/user/pspmodulemgr.h:164)
 						int sceKernelStopUnloadSelfModule( int argsize, int argp, int status, int option ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x748CBED9, "sceKernelQueryModuleInfo" )] [Stateless]
-						// /user/pspmodulemgr.h:198: int sceKernelQueryModuleInfo(SceUID modid, SceKernelModuleInfo *info);
+						// int sceKernelQueryModuleInfo(SceUID modid, SceKernelModuleInfo *info); (/user/pspmodulemgr.h:198)
 						int sceKernelQueryModuleInfo( int modid, int info ){ return NISTUBRETURN; }
 
 					};
@@ -98,4 +98,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 85C82CC3 */
+/* GenerateStubsV2: auto-generated - E6ADC14F */

@@ -42,52 +42,52 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x6A2774F3, "sceCtrlSetSamplingCycle" )] [Stateless]
-						// /ctrl/pspctrl.h:119: int sceCtrlSetSamplingCycle(int cycle);
+						// int sceCtrlSetSamplingCycle(int cycle); (/ctrl/pspctrl.h:119)
 						int sceCtrlSetSamplingCycle( int cycle ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x02BAAD91, "sceCtrlGetSamplingCycle" )] [Stateless]
-						// /ctrl/pspctrl.h:128: int sceCtrlGetSamplingCycle(int *pcycle);
+						// int sceCtrlGetSamplingCycle(int *pcycle); (/ctrl/pspctrl.h:128)
 						int sceCtrlGetSamplingCycle( int pcycle ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x1F4011E6, "sceCtrlSetSamplingMode" )] [Stateless]
-						// /ctrl/pspctrl.h:137: int sceCtrlSetSamplingMode(int mode);
+						// int sceCtrlSetSamplingMode(int mode); (/ctrl/pspctrl.h:137)
 						int sceCtrlSetSamplingMode( int mode ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xDA6B76A1, "sceCtrlGetSamplingMode" )] [Stateless]
-						// /ctrl/pspctrl.h:146: int sceCtrlGetSamplingMode(int *pmode);
+						// int sceCtrlGetSamplingMode(int *pmode); (/ctrl/pspctrl.h:146)
 						int sceCtrlGetSamplingMode( int pmode ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x3A622550, "sceCtrlPeekBufferPositive" )] [Stateless]
-						// /ctrl/pspctrl.h:148: int sceCtrlPeekBufferPositive(SceCtrlData *pad_data, int count);
+						// int sceCtrlPeekBufferPositive(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:148)
 						int sceCtrlPeekBufferPositive( int pad_data, int count ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xC152080A, "sceCtrlPeekBufferNegative" )] [Stateless]
-						// /ctrl/pspctrl.h:150: int sceCtrlPeekBufferNegative(SceCtrlData *pad_data, int count);
+						// int sceCtrlPeekBufferNegative(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:150)
 						int sceCtrlPeekBufferNegative( int pad_data, int count ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x1F803938, "sceCtrlReadBufferPositive" )] [Stateless]
-						// /ctrl/pspctrl.h:168: int sceCtrlReadBufferPositive(SceCtrlData *pad_data, int count);
+						// int sceCtrlReadBufferPositive(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:168)
 						int sceCtrlReadBufferPositive( int pad_data, int count ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x60B81F86, "sceCtrlReadBufferNegative" )] [Stateless]
-						// /ctrl/pspctrl.h:170: int sceCtrlReadBufferNegative(SceCtrlData *pad_data, int count);
+						// int sceCtrlReadBufferNegative(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:170)
 						int sceCtrlReadBufferNegative( int pad_data, int count ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xB1D0E5CD, "sceCtrlPeekLatch" )] [Stateless]
-						// /ctrl/pspctrl.h:172: int sceCtrlPeekLatch(SceCtrlLatch *latch_data);
+						// int sceCtrlPeekLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:172)
 						int sceCtrlPeekLatch( int latch_data ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x0B588501, "sceCtrlReadLatch" )] [Stateless]
-						// /ctrl/pspctrl.h:174: int sceCtrlReadLatch(SceCtrlLatch *latch_data);
+						// int sceCtrlReadLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:174)
 						int sceCtrlReadLatch( int latch_data ){ return NISTUBRETURN; }
 
 					};
@@ -98,4 +98,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - C5D8CDE0 */
+/* GenerateStubsV2: auto-generated - A6CBB232 */

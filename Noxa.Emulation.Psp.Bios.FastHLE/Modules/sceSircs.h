@@ -42,7 +42,7 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x71EEF62D, "sceSircsSend" )] [Stateless]
-						// /sircs/pspsircs.h:37: int sceSircsSend(struct sircs_data* sd, int count);
+						// int sceSircsSend(struct sircs_data* sd, int count); (/sircs/pspsircs.h:37)
 						int sceSircsSend( int sd, int count ){ return NISTUBRETURN; }
 
 					};
@@ -53,4 +53,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 4E1E736F */
+/* GenerateStubsV2: auto-generated - B1916DC3 */

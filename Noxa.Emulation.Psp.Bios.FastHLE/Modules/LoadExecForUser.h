@@ -42,17 +42,17 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0xBD2F1094, "sceKernelLoadExec" )] [Stateless]
-						// /user/psploadexec.h:80: int sceKernelLoadExec(const char *file, struct SceKernelLoadExecParam *param);
+						// int sceKernelLoadExec(const char *file, struct SceKernelLoadExecParam *param); (/user/psploadexec.h:80)
 						int sceKernelLoadExec( int file, int param ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x05572A5F, "sceKernelExitGame" )] [Stateless]
-						// /user/psploadexec.h:57: void sceKernelExitGame();
+						// void sceKernelExitGame(); (/user/psploadexec.h:57)
 						void sceKernelExitGame(){}
 
 						[NotImplemented]
 						[BiosFunction( 0x4AC57943, "sceKernelRegisterExitCallback" )] [Stateless]
-						// /user/psploadexec.h:49: int sceKernelRegisterExitCallback(int cbid);
+						// int sceKernelRegisterExitCallback(int cbid); (/user/psploadexec.h:49)
 						int sceKernelRegisterExitCallback( int cbid ){ return NISTUBRETURN; }
 
 					};
@@ -63,4 +63,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - B5CB02F4 */
+/* GenerateStubsV2: auto-generated - 00A2C2A7 */

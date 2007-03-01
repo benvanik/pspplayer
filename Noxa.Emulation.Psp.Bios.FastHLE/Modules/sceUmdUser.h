@@ -42,22 +42,22 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x46EBB729, "sceUmdCheckMedium" )] [Stateless]
-						// /umd/pspumd.h:42: int sceUmdCheckMedium(int a);
+						// int sceUmdCheckMedium(int a); (/umd/pspumd.h:42)
 						int sceUmdCheckMedium( int a ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xC6183D47, "sceUmdActivate" )] [Stateless]
-						// /umd/pspumd.h:66: int sceUmdActivate(int unit, const char *drive);
+						// int sceUmdActivate(int unit, const char *drive); (/umd/pspumd.h:66)
 						int sceUmdActivate( int unit, int drive ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x8EF08FCE, "sceUmdWaitDriveStat" )] [Stateless]
-						// /umd/pspumd.h:75: int sceUmdWaitDriveStat(int stat);
+						// int sceUmdWaitDriveStat(int stat); (/umd/pspumd.h:75)
 						int sceUmdWaitDriveStat( int stat ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xAEE7404D, "sceUmdRegisterUMDCallBack" )] [Stateless]
-						// /umd/pspumd.h:89: int sceUmdRegisterUMDCallBack(int cbid);
+						// int sceUmdRegisterUMDCallBack(int cbid); (/umd/pspumd.h:89)
 						int sceUmdRegisterUMDCallBack( int cbid ){ return NISTUBRETURN; }
 
 					};
@@ -68,4 +68,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 147E4A8A */
+/* GenerateStubsV2: auto-generated - 5085FAD2 */

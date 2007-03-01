@@ -42,72 +42,72 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x1F6752AD, "sceGeEdramGetSize" )] [Stateless]
-						// /ge/pspge.h:47: unsigned int sceGeEdramGetSize();
+						// unsigned int sceGeEdramGetSize(); (/ge/pspge.h:47)
 						int sceGeEdramGetSize(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xE47E40E4, "sceGeEdramGetAddr" )] [Stateless]
-						// /ge/pspge.h:54: void * sceGeEdramGetAddr();
+						// void * sceGeEdramGetAddr(); (/ge/pspge.h:54)
 						int sceGeEdramGetAddr(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xDC93CFEF, "sceGeGetCmd" )] [Stateless]
-						// /ge/pspge.h:63: unsigned int sceGeGetCmd(int cmd);
+						// unsigned int sceGeGetCmd(int cmd); (/ge/pspge.h:63)
 						int sceGeGetCmd( int cmd ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x57C8945B, "sceGeGetMtx" )] [Stateless]
-						// /ge/pspge.h:93: int sceGeGetMtx(int type, void *matrix);
+						// int sceGeGetMtx(int type, void *matrix); (/ge/pspge.h:93)
 						int sceGeGetMtx( int type, int matrix ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x438A385A, "sceGeSaveContext" )] [Stateless]
-						// /ge/pspge.h:102: int sceGeSaveContext(PspGeContext *context);
+						// int sceGeSaveContext(PspGeContext *context); (/ge/pspge.h:102)
 						int sceGeSaveContext( int context ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x0BF608FB, "sceGeRestoreContext" )] [Stateless]
-						// /ge/pspge.h:111: int sceGeRestoreContext(const PspGeContext *context);
+						// int sceGeRestoreContext(const PspGeContext *context); (/ge/pspge.h:111)
 						int sceGeRestoreContext( int context ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xAB49E76A, "sceGeListEnQueue" )] [Stateless]
-						// /ge/pspge.h:124: int sceGeListEnQueue(const void *list, void *stall, int cbid, void *arg);
+						// int sceGeListEnQueue(const void *list, void *stall, int cbid, void *arg); (/ge/pspge.h:124)
 						int sceGeListEnQueue( int list, int stall, int cbid, int arg ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x1C0D95A6, "sceGeListEnQueueHead" )] [Stateless]
-						// /ge/pspge.h:137: int sceGeListEnQueueHead(const void *list, void *stall, int cbid, void *arg);
+						// int sceGeListEnQueueHead(const void *list, void *stall, int cbid, void *arg); (/ge/pspge.h:137)
 						int sceGeListEnQueueHead( int list, int stall, int cbid, int arg ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x5FB86AB0, "sceGeListDeQueue" )] [Stateless]
-						// /ge/pspge.h:146: int sceGeListDeQueue(int qid);
+						// int sceGeListDeQueue(int qid); (/ge/pspge.h:146)
 						int sceGeListDeQueue( int qid ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xE0D68148, "sceGeListUpdateStallAddr" )] [Stateless]
-						// /ge/pspge.h:156: int sceGeListUpdateStallAddr(int qid, void *stall);
+						// int sceGeListUpdateStallAddr(int qid, void *stall); (/ge/pspge.h:156)
 						int sceGeListUpdateStallAddr( int qid, int stall ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x03444EB4, "sceGeListSync" )] [Stateless]
-						// /ge/pspge.h:176: int sceGeListSync(int qid, int syncType);
+						// int sceGeListSync(int qid, int syncType); (/ge/pspge.h:176)
 						int sceGeListSync( int qid, int syncType ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xB287BD61, "sceGeDrawSync" )] [Stateless]
-						// /ge/pspge.h:185: int sceGeDrawSync(int syncType);
+						// int sceGeDrawSync(int syncType); (/ge/pspge.h:185)
 						int sceGeDrawSync( int syncType ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xA4FC06A4, "sceGeSetCallback" )] [Stateless]
-						// /ge/pspge.h:193: int sceGeSetCallback(PspGeCallbackData *cb);
+						// int sceGeSetCallback(PspGeCallbackData *cb); (/ge/pspge.h:193)
 						int sceGeSetCallback( int cb ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x05DB22CE, "sceGeUnsetCallback" )] [Stateless]
-						// /ge/pspge.h:201: int sceGeUnsetCallback(int cbid);
+						// int sceGeUnsetCallback(int cbid); (/ge/pspge.h:201)
 						int sceGeUnsetCallback( int cbid ){ return NISTUBRETURN; }
 
 					};
@@ -118,4 +118,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 50569958 */
+/* GenerateStubsV2: auto-generated - BF91B5C0 */

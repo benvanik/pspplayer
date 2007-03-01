@@ -42,32 +42,32 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0xE58818A8, "sceUsbstorBootSetCapacity" )] [Stateless]
-						// /usbstor/pspusbstor.h:50: int sceUsbstorBootSetCapacity(u32 size);
+						// int sceUsbstorBootSetCapacity(u32 size); (/usbstor/pspusbstor.h:50)
 						int sceUsbstorBootSetCapacity( int size ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x594BBF95, "sceUsbstorBootSetLoadAddr" )] [Stateless]
-						// /usbstor/pspusbstor.h:55: int sceUsbstorBootSetLoadAddr(u32 addr);
+						// int sceUsbstorBootSetLoadAddr(u32 addr); (/usbstor/pspusbstor.h:55)
 						int sceUsbstorBootSetLoadAddr( int addr ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x6D865ECD, "sceUsbstorBootGetDataSize" )] [Stateless]
-						// /usbstor/pspusbstor.h:54: int sceUsbstorBootGetDataSize();
+						// int sceUsbstorBootGetDataSize(); (/usbstor/pspusbstor.h:54)
 						int sceUsbstorBootGetDataSize(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xA1119F0D, "sceUsbstorBootSetStatus" )] [Stateless]
-						// /usbstor/pspusbstor.h:56: int sceUsbstorBootSetStatus(u32 status);
+						// int sceUsbstorBootSetStatus(u32 status); (/usbstor/pspusbstor.h:56)
 						int sceUsbstorBootSetStatus( int status ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x1F080078, "sceUsbstorBootRegisterNotify" )] [Stateless]
-						// /usbstor/pspusbstor.h:28: int sceUsbstorBootRegisterNotify(u32 eventFlag);
+						// int sceUsbstorBootRegisterNotify(u32 eventFlag); (/usbstor/pspusbstor.h:28)
 						int sceUsbstorBootRegisterNotify( int eventFlag ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xA55C9E16, "sceUsbstorBootUnregisterNotify" )] [Stateless]
-						// /usbstor/pspusbstor.h:37: int sceUsbstorBootUnregisterNotify(u32 eventFlag);
+						// int sceUsbstorBootUnregisterNotify(u32 eventFlag); (/usbstor/pspusbstor.h:37)
 						int sceUsbstorBootUnregisterNotify( int eventFlag ){ return NISTUBRETURN; }
 
 					};
@@ -78,4 +78,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 63726C37 */
+/* GenerateStubsV2: auto-generated - 13D1DE64 */

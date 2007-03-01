@@ -42,17 +42,17 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x172D316E, "sceKernelStdin" )] [Stateless]
-						// /user/pspstdio.h:35: SceUID sceKernelStdin();
+						// SceUID sceKernelStdin(); (/user/pspstdio.h:35)
 						int sceKernelStdin(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xA6BAB2E9, "sceKernelStdout" )] [Stateless]
-						// /user/pspstdio.h:42: SceUID sceKernelStdout();
+						// SceUID sceKernelStdout(); (/user/pspstdio.h:42)
 						int sceKernelStdout(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xF78BA90A, "sceKernelStderr" )] [Stateless]
-						// /user/pspstdio.h:49: SceUID sceKernelStderr();
+						// SceUID sceKernelStderr(); (/user/pspstdio.h:49)
 						int sceKernelStderr(){ return NISTUBRETURN; }
 
 					};
@@ -63,4 +63,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - B62EF295 */
+/* GenerateStubsV2: auto-generated - 5D298879 */

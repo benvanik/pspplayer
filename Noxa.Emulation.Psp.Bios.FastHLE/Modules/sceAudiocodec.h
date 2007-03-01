@@ -42,22 +42,22 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x5B37EB1D, "sceAudiocodecInit" )] [Stateless]
-						// /audio/pspaudiocodec.h:18: int sceAudiocodecInit(unsigned long *Buffer, int Type);
+						// int sceAudiocodecInit(unsigned long *Buffer, int Type); (/audio/pspaudiocodec.h:18)
 						int sceAudiocodecInit( int Buffer, int Type ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x70A703F8, "sceAudiocodecDecode" )] [Stateless]
-						// /audio/pspaudiocodec.h:19: int sceAudiocodecDecode(unsigned long *Buffer, int Type);
+						// int sceAudiocodecDecode(unsigned long *Buffer, int Type); (/audio/pspaudiocodec.h:19)
 						int sceAudiocodecDecode( int Buffer, int Type ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x3A20A200, "sceAudiocodecGetEDRAM" )] [Stateless]
-						// /audio/pspaudiocodec.h:20: int sceAudiocodecGetEDRAM(unsigned long *Buffer, int Type);
+						// int sceAudiocodecGetEDRAM(unsigned long *Buffer, int Type); (/audio/pspaudiocodec.h:20)
 						int sceAudiocodecGetEDRAM( int Buffer, int Type ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x29681260, "sceAudiocodecReleaseEDRAM" )] [Stateless]
-						// /audio/pspaudiocodec.h:21: int sceAudiocodecReleaseEDRAM(unsigned long *Buffer);
+						// int sceAudiocodecReleaseEDRAM(unsigned long *Buffer); (/audio/pspaudiocodec.h:21)
 						int sceAudiocodecReleaseEDRAM( int Buffer ){ return NISTUBRETURN; }
 
 					};
@@ -68,4 +68,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - B29475AF */
+/* GenerateStubsV2: auto-generated - AD645BDF */

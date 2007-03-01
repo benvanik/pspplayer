@@ -42,32 +42,32 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0xA291F107, "sceKernelMaxFreeMemSize" )] [Stateless]
-						// /user/pspsysmem.h:88: SceSize sceKernelMaxFreeMemSize();
+						// SceSize sceKernelMaxFreeMemSize(); (/user/pspsysmem.h:88)
 						int sceKernelMaxFreeMemSize(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xF919F628, "sceKernelTotalFreeMemSize" )] [Stateless]
-						// /user/pspsysmem.h:81: SceSize sceKernelTotalFreeMemSize();
+						// SceSize sceKernelTotalFreeMemSize(); (/user/pspsysmem.h:81)
 						int sceKernelTotalFreeMemSize(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x237DBD4F, "sceKernelAllocPartitionMemory" )] [Stateless]
-						// /user/pspsysmem.h:56: SceUID sceKernelAllocPartitionMemory(SceUID partitionid, const char *name, int type, SceSize size, void *addr);
+						// SceUID sceKernelAllocPartitionMemory(SceUID partitionid, const char *name, int type, SceSize size, void *addr); (/user/pspsysmem.h:56)
 						int sceKernelAllocPartitionMemory( int partitionid, int name, int type, int size, int addr ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xB6D61D02, "sceKernelFreePartitionMemory" )] [Stateless]
-						// /user/pspsysmem.h:65: int sceKernelFreePartitionMemory(SceUID blockid);
+						// int sceKernelFreePartitionMemory(SceUID blockid); (/user/pspsysmem.h:65)
 						int sceKernelFreePartitionMemory( int blockid ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x9D9A5BA1, "sceKernelGetBlockHeadAddr" )] [Stateless]
-						// /user/pspsysmem.h:74: void * sceKernelGetBlockHeadAddr(SceUID blockid);
+						// void * sceKernelGetBlockHeadAddr(SceUID blockid); (/user/pspsysmem.h:74)
 						int sceKernelGetBlockHeadAddr( int blockid ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x3FC9AE6A, "sceKernelDevkitVersion" )] [Stateless]
-						// /user/pspsysmem.h:104: int sceKernelDevkitVersion();
+						// int sceKernelDevkitVersion(); (/user/pspsysmem.h:104)
 						int sceKernelDevkitVersion(){ return NISTUBRETURN; }
 
 					};
@@ -78,4 +78,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 781FEFFF */
+/* GenerateStubsV2: auto-generated - D35D6873 */

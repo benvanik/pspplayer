@@ -42,32 +42,32 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x208DB1BD, "sceHprmIsRemoteExist" )] [Stateless]
-						// /hprm/psphprm.h:78: int sceHprmIsRemoteExist();
+						// int sceHprmIsRemoteExist(); (/hprm/psphprm.h:78)
 						int sceHprmIsRemoteExist(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x7E69EDA4, "sceHprmIsHeadphoneExist" )] [Stateless]
-						// /hprm/psphprm.h:71: int sceHprmIsHeadphoneExist();
+						// int sceHprmIsHeadphoneExist(); (/hprm/psphprm.h:71)
 						int sceHprmIsHeadphoneExist(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x219C58F1, "sceHprmIsMicrophoneExist" )] [Stateless]
-						// /hprm/psphprm.h:85: int sceHprmIsMicrophoneExist();
+						// int sceHprmIsMicrophoneExist(); (/hprm/psphprm.h:85)
 						int sceHprmIsMicrophoneExist(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x1910B327, "sceHprmPeekCurrentKey" )] [Stateless]
-						// /hprm/psphprm.h:46: int sceHprmPeekCurrentKey(u32 *key);
+						// int sceHprmPeekCurrentKey(u32 *key); (/hprm/psphprm.h:46)
 						int sceHprmPeekCurrentKey( int key ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x2BCEC83E, "sceHprmPeekLatch" )] [Stateless]
-						// /hprm/psphprm.h:55: int sceHprmPeekLatch(u32 *latch);
+						// int sceHprmPeekLatch(u32 *latch); (/hprm/psphprm.h:55)
 						int sceHprmPeekLatch( int latch ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x40D2F9F0, "sceHprmReadLatch" )] [Stateless]
-						// /hprm/psphprm.h:64: int sceHprmReadLatch(u32 *latch);
+						// int sceHprmReadLatch(u32 *latch); (/hprm/psphprm.h:64)
 						int sceHprmReadLatch( int latch ){ return NISTUBRETURN; }
 
 					};
@@ -78,4 +78,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 69B3D0C9 */
+/* GenerateStubsV2: auto-generated - 63283673 */
