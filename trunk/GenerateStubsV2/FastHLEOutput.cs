@@ -244,7 +244,7 @@ namespace GenerateStubsV2
 			_writer.WriteLine( "{0}[BiosFunction( 0x{1:X8}, \"{2}\" )] [Stateless]", _indent, function.NID, function.Name );
 
 			// Original decl & source
-			_writer.WriteLine( "{0}// {2}:{3}: {1}", _indent, function.Source.DeclarationBlock, sourceFile, function.Source.LineNumber );
+			_writer.WriteLine( "{0}// {1} ({2}:{3})", _indent, function.Source.DeclarationBlock, sourceFile, function.Source.LineNumber );
 
 			bool hasReturn;
 			string transformed = TransformDeclaration( function.Name, function.Source.DeclarationBlock, out hasReturn );

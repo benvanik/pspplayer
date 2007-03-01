@@ -42,47 +42,47 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x0E20F177, "sceDisplaySetMode" )] [Stateless]
-						// /display/pspdisplay.h:53: int sceDisplaySetMode(int mode, int width, int height);
+						// int sceDisplaySetMode(int mode, int width, int height); (/display/pspdisplay.h:53)
 						int sceDisplaySetMode( int mode, int width, int height ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xDEA197D4, "sceDisplayGetMode" )] [Stateless]
-						// /display/pspdisplay.h:64: int sceDisplayGetMode(int *pmode, int *pwidth, int *pheight);
+						// int sceDisplayGetMode(int *pmode, int *pwidth, int *pheight); (/display/pspdisplay.h:64)
 						int sceDisplayGetMode( int pmode, int pwidth, int pheight ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x289D82FE, "sceDisplaySetFrameBuf" )] [Stateless]
-						// /display/pspdisplay.h:74: void sceDisplaySetFrameBuf(void *topaddr, int bufferwidth, int pixelformat, int sync);
+						// void sceDisplaySetFrameBuf(void *topaddr, int bufferwidth, int pixelformat, int sync); (/display/pspdisplay.h:74)
 						void sceDisplaySetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int sync ){}
 
 						[NotImplemented]
 						[BiosFunction( 0xEEDA2E54, "sceDisplayGetFrameBuf" )] [Stateless]
-						// /display/pspdisplay.h:84: int sceDisplayGetFrameBuf(void **topaddr, int *bufferwidth, int *pixelformat, int *unk1);
+						// int sceDisplayGetFrameBuf(void **topaddr, int *bufferwidth, int *pixelformat, int *unk1); (/display/pspdisplay.h:84)
 						int sceDisplayGetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int unk1 ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x9C6EAAD7, "sceDisplayGetVcount" )] [Stateless]
-						// /display/pspdisplay.h:89: unsigned int sceDisplayGetVcount();
+						// unsigned int sceDisplayGetVcount(); (/display/pspdisplay.h:89)
 						int sceDisplayGetVcount(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x36CDFADE, "sceDisplayWaitVblank" )] [Stateless]
-						// /display/pspdisplay.h:104: int sceDisplayWaitVblank();
+						// int sceDisplayWaitVblank(); (/display/pspdisplay.h:104)
 						int sceDisplayWaitVblank(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x8EB9EC49, "sceDisplayWaitVblankCB" )] [Stateless]
-						// /display/pspdisplay.h:109: int sceDisplayWaitVblankCB();
+						// int sceDisplayWaitVblankCB(); (/display/pspdisplay.h:109)
 						int sceDisplayWaitVblankCB(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x984C27E7, "sceDisplayWaitVblankStart" )] [Stateless]
-						// /display/pspdisplay.h:94: int sceDisplayWaitVblankStart();
+						// int sceDisplayWaitVblankStart(); (/display/pspdisplay.h:94)
 						int sceDisplayWaitVblankStart(){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x46F186C3, "sceDisplayWaitVblankStartCB" )] [Stateless]
-						// /display/pspdisplay.h:99: int sceDisplayWaitVblankStartCB();
+						// int sceDisplayWaitVblankStartCB(); (/display/pspdisplay.h:99)
 						int sceDisplayWaitVblankStartCB(){ return NISTUBRETURN; }
 
 					};
@@ -93,4 +93,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 8D7F092A */
+/* GenerateStubsV2: auto-generated - CD31A16C */
