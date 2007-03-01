@@ -7,6 +7,7 @@
 #pragma once
 
 using namespace System;
+using namespace System::Reflection;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Debugging;
@@ -28,6 +29,8 @@ namespace Noxa {
 				ref class UltraCpu;
 				ref class R4000BiosStubs;
 				ref class R4000VideoInterface;
+
+				delegate void BiosShim();
 
 				ref class R4000Cpu : ICpu
 				{
@@ -66,9 +69,13 @@ namespace Noxa {
 				internal:
 					int							_lastSyscall;
 					array<BiosFunction^>^		_syscalls;
+					array<BiosShim^>^			_syscallShims;
 #ifdef SYSCALLSTATS
 					array<int>^					_syscallCounts;
 #endif
+
+					FieldInfo^					_globalCpuFieldInfo;
+					FieldInfo^					_privateMemoryFieldInfo;
 
 				public:
 
@@ -269,6 +276,9 @@ namespace Noxa {
 					virtual int ExecuteBlock();
 
 					virtual void PrintStatistics();
+
+				protected:
+					BiosShim^ EmitShim( BiosFunction^ function, void* memory, void* registers );
 				};
 
 			}

@@ -12,7 +12,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using Noxa.Emulation.Psp.Player.Configuration;
-using Noxa.Emulation.Psp.Player.Development;
+//using Noxa.Emulation.Psp.Player.Development;
 
 namespace Noxa.Emulation.Psp.Player
 {

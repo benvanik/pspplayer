@@ -406,6 +406,10 @@
 				Name="Shared"
 				>
 				<File
+					RelativePath="..\Shared\Include\BiosApi.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Shared\Include\MemoryPool.h"
 					>
 				</File>

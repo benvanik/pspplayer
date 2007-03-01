@@ -4,16 +4,7 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+#pragma once
 
-namespace Noxa.Emulation.Psp.Bios
-{
-	public interface IStatefulModule : IModule
-	{
-		void Start();
-		void Stop();
-		void Clear();
-	}
-}
+// The default return value for stubbed (unimplemented) methods
+#define NISTUBRETURN -1

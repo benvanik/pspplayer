@@ -36,6 +36,7 @@ namespace Noxa.Emulation.Psp.Player
 
 			Properties.Settings.Default.Save();
 
+			_debugger = null;
 			_player = new Player( this );
 
 			this.Load();
@@ -237,8 +238,8 @@ namespace Noxa.Emulation.Psp.Player
 			if( _debugger != null )
 				return;
 
-			_debugger = new Noxa.Emulation.Psp.Player.Development.Debugger( this );
-			_debugger.Show();
+			//_debugger = new Noxa.Emulation.Psp.Player.Development.Debugger( this );
+			//_debugger.Show();
 
 			_instance.Cpu.EnableDebugging();
 		}

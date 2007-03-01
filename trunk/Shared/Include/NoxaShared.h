@@ -9,6 +9,8 @@
 typedef unsigned char byte;
 typedef unsigned short ushort;
 typedef unsigned int uint;
+typedef long long int64;
+typedef unsigned long long uint64;
 typedef void* ptr;
 
 #define SAFEFREE( x ) { if( x != NULL ) free( x ); x = NULL; }

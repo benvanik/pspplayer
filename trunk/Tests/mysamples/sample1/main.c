@@ -21,12 +21,19 @@ yy )
 	return r;
 }
 
+void test2( int a0, int a1, long long a12, int a3, int a4 )
+{
+	volatile int x = 5;
+}
+
 int main( int argc, char *argv[] )
 {
 	//pspDebugScreenInit();
 	//pspDebugScreenPrintf( "Hello World\n" );
 
-	long long xx = test( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+	//long long xx = test( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 );
+	//return (long)xx;
 
-	return (long)xx;
+	test2( 1, 9, 0xCDCDCDCDFEFEFEFE, 2, 3 );
+	return 0;
 }

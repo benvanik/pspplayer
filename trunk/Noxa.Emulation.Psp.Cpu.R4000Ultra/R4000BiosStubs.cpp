@@ -226,14 +226,14 @@ int scePowerSetClockFrequency( int cpuFreq, int ramFreq, int busFreq )
 
 int scePowerSetBusClockFrequency( int busFreq )
 {
-	if( ( busFreq < 1 ) || ( busFreq > 166 )
+	if( ( busFreq < 1 ) || ( busFreq > 166 ) )
 		return -1;
 	return 0;
 }
 
 int scePowerSetCpuClockFrequency( int cpuFreq )
 {
-	if( ( cpuFreq < 1 ) || ( cpuFreq > 333 )
+	if( ( cpuFreq < 1 ) || ( cpuFreq > 333 ) )
 		return -1;
 	return 0;
 }
