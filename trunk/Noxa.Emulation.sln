@@ -27,7 +27,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Cpu.R400
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{102BC2E8-2DED-489C-851C-333302D03BFF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StaticLibrary", "Dependencies\SoftWire\StaticLibrary-VC8.vcproj", "{13E6F43F-CC20-4861-BC80-FA1A1F4CBB72}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SoftWire", "Dependencies\SoftWire\StaticLibrary-VC8.vcproj", "{13E6F43F-CC20-4861-BC80-FA1A1F4CBB72}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Video.OpenGL", "Noxa.Emulation.Psp.Video.OpenGL\Noxa.Emulation.Psp.Video.OpenGL.vcproj", "{78980526-7FCC-4DB8-BDDA-BEDBBE8C8705}"
 EndProject
@@ -76,7 +76,6 @@ Global
 		{96442D9A-AE98-47BE-A418-BA6E42CF81EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{96442D9A-AE98-47BE-A418-BA6E42CF81EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96442D9A-AE98-47BE-A418-BA6E42CF81EB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{96442D9A-AE98-47BE-A418-BA6E42CF81EB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{96442D9A-AE98-47BE-A418-BA6E42CF81EB}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{96442D9A-AE98-47BE-A418-BA6E42CF81EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96442D9A-AE98-47BE-A418-BA6E42CF81EB}.Release|Any CPU.Build.0 = Release|Any CPU

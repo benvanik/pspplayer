@@ -51,6 +51,11 @@ namespace Noxa {
 						int sceUmdActivate( int unit, int drive ){ return NISTUBRETURN; }
 
 						[NotImplemented]
+						[BiosFunction( 0x6B4A146C, "sceUmdGetDriveStat" )] [Stateless]
+						// manual add
+						int sceUmdGetDriveStat(){ return NISTUBRETURN; }
+
+						[NotImplemented]
 						[BiosFunction( 0x8EF08FCE, "sceUmdWaitDriveStat" )] [Stateless]
 						// int sceUmdWaitDriveStat(int stat); (/umd/pspumd.h:75)
 						int sceUmdWaitDriveStat( int stat ){ return NISTUBRETURN; }

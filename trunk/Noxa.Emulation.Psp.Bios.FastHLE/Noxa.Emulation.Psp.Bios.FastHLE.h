@@ -6,7 +6,7 @@
 
 #pragma once
 
-//#include "FastBios.h"
+#include "FastBios.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -113,7 +113,7 @@ namespace Noxa {
 
 					virtual IComponentInstance^ CreateInstance( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 					{
-						return nullptr;
+						return gcnew FastBios( emulator, parameters );
 					}
 				};
 

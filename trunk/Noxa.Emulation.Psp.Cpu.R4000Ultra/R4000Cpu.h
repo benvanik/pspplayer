@@ -30,7 +30,7 @@ namespace Noxa {
 				ref class R4000BiosStubs;
 				ref class R4000VideoInterface;
 
-				delegate void BiosShim();
+				delegate void BiosShim( R4000Cpu^ cpu );
 
 				ref class R4000Cpu : ICpu
 				{
@@ -73,9 +73,10 @@ namespace Noxa {
 #ifdef SYSCALLSTATS
 					array<int>^					_syscallCounts;
 #endif
+					array<IModule^>^			_moduleInstances;
 
-					FieldInfo^					_globalCpuFieldInfo;
 					FieldInfo^					_privateMemoryFieldInfo;
+					FieldInfo^					_privateModuleInstancesFieldInfo;
 
 				public:
 
@@ -278,6 +279,7 @@ namespace Noxa {
 					virtual void PrintStatistics();
 
 				protected:
+					int LookupOrAddModule( IModule^ module );
 					BiosShim^ EmitShim( BiosFunction^ function, void* memory, void* registers );
 				};
 

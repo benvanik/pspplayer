@@ -13,6 +13,16 @@ typedef long long int64;
 typedef unsigned long long uint64;
 typedef void* ptr;
 
+typedef union SysClock_u
+{
+	struct
+	{
+		uint	LowPart;
+		int		HighPart;
+	};
+	long long	QuadPart;
+} SysClock;
+
 #define SAFEFREE( x ) { if( x != NULL ) free( x ); x = NULL; }
 #define SAFEDELETE( x ) { if( x != NULL ) delete x; x = NULL; }
 

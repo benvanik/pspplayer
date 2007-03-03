@@ -101,6 +101,16 @@ namespace Noxa {
 						int sceGeDrawSync( int syncType ){ return NISTUBRETURN; }
 
 						[NotImplemented]
+						[BiosFunction( 0xB448EC0D, "sceGeBreak" )] [Stateless]
+						// manual add
+						int sceGeBreak( int mode, int unknown ){ return NISTUBRETURN; }
+
+						[NotImplemented]
+						[BiosFunction( 0x4C06E472, "sceGeContinue" )] [Stateless]
+						// manual add
+						int sceGeContinue(){ return NISTUBRETURN; }
+
+						[NotImplemented]
 						[BiosFunction( 0xA4FC06A4, "sceGeSetCallback" )] [Stateless]
 						// int sceGeSetCallback(PspGeCallbackData *cb); (/ge/pspge.h:193)
 						int sceGeSetCallback( int cb ){ return NISTUBRETURN; }

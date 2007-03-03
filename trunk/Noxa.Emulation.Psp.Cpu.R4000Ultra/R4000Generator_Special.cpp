@@ -27,11 +27,11 @@ extern uint _nativeSyscallCount;
 
 #define g context->Generator
 
-void __syscallBounce( int address, int syscallId )
+void __syscallBounce( int syscallId, int address )
 {
-#ifdef LOGSYSCALLS
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
 
+#ifdef LOGSYSCALLS
 	BiosFunction^ function = cpu->_syscalls[ syscallId ];
 	Debug::Assert( function != nullptr );
 	if( function != nullptr )
@@ -95,50 +95,64 @@ void __syscallBounce( int address, int syscallId )
 #endif
 
 #ifdef STATISTICS
-	R4000Cpu::GlobalCpu->_stats->ManagedSyscallCount++;
+	cpu->_stats->ManagedSyscallCount++;
 #endif
 
-	BiosShim^ shim = R4000Cpu::GlobalCpu->_syscallShims[ syscallId ];
+	BiosShim^ shim = cpu->_syscallShims[ syscallId ];
 	Debug::Assert( shim != nullptr );
 	if( shim == nullptr )
 		return;
 
 #ifdef SYSCALLSTATS
-	int currentStat = R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ];
-	R4000Cpu::GlobalCpu->_syscallCounts[ syscallId ] = currentStat + 1;
+	//int currentStat = cpu->_syscallCounts[ syscallId ];
+	//cpu->_syscallCounts[ syscallId ] = currentStat + 1;
+	cpu->_syscallCounts[ syscallId ]++;
 #endif
 
-	shim();
+	shim( cpu );
 }
 
-GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+void EmitNativeCall( R4000GenContext^ context, BiosFunction^ function )
+{
+	Debug::Assert( false );
+}
+
+GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte _function )
 {
 	int syscall = ( int )( ( code >> 6 ) & 0xFFFFF );
 
-	BiosFunction^ biosFunction = R4000Cpu::GlobalCpu->_syscalls[ syscall ];
+	BiosFunction^ function = R4000Cpu::GlobalCpu->_syscalls[ syscall ];
 	bool willCall;
 	bool canEmit;
-	if( biosFunction != nullptr )
+	bool hasReturn;
+	bool wideReturn;
+	if( function != nullptr )
 	{
-		willCall = biosFunction->IsImplemented;
+		willCall = function->IsImplemented;
 
 		// Take its word on its statelessness
-		context->LastSyscallStateless = biosFunction->IsStateless;
-		
-		if( biosFunction->IsImplemented == true )
+		context->LastSyscallStateless = function->IsStateless;
+
+		hasReturn = ( function->MethodInfo->ReturnType != void::typeid );
+		wideReturn = ( function->MethodInfo->ReturnType == Int64::typeid );
+
+		if( function->IsImplemented == true )
 		{
 			// If it is implemented we can only emit if it is also stateless
-			canEmit = biosFunction->IsStateless;
+			canEmit = function->IsStateless;
 		}
 		else
 		{
 			// If not implemented we can always emit
 			canEmit = true;
 
+			// Sanity check - we can't have unimplemented methods that have native pointers!
+			Debug::Assert( function->NativeMethod == IntPtr::Zero );
+
 			if( pass == 0 )
 			{
 				Debug::WriteLine( String::Format( "R4000Generator: NID 0x{0:X8} {1} is not implemented",
-					biosFunction->NID, biosFunction->Name ) );
+					function->NID, function->Name ) );
 			}
 		}
 	}
@@ -149,6 +163,10 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		// Assume stateless and we can emit
 		canEmit = true;
 		context->LastSyscallStateless = true;
+
+		hasReturn = true;
+		wideReturn = false;
+
 
 		if( pass == 0 )
 			Debug::WriteLine( String::Format( "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address ) );
@@ -176,18 +194,23 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		if( canEmit == true )
 		{
 			// Note we may not emit here!
-			bool emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, biosFunction->NID );
+			bool emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, function->NID );
 			if( emitted == true  )
 			{
 				// If we emitted then we must be stateless
 				context->LastSyscallStateless = true;
 
 #ifdef GENDEBUG
-				Debug::WriteLine( String::Format( "Overrode {0} with native method", biosFunction->Name ) );
+				Debug::WriteLine( String::Format( "Overrode {0} with native method", function->Name ) );
 #endif
 
 				// Everything handled for us by our overrides
-				g->mov( MREG( CTX, 2 ), EAX );
+				if( hasReturn == true )
+				{
+					g->mov( MREG( CTX, 2 ), EAX );
+					if( wideReturn == true )
+						g->mov( MREG( CTX, 3 ), EBX );
+				}
 
 #ifdef STATISTICS
 				g->inc( g->dword_ptr[ &_nativeSyscallCount ] );
@@ -200,26 +223,31 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		
 		if( willCall == true )
 		{
-			// Couldn't do a native stub, so use the thunk
+			// Couldn't do a native stub, so try to emit a native call
 
-			g->push( ( uint )syscall );
-			// We push $ra as the address cause it is where the stub will go back to
-			g->push( MREG( CTX, 31 ) );
-
-			g->call( ( int )__syscallBounce );
-
-			g->add( ESP, 8 );
+			if( function->NativeMethod != IntPtr::Zero )
+			{
+				EmitNativeCall( context, function );
+			}
+			else
+			{
+				// We push $ra as the address cause it is where the stub will go back to
+				g->push( MREG( CTX, 31 ) );
+				g->push( ( uint )syscall );
+				g->call( ( int )__syscallBounce );
+				g->add( ESP, 8 );
+			}
 		}
 		else
 		{
 			// No native stub AND not implemented - uh oh!
 
-			if( biosFunction != nullptr )
+			if( function != nullptr )
 			{
-				if( biosFunction->HasReturn == true )
+				if( hasReturn == true )
 				{
 					g->mov( MREG( CTX, 2 ), ( int )-1 );
-					if( biosFunction->DoubleWordReturn == true )
+					if( wideReturn == true )
 						g->mov( MREG( CTX, 3 ), ( int )-1 );
 				}
 			}

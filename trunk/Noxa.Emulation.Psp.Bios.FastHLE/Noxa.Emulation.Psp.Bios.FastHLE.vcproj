@@ -202,6 +202,38 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FastBios.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Kernel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Kernel_Handles.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Kernel_Threads.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelHelpers.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelPartition.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelStatistics.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelThread.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Noxa.Emulation.Psp.Bios.FastHLE.cpp"
 				>
 			</File>
@@ -239,6 +271,62 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\FastBios.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Kernel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelCallback.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelDevice.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelFileHandle.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelHandle.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelHelpers.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelMemoryBlock.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelMsgPipe.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelPartition.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelSemaphore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelStatistics.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelThread.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Module.h"
 				>
