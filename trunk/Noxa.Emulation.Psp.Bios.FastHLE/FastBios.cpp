@@ -74,7 +74,7 @@ void FastBios::GatherFunctions()
 		if( type->IsAbstract == true )
 			continue;
 
-		Module^ module = ( Module^ )Activator::CreateInstance( type, this->_kernel );
+		Module^ module = ( Module^ )Activator::CreateInstance( type, _kernel );
 		Debug::Assert( module != nullptr );
 		if( module == nullptr )
 			continue;

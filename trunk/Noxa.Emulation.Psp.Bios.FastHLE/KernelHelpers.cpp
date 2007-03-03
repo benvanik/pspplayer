@@ -24,7 +24,7 @@ String^ KernelHelpers::ReadString( IMemory^ memory, int address )
 		byte c = ( byte )( memory->ReadWord( address ) & 0xFF );
 		if( c == 0 )
 			break;
-		sb->Append( ( char )c );
+		sb->Append( ( wchar_t )c );
 		address++;
 	}
 	return sb->ToString();

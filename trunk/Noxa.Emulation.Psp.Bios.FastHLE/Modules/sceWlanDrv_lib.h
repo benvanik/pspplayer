@@ -21,14 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					public ref class {MODULENAME} : public Module
+					ref class sceWlanDrv_lib : public Module
 					{
-					internal:
-						{MODULENAME}( Kernel^ kernel ) : Module( kernel ) {}
-						~{MODULENAME}(){}
-
 					public:
-						property String^ Name { virtual String^ get() override { return "{MODULENAME}"; } }
+						sceWlanDrv_lib( Kernel^ kernel ) : Module( kernel ) {}
+						~sceWlanDrv_lib(){}
+
+						property String^ Name { virtual String^ get() override { return "sceWlanDrv_lib"; } }
 
 						//virtual void Start() override;
 						//virtual void Stop() override;
@@ -41,3 +40,22 @@ namespace Noxa {
 
 					public: // ------ Stubbed calls ------
 
+						[NotImplemented]
+						[BiosFunction( 0x482CAE9A, "sceWlanDevAttach" )] [Stateless]
+						// int sceWlanDevAttach(); (/wlan/pspwlan.h:46)
+						int sceWlanDevAttach(){ return NISTUBRETURN; }
+
+						[NotImplemented]
+						[BiosFunction( 0xC9A8CAB7, "sceWlanDevDetach" )] [Stateless]
+						// int sceWlanDevDetach(); (/wlan/pspwlan.h:53)
+						int sceWlanDevDetach(){ return NISTUBRETURN; }
+
+					};
+				
+				}
+			}
+		}
+	}
+}
+
+/* GenerateStubsV2: auto-generated - C3C6478D */

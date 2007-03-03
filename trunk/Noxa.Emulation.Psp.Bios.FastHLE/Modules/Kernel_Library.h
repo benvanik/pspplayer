@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class Kernel_Library : public Module
+					public ref class Kernel_Library : public Module
 					{
 					public:
 						Kernel_Library( Kernel^ kernel ) : Module( kernel ) {}
 						~Kernel_Library(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "Kernel_Library"; } }
 
 						//virtual void Start() override;

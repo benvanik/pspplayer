@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class sceUtility : public Module
+					public ref class sceUtility : public Module
 					{
 					public:
 						sceUtility( Kernel^ kernel ) : Module( kernel ) {}
 						~sceUtility(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "sceUtility"; } }
 
 						//virtual void Start() override;

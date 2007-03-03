@@ -14,6 +14,8 @@ using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 
+#pragma warning( disable : 4677 )
+
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
@@ -21,14 +23,16 @@ namespace Noxa {
 
 				ref class Kernel;
 
-				ref class Module abstract : public IModule
+				public ref class Module abstract : public IModule
 				{
 				internal:
 					Kernel^						_kernel;
-				public:
+
+				internal:
 					Module( Kernel^ kernel ){ _kernel = kernel; }
 					~Module(){ this->Clear(); }
 
+				public:
 					property String^ Name { virtual String^ get() = 0; }
 
 					virtual void Start(){}
