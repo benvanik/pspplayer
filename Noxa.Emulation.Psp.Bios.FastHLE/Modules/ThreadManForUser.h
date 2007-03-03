@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class ThreadManForUser : public Module
+					public ref class ThreadManForUser : public Module
 					{
 					public:
 						ThreadManForUser( Kernel^ kernel ) : Module( kernel ) {}
 						~ThreadManForUser(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "ThreadManForUser"; } }
 
 						//virtual void Start() override;

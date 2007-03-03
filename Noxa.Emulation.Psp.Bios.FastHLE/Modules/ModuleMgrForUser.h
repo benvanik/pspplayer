@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class ModuleMgrForUser : public Module
+					public ref class ModuleMgrForUser : public Module
 					{
 					public:
 						ModuleMgrForUser( Kernel^ kernel ) : Module( kernel ) {}
 						~ModuleMgrForUser(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "ModuleMgrForUser"; } }
 
 						//virtual void Start() override;

@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class SysMemUserForUser : public Module
+					public ref class SysMemUserForUser : public Module
 					{
 					public:
 						SysMemUserForUser( Kernel^ kernel ) : Module( kernel ) {}
 						~SysMemUserForUser(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "SysMemUserForUser"; } }
 
 						//virtual void Start() override;

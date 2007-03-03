@@ -55,7 +55,7 @@ int R4000Cpu::LookupOrAddModule( IModule^ module )
 // Here we are in the x86 dynarec CPU emitting MSIL. I'm craaazzy ----___----
 BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* registers )
 {
-	Type^ voidStar = ( void::typeid )->MakePointerType();
+	//Type^ voidStar = ( void::typeid )->MakePointerType();
 	array<Type^>^ shimArgs = { R4000Cpu::typeid };
 	MethodInfo^ mi = function->MethodInfo;
 
@@ -190,7 +190,7 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 	}
 
 	// Invoke method
-	ilgen->EmitCall( OpCodes::Call, function->MethodInfo, nullptr );
+	ilgen->Emit( OpCodes::Call, function->MethodInfo );
 
 	// Handle return
 	if( hasReturn == true )

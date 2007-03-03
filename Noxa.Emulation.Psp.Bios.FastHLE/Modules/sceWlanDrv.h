@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class sceWlanDrv : public Module
+					public ref class sceWlanDrv : public Module
 					{
 					public:
 						sceWlanDrv( Kernel^ kernel ) : Module( kernel ) {}
 						~sceWlanDrv(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "sceWlanDrv"; } }
 
 						//virtual void Start() override;

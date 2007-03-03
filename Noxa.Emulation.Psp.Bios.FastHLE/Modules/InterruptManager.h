@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class InterruptManager : public Module
+					public ref class InterruptManager : public Module
 					{
 					public:
 						InterruptManager( Kernel^ kernel ) : Module( kernel ) {}
 						~InterruptManager(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "InterruptManager"; } }
 
 						//virtual void Start() override;

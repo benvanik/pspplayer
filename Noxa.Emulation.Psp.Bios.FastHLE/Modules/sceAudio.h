@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class sceAudio : public Module
+					public ref class sceAudio : public Module
 					{
 					public:
 						sceAudio( Kernel^ kernel ) : Module( kernel ) {}
 						~sceAudio(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "sceAudio"; } }
 
 						//virtual void Start() override;

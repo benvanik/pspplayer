@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class sceSuspendForUser : public Module
+					public ref class sceSuspendForUser : public Module
 					{
 					public:
 						sceSuspendForUser( Kernel^ kernel ) : Module( kernel ) {}
 						~sceSuspendForUser(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "sceSuspendForUser"; } }
 
 						//virtual void Start() override;

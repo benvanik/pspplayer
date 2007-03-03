@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class sceDmac : public Module
+					public ref class sceDmac : public Module
 					{
 					public:
 						sceDmac( Kernel^ kernel ) : Module( kernel ) {}
 						~sceDmac(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "sceDmac"; } }
 
 						//virtual void Start() override;

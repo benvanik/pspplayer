@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class LoadExecForUser : public Module
+					public ref class LoadExecForUser : public Module
 					{
 					public:
 						LoadExecForUser( Kernel^ kernel ) : Module( kernel ) {}
 						~LoadExecForUser(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "LoadExecForUser"; } }
 
 						//virtual void Start() override;

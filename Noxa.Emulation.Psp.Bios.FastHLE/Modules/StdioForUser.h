@@ -22,12 +22,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class StdioForUser : public Module
+					public ref class StdioForUser : public Module
 					{
 					public:
 						StdioForUser( Kernel^ kernel ) : Module( kernel ) {}
 						~StdioForUser(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "StdioForUser"; } }
 
 						//virtual void Start() override;

@@ -21,12 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class IoFileMgrForUser : public Module
+					public ref class IoFileMgrForUser : public Module
 					{
 					public:
 						IoFileMgrForUser( Kernel^ kernel ) : Module( kernel ) {}
 						~IoFileMgrForUser(){}
 
+					public:
 						property String^ Name { virtual String^ get() override { return "IoFileMgrForUser"; } }
 
 						//virtual void Start() override;
