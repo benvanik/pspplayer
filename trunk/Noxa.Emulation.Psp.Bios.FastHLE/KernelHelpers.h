@@ -15,21 +15,24 @@ namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
 			namespace Bios {
-				namespace KernelHelpers {
+				
+				ref class KernelHelpers
+				{
+				public:
 
-					__inline static String^ ReadString( IMemory^ memory, int address );
-					__inline static int WriteString( IMemory^ memory, const int address, String^ value );
+					static String^ ReadString( IMemory^ memory, int address );
+					static int WriteString( IMemory^ memory, const int address, String^ value );
 
-					__inline static String^ ReadString( byte* memory, const int address );
-					__inline static int WriteString( byte* memory, const int address, String^ value );
+					static String^ ReadString( byte* memory, const int address );
+					static int WriteString( byte* memory, const int address, String^ value );
 
-					__inline static DateTime ReadTime( IMemory^ memory, const int address );
-					__inline static int WriteTime( IMemory^ memory, const int address, DateTime time );
+					static DateTime ReadTime( IMemory^ memory, const int address );
+					static int WriteTime( IMemory^ memory, const int address, DateTime time );
 
-					__inline static DateTime ReadTime( byte* memory, const int address );
-					__inline static int WriteTime( byte* memory, const int address, DateTime time );
+					static DateTime ReadTime( byte* memory, const int address );
+					static int WriteTime( byte* memory, const int address, DateTime time );
 
-				}
+				};
 			}
 		}
 	}

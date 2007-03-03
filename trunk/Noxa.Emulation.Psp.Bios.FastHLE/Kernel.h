@@ -57,6 +57,8 @@ namespace Noxa {
 					DateTime							UnixBaseTime;
 
 					KernelStatistics^					Statistics;
+					int64								IdleClocks;
+					int									Status;
 
 					Dictionary<int, KernelThread^>^		Threads;
 					array<KernelPartition^>^			Partitions;

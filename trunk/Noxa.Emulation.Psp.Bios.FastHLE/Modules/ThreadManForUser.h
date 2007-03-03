@@ -36,29 +36,14 @@ namespace Noxa {
 					internal:
 						//virtual void* QueryNativePointer( uint nid ) override;
 
-					public: // ------ Implemented calls ------
+					public: // So many they are all inline... good luck!
 
-					public: // ------ Stubbed calls ------
+						// - Callbacks ------------------------------------------------------------------------------------------
 
 						[NotImplemented]
 						[BiosFunction( 0x6E9EA350, "_sceKernelReturnFromCallback" )] [Stateless]
 						// void _sceKernelReturnFromCallback(); (/user/pspthreadman.h:1453)
 						void _sceKernelReturnFromCallback(){}
-
-						[NotImplemented]
-						[BiosFunction( 0x0C106E53, "sceKernelRegisterThreadEventHandler" )] [Stateless]
-						// SceUID sceKernelRegisterThreadEventHandler(const char *name, SceUID threadID, int mask, SceKernelThreadEventHandler handler, void *common); (/user/pspthreadman.h:1729)
-						int sceKernelRegisterThreadEventHandler( int name, int threadID, int mask, int handler, int common ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x72F3C145, "sceKernelReleaseThreadEventHandler" )] [Stateless]
-						// int sceKernelReleaseThreadEventHandler(SceUID uid); (/user/pspthreadman.h:1738)
-						int sceKernelReleaseThreadEventHandler( int uid ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x369EEB6B, "sceKernelReferThreadEventHandlerStatus" )] [Stateless]
-						// int sceKernelReferThreadEventHandlerStatus(SceUID uid, struct SceKernelThreadEventHandlerInfo *info); (/user/pspthreadman.h:1748)
-						int sceKernelReferThreadEventHandlerStatus( int uid, int info ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xE81CAF8F, "sceKernelCreateCallback" )] [Stateless]
@@ -95,65 +80,188 @@ namespace Noxa {
 						// int sceKernelReferCallbackStatus(SceUID cb, SceKernelCallbackInfo *status); (/user/pspthreadman.h:996)
 						int sceKernelReferCallbackStatus( int cb, int status ){ return NISTUBRETURN; }
 
+						// - Threads --------------------------------------------------------------------------------------------
+
+						[NotImplemented]
+						[BiosFunction( 0x0C106E53, "sceKernelRegisterThreadEventHandler" )] [Stateless]
+						// SceUID sceKernelRegisterThreadEventHandler(const char *name, SceUID threadID, int mask, SceKernelThreadEventHandler handler, void *common); (/user/pspthreadman.h:1729)
+						int sceKernelRegisterThreadEventHandler( IMemory^ memory, int name, int threadID, int mask, int handler, int common );
+
+						[NotImplemented]
+						[BiosFunction( 0x72F3C145, "sceKernelReleaseThreadEventHandler" )] [Stateless]
+						// int sceKernelReleaseThreadEventHandler(SceUID uid); (/user/pspthreadman.h:1738)
+						int sceKernelReleaseThreadEventHandler( int uid );
+
+						[NotImplemented]
+						[BiosFunction( 0x369EEB6B, "sceKernelReferThreadEventHandlerStatus" )] [Stateless]
+						// int sceKernelReferThreadEventHandlerStatus(SceUID uid, struct SceKernelThreadEventHandlerInfo *info); (/user/pspthreadman.h:1748)
+						int sceKernelReferThreadEventHandlerStatus( IMemory^ memory, int uid, int info );
+
+						[BiosFunction( 0x446D8DE6, "sceKernelCreateThread" )] [Stateless]
+						// SceUID sceKernelCreateThread(const char *name, SceKernelThreadEntry entry, int initPriority, int stackSize, SceUInt attr, SceKernelThreadOptParam *option); (/user/pspthreadman.h:169)
+						int sceKernelCreateThread( IMemory^ memory, int name, int entry, int initPriority, int stackSize, int attr, int option );
+
+						[BiosFunction( 0x9FA03CD3, "sceKernelDeleteThread" )]
+						// int sceKernelDeleteThread(SceUID thid); (/user/pspthreadman.h:179)
+						int sceKernelDeleteThread( int thid );
+
+						[BiosFunction( 0xF475845D, "sceKernelStartThread" )]
+						// int sceKernelStartThread(SceUID thid, SceSize arglen, void *argp); (/user/pspthreadman.h:188)
+						int sceKernelStartThread( int thid, int arglen, int argp );
+
+						[NotImplemented]
+						[BiosFunction( 0x532A522E, "_sceKernelExitThread" )] [Stateless]
+						// void _sceKernelExitThread(); (/user/pspthreadman.h:1679)
+						void _sceKernelExitThread();
+
+						[BiosFunction( 0xAA73C935, "sceKernelExitThread" )]
+						// int sceKernelExitThread(int status); (/user/pspthreadman.h:195)
+						int sceKernelExitThread( int status );
+
+						[BiosFunction( 0x809CE29B, "sceKernelExitDeleteThread" )]
+						// int sceKernelExitDeleteThread(int status); (/user/pspthreadman.h:202)
+						int sceKernelExitDeleteThread( int status );
+
+						[BiosFunction( 0x616403BA, "sceKernelTerminateThread" )]
+						// int sceKernelTerminateThread(SceUID thid); (/user/pspthreadman.h:211)
+						int sceKernelTerminateThread( int thid );
+
+						[BiosFunction( 0x383F7BCC, "sceKernelTerminateDeleteThread" )]
+						// int sceKernelTerminateDeleteThread(SceUID thid); (/user/pspthreadman.h:220)
+						int sceKernelTerminateDeleteThread( int thid );
+
+						[NotImplemented]
+						[BiosFunction( 0x3AD58B8C, "sceKernelSuspendDispatchThread" )] [Stateless]
+						// int sceKernelSuspendDispatchThread(); (/user/pspthreadman.h:227)
+						int sceKernelSuspendDispatchThread();
+
+						[NotImplemented]
+						[BiosFunction( 0x27E22EC2, "sceKernelResumeDispatchThread" )] [Stateless]
+						// int sceKernelResumeDispatchThread(int state); (/user/pspthreadman.h:237)
+						int sceKernelResumeDispatchThread( int state );
+
+						[BiosFunction( 0xEA748E31, "sceKernelChangeCurrentThreadAttr" )] [Stateless]
+						// int sceKernelChangeCurrentThreadAttr(int unknown, SceUInt attr); (/user/pspthreadman.h:364)
+						int sceKernelChangeCurrentThreadAttr( int unknown, int attr );
+
+						[BiosFunction( 0x71BC9871, "sceKernelChangeThreadPriority" )] [Stateless]
+						// int sceKernelChangeThreadPriority(SceUID thid, int priority); (/user/pspthreadman.h:381)
+						int sceKernelChangeThreadPriority( int thid, int priority );
+
+						[NotImplemented]
+						[BiosFunction( 0x912354A7, "sceKernelRotateThreadReadyQueue" )] [Stateless]
+						// int sceKernelRotateThreadReadyQueue(int priority); (/user/pspthreadman.h:390)
+						int sceKernelRotateThreadReadyQueue( int priority );
+
+						[BiosFunction( 0x2C34E053, "sceKernelReleaseWaitThread" )] [Stateless]
+						// int sceKernelReleaseWaitThread(SceUID thid); (/user/pspthreadman.h:399)
+						int sceKernelReleaseWaitThread( int thid );
+
+						[BiosFunction( 0x293B45B8, "sceKernelGetThreadId" )] [Stateless]
+						// int sceKernelGetThreadId(); (/user/pspthreadman.h:406)
+						int sceKernelGetThreadId();
+
+						[BiosFunction( 0x94AA61EE, "sceKernelGetThreadCurrentPriority" )] [Stateless]
+						// int sceKernelGetThreadCurrentPriority(); (/user/pspthreadman.h:413)
+						int sceKernelGetThreadCurrentPriority();
+
+						[BiosFunction( 0x3B183E26, "sceKernelGetThreadExitStatus" )] [Stateless]
+						// int sceKernelGetThreadExitStatus(SceUID thid); (/user/pspthreadman.h:422)
+						int sceKernelGetThreadExitStatus( int thid );
+
+						[NotImplemented]
+						[BiosFunction( 0xD13BDE95, "sceKernelCheckThreadStack" )] [Stateless]
+						// int sceKernelCheckThreadStack(); (/user/pspthreadman.h:429)
+						int sceKernelCheckThreadStack();
+
+						[NotImplemented]
+						[BiosFunction( 0x52089CA1, "sceKernelGetThreadStackFreeSize" )] [Stateless]
+						// int sceKernelGetThreadStackFreeSize(SceUID thid); (/user/pspthreadman.h:439)
+						int sceKernelGetThreadStackFreeSize( int thid );
+
+						[BiosFunction( 0x17C1684E, "sceKernelReferThreadStatus" )] [Stateless]
+						// int sceKernelReferThreadStatus(SceUID thid, SceKernelThreadInfo *info); (/user/pspthreadman.h:458)
+						int sceKernelReferThreadStatus( IMemory^ memory, int thid, int info );
+
+						[BiosFunction( 0xFFC36A14, "sceKernelReferThreadRunStatus" )] [Stateless]
+						// int sceKernelReferThreadRunStatus(SceUID thid, SceKernelThreadRunStatus *status); (/user/pspthreadman.h:468)
+						int sceKernelReferThreadRunStatus( IMemory^ memory, int thid, int status );
+
+						[BiosFunction( 0x627E6F3A, "sceKernelReferSystemStatus" )] [Stateless]
+						// int sceKernelReferSystemStatus(SceKernelSystemStatus *status); (/user/pspthreadman.h:1100)
+						int sceKernelReferSystemStatus( IMemory^ memory, int status );
+
+						[NotImplemented]
+						[BiosFunction( 0x94416130, "sceKernelGetThreadmanIdList" )] [Stateless]
+						// int sceKernelGetThreadmanIdList(enum SceKernelIdListType type, SceUID *readbuf, int readbufsize, int *idcount); (/user/pspthreadman.h:1075)
+						int sceKernelGetThreadmanIdList( IMemory^ memory, int type, int readbuf, int readbufsize, int idcount );
+
+						[NotImplemented]
+						[BiosFunction( 0x57CF62DD, "sceKernelGetThreadmanIdType" )] [Stateless]
+						// enum SceKernelIdListType sceKernelGetThreadmanIdType(SceUID uid); (/user/pspthreadman.h:1688)
+						int sceKernelGetThreadmanIdType( int uid );
+
 						[NotImplemented]
 						[BiosFunction( 0x9ACE131E, "sceKernelSleepThread" )] [Stateless]
 						// int sceKernelSleepThread(); (/user/pspthreadman.h:244)
-						int sceKernelSleepThread(){ return NISTUBRETURN; }
+						int sceKernelSleepThread();
 
 						[NotImplemented]
 						[BiosFunction( 0x82826F70, "sceKernelSleepThreadCB" )] [Stateless]
 						// int sceKernelSleepThreadCB(); (/user/pspthreadman.h:255)
-						int sceKernelSleepThreadCB(){ return NISTUBRETURN; }
+						int sceKernelSleepThreadCB();
 
 						[NotImplemented]
 						[BiosFunction( 0xD59EAD2F, "sceKernelWakeupThread" )] [Stateless]
 						// int sceKernelWakeupThread(SceUID thid); (/user/pspthreadman.h:264)
-						int sceKernelWakeupThread( int thid ){ return NISTUBRETURN; }
+						int sceKernelWakeupThread( int thid );
 
 						[NotImplemented]
 						[BiosFunction( 0xFCCFAD26, "sceKernelCancelWakeupThread" )] [Stateless]
 						// int sceKernelCancelWakeupThread(SceUID thid); (/user/pspthreadman.h:273)
-						int sceKernelCancelWakeupThread( int thid ){ return NISTUBRETURN; }
+						int sceKernelCancelWakeupThread( int thid );
 
 						[NotImplemented]
 						[BiosFunction( 0x9944F31F, "sceKernelSuspendThread" )] [Stateless]
 						// int sceKernelSuspendThread(SceUID thid); (/user/pspthreadman.h:282)
-						int sceKernelSuspendThread( int thid ){ return NISTUBRETURN; }
+						int sceKernelSuspendThread( int thid );
 
 						[NotImplemented]
 						[BiosFunction( 0x75156E8F, "sceKernelResumeThread" )] [Stateless]
 						// int sceKernelResumeThread(SceUID thid); (/user/pspthreadman.h:291)
-						int sceKernelResumeThread( int thid ){ return NISTUBRETURN; }
+						int sceKernelResumeThread( int thid );
 
 						[NotImplemented]
 						[BiosFunction( 0x278C0DF5, "sceKernelWaitThreadEnd" )] [Stateless]
 						// int sceKernelWaitThreadEnd(SceUID thid, SceUInt *timeout); (/user/pspthreadman.h:301)
-						int sceKernelWaitThreadEnd( int thid, int timeout ){ return NISTUBRETURN; }
+						int sceKernelWaitThreadEnd( IMemory^ memory, int thid, int timeout );
 
 						[NotImplemented]
 						[BiosFunction( 0x840E8133, "sceKernelWaitThreadEndCB" )] [Stateless]
 						// int sceKernelWaitThreadEndCB(SceUID thid, SceUInt *timeout); (/user/pspthreadman.h:311)
-						int sceKernelWaitThreadEndCB( int thid, int timeout ){ return NISTUBRETURN; }
+						int sceKernelWaitThreadEndCB( IMemory^ memory, int thid, int timeout );
 
 						[NotImplemented]
 						[BiosFunction( 0xCEADEB47, "sceKernelDelayThread" )] [Stateless]
 						// int sceKernelDelayThread(SceUInt delay); (/user/pspthreadman.h:323)
-						int sceKernelDelayThread( int delay ){ return NISTUBRETURN; }
+						int sceKernelDelayThread( int delay );
 
 						[NotImplemented]
 						[BiosFunction( 0x68DA9E36, "sceKernelDelayThreadCB" )] [Stateless]
 						// int sceKernelDelayThreadCB(SceUInt delay); (/user/pspthreadman.h:335)
-						int sceKernelDelayThreadCB( int delay ){ return NISTUBRETURN; }
+						int sceKernelDelayThreadCB( int delay );
 
 						[NotImplemented]
 						[BiosFunction( 0xBD123D9E, "sceKernelDelaySysClockThread" )] [Stateless]
 						// int sceKernelDelaySysClockThread(SceKernelSysClock *delay); (/user/pspthreadman.h:344)
-						int sceKernelDelaySysClockThread( int delay ){ return NISTUBRETURN; }
+						int sceKernelDelaySysClockThread( IMemory^ memory, int delay );
 
 						[NotImplemented]
 						[BiosFunction( 0x1181E963, "sceKernelDelaySysClockThreadCB" )] [Stateless]
 						// int sceKernelDelaySysClockThreadCB(SceKernelSysClock *delay); (/user/pspthreadman.h:354)
-						int sceKernelDelaySysClockThreadCB( int delay ){ return NISTUBRETURN; }
+						int sceKernelDelaySysClockThreadCB( IMemory^ memory, int delay );
+
+						// - Semaphores -----------------------------------------------------------------------------------------
 
 						[NotImplemented]
 						[BiosFunction( 0xD6DA4BA1, "sceKernelCreateSema" )] [Stateless]
@@ -189,6 +297,8 @@ namespace Noxa {
 						[BiosFunction( 0xBC6FEBC5, "sceKernelReferSemaStatus" )] [Stateless]
 						// int sceKernelReferSemaStatus(SceUID semaid, SceKernelSemaInfo *info); (/user/pspthreadman.h:591)
 						int sceKernelReferSemaStatus( int semaid, int info ){ return NISTUBRETURN; }
+
+						// - Events ---------------------------------------------------------------------------------------------
 
 						[NotImplemented]
 						[BiosFunction( 0x55C20A00, "sceKernelCreateEventFlag" )] [Stateless]
@@ -230,6 +340,8 @@ namespace Noxa {
 						// int sceKernelReferEventFlagStatus(SceUID event, SceKernelEventFlagInfo *status); (/user/pspthreadman.h:719)
 						int sceKernelReferEventFlagStatus( int event, int status ){ return NISTUBRETURN; }
 
+						// - Mailboxes? -----------------------------------------------------------------------------------------
+
 						[NotImplemented]
 						[BiosFunction( 0x8125221D, "sceKernelCreateMbx" )] [Stateless]
 						// SceUID sceKernelCreateMbx(const char *name, SceUInt attr, SceKernelMbxOptParam *option); (/user/pspthreadman.h:774)
@@ -269,6 +381,8 @@ namespace Noxa {
 						[BiosFunction( 0xA8E8C846, "sceKernelReferMbxStatus" )] [Stateless]
 						// int sceKernelReferMbxStatus(SceUID mbxid, SceKernelMbxInfo *info); (/user/pspthreadman.h:886)
 						int sceKernelReferMbxStatus( int mbxid, int info ){ return NISTUBRETURN; }
+
+						// - MsgPipes -------------------------------------------------------------------------------------------
 
 						[NotImplemented]
 						[BiosFunction( 0x7C0DC2A0, "sceKernelCreateMsgPipe" )] [Stateless]
@@ -320,6 +434,8 @@ namespace Noxa {
 						// int sceKernelReferMsgPipeStatus(SceUID uid, SceKernelMppInfo *info); (/user/pspthreadman.h:1237)
 						int sceKernelReferMsgPipeStatus( int uid, int info ){ return NISTUBRETURN; }
 
+						// - VPL? -----------------------------------------------------------------------------------------------
+
 						[NotImplemented]
 						[BiosFunction( 0x56C039B5, "sceKernelCreateVpl" )] [Stateless]
 						// SceUID sceKernelCreateVpl(const char *name, int part, int attr, unsigned int size, struct SceKernelVplOptParam *opt); (/user/pspthreadman.h:1256)
@@ -359,6 +475,8 @@ namespace Noxa {
 						[BiosFunction( 0x39810265, "sceKernelReferVplStatus" )] [Stateless]
 						// int sceKernelReferVplStatus(SceUID uid, SceKernelVplInfo *info); (/user/pspthreadman.h:1340)
 						int sceKernelReferVplStatus( int uid, int info ){ return NISTUBRETURN; }
+
+						// - FPL? -----------------------------------------------------------------------------------------------
 
 						[NotImplemented]
 						[BiosFunction( 0xC07BB470, "sceKernelCreateFpl" )] [Stateless]
@@ -400,6 +518,8 @@ namespace Noxa {
 						// int sceKernelReferFplStatus(SceUID uid, SceKernelFplInfo *info); (/user/pspthreadman.h:1442)
 						int sceKernelReferFplStatus( int uid, int info ){ return NISTUBRETURN; }
 
+						// - Time -----------------------------------------------------------------------------------------------
+
 						[NotImplemented]
 						[BiosFunction( 0x0E927AED, "_sceKernelReturnFromTimerHandler" )] [Stateless]
 						// void _sceKernelReturnFromTimerHandler(); (/user/pspthreadman.h:1447)
@@ -440,6 +560,8 @@ namespace Noxa {
 						// unsigned int sceKernelGetSystemTimeLow(); (/user/pspthreadman.h:1517)
 						int sceKernelGetSystemTimeLow(){ return NISTUBRETURN; }
 
+						// - Alarms ---------------------------------------------------------------------------------------------
+
 						[NotImplemented]
 						[BiosFunction( 0x6652B8CA, "sceKernelSetAlarm" )] [Stateless]
 						// SceUID sceKernelSetAlarm(SceUInt clock, SceKernelAlarmHandler handler, void *common); (/user/pspthreadman.h:915)
@@ -459,6 +581,8 @@ namespace Noxa {
 						[BiosFunction( 0xDAA3F564, "sceKernelReferAlarmStatus" )] [Stateless]
 						// int sceKernelReferAlarmStatus(SceUID alarmid, SceKernelAlarmInfo *info); (/user/pspthreadman.h:945)
 						int sceKernelReferAlarmStatus( int alarmid, int info ){ return NISTUBRETURN; }
+
+						// - Timers ---------------------------------------------------------------------------------------------
 
 						[NotImplemented]
 						[BiosFunction( 0x20FFF560, "sceKernelCreateVTimer" )] [Stateless]
@@ -530,125 +654,7 @@ namespace Noxa {
 						// int sceKernelReferVTimerStatus(SceUID uid, SceKernelVTimerInfo *info); (/user/pspthreadman.h:1673)
 						int sceKernelReferVTimerStatus( int uid, int info ){ return NISTUBRETURN; }
 
-						[NotImplemented]
-						[BiosFunction( 0x446D8DE6, "sceKernelCreateThread" )] [Stateless]
-						// SceUID sceKernelCreateThread(const char *name, SceKernelThreadEntry entry, int initPriority, int stackSize, SceUInt attr, SceKernelThreadOptParam *option); (/user/pspthreadman.h:169)
-						int sceKernelCreateThread( int name, int entry, int initPriority, int stackSize, int attr, int option ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x9FA03CD3, "sceKernelDeleteThread" )] [Stateless]
-						// int sceKernelDeleteThread(SceUID thid); (/user/pspthreadman.h:179)
-						int sceKernelDeleteThread( int thid ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0xF475845D, "sceKernelStartThread" )] [Stateless]
-						// int sceKernelStartThread(SceUID thid, SceSize arglen, void *argp); (/user/pspthreadman.h:188)
-						int sceKernelStartThread( int thid, int arglen, int argp ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x532A522E, "_sceKernelExitThread" )] [Stateless]
-						// void _sceKernelExitThread(); (/user/pspthreadman.h:1679)
-						void _sceKernelExitThread(){}
-
-						[NotImplemented]
-						[BiosFunction( 0xAA73C935, "sceKernelExitThread" )] [Stateless]
-						// int sceKernelExitThread(int status); (/user/pspthreadman.h:195)
-						int sceKernelExitThread( int status ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x809CE29B, "sceKernelExitDeleteThread" )] [Stateless]
-						// int sceKernelExitDeleteThread(int status); (/user/pspthreadman.h:202)
-						int sceKernelExitDeleteThread( int status ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x616403BA, "sceKernelTerminateThread" )] [Stateless]
-						// int sceKernelTerminateThread(SceUID thid); (/user/pspthreadman.h:211)
-						int sceKernelTerminateThread( int thid ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x383F7BCC, "sceKernelTerminateDeleteThread" )] [Stateless]
-						// int sceKernelTerminateDeleteThread(SceUID thid); (/user/pspthreadman.h:220)
-						int sceKernelTerminateDeleteThread( int thid ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x3AD58B8C, "sceKernelSuspendDispatchThread" )] [Stateless]
-						// int sceKernelSuspendDispatchThread(); (/user/pspthreadman.h:227)
-						int sceKernelSuspendDispatchThread(){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x27E22EC2, "sceKernelResumeDispatchThread" )] [Stateless]
-						// int sceKernelResumeDispatchThread(int state); (/user/pspthreadman.h:237)
-						int sceKernelResumeDispatchThread( int state ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0xEA748E31, "sceKernelChangeCurrentThreadAttr" )] [Stateless]
-						// int sceKernelChangeCurrentThreadAttr(int unknown, SceUInt attr); (/user/pspthreadman.h:364)
-						int sceKernelChangeCurrentThreadAttr( int unknown, int attr ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x71BC9871, "sceKernelChangeThreadPriority" )] [Stateless]
-						// int sceKernelChangeThreadPriority(SceUID thid, int priority); (/user/pspthreadman.h:381)
-						int sceKernelChangeThreadPriority( int thid, int priority ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x912354A7, "sceKernelRotateThreadReadyQueue" )] [Stateless]
-						// int sceKernelRotateThreadReadyQueue(int priority); (/user/pspthreadman.h:390)
-						int sceKernelRotateThreadReadyQueue( int priority ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x2C34E053, "sceKernelReleaseWaitThread" )] [Stateless]
-						// int sceKernelReleaseWaitThread(SceUID thid); (/user/pspthreadman.h:399)
-						int sceKernelReleaseWaitThread( int thid ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x293B45B8, "sceKernelGetThreadId" )] [Stateless]
-						// int sceKernelGetThreadId(); (/user/pspthreadman.h:406)
-						int sceKernelGetThreadId(){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x94AA61EE, "sceKernelGetThreadCurrentPriority" )] [Stateless]
-						// int sceKernelGetThreadCurrentPriority(); (/user/pspthreadman.h:413)
-						int sceKernelGetThreadCurrentPriority(){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x3B183E26, "sceKernelGetThreadExitStatus" )] [Stateless]
-						// int sceKernelGetThreadExitStatus(SceUID thid); (/user/pspthreadman.h:422)
-						int sceKernelGetThreadExitStatus( int thid ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0xD13BDE95, "sceKernelCheckThreadStack" )] [Stateless]
-						// int sceKernelCheckThreadStack(); (/user/pspthreadman.h:429)
-						int sceKernelCheckThreadStack(){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x52089CA1, "sceKernelGetThreadStackFreeSize" )] [Stateless]
-						// int sceKernelGetThreadStackFreeSize(SceUID thid); (/user/pspthreadman.h:439)
-						int sceKernelGetThreadStackFreeSize( int thid ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x17C1684E, "sceKernelReferThreadStatus" )] [Stateless]
-						// int sceKernelReferThreadStatus(SceUID thid, SceKernelThreadInfo *info); (/user/pspthreadman.h:458)
-						int sceKernelReferThreadStatus( int thid, int info ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0xFFC36A14, "sceKernelReferThreadRunStatus" )] [Stateless]
-						// int sceKernelReferThreadRunStatus(SceUID thid, SceKernelThreadRunStatus *status); (/user/pspthreadman.h:468)
-						int sceKernelReferThreadRunStatus( int thid, int status ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x627E6F3A, "sceKernelReferSystemStatus" )] [Stateless]
-						// int sceKernelReferSystemStatus(SceKernelSystemStatus *status); (/user/pspthreadman.h:1100)
-						int sceKernelReferSystemStatus( int status ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x94416130, "sceKernelGetThreadmanIdList" )] [Stateless]
-						// int sceKernelGetThreadmanIdList(enum SceKernelIdListType type, SceUID *readbuf, int readbufsize, int *idcount); (/user/pspthreadman.h:1075)
-						int sceKernelGetThreadmanIdList( int type, int readbuf, int readbufsize, int idcount ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x57CF62DD, "sceKernelGetThreadmanIdType" )] [Stateless]
-						// enum SceKernelIdListType sceKernelGetThreadmanIdType(SceUID uid); (/user/pspthreadman.h:1688)
-						int sceKernelGetThreadmanIdType( int uid ){ return NISTUBRETURN; }
+						// ------------------------------------------------------------------------------------------------------
 
 					};
 				

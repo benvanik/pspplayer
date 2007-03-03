@@ -38,6 +38,14 @@ namespace Noxa {
 
 					public: // ------ Implemented calls ------
 
+						[BiosFunction( 0xD675EBB8, "sceKernelSelfStopUnloadModule" )]
+						// int sceKernelSelfStopUnloadModule(int unknown, SceSize argsize, void *argp); (/user/pspmodulemgr.h:152)
+						int sceKernelSelfStopUnloadModule( int unknown, int argsize, int argp );
+
+						[BiosFunction( 0xCC1D3699, "sceKernelStopUnloadSelfModule" )]
+						// int sceKernelStopUnloadSelfModule(SceSize argsize, void *argp, int *status, SceKernelSMOption *option); (/user/pspmodulemgr.h:164)
+						int sceKernelStopUnloadSelfModule( int argsize, int argp, int status, int option );
+
 					public: // ------ Stubbed calls ------
 
 						[NotImplemented]
@@ -74,16 +82,6 @@ namespace Noxa {
 						[BiosFunction( 0x2E0911AA, "sceKernelUnloadModule" )] [Stateless]
 						// int sceKernelUnloadModule(SceUID modid); (/user/pspmodulemgr.h:141)
 						int sceKernelUnloadModule( int modid ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0xD675EBB8, "sceKernelSelfStopUnloadModule" )] [Stateless]
-						// int sceKernelSelfStopUnloadModule(int unknown, SceSize argsize, void *argp); (/user/pspmodulemgr.h:152)
-						int sceKernelSelfStopUnloadModule( int unknown, int argsize, int argp ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0xCC1D3699, "sceKernelStopUnloadSelfModule" )] [Stateless]
-						// int sceKernelStopUnloadSelfModule(SceSize argsize, void *argp, int *status, SceKernelSMOption *option); (/user/pspmodulemgr.h:164)
-						int sceKernelStopUnloadSelfModule( int argsize, int argp, int status, int option ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0x748CBED9, "sceKernelQueryModuleInfo" )] [Stateless]

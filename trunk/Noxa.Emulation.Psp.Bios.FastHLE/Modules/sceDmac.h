@@ -9,7 +9,6 @@
 #include "NoxaShared.h"
 #include "ModulesShared.h"
 #include "Module.h"
-#include "KernelFileHandle.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -22,13 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class StdioForUser : public Module
+					ref class sceDmac : public Module
 					{
 					public:
-						StdioForUser( Kernel^ kernel ) : Module( kernel ) {}
-						~StdioForUser(){}
+						sceDmac( Kernel^ kernel ) : Module( kernel ) {}
+						~sceDmac(){}
 
-						property String^ Name { virtual String^ get() override { return "StdioForUser"; } }
+						property String^ Name { virtual String^ get() override { return "sceDmac"; } }
 
 						//virtual void Start() override;
 						//virtual void Stop() override;
@@ -39,19 +38,12 @@ namespace Noxa {
 
 					public: // ------ Implemented calls ------
 
-						[BiosFunction( 0x172D316E, "sceKernelStdin" )] [Stateless]
-						// SceUID sceKernelStdin(); (/user/pspstdio.h:35)
-						int sceKernelStdin(){ return _kernel->StdIn->ID; }
-
-						[BiosFunction( 0xA6BAB2E9, "sceKernelStdout" )] [Stateless]
-						// SceUID sceKernelStdout(); (/user/pspstdio.h:42)
-						int sceKernelStdout(){ return _kernel->StdOut->ID; }
-
-						[BiosFunction( 0xF78BA90A, "sceKernelStderr" )] [Stateless]
-						// SceUID sceKernelStderr(); (/user/pspstdio.h:49)
-						int sceKernelStderr(){ return _kernel->StdErr->ID; }
-
 					public: // ------ Stubbed calls ------
+
+						[NotImplemented]
+						[BiosFunction( 0x617F3FE6, "sceDmacMemcpy" )] [Stateless]
+						// manual add
+						int sceDmacMemcpy( int destination, int source, int num ){ return NISTUBRETURN; }
 
 					};
 				
@@ -61,4 +53,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 5D298879 */
+/* GenerateStubsV2: auto-generated - 0E7D4FF8 */

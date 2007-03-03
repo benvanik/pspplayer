@@ -24,9 +24,9 @@ namespace Noxa {
 
 				enum class KernelAllocationType
 				{
-					Low,
-					High,
-					SpecificAddress,
+					Low					= 0,	// Allocate at lowest address
+					High				= 1,	// Allocate at highest address
+					SpecificAddress		= 2,	// Allocate at specified address
 				};
 
 				ref class KernelPartition

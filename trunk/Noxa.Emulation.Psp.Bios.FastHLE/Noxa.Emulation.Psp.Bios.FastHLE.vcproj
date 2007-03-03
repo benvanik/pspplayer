@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Shared\Include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Shared\Include&quot;; $(ProjectDir)\"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Shared\Include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Shared\Include&quot;; $(ProjectDir)\"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -265,6 +265,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Modules"
+				>
+				<File
+					RelativePath=".\Modules\ModuleMgrForUser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\SysMemUserForUser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\ThreadManForUser_Threads.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -387,11 +403,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\Kernel_Library.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\LoadExecForUser.h"
 					>
 				</File>
 				<File
 					RelativePath=".\Modules\ModuleMgrForUser.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\sceAtrac3plus.h"
 					>
 				</File>
 				<File
@@ -412,6 +436,10 @@
 				</File>
 				<File
 					RelativePath=".\Modules\sceDisplay.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\sceDmac.h"
 					>
 				</File>
 				<File
@@ -436,6 +464,10 @@
 				</File>
 				<File
 					RelativePath=".\Modules\sceSircs.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\sceSuspendForUser.h"
 					>
 				</File>
 				<File

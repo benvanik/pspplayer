@@ -13,9 +13,10 @@ using namespace System::Collections::Generic;
 using namespace System::Diagnostics;
 using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Cpu;
 
-__inline static String^ ReadString( IMemory^ memory, int address )
+String^ KernelHelpers::ReadString( IMemory^ memory, int address )
 {
 	StringBuilder^ sb = gcnew StringBuilder();
 	while( true )
@@ -29,7 +30,7 @@ __inline static String^ ReadString( IMemory^ memory, int address )
 	return sb->ToString();
 }
 
-__inline static int WriteString( IMemory^ memory, const int address, String^ value )
+int KernelHelpers::WriteString( IMemory^ memory, const int address, String^ value )
 {
 	array<byte>^ bytes = Encoding::ASCII->GetBytes( value );
 	memory->WriteBytes( address, bytes );
@@ -37,7 +38,7 @@ __inline static int WriteString( IMemory^ memory, const int address, String^ val
 	return bytes->Length + 1;
 }
 
-__inline static String^ ReadString( byte* memory, const int address )
+String^ KernelHelpers::ReadString( byte* memory, const int address )
 {
 	byte* ptr = memory + ( address - MainMemoryBase );
 	StringBuilder^ sb = gcnew StringBuilder();
@@ -52,7 +53,7 @@ __inline static String^ ReadString( byte* memory, const int address )
 	return sb->ToString();
 }
 
-__inline static int WriteString( byte* memory, const int address, String^ value )
+int KernelHelpers::WriteString( byte* memory, const int address, String^ value )
 {
 	array<byte>^ bytes = Encoding::ASCII->GetBytes( value );
 	pin_ptr<byte> ptr = &bytes[ 0 ];
@@ -71,7 +72,7 @@ __inline static int WriteString( byte* memory, const int address, String^ value 
 //unsigned short	second 
 //unsigned int		microsecond
 
-__inline static DateTime ReadTime( IMemory^ memory, const int address )
+DateTime KernelHelpers::ReadTime( IMemory^ memory, const int address )
 {
 	ushort year = ( ushort )( memory->ReadWord( address ) & 0xFFFF );
 	ushort month = ( ushort )( memory->ReadWord( address + 2 ) & 0xFFFF );
@@ -85,7 +86,7 @@ __inline static DateTime ReadTime( IMemory^ memory, const int address )
 	return DateTime( year, month, day, hour, minute, second, ( int )( microsecond / 1000 ) );
 }
 
-__inline static int WriteTime( IMemory^ memory, const int address, DateTime time )
+int KernelHelpers::WriteTime( IMemory^ memory, const int address, DateTime time )
 {
 	memory->WriteWord( address, 2, time.Year );
 	memory->WriteWord( address + 2, 2, time.Month );
@@ -98,7 +99,7 @@ __inline static int WriteTime( IMemory^ memory, const int address, DateTime time
 	return 16;
 }
 
-__inline static DateTime ReadTime( byte* memory, const int address )
+DateTime KernelHelpers::ReadTime( byte* memory, const int address )
 {
 	ushort* ptr = ( ushort* )( memory + ( address - MainMemoryBase ) );
 	ushort year = *ptr;
@@ -113,7 +114,7 @@ __inline static DateTime ReadTime( byte* memory, const int address )
 	return DateTime( year, month, day, hour, minute, second, ( int )( microsecond / 1000 ) );
 }
 
-__inline static int WriteTime( byte* memory, const int address, DateTime time )
+int KernelHelpers::WriteTime( byte* memory, const int address, DateTime time )
 {
 	ushort* ptr = ( ushort* )( memory + ( address - MainMemoryBase ) );
 	*ptr = ( ushort )time.Year;
