@@ -5,16 +5,17 @@
 // ----------------------------------------------------------------------------
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 
 using Noxa.Emulation.Psp.Cpu;
-using System.Reflection;
-using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp.Bios
 {
-	#region IncompleteAttribute
+	#region NotImplementedAttribute
 
 	[global::System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
 	public sealed class NotImplementedAttribute : Attribute
@@ -46,15 +47,14 @@ namespace Noxa.Emulation.Psp.Bios
 		public bool IsImplemented;
 		public bool IsStateless;
 
-		public object Target;
 		public MethodInfo MethodInfo;
+		public IntPtr NativeMethod;
 
 		public int ParameterCount;
+		public BitArray ParameterWidths;
 		public bool UsesMemorySystem;
-		public bool HasReturn;
-		public bool DoubleWordReturn;
 
-		public BiosFunction( IModule module, uint nid, string name, bool isImplemented, bool isStateless, object target, MethodInfo methodInfo )
+		public BiosFunction( IModule module, uint nid, string name, bool isImplemented, bool isStateless, MethodInfo methodInfo )
 		{
 			this.Module = module;
 			this.NID = nid;
@@ -62,12 +62,7 @@ namespace Noxa.Emulation.Psp.Bios
 			this.IsImplemented = isImplemented;
 			this.IsStateless = isStateless;
 
-			this.Target = target;
 			this.MethodInfo = methodInfo;
-			
-			this.HasReturn = ( methodInfo.ReturnType != null );
-			if( this.HasReturn == true )
-				this.DoubleWordReturn = ( methodInfo.ReturnType == typeof( long ) );
 			
 			ParameterInfo[] ps = methodInfo.GetParameters();
 			if( ps.Length > 0 )
@@ -79,6 +74,10 @@ namespace Noxa.Emulation.Psp.Bios
 					this.UsesMemorySystem = true;
 				}
 
+				this.ParameterWidths = new BitArray( this.ParameterCount );
+				int offset = ( this.UsesMemorySystem == true ) ? -1 : 0;
+				for( int n = 0; n < ps.Length; n++ )
+					ParameterWidths[ n + offset ] = ( ps[ n ].ParameterType == typeof( long ) );
 #if DEBUG
 				// Sanity check to make sure IMemory is always the first argument
 				if( this.UsesMemorySystem == false )

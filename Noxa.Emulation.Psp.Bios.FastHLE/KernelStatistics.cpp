@@ -4,10 +4,15 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-#pragma once
+#include "Stdafx.h"
+#include "KernelStatistics.h"
 
-#include "Kernel.h"
-#include "KernelHelpers.h"
+using namespace System;
+using namespace System::Collections::Generic;
+using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::Bios;
+using namespace Noxa::Emulation::Psp::Cpu;
 
-// The default return value for stubbed (unimplemented) methods
-#define NISTUBRETURN -1
+void KernelStatistics::GatherStats()
+{
+}

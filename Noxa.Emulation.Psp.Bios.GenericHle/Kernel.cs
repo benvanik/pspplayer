@@ -400,8 +400,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 
 			_stdOut = new KernelFileHandle();
 			_stdOut.HandleType = KernelHandleType.Stdio;
-			_stdIn.CanWrite = true;
-			_stdIn.CanSeek = false;
+			_stdOut.CanWrite = true;
+			_stdOut.CanSeek = false;
 			_stdOut.IsOpen = true;
 			_stdOut.Stream = new MemoryStream();
 			_stdOut.Uid = this.AllocateUid();
@@ -409,8 +409,8 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle
 
 			_stdErr = new KernelFileHandle();
 			_stdErr.HandleType = KernelHandleType.Stdio;
-			_stdIn.CanWrite = true;
-			_stdIn.CanSeek = false;
+			_stdErr.CanWrite = true;
+			_stdErr.CanSeek = false;
 			_stdErr.IsOpen = true;
 			_stdErr.Stream = new MemoryStream();
 			_stdErr.Uid = this.AllocateUid();

@@ -192,6 +192,7 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
 			this.toolStripSeparator3.Size = new System.Drawing.Size( 6, 25 );
+			this.toolStripSeparator3.Visible = false;
 			// 
 			// debugToolStripButton
 			// 
