@@ -38,37 +38,41 @@ namespace Noxa {
 
 					public: // ------ Implemented calls ------
 
-					public: // ------ Stubbed calls ------
+						// If these get called frequently we should optimize them (more bookkeeping in the kernel)
 
-						[NotImplemented]
 						[BiosFunction( 0xA291F107, "sceKernelMaxFreeMemSize" )] [Stateless]
 						// SceSize sceKernelMaxFreeMemSize(); (/user/pspsysmem.h:88)
-						int sceKernelMaxFreeMemSize(){ return NISTUBRETURN; }
+						int sceKernelMaxFreeMemSize();
 
-						[NotImplemented]
 						[BiosFunction( 0xF919F628, "sceKernelTotalFreeMemSize" )] [Stateless]
 						// SceSize sceKernelTotalFreeMemSize(); (/user/pspsysmem.h:81)
-						int sceKernelTotalFreeMemSize(){ return NISTUBRETURN; }
+						int sceKernelTotalFreeMemSize();
 
-						[NotImplemented]
+						[BiosFunction( 0xE6581468, "sceKernelPartitionMaxFreeMemSize" )] [Stateless]
+						// manual add
+						int sceKernelPartitionMaxFreeMemSize( int partitionid );
+
+						[BiosFunction( 0x9697CD32, "sceKernelPartitionTotalFreeMemSize" )] [Stateless]
+						// manual add
+						int sceKernelPartitionTotalFreeMemSize( int partitionid );
+
 						[BiosFunction( 0x237DBD4F, "sceKernelAllocPartitionMemory" )] [Stateless]
 						// SceUID sceKernelAllocPartitionMemory(SceUID partitionid, const char *name, int type, SceSize size, void *addr); (/user/pspsysmem.h:56)
-						int sceKernelAllocPartitionMemory( int partitionid, int name, int type, int size, int addr ){ return NISTUBRETURN; }
+						int sceKernelAllocPartitionMemory( IMemory^ memory, int partitionid, int name, int type, int size, int addr );
 
-						[NotImplemented]
 						[BiosFunction( 0xB6D61D02, "sceKernelFreePartitionMemory" )] [Stateless]
 						// int sceKernelFreePartitionMemory(SceUID blockid); (/user/pspsysmem.h:65)
-						int sceKernelFreePartitionMemory( int blockid ){ return NISTUBRETURN; }
+						int sceKernelFreePartitionMemory( int blockid );
 
-						[NotImplemented]
 						[BiosFunction( 0x9D9A5BA1, "sceKernelGetBlockHeadAddr" )] [Stateless]
 						// void * sceKernelGetBlockHeadAddr(SceUID blockid); (/user/pspsysmem.h:74)
-						int sceKernelGetBlockHeadAddr( int blockid ){ return NISTUBRETURN; }
+						int sceKernelGetBlockHeadAddr( int blockid );
 
-						[NotImplemented]
 						[BiosFunction( 0x3FC9AE6A, "sceKernelDevkitVersion" )] [Stateless]
 						// int sceKernelDevkitVersion(); (/user/pspsysmem.h:104)
-						int sceKernelDevkitVersion(){ return NISTUBRETURN; }
+						int sceKernelDevkitVersion();
+
+					public: // ------ Stubbed calls ------
 
 					};
 				

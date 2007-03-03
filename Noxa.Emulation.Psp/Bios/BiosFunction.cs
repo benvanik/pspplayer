@@ -76,8 +76,8 @@ namespace Noxa.Emulation.Psp.Bios
 
 				this.ParameterWidths = new BitArray( this.ParameterCount );
 				int offset = ( this.UsesMemorySystem == true ) ? -1 : 0;
-				for( int n = 0; n < ps.Length; n++ )
-					ParameterWidths[ n + offset ] = ( ps[ n ].ParameterType == typeof( long ) );
+				for( int n = 1; n < ps.Length; n++ )
+					ParameterWidths[ n - 1 ] = ( ps[ n + offset ].ParameterType == typeof( long ) );
 #if DEBUG
 				// Sanity check to make sure IMemory is always the first argument
 				if( this.UsesMemorySystem == false )

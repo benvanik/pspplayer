@@ -43,37 +43,37 @@ void __syscallBounce( int syscallId, int address )
 		switch( function->ParameterCount )
 		{
 		case 1:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ] );
+			args = String::Format( "{0:X8}", ctx->Registers[ 4 ] );
 			break;
 		case 2:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ] );
+			args = String::Format( "{0:X8}, {1:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ] );
 			break;
 		case 3:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ] );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ] );
 			break;
 		case 4:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ] );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ] );
 			break;
 		case 5:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ] );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ] );
 			break;
 		case 6:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ] );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ] );
 			break;
 		case 7:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ] );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ] );
 			break;
 		case 8:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ] );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ] );
 			break;
 		case 9:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1 );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1 );
 			break;
 		case 10:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1 );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1 );
 			break;
 		case 11:
-			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1 );
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1 );
 			break;
 		case 12:
 			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1, -1 );

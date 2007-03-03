@@ -441,18 +441,18 @@ namespace Noxa.Emulation.Psp.Bios.GenericHle.Modules
 			//} SceKernelSystemStatus;
 
 			// Ensure 28 bytes
-			if( memory.ReadWord( a1 ) != 28 )
+			if( memory.ReadWord( a0 ) != 28 )
 			{
 				Debug.WriteLine( string.Format( "ThreadManForUser: sceKernelReferSystemStatus app passed struct with size {0}, expected 28",
-					memory.ReadWord( a1 ) ) );
+					memory.ReadWord( a0 ) ) );
 				return -1;
 			}
-			memory.WriteWord( a1 + 4, 4, _kernel.Status.Status );
-			memory.WriteWord( a1 + 8, 4, ( int )_kernel.Status.IdleClocks.Low );
-			memory.WriteWord( a1 + 12, 4, ( int )_kernel.Status.IdleClocks.Hi );
-			memory.WriteWord( a1 + 16, 4, ( int )_kernel.Status.LeaveIdleCount );
-			memory.WriteWord( a1 + 20, 4, ( int )_kernel.Status.ThreadSwitchCount );
-			memory.WriteWord( a1 + 24, 4, ( int )_kernel.Status.VfpuSwitchCount );
+			memory.WriteWord( a0 + 4, 4, _kernel.Status.Status );
+			memory.WriteWord( a0 + 8, 4, ( int )_kernel.Status.IdleClocks.Low );
+			memory.WriteWord( a0 + 12, 4, ( int )_kernel.Status.IdleClocks.Hi );
+			memory.WriteWord( a0 + 16, 4, ( int )_kernel.Status.LeaveIdleCount );
+			memory.WriteWord( a0 + 20, 4, ( int )_kernel.Status.ThreadSwitchCount );
+			memory.WriteWord( a0 + 24, 4, ( int )_kernel.Status.VfpuSwitchCount );
 
 			// int
 			return 0;

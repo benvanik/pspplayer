@@ -58,6 +58,10 @@ namespace GenerateStubsV2
 			List<string> prxIgnores = new List<string>();
 			prxIgnores.Add( "kd/vaudio.prx" );	// we just want kd/vaudio_game.prx
 
+			List<string> prxForces = new List<string>();
+			prxForces.Add( "kd/usersystemlib.prx" ); // Kernel_Library
+			prxForces.Add( "kd/libatrac3plus.prx" ); // sceAtrac3plus
+
 			// Libraries that will be merged (in the form of source -> target
 			Dictionary<string, string> libraryMerges = new Dictionary<string, string>();
 			libraryMerges.Add( "sceUtility_netparam_internal", "sceUtility" );
@@ -74,12 +78,17 @@ namespace GenerateStubsV2
 					continue;
 				}
 
+				bool force = prxForces.Contains( prx.FileName );
+
 				foreach( PrxLibrary library in prx.Libraries )
 				{
-					if( ( library.Flags & PrxLibrary.UserFlag ) == 0x0 )
+					if( force == false )
 					{
-						Console.WriteLine( " - Ignoring library {0} in prx {1}; flags {2:X8}", library.Name, prx.Name, library.Flags );
-						continue;
+						if( ( library.Flags & PrxLibrary.UserFlag ) == 0x0 )
+						{
+							Console.WriteLine( " - Ignoring library {0} in prx {1}; flags {2:X8}", library.Name, prx.Name, library.Flags );
+							continue;
+						}
 					}
 
 					libraryLookup.Add( library.Name, library );
@@ -133,10 +142,10 @@ namespace GenerateStubsV2
 
 				foreach( PrxLibrary library in prx.Libraries )
 				{
-					if( ( library.Flags & PrxLibrary.UserFlag ) == 0x0 )
-						continue;
-					if( skipLibraries.Contains( library ) == true )
-						continue;
+					//if( ( library.Flags & PrxLibrary.UserFlag ) == 0x0 )
+					//    continue;
+					//if( skipLibraries.Contains( library ) == true )
+					//    continue;
 
 					bool hasBegun = false;
 
@@ -177,6 +186,9 @@ namespace GenerateStubsV2
 			//    Debug.WriteLine( req.CommentBlock );
 			//    Debug.WriteLine( req.DeclarationBlock );
 			//}
+
+			Console.WriteLine( "Press any key to exit..." );
+			Console.ReadKey();
 		}
 	}
 }

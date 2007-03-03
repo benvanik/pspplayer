@@ -9,7 +9,6 @@
 #include "NoxaShared.h"
 #include "ModulesShared.h"
 #include "Module.h"
-#include "KernelFileHandle.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -22,13 +21,13 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class StdioForUser : public Module
+					ref class sceSuspendForUser : public Module
 					{
 					public:
-						StdioForUser( Kernel^ kernel ) : Module( kernel ) {}
-						~StdioForUser(){}
+						sceSuspendForUser( Kernel^ kernel ) : Module( kernel ) {}
+						~sceSuspendForUser(){}
 
-						property String^ Name { virtual String^ get() override { return "StdioForUser"; } }
+						property String^ Name { virtual String^ get() override { return "sceSuspendForUser"; } }
 
 						//virtual void Start() override;
 						//virtual void Stop() override;
@@ -39,19 +38,22 @@ namespace Noxa {
 
 					public: // ------ Implemented calls ------
 
-						[BiosFunction( 0x172D316E, "sceKernelStdin" )] [Stateless]
-						// SceUID sceKernelStdin(); (/user/pspstdio.h:35)
-						int sceKernelStdin(){ return _kernel->StdIn->ID; }
-
-						[BiosFunction( 0xA6BAB2E9, "sceKernelStdout" )] [Stateless]
-						// SceUID sceKernelStdout(); (/user/pspstdio.h:42)
-						int sceKernelStdout(){ return _kernel->StdOut->ID; }
-
-						[BiosFunction( 0xF78BA90A, "sceKernelStderr" )] [Stateless]
-						// SceUID sceKernelStderr(); (/user/pspstdio.h:49)
-						int sceKernelStderr(){ return _kernel->StdErr->ID; }
-
 					public: // ------ Stubbed calls ------
+
+						[NotImplemented]
+						[BiosFunction( 0xEADB1BD7, "sceKernelPowerLock" )] [Stateless]
+						// manual add
+						int sceKernelPowerLock( int type ){ return NISTUBRETURN; }
+
+						[NotImplemented]
+						[BiosFunction( 0x3AEE7261, "sceKernelPowerUnlock" )] [Stateless]
+						// manual add
+						int sceKernelPowerUnlock( int type ){ return NISTUBRETURN; }
+
+						[NotImplemented]
+						[BiosFunction( 0x090CCB3F, "sceKernelPowerTick" )] [Stateless]
+						// int sceKernelPowerTick(int ticktype); (/include/kernelutils.h:167)
+						int sceKernelPowerTick( int type ){ return NISTUBRETURN; }
 
 					};
 				
@@ -61,4 +63,4 @@ namespace Noxa {
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 5D298879 */
+/* GenerateStubsV2: auto-generated - FA33C104 */
