@@ -20,7 +20,7 @@ void Kernel::CreateThread( KernelThread^ thread )
 	Debug::Assert( thread != nullptr );
 
 	// Must be user for us, I think :)
-	Debug::Assert( ( thread->Attributes & KernelThreadAttributes::User ) == KernelThreadAttributes::User );
+	//Debug::Assert( ( thread->Attributes & KernelThreadAttributes::User ) == KernelThreadAttributes::User );
 
 	Threads->Add( thread->ID, thread );
 }
@@ -50,14 +50,16 @@ __inline KernelThread^ Kernel::FindThread( int id )
 		return nullptr;
 }
 
-void Kernel::WaitThreadOnEvent( KernelThread^ thread, KernelEvent^ ev, int bitMask, int outAddress )
+void Kernel::WaitThreadOnEvent( KernelThread^ thread, KernelEvent^ ev, KernelThreadWaitTypes waitType, int bitMask, int outAddress )
 {
 	Debug::Assert( thread != nullptr );
 	Debug::Assert( ev != nullptr );
 
-	thread->Wait( ev, bitMask, outAddress );
+	thread->Wait( ev, waitType, bitMask, outAddress );
 	thread->CanHandleCallbacks = true;
 	_threadsWaitingOnEvents->Add( thread );
+
+	ev->WaitingThreads++;
 
 	this->ContextSwitch();
 }
@@ -71,15 +73,30 @@ void Kernel::SignalEvent( KernelEvent^ ev )
 		if( thread->WaitEvent == ev )
 		{
 			// Check for a match somehow
-			if( ( thread->WaitID & ev->BitMask ) != 0 )
+			bool matches = ev->Matches( thread->WaitID, thread->WaitType );
+			if( matches == true )
 			{
 				thread->State = KernelThreadState::Ready;
 
 				// Need to obey output param
 				if( thread->OutAddress != 0x0 )
 					_cpu->Memory->WriteWord( thread->OutAddress, 4, ev->BitMask );
+
+				if( ( thread->WaitType & KernelThreadWaitTypes::ClearAll ) == KernelThreadWaitTypes::ClearAll )
+					ev->BitMask = 0;
+				else if( ( thread->WaitType & KernelThreadWaitTypes::ClearPattern ) == KernelThreadWaitTypes::ClearPattern )
+					ev->BitMask = ev->BitMask & ~thread->WaitID;
 				
+				ev->WaitingThreads--;
+
 				needsSwitch = true;
+
+				// If we can't have multiple threads waiting, just return now
+				if( ( ev->Attributes & KernelEventAttributes::WaitMultiple ) != KernelEventAttributes::WaitMultiple )
+				{
+					Debug::Assert( ev->WaitingThreads == 0 );
+					break;
+				}
 			}
 		}
 	}
@@ -122,7 +139,7 @@ void Kernel::ContextSwitch()
 		{
 			if( thread->State == KernelThreadState::Waiting )
 			{
-				switch( thread->WaitType )
+				switch( thread->WaitClass )
 				{
 					case KernelThreadWait::Sleep:
 						// Cannot un-wait automatically

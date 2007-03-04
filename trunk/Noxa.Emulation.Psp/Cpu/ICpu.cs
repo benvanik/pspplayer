@@ -104,6 +104,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		void Break();
 
 		int ExecuteBlock();
+		void Stop();
 
 		void PrintStatistics();
 	}

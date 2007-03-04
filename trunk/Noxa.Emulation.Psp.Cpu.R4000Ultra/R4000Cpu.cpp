@@ -187,6 +187,12 @@ int R4000Cpu::ExecuteBlock()
 #endif
 }
 
+void R4000Cpu::Stop()
+{
+	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
+	ctx->StopFlag = 1;
+}
+
 void R4000Cpu::PrintStatistics()
 {
 #ifdef TRACE

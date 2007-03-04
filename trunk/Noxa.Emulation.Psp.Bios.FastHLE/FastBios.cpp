@@ -113,7 +113,7 @@ void FastBios::GatherFunctions()
 		}
 	}
 
-	Debug::WriteLine( String::Format( "FastBios: found {0} functions in {1} modules. {2} ({3}%) implemented", functionCount, moduleCount, implementedCount, ( implementedCount / functionCount ) ) );
+	Debug::WriteLine( String::Format( "FastBios: found {0} functions in {1} modules. {2} ({3}%) implemented", functionCount, moduleCount, implementedCount, ( implementedCount / ( float )functionCount ) * 100.0f ) );
 }
 
 void FastBios::RegisterFunction( BiosFunction^ function )

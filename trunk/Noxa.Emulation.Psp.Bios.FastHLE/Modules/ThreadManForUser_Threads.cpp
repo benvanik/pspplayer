@@ -271,7 +271,7 @@ int ThreadManForUser::sceKernelReferThreadStatus( IMemory^ memory, int thid, int
 	memory->WriteWord( info + 56, 4, 0 ); // TODO: get thread gp pointer
 	memory->WriteWord( info + 60, 4, thread->InitialPriority );
 	memory->WriteWord( info + 64, 4, thread->Priority );
-	memory->WriteWord( info + 68, 4, ( int )thread->WaitType );
+	memory->WriteWord( info + 68, 4, ( int )thread->WaitClass );
 	memory->WriteWord( info + 72, 4, thread->WaitID );
 	memory->WriteWord( info + 76, 4, ( int )thread->WakeupCount );
 	memory->WriteWord( info + 80, 4, thread->ExitCode );
@@ -317,7 +317,7 @@ int ThreadManForUser::sceKernelReferThreadRunStatus( IMemory^ memory, int thid, 
 	}
 	memory->WriteWord( status +  4, 4, ( int )thread->State );
 	memory->WriteWord( status +  8, 4, thread->Priority );
-	memory->WriteWord( status + 12, 4, ( int )thread->WaitType );
+	memory->WriteWord( status + 12, 4, ( int )thread->WaitClass );
 	memory->WriteWord( status + 16, 4, thread->WaitID );
 	memory->WriteWord( status + 20, 4, ( int )thread->WakeupCount );
 	memory->WriteWord( status + 24, 4, ( int )runClocks.LowPart );
@@ -368,39 +368,3 @@ int ThreadManForUser::sceKernelGetThreadmanIdList( IMemory^ memory, int type, in
 
 // enum SceKernelIdListType sceKernelGetThreadmanIdType(SceUID uid); (/user/pspthreadman.h:1688)
 int ThreadManForUser::sceKernelGetThreadmanIdType( int uid ){ return NISTUBRETURN; }
-
-// int sceKernelSleepThread(); (/user/pspthreadman.h:244)
-int ThreadManForUser::sceKernelSleepThread(){ return NISTUBRETURN; }
-
-// int sceKernelSleepThreadCB(); (/user/pspthreadman.h:255)
-int ThreadManForUser::sceKernelSleepThreadCB(){ return NISTUBRETURN; }
-
-// int sceKernelWakeupThread(SceUID thid); (/user/pspthreadman.h:264)
-int ThreadManForUser::sceKernelWakeupThread( int thid ){ return NISTUBRETURN; }
-
-// int sceKernelCancelWakeupThread(SceUID thid); (/user/pspthreadman.h:273)
-int ThreadManForUser::sceKernelCancelWakeupThread( int thid ){ return NISTUBRETURN; }
-
-// int sceKernelSuspendThread(SceUID thid); (/user/pspthreadman.h:282)
-int ThreadManForUser::sceKernelSuspendThread( int thid ){ return NISTUBRETURN; }
-
-// int sceKernelResumeThread(SceUID thid); (/user/pspthreadman.h:291)
-int ThreadManForUser::sceKernelResumeThread( int thid ){ return NISTUBRETURN; }
-
-// int sceKernelWaitThreadEnd(SceUID thid, SceUInt *timeout); (/user/pspthreadman.h:301)
-int ThreadManForUser::sceKernelWaitThreadEnd( IMemory^ memory, int thid, int timeout ){ return NISTUBRETURN; }
-
-// int sceKernelWaitThreadEndCB(SceUID thid, SceUInt *timeout); (/user/pspthreadman.h:311)
-int ThreadManForUser::sceKernelWaitThreadEndCB( IMemory^ memory, int thid, int timeout ){ return NISTUBRETURN; }
-
-// int sceKernelDelayThread(SceUInt delay); (/user/pspthreadman.h:323)
-int ThreadManForUser::sceKernelDelayThread( int delay ){ return NISTUBRETURN; }
-
-// int sceKernelDelayThreadCB(SceUInt delay); (/user/pspthreadman.h:335)
-int ThreadManForUser::sceKernelDelayThreadCB( int delay ){ return NISTUBRETURN; }
-
-// int sceKernelDelaySysClockThread(SceKernelSysClock *delay); (/user/pspthreadman.h:344)
-int ThreadManForUser::sceKernelDelaySysClockThread( IMemory^ memory, int delay ){ return NISTUBRETURN; }
-
-// int sceKernelDelaySysClockThreadCB(SceKernelSysClock *delay); (/user/pspthreadman.h:354)
-int ThreadManForUser::sceKernelDelaySysClockThreadCB( IMemory^ memory, int delay ){ return NISTUBRETURN; }

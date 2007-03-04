@@ -5,6 +5,9 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#pragma unmanaged
+#include "MemoryPool.h"
+#pragma managed
 #include "R4000Cpu.h"
 #include "R4000VideoInterface.h"
 #include "VideoApi.h"
@@ -269,9 +272,11 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 
 	vdl->PacketCapacity = DEFAULTPACKETCAPACITY;
 	vdl->Packets = ( VideoPacket* )_memoryPool->Request( DEFAULTPACKETCAPACITY * sizeof( VideoPacket ) );
-#ifdef _DEBUG
-	memset( vdl->Packets, 0, DEFAULTPACKETCAPACITY * sizeof( VideoPacket ) );
-#endif
+
+	// BUG: seems to be a big issue here sometimes...
+//#ifdef _DEBUG
+//	memset( vdl->Packets, 0, DEFAULTPACKETCAPACITY * sizeof( VideoPacket ) );
+//#endif
 
 	if( stall == NULL )
 	{

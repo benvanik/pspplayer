@@ -23,7 +23,7 @@ int ModuleMgrForUser::sceKernelSelfStopUnloadModule( int status, int argsize, in
 // int sceKernelStopUnloadSelfModule(SceSize argsize, void *argp, int *status, SceKernelSMOption *option); (/user/pspmodulemgr.h:164)
 int ModuleMgrForUser::sceKernelStopUnloadSelfModule( int argsize, int argp, int status, int option )
 {
-	_kernel->ExitGame();
+	_kernel->ExitGame( status );
 
 	return 0;
 }

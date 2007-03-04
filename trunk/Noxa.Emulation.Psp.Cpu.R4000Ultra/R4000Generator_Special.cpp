@@ -189,6 +189,16 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 			//g->mov( MPCVALID( CTX ), 1 );
 		}
 
+		// Emit stop flag check - if the flag is set we return
+		char skipStopLabel[ 30 ];
+		sprintf_s( skipStopLabel, 30, "ssl%08d", address );
+		g->mov( EAX, MSTOPFLAG( CTX ) );
+		g->cmp( EAX, 1 );
+		g->jne( skipStopLabel );
+		//g->int3();
+		g->ret();
+		g->label( skipStopLabel );
+
 		// Override if we can - we do this regardless of whether or not the BIOS implements it
 #ifdef OVERRIDESYSCALLS
 		if( canEmit == true )

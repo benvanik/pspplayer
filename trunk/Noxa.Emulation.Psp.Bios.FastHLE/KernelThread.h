@@ -45,6 +45,15 @@ namespace Noxa {
 				};
 
 				[Flags]
+				enum class KernelThreadWaitTypes
+				{
+					And				= 0x00,		// Wait for all bits to be set
+					Or				= 0x01,		// Wait for one or more bits to be set
+					ClearAll		= 0x10,		// Clear the entire bitmask when it matches
+					ClearPattern	= 0x20,		// Clear the just the matched pattern when it matches
+				};
+
+				[Flags]
 				enum class KernelThreadAttributes : uint
 				{
 					/// <summary>
@@ -110,7 +119,8 @@ namespace Noxa {
 					bool					CanHandleCallbacks;
 					List<KernelCallback^>^	Callbacks;
 					
-					KernelThreadWait		WaitType;
+					KernelThreadWait		WaitClass;
+					KernelThreadWaitTypes	WaitType;
 					int						WaitID;
 					int						WaitTimeout;
 					KernelEvent^			WaitEvent;
@@ -124,7 +134,7 @@ namespace Noxa {
 					void Start( KernelPartition^ partition, int argumentsLength, int argumentsPointer );
 					void Exit( int code );
 
-					void Wait( KernelEvent^ ev, int bitMask, int outAddress );
+					void Wait( KernelEvent^ ev, KernelThreadWaitTypes waitType, int bitMask, int outAddress );
 				};
 
 			}

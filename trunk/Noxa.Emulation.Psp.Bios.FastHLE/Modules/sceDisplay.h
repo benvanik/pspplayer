@@ -41,50 +41,43 @@ namespace Noxa {
 
 					public: // ------ Stubbed calls ------
 
-						[NotImplemented]
 						[BiosFunction( 0x0E20F177, "sceDisplaySetMode" )] [Stateless]
 						// int sceDisplaySetMode(int mode, int width, int height); (/display/pspdisplay.h:53)
-						int sceDisplaySetMode( int mode, int width, int height ){ return NISTUBRETURN; }
+						int sceDisplaySetMode( int mode, int width, int height );
 
-						[NotImplemented]
 						[BiosFunction( 0xDEA197D4, "sceDisplayGetMode" )] [Stateless]
 						// int sceDisplayGetMode(int *pmode, int *pwidth, int *pheight); (/display/pspdisplay.h:64)
-						int sceDisplayGetMode( int pmode, int pwidth, int pheight ){ return NISTUBRETURN; }
+						int sceDisplayGetMode( IMemory^ memory, int pmode, int pwidth, int pheight );
 
-						[NotImplemented]
 						[BiosFunction( 0x289D82FE, "sceDisplaySetFrameBuf" )] [Stateless]
 						// void sceDisplaySetFrameBuf(void *topaddr, int bufferwidth, int pixelformat, int sync); (/display/pspdisplay.h:74)
-						void sceDisplaySetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int sync ){}
+						int sceDisplaySetFrameBuf( IMemory^ memory, int topaddr, int bufferwidth, int pixelformat, int sync );
 
-						[NotImplemented]
 						[BiosFunction( 0xEEDA2E54, "sceDisplayGetFrameBuf" )] [Stateless]
 						// int sceDisplayGetFrameBuf(void **topaddr, int *bufferwidth, int *pixelformat, int *unk1); (/display/pspdisplay.h:84)
-						int sceDisplayGetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int unk1 ){ return NISTUBRETURN; }
+						int sceDisplayGetFrameBuf( IMemory^ memory, int topaddr, int bufferwidth, int pixelformat, int unk1 );
 
-						[NotImplemented]
 						[BiosFunction( 0x9C6EAAD7, "sceDisplayGetVcount" )] [Stateless]
 						// unsigned int sceDisplayGetVcount(); (/display/pspdisplay.h:89)
-						int sceDisplayGetVcount(){ return NISTUBRETURN; }
+						int sceDisplayGetVcount();
 
-						[NotImplemented]
 						[BiosFunction( 0x36CDFADE, "sceDisplayWaitVblank" )] [Stateless]
 						// int sceDisplayWaitVblank(); (/display/pspdisplay.h:104)
-						int sceDisplayWaitVblank(){ return NISTUBRETURN; }
+						int sceDisplayWaitVblank();
 
 						[NotImplemented]
-						[BiosFunction( 0x8EB9EC49, "sceDisplayWaitVblankCB" )] [Stateless]
+						[BiosFunction( 0x8EB9EC49, "sceDisplayWaitVblankCB" )]
 						// int sceDisplayWaitVblankCB(); (/display/pspdisplay.h:109)
-						int sceDisplayWaitVblankCB(){ return NISTUBRETURN; }
+						int sceDisplayWaitVblankCB();
 
-						[NotImplemented]
 						[BiosFunction( 0x984C27E7, "sceDisplayWaitVblankStart" )] [Stateless]
 						// int sceDisplayWaitVblankStart(); (/display/pspdisplay.h:94)
-						int sceDisplayWaitVblankStart(){ return NISTUBRETURN; }
+						int sceDisplayWaitVblankStart();
 
 						[NotImplemented]
-						[BiosFunction( 0x46F186C3, "sceDisplayWaitVblankStartCB" )] [Stateless]
+						[BiosFunction( 0x46F186C3, "sceDisplayWaitVblankStartCB" )]
 						// int sceDisplayWaitVblankStartCB(); (/display/pspdisplay.h:99)
-						int sceDisplayWaitVblankStartCB(){ return NISTUBRETURN; }
+						int sceDisplayWaitVblankStartCB();
 
 					};
 				

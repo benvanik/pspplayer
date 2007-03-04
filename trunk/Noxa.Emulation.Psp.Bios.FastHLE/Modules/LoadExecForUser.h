@@ -39,22 +39,24 @@ namespace Noxa {
 
 					public: // ------ Implemented calls ------
 
+						[BiosFunction( 0x05572A5F, "sceKernelExitGame" )]
+						// void sceKernelExitGame(); (/user/psploadexec.h:57)
+						void sceKernelExitGame();
+
+						[BiosFunction( 0x2AC9954B, "sceKernelExitGameWithStatus" )]
+						// manual add
+						void sceKernelExitGameWithStatus( int status );
+
+						[BiosFunction( 0x4AC57943, "sceKernelRegisterExitCallback" )] [Stateless]
+						// int sceKernelRegisterExitCallback(int cbid); (/user/psploadexec.h:49)
+						int sceKernelRegisterExitCallback( int cbid );
+
 					public: // ------ Stubbed calls ------
 
 						[NotImplemented]
 						[BiosFunction( 0xBD2F1094, "sceKernelLoadExec" )] [Stateless]
 						// int sceKernelLoadExec(const char *file, struct SceKernelLoadExecParam *param); (/user/psploadexec.h:80)
 						int sceKernelLoadExec( int file, int param ){ return NISTUBRETURN; }
-
-						[NotImplemented]
-						[BiosFunction( 0x05572A5F, "sceKernelExitGame" )] [Stateless]
-						// void sceKernelExitGame(); (/user/psploadexec.h:57)
-						void sceKernelExitGame(){}
-
-						[NotImplemented]
-						[BiosFunction( 0x4AC57943, "sceKernelRegisterExitCallback" )] [Stateless]
-						// int sceKernelRegisterExitCallback(int cbid); (/user/psploadexec.h:49)
-						int sceKernelRegisterExitCallback( int cbid ){ return NISTUBRETURN; }
 
 					};
 				
