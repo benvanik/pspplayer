@@ -108,7 +108,7 @@ void Kernel::StartGame()
 	_gameEvent->Set();
 }
 
-void Kernel::ExitGame()
+void Kernel::ExitGame( int status )
 {
 	_bios->StopModules();
 
@@ -126,7 +126,7 @@ void Kernel::Execute()
 		// Execute active thread
 		int instructionCount = _cpu->ExecuteBlock();
 
-		Debug::WriteLine( String::Format( "Kernel: execute ended after {0} instructions", instructionCount ) );
+		//Debug::WriteLine( String::Format( "Kernel: execute ended after {0} instructions", instructionCount ) );
 	}
 	else
 	{

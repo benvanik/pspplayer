@@ -275,6 +275,7 @@ namespace Noxa {
 					}
 
 					virtual int ExecuteBlock();
+					virtual void Stop();
 
 					virtual void PrintStatistics();
 

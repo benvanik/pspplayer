@@ -45,6 +45,7 @@ using namespace SoftWire;
 #define MPC( xr )			g->dword_ptr[ xr + CTXPC ]
 #define MCP1REG( xr, r, fmt )	g->dword_ptr[ xr + CTXCP1REGS + ( r << 4 ) ]
 #define MCP1CONDBIT( xr )	g->dword_ptr[ xr + CTXCP1CONDBIT ]
+#define MSTOPFLAG( xr )		g->dword_ptr[ xr + CTXSTOPFLAG ]
 
 namespace Noxa {
 	namespace Emulation {

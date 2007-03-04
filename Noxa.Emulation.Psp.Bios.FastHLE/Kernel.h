@@ -89,7 +89,7 @@ namespace Noxa {
 					}
 
 					void StartGame();
-					void ExitGame();
+					void ExitGame( int status );
 
 					virtual void Execute();
 
@@ -103,7 +103,7 @@ namespace Noxa {
 					void CreateThread( KernelThread^ thread );
 					void DeleteThread( KernelThread^ thread );
 					__inline KernelThread^ FindThread( int id );
-					void WaitThreadOnEvent( KernelThread^ thread, KernelEvent^ ev, int bitMask, int outAddress );
+					void WaitThreadOnEvent( KernelThread^ thread, KernelEvent^ ev, KernelThreadWaitTypes waitType, int bitMask, int outAddress );
 					void SignalEvent( KernelEvent^ ev );
 					void ContextSwitch();
 

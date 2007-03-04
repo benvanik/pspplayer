@@ -50,10 +50,11 @@ void KernelThread::Exit( int code )
 	StackBlock = nullptr;
 }
 
-void KernelThread::Wait( KernelEvent^ ev, int bitMask, int outAddress )
+void KernelThread::Wait( KernelEvent^ ev, KernelThreadWaitTypes waitType, int bitMask, int outAddress )
 {
 	State = KernelThreadState::Waiting;
-	WaitType = KernelThreadWait::Event;
+	WaitClass = KernelThreadWait::Event;
+	WaitType = waitType;
 	WaitEvent = ev;
 	WaitID = bitMask;
 	OutAddress = outAddress;

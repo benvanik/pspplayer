@@ -7,7 +7,9 @@
 #include "StdAfx.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#pragma unmanaged
 #include "MemoryPool.h"
+#pragma managed
 #include "OglDriver.h"
 #include "VideoApi.h"
 #include <string>

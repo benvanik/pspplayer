@@ -269,11 +269,35 @@
 				Name="Modules"
 				>
 				<File
+					RelativePath=".\Modules\LoadExecForUser.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\ModuleMgrForUser.cpp"
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\sceDisplay.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\sceRtc.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\SysMemUserForUser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\ThreadManForUser_Callbacks.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\ThreadManForUser_Events.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\ThreadManForUser_ThreadControl.cpp"
 					>
 				</File>
 				<File

@@ -265,11 +265,15 @@ namespace Noxa.Emulation.Psp.Player
 			// Destroy thread
 			_shutDown = true;
 			_stateChangeEvent.Set();
+			_thread.Interrupt();
+			_cpu.Stop();
 			if( _thread.Join( 1000 ) == false )
 			{
 				// Failed to wait, so kill
 				_thread.Abort();
 			}
+			while( _thread.IsAlive == true )
+				Thread.Sleep( 10 );
 			_thread = null;
 
 #if XMB

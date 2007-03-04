@@ -7,6 +7,7 @@
 #pragma once
 
 #include "KernelHandle.h"
+#include "KernelThread.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -19,15 +20,43 @@ namespace Noxa {
 		namespace Psp {
 			namespace Bios {
 
+				[Flags]
+				enum class KernelEventAttributes
+				{
+					// Allow multiple threads to wait on the event
+					WaitMultiple	= 0x200,
+				};
+
 				ref class KernelEvent : public KernelHandle
 				{
 				public:
-					String^				Name;
-					int					BitMask;
+					String^					Name;
+					KernelEventAttributes	Attributes;
+					int						InitialBitMask;
+					int						BitMask;
+
+					int						WaitingThreads;
 
 				public:
 					KernelEvent( int id )
 						: KernelHandle( KernelHandleType::Event, id ){}
+
+					bool Matches( int userMask, KernelThreadWaitTypes waitType )
+					{
+						bool matched = false;
+						if( ( waitType & KernelThreadWaitTypes::And ) == KernelThreadWaitTypes::And )
+						{
+							// &
+							return ( BitMask & userMask ) != 0;
+						}
+						else
+						{
+							// Must be |
+							Debug::Assert( ( waitType & KernelThreadWaitTypes::Or ) == KernelThreadWaitTypes::Or );
+
+							return ( BitMask | userMask ) != 0;
+						}
+					}
 				};
 
 			}

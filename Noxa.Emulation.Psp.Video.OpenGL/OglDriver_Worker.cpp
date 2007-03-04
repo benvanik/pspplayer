@@ -61,8 +61,11 @@ void OglDriver::StopThread()
 	{
 		_shutdown = true;
 
-		if( _thread->Join( 500 ) == false )
+		_thread->Interrupt();
+		if( _thread->Join( 1000 ) == false )
 			_thread->Abort();
+		while( _thread->IsAlive == true )
+			Thread::Sleep( 10 );
 		_thread = nullptr;
 
 		SAFEFREE( _context );
