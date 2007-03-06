@@ -44,14 +44,22 @@ namespace Noxa.Emulation.Psp.Games
 			Stream bootStream = null;
 			if( bootBin == null )
 			{
-				// Probably in PBP
-				IMediaFile pbp = folder[ "EBOOT.PBP" ] as IMediaFile;
-				using( Stream stream = pbp.OpenRead() )
+				// Probably in PBP - unless exploited!
+				if( folder.Name.Contains( "__SCE__" ) == true )
 				{
-					PbpReader reader = new PbpReader( stream );
-					if( reader.ContainsEntry( PbpReader.PbpEntryType.DataPsp ) == true )
+					// If this is exploited, the eboot.pbp IS the elf!
+					bootStream = ( folder[ "EBOOT.PBP" ] as IMediaFile ).OpenRead();
+				}
+				else
+				{
+					IMediaFile pbp = folder[ "EBOOT.PBP" ] as IMediaFile;
+					using( Stream stream = pbp.OpenRead() )
 					{
-						bootStream = reader.Read( stream, PbpReader.PbpEntryType.DataPsp );
+						PbpReader reader = new PbpReader( stream );
+						if( reader.ContainsEntry( PbpReader.PbpEntryType.DataPsp ) == true )
+						{
+							bootStream = reader.Read( stream, PbpReader.PbpEntryType.DataPsp );
+						}
 					}
 				}
 			}
@@ -203,7 +211,17 @@ namespace Noxa.Emulation.Psp.Games
 				IMediaFolder rootFolder = instance.MemoryStick.Root.FindFolder( @"PSP\GAME\" );
 				foreach( IMediaFolder folder in rootFolder )
 				{
-					GameInformation info = this.GetEbootGameInformation( folder );
+					// kxploit check
+					IMediaFolder realFolder = folder;
+					if( folder.Name.StartsWith( "__SCE__" ) == true )
+					{
+						// Find the %__SCE__... folder
+						realFolder = folder.Parent[ "%" + folder.Name ] as IMediaFolder;
+						Debug.Assert( realFolder != null );
+					}
+					else if( folder.Name[ 0 ] == '%' )
+						continue;
+					GameInformation info = this.GetEbootGameInformation( realFolder );
 					if( info != null )
 						infos.Add( info );
 				}

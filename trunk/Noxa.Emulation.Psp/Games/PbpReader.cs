@@ -6,10 +6,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 using Noxa.Emulation.Psp.Media;
-using System.IO;
-using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp.Games
 {

@@ -269,6 +269,22 @@
 				Name="Modules"
 				>
 				<File
+					RelativePath=".\Modules\IoFileMgrForUser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\IoFileMgrForUser_Devices.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\IoFileMgrForUser_Directories.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\IoFileMgrForUser_Files.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\LoadExecForUser.cpp"
 					>
 				</File>
@@ -302,6 +318,10 @@
 				</File>
 				<File
 					RelativePath=".\Modules\ThreadManForUser_Threads.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\UtilsForUser_Timing.cpp"
 					>
 				</File>
 			</Filter>
