@@ -293,11 +293,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\sceCtrl.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\sceDisplay.cpp"
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\sceGe_user.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\sceRtc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\sceUmdUser.cpp"
 					>
 				</File>
 				<File

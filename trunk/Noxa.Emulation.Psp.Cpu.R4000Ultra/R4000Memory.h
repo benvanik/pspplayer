@@ -43,9 +43,11 @@ namespace Noxa {
 					virtual IMemorySegment^ FindSegment( int baseAddress );
 
 					virtual int ReadWord( int address );
+					virtual int64 ReadDoubleWord( int address );
 					virtual array<unsigned char>^ ReadBytes( int address, int count );
 					virtual int ReadStream( int address, Stream^ destination, int count );
 					virtual void WriteWord( int address, int width, int value );
+					virtual void WriteDoubleWord( int address, int64 value );
 					virtual void WriteBytes( int address, array<unsigned char>^ bytes );
 					virtual void WriteBytes( int address, array<unsigned char>^ bytes, int index, int count );
 					virtual void WriteStream( int address, Stream^ source, int count );

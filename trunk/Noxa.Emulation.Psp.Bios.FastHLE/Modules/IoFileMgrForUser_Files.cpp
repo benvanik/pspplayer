@@ -17,6 +17,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 
+#define PRINTNAMES
+
 // SceUID sceIoOpen(const char *file, int flags, SceMode mode); (/user/pspiofilemgr.h:63)
 int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int mode )
 {
@@ -89,6 +91,12 @@ int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int m
 		Debug::WriteLine( String::Format( "sceIoOpen: could not open stream on file '{0}' for mode {1} access {2}", path, fileMode, fileAccess ) );
 		return -1;
 	}
+	else
+	{
+#ifdef PRINTNAMES
+		Debug::WriteLine( String::Format( "sceIoOpen: opened file {0}", path ) );
+#endif
+	}
 
 	KernelFileHandle^ handle = gcnew KernelFileHandle( _kernel->AllocateID() );
 	handle->Device = ( KernelFileDevice^ )_kernel->FindDevice( path );
@@ -126,8 +134,6 @@ int IoFileMgrForUser::sceIoClose( int fd )
 // int sceIoCloseAsync(SceUID fd); (/user/pspiofilemgr.h:93)
 int IoFileMgrForUser::sceIoCloseAsync( int fd ){ return NISTUBRETURN; }
 
-#define MIN( a, b ) ( a < b ) ? a : b
-
 // int sceIoRead(SceUID fd, void *data, SceSize size); (/user/pspiofilemgr.h:109)
 int IoFileMgrForUser::sceIoRead( IMemory^ memory, int fd, int data, int size )
 {
@@ -138,7 +144,7 @@ int IoFileMgrForUser::sceIoRead( IMemory^ memory, int fd, int data, int size )
 		return -1;
 	}
 
-	int length = MIN( size, ( int )( handle->Stream->Length - handle->Stream->Position ) );
+	int length = MIN2( size, ( int )( handle->Stream->Length - handle->Stream->Position ) );
 
 	memory->WriteStream( data, handle->Stream, length );
 
@@ -155,7 +161,11 @@ int IoFileMgrForUser::sceIoWrite( IMemory^ memory, int fd, int data, int size )
 	// a1 = const void *data
 	// a2 = SceSize size
 
-	KernelFileHandle^ handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
+	KernelFileHandle^ handle;
+	if( fd == 1 )
+		handle = _kernel->StdOut;
+	else
+		handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
 	if( handle == nullptr )
 	{
 		Debug::WriteLine( String::Format( "sceIoWrite: kernel file handle {0} not found", fd ) );
@@ -163,6 +173,13 @@ int IoFileMgrForUser::sceIoWrite( IMemory^ memory, int fd, int data, int size )
 	}
 
 	memory->ReadStream( data, handle->Stream, size );
+
+	if( fd == 1 )
+	{
+		array<byte>^ buffer = memory->ReadBytes( data, size );
+		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length );
+		Debug::WriteLine( String::Format( "StdOut: {0}", str ) );
+	}
 
 	return 0;
 }
@@ -183,14 +200,6 @@ int64 IoFileMgrForUser::sceIoLseek( int fd, int64 offset, int whence )
 	SeekOrigin seekOrigin = SeekOrigin::Current;
 	switch( whence )
 	{
-		case 1:
-			seekOrigin = SeekOrigin::Current;
-			Debug::Assert( handle->Stream->Position + offset < handle->Stream->Length );
-			break;
-		case 2:
-			seekOrigin = SeekOrigin::End;
-			Debug::Assert( handle->Stream->Length + offset < handle->Stream->Length );
-			break;
 		case 0:
 			seekOrigin = SeekOrigin::Begin;
 			//Debug.Assert( offset < handle.Stream.Length );
@@ -199,6 +208,14 @@ int64 IoFileMgrForUser::sceIoLseek( int fd, int64 offset, int whence )
 				offset = 0;
 				//return ( int )handle.Stream.Position;
 			}
+			break;
+		case 1:
+			seekOrigin = SeekOrigin::Current;
+			Debug::Assert( handle->Stream->Position + offset < handle->Stream->Length );
+			break;
+		case 2:
+			seekOrigin = SeekOrigin::End;
+			Debug::Assert( handle->Stream->Length + offset <= handle->Stream->Length );
 			break;
 	}
 
@@ -222,14 +239,6 @@ int IoFileMgrForUser::sceIoLseek32( int fd, int offset, int whence )
 	SeekOrigin seekOrigin = SeekOrigin::Current;
 	switch( whence )
 	{
-		case 1:
-			seekOrigin = SeekOrigin::Current;
-			Debug::Assert( handle->Stream->Position + offset < handle->Stream->Length );
-			break;
-		case 2:
-			seekOrigin = SeekOrigin::End;
-			Debug::Assert( handle->Stream->Length + offset < handle->Stream->Length );
-			break;
 		case 0:
 			seekOrigin = SeekOrigin::Begin;
 			//Debug.Assert( offset < handle.Stream.Length );
@@ -238,6 +247,14 @@ int IoFileMgrForUser::sceIoLseek32( int fd, int offset, int whence )
 				offset = 0;
 				//return ( int )handle.Stream.Position;
 			}
+			break;
+		case 1:
+			seekOrigin = SeekOrigin::Current;
+			Debug::Assert( handle->Stream->Position + offset < handle->Stream->Length );
+			break;
+		case 2:
+			seekOrigin = SeekOrigin::End;
+			Debug::Assert( handle->Stream->Length + offset < handle->Stream->Length );
 			break;
 	}
 

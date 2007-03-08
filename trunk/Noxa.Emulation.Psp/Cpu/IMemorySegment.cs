@@ -44,9 +44,11 @@ namespace Noxa.Emulation.Psp.Cpu
 		event MemoryChangeDelegate MemoryChanged;
 
 		int ReadWord( int address );
+		long ReadDoubleWord( int address );
 		byte[] ReadBytes( int address, int count );
 		int ReadStream( int address, Stream destination, int count );
 		void WriteWord( int address, int width, int value );
+		void WriteDoubleWord( int address, long value );
 		void WriteBytes( int address, byte[] bytes );
 		void WriteBytes( int address, byte[] bytes, int index, int count );
 		void WriteStream( int address, Stream source, int count );

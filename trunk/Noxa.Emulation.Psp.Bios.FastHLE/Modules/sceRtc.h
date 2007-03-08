@@ -134,47 +134,38 @@ namespace Noxa {
 						// int sceRtcCompareTick(const u64* tick1, const u64* tick2); (/rtc/psprtc.h:151)
 						int sceRtcCompareTick( IMemory^ memory, int tick1, int tick2 );
 
-						[NotImplemented]
 						[BiosFunction( 0x44F45E05, "sceRtcTickAddTicks" )] [Stateless]
 						// int sceRtcTickAddTicks(u64* destTick, const u64* srcTick, u64 numTicks); (/rtc/psprtc.h:161)
 						int sceRtcTickAddTicks( IMemory^ memory, int destTick, int srcTick, int numTicks );
 
-						[NotImplemented]
 						[BiosFunction( 0x26D25A5D, "sceRtcTickAddMicroseconds" )] [Stateless]
 						// int sceRtcTickAddMicroseconds(u64* destTick, const u64* srcTick, u64 numMS); (/rtc/psprtc.h:171)
 						int sceRtcTickAddMicroseconds( IMemory^ memory, int destTick, int srcTick, int numMS );
 
-						[NotImplemented]
 						[BiosFunction( 0xF2A4AFE5, "sceRtcTickAddSeconds" )] [Stateless]
 						// int sceRtcTickAddSeconds(u64* destTick, const u64* srcTick, u64 numSecs); (/rtc/psprtc.h:181)
 						int sceRtcTickAddSeconds( IMemory^ memory, int destTick, int srcTick, int numSecs );
 
-						[NotImplemented]
 						[BiosFunction( 0xE6605BCA, "sceRtcTickAddMinutes" )] [Stateless]
 						// int sceRtcTickAddMinutes(u64* destTick, const u64* srcTick, u64 numMins); (/rtc/psprtc.h:191)
 						int sceRtcTickAddMinutes( IMemory^ memory, int destTick, int srcTick, int numMins );
 
-						[NotImplemented]
 						[BiosFunction( 0x26D7A24A, "sceRtcTickAddHours" )] [Stateless]
 						// int sceRtcTickAddHours(u64* destTick, const u64* srcTick, int numHours); (/rtc/psprtc.h:201)
 						int sceRtcTickAddHours( IMemory^ memory, int destTick, int srcTick, int numHours );
 
-						[NotImplemented]
 						[BiosFunction( 0xE51B4B7A, "sceRtcTickAddDays" )] [Stateless]
 						// int sceRtcTickAddDays(u64* destTick, const u64* srcTick, int numDays); (/rtc/psprtc.h:211)
 						int sceRtcTickAddDays( IMemory^ memory, int destTick, int srcTick, int numDays );
 
-						[NotImplemented]
 						[BiosFunction( 0xCF3A2CA8, "sceRtcTickAddWeeks" )] [Stateless]
 						// int sceRtcTickAddWeeks(u64* destTick, const u64* srcTick, int numWeeks); (/rtc/psprtc.h:221)
 						int sceRtcTickAddWeeks( IMemory^ memory, int destTick, int srcTick, int numWeeks );
 
-						[NotImplemented]
 						[BiosFunction( 0xDBF74F1B, "sceRtcTickAddMonths" )] [Stateless]
 						// int sceRtcTickAddMonths(u64* destTick, const u64* srcTick, int numMonths); (/rtc/psprtc.h:232)
 						int sceRtcTickAddMonths( IMemory^ memory, int destTick, int srcTick, int numMonths );
 
-						[NotImplemented]
 						[BiosFunction( 0x42842C77, "sceRtcTickAddYears" )] [Stateless]
 						// int sceRtcTickAddYears(u64* destTick, const u64* srcTick, int numYears); (/rtc/psprtc.h:242)
 						int sceRtcTickAddYears( IMemory^ memory, int destTick, int srcTick, int numYears );

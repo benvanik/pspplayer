@@ -26,6 +26,8 @@ typedef union SysClock_u
 #define SAFEFREE( x ) { if( x != NULL ) free( x ); x = NULL; }
 #define SAFEDELETE( x ) { if( x != NULL ) delete x; x = NULL; }
 
+#define MIN2( a, b ) ( a < b ) ? a : b
+
 // Stupid standard...
 __inline int power( int base, int exponent )
 {
