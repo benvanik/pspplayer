@@ -76,6 +76,10 @@ namespace Noxa.Emulation.Psp.Games
 			{
 				return _folder;
 			}
+			set
+			{
+				_folder = value;
+			}
 		}
 
 		public string UniqueID

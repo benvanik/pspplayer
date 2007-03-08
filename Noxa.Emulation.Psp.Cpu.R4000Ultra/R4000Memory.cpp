@@ -111,6 +111,40 @@ int R4000Memory::ReadWord( int address )
 	}
 }
 
+int64 R4000Memory::ReadDoubleWord( int address )
+{
+#ifdef STATISTICS
+	_managedMemoryReadCount++;
+#endif
+
+	//Debug::WriteLine( String::Format( "RW @ 0x{0:X8}", address ) );
+	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
+	{
+		int64* ptr = ( int64* )( MainMemory + ( address - MainMemoryBase ) );
+		return *ptr;
+	}
+	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
+	{
+		int64* ptr = ( int64* )( _scratchPad + ( address - ScratchPadBase ) );
+		return *ptr;
+	}
+	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	{
+		if( _frameBuffer != nullptr )
+			return _frameBuffer->ReadDoubleWord( address );
+		else
+		{
+			int64* ptr = ( int64* )( _frameBufferBytes + ( address - FrameBufferBase ) );
+			return *ptr;
+		}
+	}
+	else
+	{
+		Debugger::Break();
+		return 0;
+	}
+}
+
 array<byte>^ R4000Memory::ReadBytes( int address, int count )
 {
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
@@ -243,8 +277,48 @@ void R4000Memory::WriteWord( int address, int width, int value )
 	//this->MemoryChanged( this, address, width, value );
 }
 
+void R4000Memory::WriteDoubleWord( int address, int64 value )
+{
+#ifdef STATISTICS
+	_managedMemoryWriteCount++;
+#endif
+
+	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
+	{
+		byte* ptr = MainMemory + ( address - MainMemoryBase );
+		int64* p = ( int64* )ptr;
+		*p = value;
+	}
+	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
+	{
+		byte* ptr = _scratchPad + ( address - ScratchPadBase );
+		int64* p = ( int64* )ptr;
+		*p = value;
+	}
+	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	{
+		if( _frameBuffer != nullptr )
+			_frameBuffer->WriteDoubleWord( address, value );
+		else
+		{
+			byte* ptr = _frameBufferBytes + ( address - FrameBufferBase );
+			int64* p = ( int64* )ptr;
+			*p = value;
+		}
+	}
+	else
+	{
+		Debugger::Break();
+	}
+
+	//if( this->MemoryChanged != nullptr )
+	//this->MemoryChanged( this, address, width, value );
+}
+
 void R4000Memory::WriteBytes( int address, array<byte>^ bytes )
 {
+	if( bytes->Length == 0 )
+		return;
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
 		pin_ptr<byte> ptr = &bytes[ 0 ];

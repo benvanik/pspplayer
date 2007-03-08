@@ -17,6 +17,15 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 
+#define TICKSPERUS		10
+#define TICKSPERSEC		10000000
+#define TICKSPERMIN		600000000
+#define TICKSPERHOUR	36000000000
+#define TICKSPERDAY		864000000000
+#define TICKSPERWEEK	6048000000000
+#define TICKSPERMONTH	24192000000000		// 4 weeks/month?
+#define TICKSPERYEAR	314496000000000		// 52 weeks/year?
+
 int sceRtcGetTickResolutionN();
 int sceRtcGetCurrentTickN( LARGE_INTEGER* tick );
 
@@ -120,31 +129,94 @@ int sceRtc::sceRtcGetTick( IMemory^ memory, int date, int tick ){ return NISTUBR
 int sceRtc::sceRtcCompareTick( IMemory^ memory, int tick1, int tick2 ){ return NISTUBRETURN; }
 
 // int sceRtcTickAddTicks(u64* destTick, const u64* srcTick, u64 numTicks); (/rtc/psprtc.h:161)
-int sceRtc::sceRtcTickAddTicks( IMemory^ memory, int destTick, int srcTick, int numTicks ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddTicks( IMemory^ memory, int destTick, int srcTick, int numTicks )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numTicks;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcTickAddMicroseconds(u64* destTick, const u64* srcTick, u64 numMS); (/rtc/psprtc.h:171)
-int sceRtc::sceRtcTickAddMicroseconds( IMemory^ memory, int destTick, int srcTick, int numMS ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddMicroseconds( IMemory^ memory, int destTick, int srcTick, int numMS )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numMS * TICKSPERUS;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcTickAddSeconds(u64* destTick, const u64* srcTick, u64 numSecs); (/rtc/psprtc.h:181)
-int sceRtc::sceRtcTickAddSeconds( IMemory^ memory, int destTick, int srcTick, int numSecs ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddSeconds( IMemory^ memory, int destTick, int srcTick, int numSecs )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numSecs * TICKSPERSEC;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcTickAddMinutes(u64* destTick, const u64* srcTick, u64 numMins); (/rtc/psprtc.h:191)
-int sceRtc::sceRtcTickAddMinutes( IMemory^ memory, int destTick, int srcTick, int numMins ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddMinutes( IMemory^ memory, int destTick, int srcTick, int numMins )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numMins * TICKSPERMIN;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcTickAddHours(u64* destTick, const u64* srcTick, int numHours); (/rtc/psprtc.h:201)
-int sceRtc::sceRtcTickAddHours( IMemory^ memory, int destTick, int srcTick, int numHours ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddHours( IMemory^ memory, int destTick, int srcTick, int numHours )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numHours * TICKSPERHOUR;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcTickAddDays(u64* destTick, const u64* srcTick, int numDays); (/rtc/psprtc.h:211)
-int sceRtc::sceRtcTickAddDays( IMemory^ memory, int destTick, int srcTick, int numDays ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddDays( IMemory^ memory, int destTick, int srcTick, int numDays )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numDays * TICKSPERDAY;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcTickAddWeeks(u64* destTick, const u64* srcTick, int numWeeks); (/rtc/psprtc.h:221)
-int sceRtc::sceRtcTickAddWeeks( IMemory^ memory, int destTick, int srcTick, int numWeeks ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddWeeks( IMemory^ memory, int destTick, int srcTick, int numWeeks )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numWeeks * TICKSPERWEEK;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcTickAddMonths(u64* destTick, const u64* srcTick, int numMonths); (/rtc/psprtc.h:232)
-int sceRtc::sceRtcTickAddMonths( IMemory^ memory, int destTick, int srcTick, int numMonths ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddMonths( IMemory^ memory, int destTick, int srcTick, int numMonths )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numMonths * TICKSPERMONTH;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcTickAddYears(u64* destTick, const u64* srcTick, int numYears); (/rtc/psprtc.h:242)
-int sceRtc::sceRtcTickAddYears( IMemory^ memory, int destTick, int srcTick, int numYears ){ return NISTUBRETURN; }
+int sceRtc::sceRtcTickAddYears( IMemory^ memory, int destTick, int srcTick, int numYears )
+{
+	int64 st = memory->ReadDoubleWord( srcTick );
+	st += numYears * TICKSPERYEAR;
+	memory->WriteDoubleWord( destTick, st );
+
+	return 0;
+}
 
 // int sceRtcParseDateTime(u64 *destTick, const char *dateString); (/rtc/psprtc.h:251)
 int sceRtc::sceRtcParseDateTime( IMemory^ memory, int destTick, int dateString ){ return NISTUBRETURN; }

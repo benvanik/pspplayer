@@ -41,20 +41,17 @@ namespace Noxa {
 
 					public: // ------ Stubbed calls ------
 
-						[NotImplemented]
 						[BiosFunction( 0x46EBB729, "sceUmdCheckMedium" )] [Stateless]
-						// int sceUmdCheckMedium(int a); (/umd/pspumd.h:42)
-						int sceUmdCheckMedium( int a ){ return NISTUBRETURN; }
+						// int sceUmdCheckMedium(); (/umd/pspumd.h:42)
+						int sceUmdCheckMedium();
 
-						[NotImplemented]
 						[BiosFunction( 0xC6183D47, "sceUmdActivate" )] [Stateless]
 						// int sceUmdActivate(int unit, const char *drive); (/umd/pspumd.h:66)
-						int sceUmdActivate( int unit, int drive ){ return NISTUBRETURN; }
+						int sceUmdActivate( IMemory^ memory, int unit, int drive );
 
-						[NotImplemented]
 						[BiosFunction( 0x6B4A146C, "sceUmdGetDriveStat" )] [Stateless]
 						// manual add
-						int sceUmdGetDriveStat(){ return NISTUBRETURN; }
+						int sceUmdGetDriveStat();
 
 						[NotImplemented]
 						[BiosFunction( 0x8EF08FCE, "sceUmdWaitDriveStat" )] [Stateless]

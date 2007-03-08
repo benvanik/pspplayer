@@ -150,10 +150,10 @@ void Kernel::Execute()
 			return;
 		}
 
+		this->CreateStdio();
+
 		// Have to allocate the stuff taken by the elf
 		Partitions[ 1 ]->Allocate( KernelAllocationType::SpecificAddress, lowerBounds, upperBounds - lowerBounds );
-
-		this->CreateStdio();
 
 		int preThreadCount = 0;
 		while( _activeThread == nullptr )

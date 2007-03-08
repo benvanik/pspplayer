@@ -24,7 +24,7 @@ namespace Noxa {
 					File,
 					MemoryBlock,
 					Callback,
-					GuCallback,
+					GeCallback,
 					Semaphore,
 					Event
 				};

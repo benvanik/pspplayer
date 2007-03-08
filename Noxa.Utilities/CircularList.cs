@@ -72,6 +72,14 @@ namespace Noxa
 			return _list[ _index ];
 		}
 
+		public T PeekAhead( int offset )
+		{
+			if( _length == 0 )
+				return default( T );
+			int index = ( _index + offset ) % _list.Length;
+			return _list[ index ];
+		}
+
 		public List<T> Peek( int count )
 		{
 			return null;

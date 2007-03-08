@@ -213,15 +213,19 @@ namespace Noxa.Emulation.Psp.Games
 				{
 					// kxploit check
 					IMediaFolder realFolder = folder;
+					bool wasExploited = false;
 					if( folder.Name.StartsWith( "__SCE__" ) == true )
 					{
 						// Find the %__SCE__... folder
 						realFolder = folder.Parent[ "%" + folder.Name ] as IMediaFolder;
 						Debug.Assert( realFolder != null );
+						wasExploited = true;
 					}
 					else if( folder.Name[ 0 ] == '%' )
 						continue;
 					GameInformation info = this.GetEbootGameInformation( realFolder );
+					if( wasExploited == true )
+						info.Folder = folder;
 					if( info != null )
 						infos.Add( info );
 				}

@@ -137,7 +137,7 @@ namespace Noxa {
 				internal:
 					int AllocateID()
 					{
-						return ++_lastId;
+						return _lastId++;
 					}
 				};
 

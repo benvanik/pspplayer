@@ -71,17 +71,13 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 	// function while we build the address (cause order is address, value for stind).
 	// BUT: if we push the return address stuff here we can just stind the value
 	// after the function call! We saved a local! Woo!
-	// BUT: this only works for int32 returns. With 64 we need to store the value around.
-	// MAYBE: we could use stind_i8?
 	if( hasReturn == true )
 	{
-		// Shared code for $v0
-		ilgen->Emit( OpCodes::Ldc_I4, ( int )registers );		// load registers
+		// Load $v0 (+ $v1 if it is a 64 bit return)
+		ilgen->Emit( OpCodes::Ldc_I4, ( int )registers + ( 2 << 2 ) );	// load registers[ v0 = $2 ]
 		ilgen->Emit( OpCodes::Conv_I );
-		ilgen->Emit( OpCodes::Ldc_I4, 2 << 2 );					// v0 = $2
-		ilgen->Emit( OpCodes::Conv_I );
-		ilgen->Emit( OpCodes::Add );							// register base + register offset
 
+#if 0
 		if( wideReturn == true )
 		{
 			// 64 bit return - lower in v0 ($2), upper in v1 ($3)
@@ -89,11 +85,8 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 			// Local for storage - we only need 32 bits
 			ilgen->DeclareLocal( int::typeid );
 
-			ilgen->Emit( OpCodes::Ldc_I4, ( int )registers );	// load registers
+			ilgen->Emit( OpCodes::Ldc_I4, ( int )registers + ( 3 << 2 ) );	// load registers[ v1 = $3 ]
 			ilgen->Emit( OpCodes::Conv_I );
-			ilgen->Emit( OpCodes::Ldc_I4, 3 << 2 );				// v1 = $3
-			ilgen->Emit( OpCodes::Conv_I );
-			ilgen->Emit( OpCodes::Add );						// register base + register offset
 
 			// stack now contains address of $v0, $v1
 		}
@@ -103,6 +96,7 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 			
 			// stack now contains address of $v0
 		}
+#endif
 	}
 
 	// Push module instance (needed for Call below)
@@ -154,9 +148,19 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 			int registerAddress = ( int )registers + ( ( regOffset + 4 ) << 2 );
 			ilgen->Emit( OpCodes::Ldc_I4, registerAddress );	// load register address
 			ilgen->Emit( OpCodes::Conv_I );
-			ilgen->Emit( OpCodes::Ldind_I4 );					// load value
 
-			regOffset++;
+			if( isWide == false )
+			{
+				// 32 bit load
+				ilgen->Emit( OpCodes::Ldind_I4 );			// load value
+				regOffset++;
+			}
+			else
+			{
+				// 64 bit load
+				ilgen->Emit( OpCodes::Ldind_I8 );
+				regOffset += 2;
+			}
 		}
 		else
 		{
@@ -195,20 +199,29 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 	// Handle return
 	if( hasReturn == true )
 	{
+		if( wideReturn == false )
+			ilgen->Emit( OpCodes::Stind_I4 );				// store to $v0
+		else
+			ilgen->Emit( OpCodes::Stind_I8 );				// store to $v0 + $v1
+#if 0
 		if( wideReturn == true )
 		{
+			MethodInfo^ breakInfo = ( Debugger::typeid )->GetMethod( "Break" );
+			Debug::Assert( breakInfo != nullptr );
+			ilgen->Emit( OpCodes::Call, breakInfo );
+
 			// 64 bit return - lower in v0 ($2), upper in v1 ($3)
-			// stack contains long
+			// stack contains v0 addr, v1 addr, long value
 
 			// Put ret in local - we truncate to 32 bits so we don't have to do it later
 			ilgen->Emit( OpCodes::Dup );
-			ilgen->Emit( OpCodes::Conv_I4 );
+			ilgen->Emit( OpCodes::Conv_I4 );				// truncates upper
 			ilgen->Emit( OpCodes::Stloc_0 );
 
 			// We need to store $v1 (upper word) - we still have the long on the stack
 			ilgen->Emit( OpCodes::Ldc_I4, 32 );
 			ilgen->Emit( OpCodes::Shr_Un );					// =>> 32
-			ilgen->Emit( OpCodes::Conv_I4 );
+			ilgen->Emit( OpCodes::Conv_I4 );				// truncates upper
 			ilgen->Emit( OpCodes::Stind_I4 );				// store in $v1
 
 			// Load back local for $v0 code below
@@ -217,11 +230,12 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 		else
 		{
 			// 32 bit return - in v0 ($2)
-			// stack contains int
+			// stack contains v0 addr, int value
 		}
 
 		// Shared code for $v0
 		ilgen->Emit( OpCodes::Stind_I4 );					// store in $v0
+#endif
 	}
 	else
 	{
