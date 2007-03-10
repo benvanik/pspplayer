@@ -293,6 +293,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\sceAudio.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\sceCtrl.cpp"
 					>
 				</File>
@@ -330,6 +334,22 @@
 				</File>
 				<File
 					RelativePath=".\Modules\ThreadManForUser_Threads.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\UtilsForUser.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\UtilsForUser_MD5.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\UtilsForUser_MT19937.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Modules\UtilsForUser_SHA1.cpp"
 					>
 				</File>
 				<File

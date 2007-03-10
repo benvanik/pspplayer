@@ -21,6 +21,11 @@ DEFR( MULT );
 DEFR( MULTU );
 DEFR( DIV );
 DEFR( DIVU );
+DEFR( MUL );		// don't know what the encoding of this is!
+DEFR( MADD );
+DEFR( MADDU );
+DEFR( MSUB );
+DEFR( MSUBU );
 DEFR( ADD );
 DEFR( ADDU );
 DEFR( SUB );

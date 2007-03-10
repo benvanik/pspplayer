@@ -42,6 +42,14 @@ namespace Noxa {
 					virtual IMemorySegment^ FindSegment( String^ name );
 					virtual IMemorySegment^ FindSegment( int baseAddress );
 
+					property void* InternalPointer
+					{
+						virtual void* get()
+						{
+							return MainMemory;
+						}
+					}
+
 					virtual int ReadWord( int address );
 					virtual int64 ReadDoubleWord( int address );
 					virtual array<unsigned char>^ ReadBytes( int address, int count );
