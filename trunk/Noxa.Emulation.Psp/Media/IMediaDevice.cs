@@ -49,6 +49,11 @@ namespace Noxa.Emulation.Psp.Media
 			get;
 		}
 
+		string DevicePath
+		{
+			get;
+		}
+
 		IMediaFolder Root
 		{
 			get;

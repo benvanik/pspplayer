@@ -17,8 +17,6 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 
-#define PRINTNAMES
-
 // SceUID sceIoOpen(const char *file, int flags, SceMode mode); (/user/pspiofilemgr.h:63)
 int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int mode )
 {
@@ -91,12 +89,6 @@ int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int m
 		Debug::WriteLine( String::Format( "sceIoOpen: could not open stream on file '{0}' for mode {1} access {2}", path, fileMode, fileAccess ) );
 		return -1;
 	}
-	else
-	{
-#ifdef PRINTNAMES
-		Debug::WriteLine( String::Format( "sceIoOpen: opened file {0}", path ) );
-#endif
-	}
 
 	KernelFileHandle^ handle = gcnew KernelFileHandle( _kernel->AllocateID() );
 	handle->Device = ( KernelFileDevice^ )_kernel->FindDevice( path );
@@ -106,6 +98,10 @@ int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int m
 	handle->MediaItem = file;
 	handle->Stream = stream;
 	_kernel->AddHandle( handle );
+
+#ifdef VERBOSEIO
+	Debug::WriteLine( String::Format( "sceIoOpen: opened file {0} with ID {1}", path, handle->ID ) );
+#endif
 
 	return handle->ID;
 }
@@ -144,6 +140,11 @@ int IoFileMgrForUser::sceIoRead( IMemory^ memory, int fd, int data, int size )
 		return -1;
 	}
 
+	if( fd == 0 )
+	{
+		// stdin
+	}
+
 	int length = MIN2( size, ( int )( handle->Stream->Length - handle->Stream->Position ) );
 
 	memory->WriteStream( data, handle->Stream, length );
@@ -176,9 +177,17 @@ int IoFileMgrForUser::sceIoWrite( IMemory^ memory, int fd, int data, int size )
 
 	if( fd == 1 )
 	{
+		// stdout
 		array<byte>^ buffer = memory->ReadBytes( data, size );
 		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length );
-		Debug::WriteLine( String::Format( "StdOut: {0}", str ) );
+		Debug::WriteLine( String::Format( "stdout: {0}", str ) );
+	}
+	else if( fd == 2 )
+	{
+		// stderr
+		array<byte>^ buffer = memory->ReadBytes( data, size );
+		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length );
+		Debug::WriteLine( String::Format( "stderr: {0}", str ) );
 	}
 
 	return 0;
