@@ -319,6 +319,85 @@ GenerationResult MULTU( R4000GenContext^ context, int pass, int address, uint co
 	return GenerationResult::Success;
 }
 
+GenerationResult MUL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+{
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->imul( MREG( CTX, rt ) );
+		g->mov( MREG( CTX, rd ), EAX );
+	}
+	return GenerationResult::Success;
+}
+
+GenerationResult MADD( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+{
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->imul( MREG( CTX, rt ) );
+		g->add( MLO( CTX ), EAX );
+		g->adc( MHI( CTX ), EDX );	// add with carry for 64 bit add
+	}
+	return GenerationResult::Success;
+}
+
+GenerationResult MADDU( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+{
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mul( MREG( CTX, rt ) );
+		g->add( MLO( CTX ), EAX );
+		g->adc( MHI( CTX ), EDX );	// add with carry for 64 bit add
+	}
+	return GenerationResult::Success;
+}
+
+GenerationResult MSUB( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+{
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->imul( MREG( CTX, rt ) );
+		g->sub( MLO( CTX ), EAX );
+		g->sbb( MHI( CTX ), EDX );
+	}
+	return GenerationResult::Success;
+}
+
+GenerationResult MSUBU( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
+{
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		LOADCTXBASE( ECX );
+		g->mov( EAX, MREG( CTX, rs ) );
+		g->mul( MREG( CTX, rt ) );
+		g->sub( MLO( CTX ), EAX );
+		g->sbb( MHI( CTX ), EDX );
+	}
+	return GenerationResult::Success;
+}
+
 GenerationResult DIV( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
 	if( pass == 0 )

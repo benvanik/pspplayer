@@ -29,9 +29,9 @@
 #define IGNOREFRAMEBUFFER
 
 // Emit trace file
-//#define TRACE
+#define TRACE
 #define TRACEFILE "Trace-Ultra.txt"
-#define TRACEAFTER 0x08900d24
+#define TRACEAFTER 0x0892399C
 
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG

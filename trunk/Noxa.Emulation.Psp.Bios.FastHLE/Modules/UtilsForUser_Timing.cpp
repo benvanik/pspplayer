@@ -40,6 +40,8 @@ int UtilsForUser::sceKernelLibcTime( IMemory^ memory, int t )
 	if( t != 0x0 )
 		memory->WriteWord( t, 4, time );
 
+	Debug::Assert( time != 0xFFFFFFFF );
+
 	return time;
 }
 

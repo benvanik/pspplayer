@@ -14,6 +14,7 @@ using namespace System;
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
+using namespace Noxa::Emulation::Psp::Audio;
 
 namespace Noxa {
 	namespace Emulation {
@@ -23,6 +24,9 @@ namespace Noxa {
 
 					public ref class sceAudio : public Module
 					{
+					internal:
+						IAudioDriver^		_driver;
+
 					public:
 						sceAudio( Kernel^ kernel ) : Module( kernel ) {}
 						~sceAudio(){}
@@ -30,46 +34,40 @@ namespace Noxa {
 					public:
 						property String^ Name { virtual String^ get() override { return "sceAudio"; } }
 
-						//virtual void Start() override;
-						//virtual void Stop() override;
-						//virtual void Clear() override;
+						virtual void Start() override;
+						virtual void Stop() override;
+						virtual void Clear() override;
 
 					internal:
 						//virtual void* QueryNativePointer( uint nid ) override;
 
 					public: // ------ Implemented calls ------
 
-					public: // ------ Stubbed calls ------
-
-						[NotImplemented]
 						[BiosFunction( 0x8C1009B2, "sceAudioOutput" )] [Stateless]
 						// int sceAudioOutput(int channel, int vol, void *buf); (/audio/pspaudio.h:73)
-						int sceAudioOutput( int channel, int vol, int buf ){ return NISTUBRETURN; }
+						int sceAudioOutput( IMemory^ memory, int channel, int vol, int buf );
 
-						[NotImplemented]
 						[BiosFunction( 0x136CAF51, "sceAudioOutputBlocking" )] [Stateless]
 						// int sceAudioOutputBlocking(int channel, int vol, void *buf); (/audio/pspaudio.h:79)
-						int sceAudioOutputBlocking( int channel, int vol, int buf ){ return NISTUBRETURN; }
+						int sceAudioOutputBlocking( IMemory^ memory, int channel, int vol, int buf );
 
-						[NotImplemented]
 						[BiosFunction( 0xE2D56B2D, "sceAudioOutputPanned" )] [Stateless]
 						// int sceAudioOutputPanned(int channel, int leftvol, int rightvol, void *buffer); (/audio/pspaudio.h:85)
-						int sceAudioOutputPanned( int channel, int leftvol, int rightvol, int buffer ){ return NISTUBRETURN; }
+						int sceAudioOutputPanned( IMemory^ memory, int channel, int leftvol, int rightvol, int buffer );
 
-						[NotImplemented]
 						[BiosFunction( 0x13F592BC, "sceAudioOutputPannedBlocking" )] [Stateless]
 						// int sceAudioOutputPannedBlocking(int channel, int leftvol, int rightvol, void *buffer); (/audio/pspaudio.h:91)
-						int sceAudioOutputPannedBlocking( int channel, int leftvol, int rightvol, int buffer ){ return NISTUBRETURN; }
+						int sceAudioOutputPannedBlocking( IMemory^ memory, int channel, int leftvol, int rightvol, int buffer );
 
-						[NotImplemented]
 						[BiosFunction( 0x5EC81C55, "sceAudioChReserve" )] [Stateless]
 						// int sceAudioChReserve(int channel, int samplecount, int format); (/audio/pspaudio.h:61)
-						int sceAudioChReserve( int channel, int samplecount, int format ){ return NISTUBRETURN; }
+						int sceAudioChReserve( int channel, int samplecount, int format );
 
-						[NotImplemented]
 						[BiosFunction( 0x6FC46853, "sceAudioChRelease" )] [Stateless]
 						// int sceAudioChRelease(int channel); (/audio/pspaudio.h:70)
-						int sceAudioChRelease( int channel ){ return NISTUBRETURN; }
+						int sceAudioChRelease( int channel );
+
+					public: // ------ Stubbed calls ------
 
 						[NotImplemented]
 						[BiosFunction( 0xE9D97901, "sceAudioGetChannelRestLen" )] [Stateless]

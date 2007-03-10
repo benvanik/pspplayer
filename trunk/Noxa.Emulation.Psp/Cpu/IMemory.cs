@@ -18,6 +18,11 @@ namespace Noxa.Emulation.Psp.Cpu
 		IMemorySegment FindSegment( string name );
 		IMemorySegment FindSegment( int baseAddress );
 
+		unsafe void* InternalPointer
+		{
+			get;
+		}
+
 		int ReadWord( int address );
 		long ReadDoubleWord( int address );
 		byte[] ReadBytes( int address, int count );

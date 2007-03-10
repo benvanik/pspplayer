@@ -235,11 +235,11 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		{
 			// Couldn't do a native stub, so try to emit a native call
 
-			if( function->NativeMethod != IntPtr::Zero )
+			/*if( function->NativeMethod != IntPtr::Zero )
 			{
 				EmitNativeCall( context, function );
 			}
-			else
+			else*/
 			{
 				// We push $ra as the address cause it is where the stub will go back to
 				g->push( MREG( CTX, 31 ) );
