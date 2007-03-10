@@ -111,14 +111,14 @@ namespace Noxa {
 					/// <summary>
 					/// Unix time since 1970-01-01 UTC (not accurate) in microseconds.
 					/// </summary>
-					property uint ClockTime
+					property int64 ClockTime
 					{
-						uint get()
+						int64 get()
 						{
 							// 1000000 us per second
 							// 10000000 ticks per second
 							TimeSpan elapsed = DateTime::UtcNow - UnixBaseTime;
-							return ( uint )( elapsed.Ticks / 10 );
+							return ( elapsed.Ticks / 10 );
 						}
 					}
 

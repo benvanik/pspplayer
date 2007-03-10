@@ -123,6 +123,14 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 			}
 		}
 
+		public string DevicePath
+		{
+			get
+			{
+				return "ms0:/";
+			}
+		}
+
 		public IMediaFolder Root
 		{
 			get

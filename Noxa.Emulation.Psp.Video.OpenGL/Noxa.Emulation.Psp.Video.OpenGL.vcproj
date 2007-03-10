@@ -119,6 +119,7 @@
 				AdditionalIncludeDirectories="$(SolutionDir)Shared\Include"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"

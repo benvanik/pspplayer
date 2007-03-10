@@ -30,6 +30,11 @@
 // properly when the code hits this limit, so it should be high!
 #define MAXCODELENGTH 200
 
+// Debugging addresses
+//#define BREAKADDRESS1		0x0895c9b8
+//#define BREAKADDRESS2		0x0895ce9c
+//#define GENBREAKADDRESS		0x0
+
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
@@ -94,18 +99,15 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 #if _DEBUG
 			// Debug breakpoint on instruction
-			if( pass == 0 )
-			{
-				//if( address == 0x0890012C )
-				//	Debugger::Break();
-			}
-			if( pass == 1 )
-			{
-				//if( address == 0x08900390 )
-				//	g->int3();
-				//if( address == 0x08909C98 )
-				//	g->int3();
-			}
+#ifdef GENBREAKADDRESS
+			if( pass == 0 ){ if( address == GENBREAKADDRESS ) Debugger::Break(); }
+#endif
+#ifdef BREAKADDRESS1
+			if( pass == 1 ){ if( address == BREAKADDRESS1 ) g->int3(); }
+#endif
+#ifdef BREAKADDRESS2
+			if( pass == 1 ){ if( address == BREAKADDRESS2 ) g->int3(); }
+#endif
 #endif
 
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )

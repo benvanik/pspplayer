@@ -13,6 +13,9 @@
 // Runtime statistic generation
 //#define STATISTICS
 
+// Verbose IO information (print file/dir names, etc)
+#define VERBOSEIO
+
 // Emit trace file
 //#define TRACE
 

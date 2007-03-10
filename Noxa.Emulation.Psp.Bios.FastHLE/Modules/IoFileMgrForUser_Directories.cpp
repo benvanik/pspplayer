@@ -38,6 +38,10 @@ int IoFileMgrForUser::sceIoDopen( IMemory^ memory, int dirname )
 	handle->FolderOffset = -2;
 	_kernel->AddHandle( handle );
 
+#ifdef VERBOSEIO
+	Debug::WriteLine( String::Format( "sceIoDopen: opened {0} with ID {1}", path, handle->ID ) );
+#endif
+
 	return handle->ID;
 }
 

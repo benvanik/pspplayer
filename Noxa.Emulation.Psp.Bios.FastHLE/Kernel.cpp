@@ -84,11 +84,11 @@ void Kernel::StartGame()
 	IMediaDevice^ msDevice = _emu->MemoryStick;
 	IMediaDevice^ umdDevice = _emu->Umd;
 	_devices->Add( gcnew KernelFileDevice( "MemoryStick",
-		gcnew array<String^>{ "fatms0", "ms0", "fatms" },
+		gcnew array<String^>{ "fatms0", "ms", "ms0", "fatms" },
 		true, ( msDevice != nullptr ) ? msDevice->IsReadOnly : true, msDevice,
 		( msDevice != nullptr ) ? msDevice->Root : nullptr ) );
 	_devices->Add( gcnew KernelFileDevice( "UMD",
-		gcnew array<String^>{ "umd0", "isofs", "isofs0", "disc0" },
+		gcnew array<String^>{ "umd", "umd0", "isofs", "isofs0", "disc0" },
 		true, true, umdDevice,
 		( umdDevice != nullptr ) ? umdDevice->Root : nullptr ) );
 	//_devices.Add( new KernelFileDevice( "flash0", new string[] { "flash0", "flashfat", "flashfat0" }, true, false, null, null ) );
