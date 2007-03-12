@@ -6,7 +6,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+
 using Noxa.Emulation.Psp.Games;
 
 namespace Noxa.Emulation.Psp.Bios
@@ -17,6 +19,11 @@ namespace Noxa.Emulation.Psp.Bios
 		{
 			get;
 			set;
+		}
+
+		Stream BootStream
+		{
+			get;
 		}
 
 		void Execute();

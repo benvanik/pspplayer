@@ -399,11 +399,14 @@ namespace Noxa.Emulation.Psp.Games
 		{
 			_address = 0;
 
+			//long position = source.Position;
+			source.Position = 0;
 			if( LoadElf( new BinaryReader( source ) ) == false )
 			{
 				// Failed
 				throw new Exception( "Elf load failed" );
 			}
+			//source.Position = position;
 		}
 
 		public ElfType ProgramType
@@ -451,6 +454,14 @@ namespace Noxa.Emulation.Psp.Games
 			get
 			{
 				return _globalPointer;
+			}
+		}
+
+		public List<ElfSymbol> Symbols
+		{
+			get
+			{
+				return _symbols;
 			}
 		}
 
@@ -569,6 +580,7 @@ namespace Noxa.Emulation.Psp.Games
 
 			//foreach( ElfSection section in _sections )
 			//{
+			//	Debugger.Break();
 			//    if( ( _programType == ElfType.Executable ) &&
 			//        ( section.SectionType != ElfSectionType.Relocation ) )
 			//        continue;

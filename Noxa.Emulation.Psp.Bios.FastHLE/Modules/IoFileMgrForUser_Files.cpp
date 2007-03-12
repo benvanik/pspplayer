@@ -179,14 +179,14 @@ int IoFileMgrForUser::sceIoWrite( IMemory^ memory, int fd, int data, int size )
 	{
 		// stdout
 		array<byte>^ buffer = memory->ReadBytes( data, size );
-		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length );
+		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length )->TrimEnd();
 		Debug::WriteLine( String::Format( "stdout: {0}", str ) );
 	}
 	else if( fd == 2 )
 	{
 		// stderr
 		array<byte>^ buffer = memory->ReadBytes( data, size );
-		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length );
+		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length )->TrimEnd();
 		Debug::WriteLine( String::Format( "stderr: {0}", str ) );
 	}
 

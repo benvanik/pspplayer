@@ -7,10 +7,12 @@
 #pragma once
 
 using namespace System;
+using namespace System::IO;
 using namespace System::Reflection;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Debugging;
+using namespace Noxa::Emulation::Psp::Games;
 using namespace Noxa::Emulation::Psp::Utilities;
 
 #include "R4000Cache.h"
@@ -77,6 +79,10 @@ namespace Noxa {
 
 					FieldInfo^					_privateMemoryFieldInfo;
 					FieldInfo^					_privateModuleInstancesFieldInfo;
+
+#ifdef TRACESYMBOLS
+					IProgramDebugData^			_symbols;
+#endif
 
 				public:
 
@@ -188,30 +194,6 @@ namespace Noxa {
 						}
 					}
 
-					property array<byte>^ InternalMemory
-					{
-						virtual array<byte>^ get()
-						{
-							return nullptr;
-						}
-					}
-
-					property IntPtr InternalMemoryPointer
-					{
-						virtual IntPtr get()
-						{
-							return IntPtr( ( void* )_memory->MainMemory );
-						}
-					}
-
-					property int InternalMemoryBaseAddress
-					{
-						virtual int get()
-						{
-							return MainMemoryBase;
-						}
-					}
-
 					property ExecutionMode ExecutionMode
 					{
 						virtual Cpu::ExecutionMode get()
@@ -274,6 +256,7 @@ namespace Noxa {
 						throw gcnew NotImplementedException();
 					}
 
+					virtual void SetupGame( GameInformation^ game, Stream^ bootStream );
 					virtual int ExecuteBlock();
 					virtual void Stop();
 

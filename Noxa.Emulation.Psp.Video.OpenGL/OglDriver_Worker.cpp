@@ -186,10 +186,10 @@ void OglDriver::WorkerThread()
 
 	// Setup the context
 	bool supportInternalMemory = _emu->Cpu->Capabilities->InternalMemorySupported;
-	bool supportInternalMemoryPointer = supportInternalMemory && ( _emu->Cpu->InternalMemoryPointer != IntPtr::Zero );
+	bool supportInternalMemoryPointer = supportInternalMemory && ( _emu->Cpu->Memory->InternalPointer != NULL );
 	// TODO: support non-pointer based internal memory
 	Debug::Assert( supportInternalMemoryPointer == true );
-	_context->MemoryPointer = ( byte* )_emu->Cpu->InternalMemoryPointer.ToPointer();
+	_context->MemoryPointer = ( byte* )_emu->Cpu->Memory->InternalPointer;
 
 	_startTime = DateTime::Now;
 

@@ -76,6 +76,7 @@
     <Compile Include="Debugging\NullDebugger.cs" />
     <Compile Include="Debugging\ObjdumpDebugData.cs" />
     <Compile Include="Debugging\ProgramDebugData.cs" />
+    <Compile Include="Debugging\SimpleElfDebugData.cs" />
     <Compile Include="EmulationParameters.cs" />
     <Compile Include="Games\ElfFile.cs" />
     <Compile Include="Games\GameInformation.cs" />

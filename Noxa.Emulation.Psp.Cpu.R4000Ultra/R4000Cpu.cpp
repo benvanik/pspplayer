@@ -97,19 +97,19 @@ void R4000Cpu::Cleanup()
 	_memory->Clear();
 }
 
-int R4000Cpu::ExecuteBlock()
+void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 {
-#ifdef STATISTICS
-	double blockStart = _timer->Elapsed;
-	if( _stats->RunTime == 0.0 )
-		_stats->RunTime = _timer->Elapsed;
-#endif
-
+	Debug::Assert( _hasExecuted == false );
 	if( _hasExecuted == false )
 	{
 		// Prepare tracer
 #ifdef TRACE
 		Tracer::OpenFile( TRACEFILE );
+#endif
+
+#ifdef TRACESYMBOLS
+		Debug::Assert( bootStream != nullptr );
+		_symbols = Debugging::ProgramDebugData::Load( Debugging::DebugDataType::Symbols, bootStream );
 #endif
 
 		// Has to happen late in the game because we need to
@@ -118,6 +118,15 @@ int R4000Cpu::ExecuteBlock()
 
 		_hasExecuted = true;
 	}
+}
+
+int R4000Cpu::ExecuteBlock()
+{
+#ifdef STATISTICS
+	double blockStart = _timer->Elapsed;
+	if( _stats->RunTime == 0.0 )
+		_stats->RunTime = _timer->Elapsed;
+#endif
 
 	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
 	//if( ctx->PC == 0 )

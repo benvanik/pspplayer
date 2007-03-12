@@ -1,3 +1,9 @@
+// ----------------------------------------------------------------------------
+// PSP Player Emulation Suite
+// Copyright (C) 2006 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -77,6 +83,8 @@ namespace Noxa.Emulation.Psp.Debugging
 						match = methodRegex.Match( line );
 						if( match.Success == true )
 						{
+							if( method != null )
+								method.SetLength();
 							int address = int.Parse( match.Groups[ "Address" ].Value, NumberStyles.HexNumber );
 							string name = match.Groups[ "Identifier" ].Value;
 							method = new ObjdumpMethod( address, name );
@@ -84,6 +92,9 @@ namespace Noxa.Emulation.Psp.Debugging
 						}
 					}
 				}
+
+				if( method != null )
+					method.SetLength();
 			}
 
 			return methods;
@@ -113,8 +124,13 @@ namespace Noxa.Emulation.Psp.Debugging
 		private class ObjdumpMethod : Method
 		{
 			public ObjdumpMethod( int entryAddress, string name )
-				: base( entryAddress, name )
+				: base( entryAddress, 0, name )
 			{
+			}
+
+			internal void SetLength()
+			{
+				_length = _instructions.Count;
 			}
 		}
 

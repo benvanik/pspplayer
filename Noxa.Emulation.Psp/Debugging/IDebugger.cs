@@ -15,6 +15,7 @@ namespace Noxa.Emulation.Psp.Debugging
 	{
 		Objdump,
 		Elf,
+		Symbols,
 	}
 
 	public enum DebuggerState
