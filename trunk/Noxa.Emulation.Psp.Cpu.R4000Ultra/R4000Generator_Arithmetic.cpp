@@ -38,6 +38,8 @@ GenerationResult SLL( R4000GenContext^ context, int pass, int address, uint code
 		g->mov( EAX, MREG( CTX, rt ) );
 		if( ( shamt >= 0 ) && ( shamt < 32 ) )
 			g->shl( EAX, shamt );
+		else
+			Debug::Assert( false );
 		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
@@ -57,6 +59,8 @@ GenerationResult SRL( R4000GenContext^ context, int pass, int address, uint code
 		g->mov( EAX, MREG( CTX, rt ) );
 		if( ( shamt >= 0 ) && ( shamt < 32 ) )
 			g->shr( EAX, shamt );
+		else
+			Debug::Assert( false );
 		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
@@ -75,8 +79,10 @@ GenerationResult SRA( R4000GenContext^ context, int pass, int address, uint code
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rt ) );
 		if( ( shamt >= 0 ) && ( shamt < 32 ) )
-			//g->sar( EAX, shamt );
-			g->shr( EAX, shamt );
+			g->sar( EAX, shamt );
+			//g->shr( EAX, shamt );
+		else
+			Debug::Assert( false );
 		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
@@ -407,7 +413,7 @@ GenerationResult DIV( R4000GenContext^ context, int pass, int address, uint code
 	{
 		LOADCTXBASE( ECX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->mov( EDX, 0 );
+		g->cdq();						// Sign extend EAX in to EDX
 		g->idiv( MREG( CTX, rt ) );
 		g->mov( MLO( CTX ), EAX );
 		g->mov( MHI( CTX ), EDX );
@@ -424,7 +430,7 @@ GenerationResult DIVU( R4000GenContext^ context, int pass, int address, uint cod
 	{
 		LOADCTXBASE( ECX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->mov( EDX, 0 );
+		g->xor( EDX, EDX );
 		g->div( MREG( CTX, rt ) );
 		g->mov( MLO( CTX ), EAX );
 		g->mov( MHI( CTX ), EDX );
