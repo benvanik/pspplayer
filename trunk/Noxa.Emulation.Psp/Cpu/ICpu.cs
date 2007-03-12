@@ -6,9 +6,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Games;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
@@ -64,21 +66,6 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 		}
 
-		byte[] InternalMemory
-		{
-			get;
-		}
-
-		IntPtr InternalMemoryPointer
-		{
-			get;
-		}
-
-		int InternalMemoryBaseAddress
-		{
-			get;
-		}
-
 		ExecutionMode ExecutionMode
 		{
 			get;
@@ -103,6 +90,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		void Resume();
 		void Break();
 
+		void SetupGame( GameInformation game, Stream bootStream );
 		int ExecuteBlock();
 		void Stop();
 

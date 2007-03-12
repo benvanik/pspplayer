@@ -53,7 +53,8 @@ R4000BlockBuilder::~R4000BlockBuilder()
 	SAFEDELETE( _gen );
 }
 
-#ifdef RUNTIMEDEBUG
+#ifdef _DEBUG
+
 static bool debugToggle = false;
 void __runtimeDebugPrint( int address, int code )
 {
@@ -67,9 +68,12 @@ void __runtimeDebugPrint( int address, int code )
 		Debug::WriteLine( String::Format( "[0x{0:X8}]: {1:X8}", address, code ) );
 	//Debug::WriteLine( String::Format( "reg 31: {0:X8}", ( ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx )->Registers[ 31 ] ) );
 }
-#endif
 
-#ifdef RUNTIMEREGS
+void __runtimeDebugPrintForce( int address, int code )
+{
+	Debug::WriteLine( String::Format( "[0x{0:X8}]: {1:X8}", address, code ) );
+}
+
 void __runtimeRegsPrint()
 {
 	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
@@ -78,6 +82,7 @@ void __runtimeRegsPrint()
 		sb->AppendFormat( "{0}={1:X8} ", n, ctx->Registers[ n ] );
 	Debug::WriteLine( sb->ToString() );
 }
+
 #endif
 
 #ifdef TRACE
@@ -120,8 +125,12 @@ void __traceLine( int address, int code )
 	char buffer[ 50 ];
 	sprintf_s( buffer, 50, "[0x%08X]: %08X\r\n", address, code );
 	Tracer::WriteLine( buffer );
+#ifdef TRACEREGISTERS
 	__traceRegs();
-	//__traceFpuRegs();
+#endif
+#ifdef TRACEFPUREGS
+	__traceFpuRegs();
+#endif
 }
 #pragma managed
 #endif /* TRACE */

@@ -830,7 +830,7 @@ GenerationResult EXT( R4000GenContext^ context, int pass, int address, uint code
 		byte rs = ( byte )( ( code >> 21 ) & 0x1F );
 
 		// This is kind of a trick I thought of ^_^
-		long long bittemp = 0x00000000FFFFFFFF;
+		uint64 bittemp = 0x00000000FFFFFFFF;
 		bittemp <<= rd + 1;
 		bittemp >>= 32;
 		int bitmask = ( int )bittemp;
@@ -866,7 +866,7 @@ GenerationResult INS( R4000GenContext^ context, int pass, int address, uint code
 		int size = rd - function + 1;
 
 		// This is kind of a trick I thought of ^_^
-		long long bittemp = 0x00000000FFFFFFFF;
+		uint64 bittemp = 0x00000000FFFFFFFF;
 		bittemp <<= size;
 		bittemp >>= 32;
 		int rsmask = ( int )bittemp;

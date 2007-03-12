@@ -12,6 +12,13 @@
 #include "R4000Memory.h"
 #include "R4000Cache.h"
 #include "R4000Generator.h"
+#include "Tracer.h"
+
+using namespace System::Diagnostics;
+using namespace System::Runtime::InteropServices;
+using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::Cpu;
+using namespace SoftWire;
 
 // #ifdef GENECHOFILE || VERBOSEANNOTATE
 #ifdef GENECHOFILE
@@ -34,11 +41,6 @@
 //#define BREAKADDRESS1		0x0895c9b8
 //#define BREAKADDRESS2		0x0895ce9c
 //#define GENBREAKADDRESS		0x0
-
-using namespace System::Diagnostics;
-using namespace Noxa::Emulation::Psp;
-using namespace Noxa::Emulation::Psp::Cpu;
-using namespace SoftWire;
 
 extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
@@ -566,6 +568,27 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 	return count;
 }
 
+#ifdef TRACESYMBOLS
+void __traceMethod( int methodAddress, int currentAddress )
+{
+	String^ methodName;
+	if( methodAddress == 0x0 )
+	{
+		methodName = "[UnknownMethod]";
+	}
+	else
+	{
+		Method^ method = R4000Cpu::GlobalCpu->_symbols->FindMethod( methodAddress );
+		methodName = method->Name;
+	}
+	String^ str = String::Format( "\r\n{0} ({1:X8}): {2}\r\n", methodName, methodAddress,
+		( methodAddress != currentAddress ) ? String::Format( "entered at {0:X8}", currentAddress ) : "" );
+	const char* str2 = ( char* )( void* )Marshal::StringToHGlobalAnsi( str );
+	Tracer::WriteLine( str2 );
+	Marshal::FreeHGlobal( ( IntPtr )( void* )str2 );
+}
+#endif
+
 void R4000AdvancedBlockBuilder::GeneratePreamble()
 {
 	R4000Generator *g = _gen;
@@ -577,6 +600,22 @@ void R4000AdvancedBlockBuilder::GeneratePreamble()
 #ifdef STATISTICS
 	// Block count
 	g->inc( g->dword_ptr[ &_codeBlocksExecuted ] );
+#endif
+
+//#if 0
+#ifdef TRACESYMBOLS
+	// Trace entry to method
+	// Since we can't store an object reference, we store the real start address
+	// of the method. This makes the lookup in FindMethod simpler than if we gave
+	// it random addresses inside of methods.
+	Method^ method = _cpu->_symbols->FindMethod( _ctx->StartAddress );
+	g->push( ( uint )_ctx->StartAddress );
+	if( method != nullptr )
+		g->push( ( uint )method->EntryAddress );
+	else
+		g->push( ( uint )0 );
+	g->call( ( int )&__traceMethod );
+	g->add( ESP, 8 );
 #endif
 }
 

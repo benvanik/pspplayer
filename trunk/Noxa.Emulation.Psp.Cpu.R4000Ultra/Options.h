@@ -29,9 +29,12 @@
 #define IGNOREFRAMEBUFFER
 
 // Emit trace file
-//#define TRACE
+#define TRACE
 #define TRACEFILE "Trace-Ultra.txt"
-//#define TRACEAFTER 0x0892399C
+//#define TRACEAFTER 0x089618B4
+#define TRACESYMBOLS			// Trace function names on calls - really slow, I think!
+//#define TRACEREGISTERS		// Trace register values on each instruction - ULTRA SLOW
+//#define TRACEFPUREGS			// Trace the FPU registers (cop1)
 
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG
@@ -66,4 +69,7 @@
 #endif
 #ifndef RUNTIMEDEBUG
 #undef RUNTIMEREGS
+#endif
+#ifndef TRACE
+#undef TRACESYMBOLS
 #endif

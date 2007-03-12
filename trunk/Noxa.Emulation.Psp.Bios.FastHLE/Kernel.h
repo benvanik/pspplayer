@@ -13,6 +13,7 @@
 
 using namespace System;
 using namespace System::Collections::Generic;
+using namespace System::IO;
 using namespace System::Threading;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Games;
@@ -40,6 +41,7 @@ namespace Noxa {
 					ICpuCore^							_core0;
 					GameInformation^					_game;
 					AutoResetEvent^						_gameEvent;
+					Stream^								_bootStream;
 
 					int									_lastId;
 					Dictionary<int, KernelHandle^>^		_handles;
@@ -78,6 +80,14 @@ namespace Noxa {
 					{
 						virtual GameInformation^ get();
 						virtual void set( GameInformation^ value );
+					}
+
+					property Stream^ BootStream
+					{
+						virtual Stream^ get()
+						{
+							return _bootStream;
+						}
 					}
 
 					property KernelThread^ ActiveThread

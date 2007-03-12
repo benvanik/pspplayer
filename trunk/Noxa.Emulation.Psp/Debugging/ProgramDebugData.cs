@@ -20,6 +20,9 @@ namespace Noxa.Emulation.Psp.Debugging
 				case DebugDataType.Elf:
 					ElfDebugData edd = new ElfDebugData( stream );
 					return edd;
+				case DebugDataType.Symbols:
+					SimpleElfDebugData sdd = new SimpleElfDebugData( stream );
+					return sdd;
 				case DebugDataType.Objdump:
 					ObjdumpDebugData odd = new ObjdumpDebugData( stream );
 					return odd;

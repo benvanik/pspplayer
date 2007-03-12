@@ -12,9 +12,10 @@ namespace Noxa.Emulation.Psp.Debugging
 
 		protected Dictionary<int, Instruction> _instructions;
 
-		protected Method( int entryAddress, string name )
+		protected Method( int entryAddress, int length, string name )
 		{
 			_entryAddress = entryAddress;
+			_length = length;
 			_name = name;
 
 			_instructions = new Dictionary<int, Instruction>();
@@ -33,6 +34,14 @@ namespace Noxa.Emulation.Psp.Debugging
 			get
 			{
 				return _name;
+			}
+		}
+
+		public int Length
+		{
+			get
+			{
+				return _length;
 			}
 		}
 
