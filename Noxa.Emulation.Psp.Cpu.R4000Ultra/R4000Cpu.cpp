@@ -182,13 +182,13 @@ int R4000Cpu::ExecuteBlock()
 	uint instructionsExecuted = _instructionsExecuted - startInstrExec;
 	_stats->IPS = ( _stats->IPS * .8 ) + ( ( ( double )instructionsExecuted / blockTime ) * .2 );
 	
-	_timeSinceLastIpsPrint += blockTime;
-	if( _timeSinceLastIpsPrint > 1.0 )
-	{
-		double ips = ( ( double )instructionsExecuted / blockTime );
-		//Debug::WriteLine( String::Format( "IPS: {0}", ( long )ips ) );
-		_timeSinceLastIpsPrint = 0.0;
-	}
+	//_timeSinceLastIpsPrint += blockTime;
+	//if( _timeSinceLastIpsPrint > 1.0 )
+	//{
+	//	double ips = ( ( double )instructionsExecuted / blockTime );
+	//	Debug::WriteLine( String::Format( "IPS: {0}", ( long )ips ) );
+	//	_timeSinceLastIpsPrint = 0.0;
+	//}
 
 	return instructionsExecuted;
 #else
