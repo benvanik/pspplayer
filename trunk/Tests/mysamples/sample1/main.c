@@ -8,6 +8,7 @@
 #include <pspdebug.h>
 #include <stdio.h>
 #include <zlib.h>
+#include <string.h>
 
 PSP_MODULE_INFO( "sample1", 0, 1, 1 );
 PSP_MAIN_THREAD_ATTR( THREAD_ATTR_USER | THREAD_ATTR_VFPU );
@@ -17,8 +18,14 @@ int main( int argc, char *argv[] )
 	//pspDebugScreenInit();
 	//pspDebugScreenPrintf( "Hello World\n" );
 
-	volatile int x = -10;
-	fprintf( stderr, "%d", x );
+	unsigned char xx[ 8 ] = { 0x00, 0xaa, 0x69, 0x71, 0xde, 0x00, 0x00, 0x00 };
+	unsigned char yy[ 4 ] = { 0 };
+	memcpy( yy, xx + 1, 4 );
+	int z = *( (int*)(char*)yy );
+	sceKernelSelfStopUnloadModule( z, 0, 0 );
+
+	//volatile int x = -10;
+	//fprintf( stderr, "%d", x );
 
 	//volatile unsigned long long x = -10;
 	//volatile unsigned long long y = 2;

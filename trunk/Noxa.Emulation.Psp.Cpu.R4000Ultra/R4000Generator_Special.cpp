@@ -277,6 +277,11 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 
 extern void __runtimeRegsPrint();
 extern void __runtimeDebugPrintForce( int address, int code );
+void __dumpMemory()
+{
+	R4000Memory^ memory = R4000Cpu::GlobalCpu->_memory;
+	memory->DumpMainMemory( "dump.bin" );
+}
 
 GenerationResult BREAK( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
@@ -292,6 +297,7 @@ GenerationResult BREAK( R4000GenContext^ context, int pass, int address, uint co
 		g->call( ( int )&__runtimeDebugPrintForce );
 		g->add( ESP, 8 );
 		g->call( ( int )&__runtimeRegsPrint );
+		g->call( ( int )&__dumpMemory );
 		g->int3();
 #endif
 	}
