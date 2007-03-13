@@ -42,10 +42,10 @@ bool CTGATexture::LoadTGA( char *filename )
 		// if couldn't open, exit
 		return false;
 	}
-	
+
 	// Read in BitmapHeader info into the structure
 	fread( &tgaHeader, 1, sizeof(tgaHeader), pFile );
-	
+
 	// We only want to read uncompressed TGA's. Chech the 
 	// header if it is of an uncompressed one.
 	if( memcmp( unCompressHeader, tgaHeader, sizeof(unCompressHeader)) != 0 ) {

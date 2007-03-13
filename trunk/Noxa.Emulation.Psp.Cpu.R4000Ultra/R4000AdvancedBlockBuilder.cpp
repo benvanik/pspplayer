@@ -35,7 +35,7 @@ using namespace SoftWire;
 
 // Maximum number of instructions per block - things are NOT handled
 // properly when the code hits this limit, so it should be high!
-#define MAXCODELENGTH 50
+#define MAXCODELENGTH 200
 
 // Debugging addresses
 //#define BREAKADDRESS1		0x0895c9b8
@@ -46,6 +46,8 @@ extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
 extern uint _jumpBlockInlineHits;
 extern uint _jumpBlockInlineMisses;
+
+#define ENDADDRESS ( startAddress + ( maxCodeLength << 2 ) )
 
 R4000AdvancedBlockBuilder::R4000AdvancedBlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 	: R4000BlockBuilder( cpu, core )
@@ -472,7 +474,8 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 					LabelMarker^ lm = _ctx->BranchTarget;
 					Debug::Assert( lm != nullptr );
 
-					if( _ctx->IsBranchLocal( lm->Address ) == true )
+					if( ( _ctx->IsBranchLocal( lm->Address ) == true ) &&
+						( lm->Address <= ENDADDRESS ) )
 					{
 						g->cmp( MPCVALID( CTXP( _ctx->CtxPointer ) ), 1 );
 						g->mov( MPCVALID( CTXP( _ctx->CtxPointer ) ), 0 );
@@ -582,6 +585,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 #endif
 						// Special case of when we hit the upper bound of the max block size
 						// We just generatetail to the next instruction
+						_ctx->UpdatePC = false;
 						GenerateTail( address - 4, true, address );
 					}
 					else
