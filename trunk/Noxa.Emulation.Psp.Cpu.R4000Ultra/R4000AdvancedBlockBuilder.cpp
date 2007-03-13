@@ -35,12 +35,12 @@ using namespace SoftWire;
 
 // Maximum number of instructions per block - things are NOT handled
 // properly when the code hits this limit, so it should be high!
-#define MAXCODELENGTH 200
+#define MAXCODELENGTH 50
 
 // Debugging addresses
 //#define BREAKADDRESS1		0x0895c9b8
 //#define BREAKADDRESS2		0x0895ce9c
-//#define GENBREAKADDRESS		0x0
+//#define GENBREAKADDRESS		0x08900ae4
 
 extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
@@ -77,22 +77,28 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 	char nullDelayLabel[ 30 ];
 	char nullDelayLabelSkip[ 30 ];
 
+	int maxCodeLength = MAXCODELENGTH;
 	for( int pass = 0; pass <= 1; pass++ )
 	{
 		if( pass == 1 )
 			GeneratePreamble();
 
+		// Regarding maxCodeLength, we need to be able to pad out block lengths by 1 in
+		// the case of hitting the max while in a delay slot. Nasty, but it should work
+
 		_ctx->InDelay = false;
 		_ctx->JumpTarget = NULL;
 		_ctx->JumpRegister = 0;
 		bool breakOut = false;
+		bool maxLengthHit = false;
 		bool checkNullDelay = false;
 		int address = startAddress;
-		for( int n = 0; n < MAXCODELENGTH; n++ )
+		for( int n = 0; n < maxCodeLength; n++ )
 		{
 			GenerationResult result = GenerationResult::Invalid;
 
-			//Debug::Assert( n < MAXCODELENGTH - 1 );
+			//Debug::Assert( n < maxCodeLength - 1 );
+			maxLengthHit = ( n == maxCodeLength - 1 );
 
 			bool inDelay = _ctx->InDelay;
 			uint code = ( uint )_memory->ReadWord( address );
@@ -102,7 +108,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 #if _DEBUG
 			// Debug breakpoint on instruction
 #ifdef GENBREAKADDRESS
-			if( pass == 0 ){ if( address == GENBREAKADDRESS ) Debugger::Break(); }
+			if( address == GENBREAKADDRESS ) Debugger::Break();
 #endif
 #ifdef BREAKADDRESS1
 			if( pass == 1 ){ if( address == BREAKADDRESS1 ) g->int3(); }
@@ -407,6 +413,20 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 			case GenerationResult::Jump:
 			case GenerationResult::BranchAndNullifyDelay:
 				_ctx->UpdatePC = true;
+				if( pass == 0 )
+				{
+					if( maxLengthHit == true )
+					{
+						// Handling for max block size padding
+						// By upping this, we will loop once more before ending!
+#ifdef VERBOSEBUILD
+						Debug::WriteLine( String::Format( "Max code length {0} hit at 0x{2:X8}, but block would end on br/j, so extending to {1}",
+							maxCodeLength, maxCodeLength + 1, address - 4 ) );
+#endif
+						maxCodeLength++;
+						maxLengthHit = false;
+					}
+				}
 				break;
 			case GenerationResult::Syscall:
 				_ctx->UseSyscalls = true;
@@ -554,7 +574,19 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 					GenerateTail( address - 4, true, -1 );
 				}
 				else
-					GenerateTail( address - 4, false, 0 );
+				{
+					if( maxLengthHit == true )
+					{
+#ifdef VERBOSEBUILD
+						Debug::WriteLine( String::Format( "Breaking out early due to max code length limit (ending on 0x{0:X8}, continuing to 0x{1:X8}", address - 4, address ) );
+#endif
+						// Special case of when we hit the upper bound of the max block size
+						// We just generatetail to the next instruction
+						GenerateTail( address - 4, true, address );
+					}
+					else
+						GenerateTail( address - 4, false, 0 );
+				}
 			}
 		}
 	}

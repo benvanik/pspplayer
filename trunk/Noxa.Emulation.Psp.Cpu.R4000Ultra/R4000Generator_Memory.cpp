@@ -477,7 +477,6 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 		// NOTE: we technically don't need to and the register here,
 		// as shifting will do it for us!
 
-		g->int3();
 		g->and( ECX, 0x3 ); // ecx = address (in ecx) & 0x3
 		g->xor( ECX, 3 );	// invert
 		g->shl( ECX, 3 );	// *= 8
@@ -565,7 +564,6 @@ GenerationResult SWR( R4000GenContext^ context, int pass, int address, uint code
 		// NOTE: we technically don't need to and the register here,
 		// as shifting will do it for us!
 
-		g->int3();
 		g->and( ECX, 0x3 ); // ecx = address (in ecx) & 0x3
 		g->shl( ECX, 3 );	// *= 8
 		g->mov( EBX, 0xFFFFFFFF );
