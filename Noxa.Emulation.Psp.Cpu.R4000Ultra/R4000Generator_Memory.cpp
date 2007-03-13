@@ -225,7 +225,7 @@ GenerationResult LWL( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
+		//LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		if( imm != 0 )
 			g->add( EAX, SE( imm ) );
@@ -237,76 +237,41 @@ GenerationResult LWL( R4000GenContext^ context, int pass, int address, uint code
 		EmitDirectMemoryRead( context, address );
 
 		// Build final data - done as follows:
-		/*if( ebx == 0 )
-			final = ( oldreg & 0x000000FF ) | ( ( mem & 0x00FFFFFF ) << 8 );
+		/*
+		if( ebx == 0 )
+			final = ( oldreg & 0x00FFFFFF ) | ( ( mem << 24 ) & 0xFF000000 );	- m 24
 		else if( ebx == 1 )
-			final = ( oldreg & 0x0000FFFF ) | ( ( mem & 0x0000FFFF ) << 16 );
+			final = ( oldreg & 0x0000FFFF ) | ( ( mem << 16 ) & 0xFFFF0000 );	- m 16
 		else if( ebx == 2 )
-			final = ( oldreg & 0x00FFFFFF ) | ( ( mem & 0x000000FF ) << 24 );
+			final = ( oldreg & 0x000000FF ) | ( ( mem << 8 ) & 0xFFFFFF00 );	- m 8
 		else if( ebx == 3 )
-			final = mem;*/
-		char ebx0[20], ebx1[20], ebx2[20], done[20];
-		sprintf_s( ebx0, 20, "l%0Xx0", address - 4 );
-		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
-		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
-		sprintf_s( done, 20, "l%0Xxd", address - 4 );
+			final = ( oldreg & 0x00000000 ) | ( ( mem << 0 ) & 0xFFFFFFFF );	- m 0	
+		*/
 
-		g->mov( EBX, ECX );
-		g->and( EBX, 0x3 ); // ebx = address & 0x3
+		// With this, we do:
+		// ecx = [0...3] (from addr)
+		// ecx = xor 3 (invert bits to make easier)
+		// ecx *= 8 (so [0...24])
+		// ebx = 0xFFFFFFFF << cl
+		// ebx is now the mask for the memory!
+		// invert to get mask for oldreg!
 
-		// We use bl as byte offset and bh as comparer for switch
-		// if bl == 0
-		g->mov( BH, 0 );
-		g->cmp( BL, BH );
-		g->je( ebx0 );
+		g->and( ECX, 0x3 ); // ecx = address (in ecx) & 0x3
+		g->xor( ECX, 0x3 );
+		g->shl( ECX, 3 );	// *= 8
+		g->mov( EBX, 0xFFFFFFFF );
+		g->shl( EBX, CL );
 
-		// if bl == 1
-		g->inc( BH );
-		g->cmp( BL, BH );
-		g->je( ebx1 );
+		g->shl( EAX, CL );		// shift memory over to match mask
+		g->and( EAX, EBX );		// mem (in eax) &= mask in ebx
 
-		// if bl == 2
-		g->inc( BH );
-		g->cmp( BL, BH );
-		g->je( ebx2 );
+		g->not( EBX );			// invert mask for oldreg
+		g->mov( ECX, MREG( CTX, rt ) );
+		g->and( ECX, EBX );		// oldreg (in ecx) &= mask in ebx
 
-		// EAX = memory value
-		// EBX = put data to write here
-		
-		// case ebx == 3 (fallthrough from above) final = mem;
-		g->mov( EBX, EAX );
-		g->jmp( done );
+		g->or( EAX, ECX );		// mem | oldreg
 
-		// case ebx == 0 final = ( oldreg & 0x000000FF ) | ( ( mem & 0x00FFFFFF ) << 8 );
-		g->label( ebx0 );
-		g->and( EAX, 0x00FFFFFF );
-		g->shl( EAX, 8 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->and( EBX, 0x000000FF );
-		g->or( EBX, EAX );
-		g->jmp( done );
-
-		// case ebx == 1 final = ( oldreg & 0x0000FFFF ) | ( ( mem & 0x0000FFFF ) << 16 );
-		g->label( ebx1 );
-		g->and( EAX, 0x0000FFFF );
-		g->shl( EAX, 16 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->and( EBX, 0x0000FFFF );
-		g->or( EBX, EAX );
-		g->jmp( done );
-
-		// case ebx == 2 final = ( oldreg & 0x00FFFFFF ) | ( ( mem & 0x000000FF ) << 24 );
-		g->label( ebx2 );
-		g->and( EAX, 0x000000FF );
-		g->shl( EAX, 24 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->and( EBX, 0x00FFFFFF );
-		g->or( EBX, EAX );
-		// No jump - fall through
-
-		// Store data back
-		g->label( done );
-		g->mov( MREG( CTX, rt ), EBX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -396,76 +361,39 @@ GenerationResult LWR( R4000GenContext^ context, int pass, int address, uint code
 		EmitDirectMemoryRead( context, address );
 
 		// Build final data - done as follows:
-		/*if( ebx == 0 )
-			final = mem;
+		/*
+		if( ebx == 0 )
+			final = ( oldreg & 0x00000000 ) | ( ( mem >> 0 ) & 0xFFFFFFFF );	- m 0
 		else if( ebx == 1 )
-			final = ( oldreg & 0xFF000000 ) | ( ( mem & 0xFFFFFF00 ) >> 8 );
+			final = ( oldreg & 0xFF000000 ) | ( ( mem >> 8 ) & 0x00FFFFFF );	- m 8
 		else if( ebx == 2 )
-			final = ( oldreg & 0xFFFF0000 ) | ( ( mem & 0xFFFF0000 ) >> 16 );
-		else if( ebx == 3 )
-			final = ( oldreg & 0xFFFFFF00 ) | ( ( mem & 0xFF000000 ) >> 24 );*/
-		char ebx3[20], ebx2[20], ebx1[20], done[20];
-		sprintf_s( ebx3, 20, "l%0Xx3", address - 4 );
-		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
-		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
-		sprintf_s( done, 20, "l%0Xxd", address - 4 );
+			final = ( oldreg & 0xFFFF0000 ) | ( ( mem >> 16 ) & 0x0000FFFF );	- m 16
+		if( ebx == 3 )
+			final = ( oldreg & 0xFFFFFF00 ) | ( ( mem >> 24 ) & 0x000000FF );	- m 24
+		*/
 
-		g->mov( EBX, ECX );
-		g->and( EBX, 0x3 ); // ebx = address & 0x3
+		// With this, we do:
+		// ecx = [0...3] (from addr)
+		// ecx *= 8 (so [0...24])
+		// ebx = 0xFFFFFFFF >> cl
+		// ebx is now the mask for the memory!
+		// invert to get mask for oldreg!
 
-		// We use bl as byte offset and bh as comparer for switch
-		// if bl == 3
-		g->mov( BH, 3 );
-		g->cmp( BL, BH );
-		g->je( ebx3 );
+		g->and( ECX, 0x3 ); // ecx = address (in ecx) & 0x3
+		g->shl( ECX, 3 );	// *= 8
+		g->mov( EBX, 0xFFFFFFFF );
+		g->shr( EBX, CL );
 
-		// if bl == 2
-		g->dec( BH );
-		g->cmp( BL, BH );
-		g->je( ebx2 );
+		g->shr( EAX, CL );		// shift to match mask
+		g->and( EAX, EBX );		// mem (in eax) &= mask in ebx
 
-		// if bl == 1
-		g->dec( BH );
-		g->cmp( BL, BH );
-		g->je( ebx1 );
+		g->not( EBX );			// invert mask for oldreg
+		g->mov( ECX, MREG( CTX, rt ) );
+		g->and( ECX, EBX );		// oldreg (in ecx) &= mask in ebx
 
-		// EAX = memory value
-		// EBX = put data to write here
-		
-		// case ebx == 0 (fallthrough from above) final = mem;
-		g->mov( EBX, EAX );
-		g->jmp( done );
+		g->or( EAX, ECX );		// mem | oldreg
 
-		// case ebx == 3 final = ( oldreg & 0xFF000000 ) | ( ( mem & 0xFFFFFF00 ) >> 8 );
-		g->label( ebx3 );
-		g->and( EAX, 0xFFFFFF00 );
-		g->shr( EAX, 8 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->and( EBX, 0xFF000000 );
-		g->or( EBX, EAX );
-		g->jmp( done );
-
-		// case ebx == 2 final = ( oldreg & 0xFFFF0000 ) | ( ( mem & 0xFFFF0000 ) >> 16 );
-		g->label( ebx2 );
-		g->and( EAX, 0xFFFF0000 );
-		g->shr( EAX, 16 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->and( EBX, 0xFFFF0000 );
-		g->or( EBX, EAX );
-		g->jmp( done );
-
-		// case ebx == 1 final = ( oldreg & 0xFFFFFF00 ) | ( ( mem & 0xFF000000 ) >> 24 );
-		g->label( ebx1 );
-		g->and( EAX, 0xFF000000 );
-		g->shr( EAX, 24 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->and( EBX, 0xFFFFFF00 );
-		g->or( EBX, EAX );
-		// No jump - fall through
-
-		// Store data back
-		g->label( done );
-		g->mov( MREG( CTX, rt ), EBX );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -515,7 +443,7 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
+		//LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		if( imm != 0 )
 			g->add( EAX, SE( imm ) );
@@ -527,78 +455,51 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 		EmitDirectMemoryRead( context, address );
 
 		// Build final data - done as follows:
-		/*if( ebx == 0 )
-			final = ( mem & 0xFFFFFF00 ) | ( ( source >> 24 ) & 0x000000FF );
+		/*
+		if( ebx == 0 )
+			final = ( ( reg >> 24 ) & 0x000000FF ) | ( mem & 0xFFFFFF00 );	- m 24
 		else if( ebx == 1 )
-			final = ( mem & 0xFFFF0000 ) | ( ( source >> 16 ) & 0x0000FFFF );
+			final = ( ( reg >> 16 ) & 0x0000FFFF ) | ( mem & 0xFFFF0000 );	- m 16
 		else if( ebx == 2 )
-			final = ( mem & 0xFF000000 ) | ( ( source >> 8 ) & 0x00FFFFFF );
+			final = ( ( reg >> 8 ) & 0x00FFFFFF ) | ( mem & 0xFF000000 );	- m 8
 		else if( ebx == 3 )
-			final = source;*/
-		char ebx0[20], ebx1[20], ebx2[20], done[20];
-		sprintf_s( ebx0, 20, "l%0Xx0", address - 4 );
-		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
-		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
-		sprintf_s( done, 20, "l%0Xxd", address - 4 );
+			final = ( ( reg >> 0 ) & 0xFFFFFFFF ) | ( mem & 0x00000000 );	- m 0
+		*/
 
-		g->mov( EBX, ECX );
-		g->and( EBX, 0x3 ); // ebx = address & 0x3
+		// With this, we do:
+		// ecx = [0...3] (from addr)
+		// ecx = xor 3 (invert to make easier)
+		// ecx *= 8 (so [0...24])
+		// ebx = 0xFFFFFFFF >> cl
+		// ebx is now the mask for the reg!
+		// invert to get mask for memory!
 
-		// We use bl as byte offset and bh as comparer for switch
-		// if bl == 0
-		g->mov( BH, 0 );
-		g->cmp( BL, BH );
-		g->je( ebx0 );
+		// NOTE: we technically don't need to and the register here,
+		// as shifting will do it for us!
 
-		// if bl == 1
-		g->inc( BH );
-		g->cmp( BL, BH );
-		g->je( ebx1 );
+		g->int3();
+		g->and( ECX, 0x3 ); // ecx = address (in ecx) & 0x3
+		g->xor( ECX, 3 );	// invert
+		g->shl( ECX, 3 );	// *= 8
+		g->mov( EBX, 0xFFFFFFFF );
+		g->shr( EBX, CL );
 
-		// if bl == 2
-		g->inc( BH );
-		g->cmp( BL, BH );
-		g->je( ebx2 );
+		g->mov( EDX, MREG( CTX, rt ) );
+		g->shr( EDX, CL );		// shift to match mask
+		g->and( EDX, EBX );		// reg (in ecx) &= mask in ebx
 
-		// EAX = memory value
-		// EBX = put data to write here
-		// ECX = address
+		g->not( EBX );			// invert mask for memory
+		g->and( EAX, EBX );		// mem (in eax) &= mask in ebx
+
+		g->or( EAX, EDX );		// mem | oldreg
+
+		g->mov( EBX, EAX );
 		
-		// case ebx == 3 (fallthrough from above) final = source;
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->jmp( done );
-
-		// case ebx == 0 final = ( mem & 0xFFFFFF00 ) | ( ( source >> 24 ) & 0x000000FF );
-		g->label( ebx0 );
-		g->and( EAX, 0xFFFFFF00 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->shr( EBX, 24 );
-		g->and( EBX, 0x000000FF );
-		g->or( EBX, EAX );
-		g->jmp( done );
-
-		// case ebx == 1 final = ( mem & 0xFFFF0000 ) | ( ( source >> 16 ) & 0x0000FFFF );
-		g->label( ebx1 );
-		g->and( EAX, 0xFFFF0000 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->shr( EBX, 16 );
-		g->and( EBX, 0x0000FFFF );
-		g->or( EBX, EAX );
-		g->jmp( done );
-
-		// case ebx == 2 final = ( mem & 0xFF000000 ) | ( ( source >> 8 ) & 0x00FFFFFF );
-		g->label( ebx2 );
-		g->and( EAX, 0xFF000000 );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->shr( EBX, 8 );
-		g->and( EBX, 0x00FFFFFF );
-		g->or( EBX, EAX );
-		// No jump - fall through
-
-		// Store data back
-		g->label( done );
-		g->mov( EAX, ECX );
-		g->and( EAX, 0xFFFFFFFC );
+		// Reget the address!
+		g->mov( EAX, MREG( CTX, rs ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
+		EmitAddressTranslation( g );
 		// Write EBX to address EAX
 		EmitDirectMemoryWrite( context, address, 4 );
 	}
@@ -631,7 +532,7 @@ GenerationResult SWR( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
+		//LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		if( imm != 0 )
 			g->add( EAX, SE( imm ) );
@@ -643,80 +544,49 @@ GenerationResult SWR( R4000GenContext^ context, int pass, int address, uint code
 		EmitDirectMemoryRead( context, address );
 
 		// Build final data - done as follows:
-		/*if( ebx == 0 )
-			final = source;
+		/*
+		if( ebx == 0 )
+			final = ( ( reg << 0 ) & 0xFFFFFFFF ) | ( mem & 0x00000000 );	- m 24
 		else if( ebx == 1 )
-			final = ( mem & 0x000000FF ) | ( ( source << 8 ) & 0xFFFFFF00 );
+			final = ( ( reg << 8 ) & 0xFFFFFF00 ) | ( mem & 0x000000FF );	- m 16
 		else if( ebx == 2 )
-			final = ( mem & 0x0000FFFF ) | ( ( source << 16 ) & 0xFFFF0000 );
+			final = ( ( reg << 16 ) & 0xFFFF0000 ) | ( mem & 0x0000FFFF );	- m 8
 		else if( ebx == 3 )
-			final = ( mem & 0x00FFFFFF ) | ( ( source << 24 ) & 0xFF000000 );
-			*/
-		char ebx3[20], ebx2[20], ebx1[20], done[20];
-		sprintf_s( ebx3, 20, "l%0Xx3", address - 4 );
-		sprintf_s( ebx2, 20, "l%0Xx2", address - 4 );
-		sprintf_s( ebx1, 20, "l%0Xx1", address - 4 );
-		sprintf_s( done, 20, "l%0Xxd", address - 4 );
+			final = ( ( reg << 24 ) & 0xFF000000 ) | ( mem & 0x00FFFFFF );	- m 0
+		*/
 
-		g->mov( EBX, ECX );
-		g->and( EBX, 0x3 ); // ebx = address & 0x3
+		// With this, we do:
+		// ecx = [0...3] (from addr)
+		// ecx *= 8 (so [0...24])
+		// ebx = 0xFFFFFFFF << cl
+		// ebx is now the mask for the reg!
+		// invert to get mask for memory!
 
-		// We use bl as byte offset and bh as comparer for switch
-		// REVERSE OF SWL as we want fallthrough case to be the same
-		// if bl == 3
-		g->mov( BH, 3 );
-		g->cmp( BL, BH );
-		g->je( ebx3 );
+		// NOTE: we technically don't need to and the register here,
+		// as shifting will do it for us!
 
-		// if bl == 2
-		g->dec( BH );
-		g->cmp( BL, BH );
-		g->je( ebx2 );
+		g->int3();
+		g->and( ECX, 0x3 ); // ecx = address (in ecx) & 0x3
+		g->shl( ECX, 3 );	// *= 8
+		g->mov( EBX, 0xFFFFFFFF );
+		g->shr( EBX, CL );
 
-		// if bl == 1
-		g->dec( BH );
-		g->cmp( BL, BH );
-		g->je( ebx1 );
+		g->mov( EDX, MREG( CTX, rt ) );
+		g->shl( EDX, CL );		// shift to match mask
+		g->and( EDX, EBX );		// reg (in ecx) &= mask in ebx
 
-		// EAX = memory value
-		// EBX = put data to write here
-		// ECX = address
-		
-		// case ebx == 0 (fallthrough from above) final = source;
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->jmp( done );
+		g->not( EBX );			// invert mask for memory
+		g->and( EAX, EBX );		// mem (in eax) &= mask in ebx
 
-		// case ebx == 1 final = ( mem & 0x000000FF ) | ( ( source << 8 ) & 0xFFFFFF00 );
-		g->label( ebx1 );
-		g->and( EAX, 0x000000FF );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->shl( EBX, 8 );
-		g->and( EBX, 0xFFFFFF00 );
-		g->or( EBX, EAX );
-		g->jmp( done );
+		g->or( EAX, EDX );		// mem | oldreg
 
-		// case ebx == 2 final = ( mem & 0x0000FFFF ) | ( ( source << 16 ) & 0xFFFF0000 );
-		g->label( ebx2 );
-		g->and( EAX, 0x0000FFFF );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->shl( EBX, 16 );
-		g->and( EBX, 0xFFFF0000 );
-		g->or( EBX, EAX );
-		g->jmp( done );
+		g->mov( EBX, EAX );
 
-		// case ebx == 3 final = ( mem & 0x00FFFFFF ) | ( ( source << 24 ) & 0xFF000000 );
-		g->label( ebx3 );
-		g->and( EAX, 0x00FFFFFF );
-		g->mov( EBX, MREG( CTX, rt ) );
-		g->shl( EBX, 24 );
-		g->and( EBX, 0xFF000000 );
-		g->or( EBX, EAX );
-		// No jump - fall through
-
-		// Store data back
-		g->label( done );
-		g->mov( EAX, ECX );
-		g->and( EAX, 0xFFFFFFFC );
+		// Reget the address!
+		g->mov( EAX, MREG( CTX, rs ) );
+		if( imm != 0 )
+			g->add( EAX, SE( imm ) );
+		EmitAddressTranslation( g );
 		// Write EBX to address EAX
 		EmitDirectMemoryWrite( context, address, 4 );
 	}
