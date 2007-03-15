@@ -500,6 +500,7 @@ GenerationResult SWL( R4000GenContext^ context, int pass, int address, uint code
 		if( imm != 0 )
 			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
+		g->and( EAX, 0xFFFFFFFC );		// word align
 		// Write EBX to address EAX
 		EmitDirectMemoryWrite( context, address, 4 );
 	}
@@ -587,6 +588,7 @@ GenerationResult SWR( R4000GenContext^ context, int pass, int address, uint code
 		if( imm != 0 )
 			g->add( EAX, SE( imm ) );
 		EmitAddressTranslation( g );
+		g->and( EAX, 0xFFFFFFFC );		// word align
 		// Write EBX to address EAX
 		EmitDirectMemoryWrite( context, address, 4 );
 	}

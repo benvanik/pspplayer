@@ -35,4 +35,9 @@ void Tracer::WriteLine( const char* line )
 	int dummy;
 	::WriteFile( _file, line, length, ( LPDWORD )&dummy, NULL );
 }
+
+void Tracer::Flush()
+{
+	::FlushFileBuffers( _file );
+}
 #pragma managed

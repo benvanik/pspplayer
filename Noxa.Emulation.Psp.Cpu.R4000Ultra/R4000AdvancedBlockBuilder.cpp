@@ -38,14 +38,16 @@ using namespace SoftWire;
 #define MAXCODELENGTH 200
 
 // Debugging addresses
-//#define BREAKADDRESS1		0x0895c9b8
-//#define BREAKADDRESS2		0x0895ce9c
+//#define BREAKADDRESS1		0x08906A00
+//#define BREAKADDRESS2		0x08906B14
 //#define GENBREAKADDRESS		0x08900ae4
 
 extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
 extern uint _jumpBlockInlineHits;
 extern uint _jumpBlockInlineMisses;
+
+void __flushTrace();
 
 #define ENDADDRESS ( startAddress + ( maxCodeLength << 2 ) )
 
@@ -113,10 +115,16 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 			if( address == GENBREAKADDRESS ) Debugger::Break();
 #endif
 #ifdef BREAKADDRESS1
-			if( pass == 1 ){ if( address == BREAKADDRESS1 ) g->int3(); }
+			if( pass == 1 ){ if( address == BREAKADDRESS1 ){
+				g->call( ( int )&__flushTrace );
+				g->int3();
+			} }
 #endif
 #ifdef BREAKADDRESS2
-			if( pass == 1 ){ if( address == BREAKADDRESS2 ) g->int3(); }
+			if( pass == 1 ){ if( address == BREAKADDRESS2 ){
+				g->call( ( int )&__flushTrace );
+				g->int3();
+			} }
 #endif
 #endif
 
