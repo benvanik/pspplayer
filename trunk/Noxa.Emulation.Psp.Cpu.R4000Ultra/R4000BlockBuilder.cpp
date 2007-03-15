@@ -132,6 +132,12 @@ void __traceLine( int address, int code )
 	__traceFpuRegs();
 #endif
 }
+
+void __flushTrace()
+{
+	Tracer::Flush();
+}
+
 #pragma managed
 #endif /* TRACE */
 

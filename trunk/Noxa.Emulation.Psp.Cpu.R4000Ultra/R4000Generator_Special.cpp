@@ -23,7 +23,7 @@ using namespace SoftWire;
 
 extern uint _nativeSyscallCount;
 
-//#define LOGSYSCALLS
+#define LOGSYSCALLS
 
 #define g context->Generator
 
