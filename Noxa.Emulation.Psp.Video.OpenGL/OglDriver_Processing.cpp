@@ -292,7 +292,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				int offset = vertexBufferAddress - MainMemoryBase;
 				assert( offset > 0 );
 				byte* ptr = context->MemoryPointer + offset;
-				SetTexture( context, 0 );
+				//SetTexture( context, 0 );
 				DrawVertexBuffer( context, primitiveType, primitiveCount, vertexType, vertexCount, vertexSize, ptr );
 			}
 			else

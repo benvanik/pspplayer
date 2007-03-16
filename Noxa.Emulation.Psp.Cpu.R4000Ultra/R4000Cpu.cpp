@@ -49,6 +49,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_lastSyscall = -1;
 	_syscalls = gcnew array<BiosFunction^>( 1024 );
 	_syscallShims = gcnew array<BiosShim^>( 1024 );
+	_syscallShimsN = gcnew array<IntPtr>( 1024 );
 #ifdef SYSCALLSTATS
 	_syscallCounts = gcnew array<int>( 1024 );
 #endif
@@ -88,6 +89,7 @@ int R4000Cpu::RegisterSyscall( unsigned int nid )
 	void* memory = ( void* )_memory->MainMemory;
 	void* registers = ( ( R4000Ctx* )_ctx )->Registers;
 	_syscallShims[ sid ] = EmitShim( function, memory, registers );
+	_syscallShimsN[ sid ] = IntPtr( EmitShimN( function, memory, registers ) );
 
 	return sid;
 }

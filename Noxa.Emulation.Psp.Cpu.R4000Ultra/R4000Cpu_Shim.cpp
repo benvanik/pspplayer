@@ -11,6 +11,7 @@
 #include "Tracer.h"
 
 #include "R4000Ctx.h"
+#include "R4000Generator.h"
 #include "R4000BiosStubs.h"
 
 using namespace System::Diagnostics;
@@ -257,4 +258,134 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 	Debug::Assert( del != nullptr );
 
 	return del;
+}
+
+void* R4000Cpu::EmitShimN( BiosFunction^ function, void* memory, void* registers )
+{
+	R4000Generator* g = _context->Generator;
+
+	MethodInfo^ mi = function->MethodInfo;
+	bool hasReturn = ( mi->ReturnType != void::typeid );
+	bool wideReturn = ( mi->ReturnType == Int64::typeid );
+
+	g->push( EBP );
+	g->mov( EBP, ESP );
+
+	// Push on parameters (with double words aligned on dword boundaries)
+	// Since the logic is pretty trivial going forward, and harder to see going back,
+	// I just do it forward and then reverse it :)
+	Debug::Assert( function->ParameterCount <= 8 );
+	int regAddresses[ 8 ];
+	memset( regAddresses, 0, sizeof( int ) * 8 );
+	int regOffset = 0;
+	int x86regOffset = 0;
+	for( int n = 0; n < function->ParameterCount; n++ )
+	{
+		if( regOffset < 8 )
+		{
+			bool isWide = function->ParameterWidths[ n ];
+			if( isWide == true )
+			{
+				if( regOffset % 2 == 1 )
+				{
+					// Unaligned dword argument - increment regOffset to skip over a register!
+					regOffset++;
+				}
+			}
+
+			int registerAddress = ( int )registers + ( ( regOffset + 4 ) << 2 );
+			regAddresses[ x86regOffset ] = registerAddress;
+
+			if( isWide == false )
+			{
+				// 32 bit load
+				regOffset++;
+				x86regOffset++;
+			}
+			else
+			{
+				// 64 bit load
+				regAddresses[ x86regOffset + 1 ] = registerAddress + 4;
+				regOffset += 2;
+				x86regOffset += 2;
+			}
+		}
+		else
+		{
+			// Emit sp + 0/4/8/12
+			// value = memory[ ( reg( sp ) - 0x08000000 ) + offset ]
+			Debug::Assert( false, "Memory spilling not supported in native shims!" );
+			throw gcnew NotImplementedException();
+
+			// Don't currently support dwords - we could easily by just writing
+			// twice and +2 to regOffset, but don't cause I won't do it unless
+			// I have to
+			//Debug::Assert( function->ParameterWidths[ n ] == false );
+
+			//int spAddress = ( int )registers + ( 29 << 2 );	// sp = $29...
+			//int spOffset = ( regOffset - 8 ) << 2;			// Offset from sp in words
+
+			//ilgen->Emit( OpCodes::Ldc_I4, spAddress );		// load sp address
+			//ilgen->Emit( OpCodes::Conv_I );
+			//ilgen->Emit( OpCodes::Ldind_I4 );				// load $sp
+			//ilgen->Emit( OpCodes::Ldc_I4, MainMemoryBase );	// 0x08000000
+			//ilgen->Emit( OpCodes::Conv_I );
+			//ilgen->Emit( OpCodes::Sub );					// addr = $sp - 0x08000000
+			//ilgen->Emit( OpCodes::Ldc_I4, spOffset );		// offset + 0..4 words
+			//ilgen->Emit( OpCodes::Conv_I );
+			//ilgen->Emit( OpCodes::Add );					// addr = ( $sp - 0x08000000 ) + offset
+			//ilgen->Emit( OpCodes::Ldc_I4, ( int )memory );	// load memory
+			//ilgen->Emit( OpCodes::Conv_I );
+			//ilgen->Emit( OpCodes::Add );					// finaladdr = addr + memory ptr
+			//ilgen->Emit( OpCodes::Ldind_I4 );				// load value
+
+			//regOffset++;
+		}
+	}
+
+	// Really push parameters on in reverse order
+	for( int n = x86regOffset - 1; n >= 0; n-- )
+	{
+		if( regAddresses[ n ] != 0 )
+			g->push( g->dword_ptr[ regAddresses[ n ] ] );
+	}
+
+	// Handle memory usage - this is always the first parameter
+	if( function->UsesMemorySystem == true )
+		g->push( ( uint )memory );
+
+	// Invoke method
+	g->call( ( int )function->NativeMethod.ToPointer() );
+
+	g->add( ESP, ( x86regOffset - 1 ) * 4 );
+
+	// Handle return
+	if( hasReturn == true )
+	{
+		int v0address = ( int )( ( byte* )registers + ( 2 << 2 ) );
+		g->mov( g->dword_ptr[ v0address ], EAX );				// store to $v0
+		if( wideReturn == true )
+			g->mov( g->dword_ptr[ v0address + 4 ], EDX );		// store upper to $v1
+	}
+	else
+	{
+#ifdef SAFESYSCALLRETURN
+		// Always set v0 ($2) to 0, because a lot of our stubs may say they have no return but really do
+		int v0address = ( int )( ( byte* )registers + ( 2 << 2 ) );
+		g->mov( g->dword_ptr[ v0address ], 0 );
+#endif
+	}
+
+	g->mov( ESP, EBP );
+	g->pop( EBP );
+
+	// This assumes caller address on top of the stack, which it should be
+	g->ret();
+
+	void* ptr = g->callable();
+	g->acquire();
+
+	g->reset();
+
+	return ptr;
 }
