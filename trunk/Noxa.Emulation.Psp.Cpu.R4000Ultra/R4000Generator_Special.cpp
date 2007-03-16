@@ -115,9 +115,10 @@ void __syscallBounce( int syscallId, int address )
 	shim( cpu );
 }
 
-void EmitNativeCall( R4000GenContext^ context, BiosFunction^ function )
+void EmitNativeCall( R4000GenContext^ context, BiosFunction^ function, int sid )
 {
-	Debug::Assert( false );
+	void* ptr = R4000Cpu::GlobalCpu->_syscallShimsN[ sid ].ToPointer();
+	g->call( ( uint )ptr );
 }
 
 GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte _function )
@@ -238,11 +239,11 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		{
 			// Couldn't do a native stub, so try to emit a native call
 
-			/*if( function->NativeMethod != IntPtr::Zero )
+			if( function->NativeMethod != IntPtr::Zero )
 			{
-				EmitNativeCall( context, function );
+				EmitNativeCall( context, function, syscall );
 			}
-			else*/
+			else
 			{
 				// We push $ra as the address cause it is where the stub will go back to
 				g->push( MREG( CTX, 31 ) );

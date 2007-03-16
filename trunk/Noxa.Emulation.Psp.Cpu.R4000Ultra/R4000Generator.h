@@ -20,6 +20,7 @@ using namespace SoftWire;
 #define ECX g->ecx
 #define EDX g->edx
 #define ESP g->esp
+#define EBP g->ebp
 #define AX g->ax
 #define BX g->bx
 #define CX g->cx

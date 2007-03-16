@@ -72,6 +72,7 @@ namespace Noxa {
 					int							_lastSyscall;
 					array<BiosFunction^>^		_syscalls;
 					array<BiosShim^>^			_syscallShims;
+					array<IntPtr>^				_syscallShimsN;
 #ifdef SYSCALLSTATS
 					array<int>^					_syscallCounts;
 #endif
@@ -265,6 +266,7 @@ namespace Noxa {
 				protected:
 					int LookupOrAddModule( IModule^ module );
 					BiosShim^ EmitShim( BiosFunction^ function, void* memory, void* registers );
+					void* EmitShimN( BiosFunction^ function, void* memory, void* registers );
 				};
 
 			}
