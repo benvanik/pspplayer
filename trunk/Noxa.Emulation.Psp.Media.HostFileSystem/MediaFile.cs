@@ -69,7 +69,7 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 					fsMode = FileMode.OpenOrCreate;
 					break;
 				case MediaFileMode.Append:
-					fsMode = FileMode.Append;
+					fsMode = FileMode.Open;
 					break;
 				case MediaFileMode.Truncate:
 					fsMode = FileMode.Truncate;
@@ -89,7 +89,14 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 					break;
 			}
 
-			return _info.Open( fsMode, fsAccess, FileShare.Read );
+			Stream stream = _info.Open( fsMode, fsAccess, FileShare.Read );
+
+			// Hack to overcome the Win32 limitation of not being able to
+			// open a file for read/write append
+			if( mode == MediaFileMode.Append )
+				stream.Seek( 0, SeekOrigin.End );
+
+			return stream;
 		}
 
 		public string Name

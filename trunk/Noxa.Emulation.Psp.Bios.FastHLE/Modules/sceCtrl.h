@@ -45,6 +45,10 @@ namespace Noxa {
 						ControlSamplingMode				_sampleMode;
 						CircularList<ControlSample^>^	_buffer;
 						AutoResetEvent^					_dataPresent;
+
+						uint							_pressedButtons;
+						uint							_makedButtons;
+						uint							_breakedButtons;
 						
 						bool							_threadRunning;
 						Thread^							_thread;
@@ -102,12 +106,10 @@ namespace Noxa {
 						// int sceCtrlReadBufferNegative(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:170)
 						int sceCtrlReadBufferNegative( IMemory^ memory, int pad_data, int count );
 
-						[NotImplemented]
 						[BiosFunction( 0xB1D0E5CD, "sceCtrlPeekLatch" )] [Stateless]
 						// int sceCtrlPeekLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:172)
 						int sceCtrlPeekLatch( IMemory^ memory, int latch_data );
 
-						[NotImplemented]
 						[BiosFunction( 0x0B588501, "sceCtrlReadLatch" )] [Stateless]
 						// int sceCtrlReadLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:174)
 						int sceCtrlReadLatch( IMemory^ memory, int latch_data );

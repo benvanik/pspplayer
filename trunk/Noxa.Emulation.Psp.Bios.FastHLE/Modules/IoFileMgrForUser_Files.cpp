@@ -220,7 +220,7 @@ int64 IoFileMgrForUser::sceIoLseek( int fd, int64 offset, int whence )
 			break;
 		case 1:
 			seekOrigin = SeekOrigin::Current;
-			Debug::Assert( handle->Stream->Position + offset < handle->Stream->Length );
+			Debug::Assert( handle->Stream->Position + offset <= handle->Stream->Length );
 			break;
 		case 2:
 			seekOrigin = SeekOrigin::End;
