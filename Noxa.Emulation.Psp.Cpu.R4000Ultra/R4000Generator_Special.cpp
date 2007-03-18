@@ -38,7 +38,10 @@ void __syscallBounce( int syscallId, int address )
 	{
 		R4000Ctx* ctx = ( R4000Ctx* )cpu->_ctx;
 
-		if( function->NID != 0x42EC03AC )	// ignore sceIoWrite
+		if( ( function->NID != 0x42EC03AC ) &&		// ignore sceIoWrite
+			( function->NID != 0x0B588501 ) &&		// ignore sceCtrlReadLatch
+			( function->NID != 0x3A622550 ) &&		// ignore sceCtrlPeekBufferPositive
+			( function->NID != 0x1F803938 ) )		// ignore sceCtrlReadBufferPositive
 		{
 			String^ args;
 			Debug::Assert( function->ParameterCount <= 12 );
