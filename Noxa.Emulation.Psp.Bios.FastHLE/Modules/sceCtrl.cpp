@@ -80,6 +80,15 @@ void sceCtrl::InputThread()
 				_buffer->Add( sample );
 				if( _buffer->Count == 1 )
 					_dataPresent->Set();
+
+				// Set pressed buttons list
+				uint oldPressed = _pressedButtons;
+				_pressedButtons = ( uint )sample->Buttons;
+				uint stillPressed = _pressedButtons & oldPressed;
+
+				// Set maked/breaked (pressed/released) buttons this last sample
+				_makedButtons = _pressedButtons & ~stillPressed;
+				_breakedButtons = oldPressed & ~stillPressed;
 			}
 			Monitor::Exit( this );
 
@@ -263,8 +272,34 @@ int sceCtrl::sceCtrlReadBufferNegative( IMemory^ memory, int pad_data, int count
 	return read;
 }
 
+//typedef struct SceCtrlLatch {
+//	unsigned int 	uiMake;		// keys pressed since last reading
+//	unsigned int 	uiBreak;	// keys released since last reading
+//	unsigned int 	uiPress;	// bitmask of pressed keys?
+//	unsigned int 	uiRelease;	// bitmask of released keys?
+//} SceCtrlLatch;
+
 // int sceCtrlPeekLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:172)
-int sceCtrl::sceCtrlPeekLatch( IMemory^ memory, int latch_data ){ return NISTUBRETURN; }
+int sceCtrl::sceCtrlPeekLatch( IMemory^ memory, int latch_data )
+{
+	memory->WriteWord( latch_data + 0, 4, _makedButtons );
+	memory->WriteWord( latch_data + 4, 4, _breakedButtons );
+	memory->WriteWord( latch_data + 8, 4, _pressedButtons );
+	memory->WriteWord( latch_data + 12, 4, ~_pressedButtons );
+
+	return 0;
+}
 
 // int sceCtrlReadLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:174)
-int sceCtrl::sceCtrlReadLatch( IMemory^ memory, int latch_data ){ return NISTUBRETURN; }
+int sceCtrl::sceCtrlReadLatch( IMemory^ memory, int latch_data )
+{
+	memory->WriteWord( latch_data + 0, 4, _makedButtons );
+	memory->WriteWord( latch_data + 4, 4, _breakedButtons );
+	memory->WriteWord( latch_data + 8, 4, _pressedButtons );
+	memory->WriteWord( latch_data + 12, 4, ~_pressedButtons );
+
+	_makedButtons = 0;
+	_breakedButtons = 0;
+
+	return 0;
+}
