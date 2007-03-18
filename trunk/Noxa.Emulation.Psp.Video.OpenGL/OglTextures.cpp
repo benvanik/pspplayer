@@ -152,7 +152,7 @@ __inline uint UnswizzleInner( uint offset, uint log2_w )
 {
 	unsigned w_mask = ( 1 << log2_w ) - 1;
 	unsigned fixed = offset & ( ( ~7 << log2_w ) | 0xf );
-	unsigned bx = offset & ( ( w_mask & 0x1F ) << 7 );
+	unsigned bx = offset & ( ( w_mask & 0xF ) << 7 );
 	unsigned my = offset & 0x70;
 
 	return fixed | ( bx >> 3 ) | ( my << ( log2_w - 4 ) );
@@ -204,10 +204,10 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 	glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
 
-	HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
+	/*HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
 	int dummy1;
 	WriteFile( f, ( void* )buffer, size, ( LPDWORD )&dummy1, NULL );
-	CloseHandle( f );
+	CloseHandle( f );*/
 
 	glTexImage2D( GL_TEXTURE_2D, 0, format->Size,
 		texture->Width, texture->Height,

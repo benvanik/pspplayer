@@ -736,12 +736,6 @@ void SetTexture( OglContext* context, int stage )
 	if( textureValid == false )
 		return;
 
-	/*if( context->TexturesEnabled == false )
-	{
-		glEnable( GL_TEXTURE_2D );
-		context->TexturesEnabled = true;
-	}*/
-
 	if( texture->TextureID > 0 )
 	{
 		// Texture has been generated, so we just set
