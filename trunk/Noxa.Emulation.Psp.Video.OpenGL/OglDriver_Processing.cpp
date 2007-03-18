@@ -30,7 +30,9 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 
 __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
 int DetermineVertexSize( int vertexType );
-void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCount, int vertexType, int vertexCount, int vertexSize, byte* ptr );
+void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int vertexCount, byte* indexBuffer );
+void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr );
+void ClearBuffers( OglContext* context, int vertexType );
 
 void SetTexture( OglContext* context, int stage );
 
@@ -140,7 +142,6 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 	int vertexCount;
 	bool areSprites;
 	int primitiveType;
-	int primitiveCount;
 
 	glDisable( GL_LIGHTING );
 	//glDisable( GL_CULL_FACE );
@@ -254,32 +255,25 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 		case PRIM:
 			vertexCount = argi & 0xFFFF;
 			areSprites = false;
-			primitiveCount = 0;
 			switch( ( argi >> 16 ) & 0x7 )
 			{
 				case 0x0: // Points
 					primitiveType = GL_POINTS;
-					primitiveCount = vertexCount;
 					break;
 				case 0x1: // Lines
 					primitiveType = GL_LINES;
-					primitiveCount = vertexCount / 2;
 					break;
 				case 0x2: // Line strips
 					primitiveType = GL_LINE_STRIP;
-					primitiveCount = vertexCount - 1;
 					break;
 				case 0x3: // Triangles
 					primitiveType = GL_TRIANGLES;
-					primitiveCount = vertexCount / 3;
 					break;
 				case 0x4: // Triangle strips
 					primitiveType = GL_TRIANGLE_STRIP;
-					primitiveCount = vertexCount - 2;
 					break;
 				case 0x5: // Triangle fans
 					primitiveType = GL_TRIANGLE_FAN;
-					primitiveCount = vertexCount - 2;
 					break;
 				case 0x6: // Sprites (2D rectangles)
 					areSprites = true;
@@ -289,11 +283,26 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			{
 				// Tris/etc
 				int vertexSize = DetermineVertexSize( vertexType );
+
+				bool isIndexed = ( vertexType & ( VTIndex8 | VTIndex16 ) ) != 0;
+				
 				int offset = vertexBufferAddress - MainMemoryBase;
 				assert( offset > 0 );
 				byte* ptr = context->MemoryPointer + offset;
+				
+				byte* iptr = 0;
+				if( isIndexed == true )
+				{
+					int ioffset = indexBufferAddress - MainMemoryBase;
+					assert( ioffset > 0 );
+					iptr = context->MemoryPointer + ioffset;
+				}
+				
 				//SetTexture( context, 0 );
-				DrawVertexBuffer( context, primitiveType, primitiveCount, vertexType, vertexCount, vertexSize, ptr );
+
+				SetupVertexBuffers( context, vertexType, vertexCount, vertexSize, ptr );
+				DrawBuffers( context, primitiveType, vertexType, vertexCount, iptr );
+				ClearBuffers( context, vertexType );
 			}
 			else
 			{
@@ -459,6 +468,9 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 		}
 	}
+
+	glDisableClientState( GL_VERTEX_ARRAY );
+	glDisableClientState( GL_COLOR_ARRAY );
 }
 
 // TODO: a faster widen matrix 3x4->4x4
@@ -530,56 +542,108 @@ int DetermineVertexSize( int vertexType )
 	else if( colorType == VTColorABGR8888 )
 		size += 4;
 
-	int indexType = vertexType & VTIndexMask;
+	/*int indexType = vertexType & VTIndexMask;
 	if( indexType == VTIndex8 )
 		size += 1;
 	else if( indexType == VTIndex16 )
-		size += 2;
+		size += 2;*/
 
 	return size;
 }
 
-void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCount, int vertexType, int vertexCount, int vertexSize, byte* ptr )
+void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int vertexCount, byte* indexBuffer )
 {
-	int positionType = ( vertexType & VTPositionMask );
-	int normalType = ( vertexType & VTNormalMask );
-	int textureType = ( vertexType & VTTextureMask );
-	int weightType = ( vertexType & VTWeightMask );
-	int colorType = ( vertexType & VTColorMask );
-	int indexType = ( vertexType & VTIndexMask );
+	if( indexBuffer == NULL )
+	{
+		glDrawArrays( primitiveType, 0, vertexCount );
+	}
+	else
+	{
+		if( ( vertexType & VTIndex8 ) != 0 )
+			glDrawElements( primitiveType, vertexCount, GL_UNSIGNED_BYTE, indexBuffer );
+		else if( ( vertexType & VTIndex16 ) != 0 )
+			glDrawElements( primitiveType, vertexCount, GL_UNSIGNED_SHORT, indexBuffer );
+	}
+}
+
+void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr )
+{
 	bool transformed = false; // ??
 
-	// DO NOT SUPPORT INDICES AND WEIGHTS OR TRANSFORMED
+	// DO NOT SUPPORT WEIGHTS OR TRANSFORMED
 
-	// PSP comes in a crazy order:
+	// PSP comes in this order:
 	//float skinWeight[WEIGHTS_PER_VERTEX];
 	//float u,v;
 	//unsigned int color;
 	//float nx,ny,nz;
 	//float x,y,z;
 
-	glBegin( primitiveType );
+	GLenum format = 0;
 
-	byte* src = ptr;
-	for( int n = 0; n < vertexCount; n++ )
+	int careMasks = VTPositionMask | VTNormalMask | VTTextureMask | VTColorMask;
+	int careType = vertexType & careMasks;
+
+	// Always assume V3F set
+	if( careType == ( VTTextureFloat | VTNormalFloat | VTPositionFloat ) )
+		format = GL_T2F_N3F_V3F;
+	else if( careType == ( VTTextureFloat | VTColorABGR8888 | VTPositionFloat ) )
+		format = GL_T2F_C4UB_V3F;
+	else if( careType == ( VTColorABGR8888 | VTPositionFloat ) )
+		format = GL_C4UB_V3F;
+	else if( careType == ( VTTextureFloat | VTPositionFloat ) )
+		format = GL_T2F_V3F;
+	else if( careType == ( VTNormalFloat | VTPositionFloat ) )
+		format = GL_N3F_V3F;
+	else if( careType == VTPositionFloat )
+		format = GL_V3F;
+
+	if( format != 0 )
 	{
-		/*switch( weightType )
-		{
-		default:
-			break;
-		}*/
+		// Something we support - issue an interleaved array
+		glInterleavedArrays( format, vertexSize, ptr );
+	}
+	else
+	{
+		// Interleaved unsupported - use separate arrays
+
+		int positionType = ( vertexType & VTPositionMask );
+		int normalType = ( vertexType & VTNormalMask );
+		int textureType = ( vertexType & VTTextureMask );
+		int colorType = ( vertexType & VTColorMask );
+		int weightType = ( vertexType & VTWeightMask );
+
+		if( positionType != 0 )
+			glEnableClientState( GL_VERTEX_ARRAY );
+		else
+			glDisableClientState( GL_VERTEX_ARRAY );
+		if( normalType != 0 )
+			glEnableClientState( GL_NORMAL_ARRAY );
+		else
+			glDisableClientState( GL_NORMAL_ARRAY );
+		if( textureType != 0 )
+			glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+		else
+			glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+		if( colorType != 0 )
+			glEnableClientState( GL_COLOR_ARRAY );
+		else
+			glDisableClientState( GL_COLOR_ARRAY );
+
+		byte* src = ptr;
 
 		switch( textureType )
 		{
 		case VTTextureFixed8:
+			assert( false );
 			src += 2;
 			break;
 		case VTTextureFixed16:
-			glTexCoord2sv( ( short* )src );
+			glTexCoordPointer( 2, GL_SHORT, vertexSize, src );
 			src += 4;
 			break;
 		case VTTextureFloat:
-			glTexCoord2fv( ( float* )src );
+			glTexCoordPointer( 2, GL_FLOAT, vertexSize, src );
 			src += 8;
 			break;
 		}
@@ -587,16 +651,19 @@ void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCoun
 		switch( colorType )
 		{
 		case VTColorBGR5650:
+			assert( false );
 			src += 2;
 			break;
 		case VTColorABGR4444:
+			assert( false );
 			src += 2;
 			break;
 		case VTColorABGR5551:
+			assert( false );
 			src += 2;
 			break;
 		case VTColorABGR8888:
-			glColor3ubv( src );
+			glColorPointer( 4, GL_UNSIGNED_BYTE, vertexSize, src );
 			src += 4;
 			break;
 		}
@@ -604,15 +671,15 @@ void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCoun
 		switch( normalType )
 		{
 		case VTNormalFixed8:
-			glNormal3bv( ( GLbyte* )src );
+			glNormalPointer( GL_BYTE, vertexSize, src );
 			src += 3;
 			break;
 		case VTNormalFixed16:
-			glNormal3sv( ( short* )src );
+			glNormalPointer( GL_SHORT, vertexSize, src );
 			src += 6;
 			break;
 		case VTNormalFloat:
-			glNormal3fv( ( float* )src );
+			glNormalPointer( GL_FLOAT, vertexSize, src );
 			src += 12;
 			break;
 		}
@@ -620,23 +687,33 @@ void DrawVertexBuffer( OglContext* context, int primitiveType, int primitiveCoun
 		switch( positionType )
 		{
 		case VTPositionFixed8:
+			assert( false );
 			src += 3;
 			break;
 		case VTPositionFixed16:
-			glVertex3sv( ( short* )src );
+			glVertexPointer( 3, GL_SHORT, vertexSize, src );
 			src += 6;
 			break;
 		case VTPositionFloat:
-			//float x = *( ( float* )src );
-			//float y = *( ( float* )src + 1 );
-			//float z = *( ( float* )src + 2 );
-			glVertex3fv( ( float* )src );
+			glVertexPointer( 3, GL_FLOAT, vertexSize, src );
 			src += 12;
 			break;
 		}
 	}
+}
 
-	glEnd();
+void ClearBuffers( OglContext* context, int vertexType )
+{
+	//int weightType = ( vertexType & VTWeightMask );
+
+	/*if( ( vertexType & VTPositionMask ) != 0 )
+		glDisableClientState( GL_VERTEX_ARRAY );
+	if( ( vertexType & VTNormalMask ) != 0 )
+		glDisableClientState( GL_NORMAL_ARRAY );
+	if( ( vertexType & VTTextureMask ) != 0 )
+		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+	if( ( vertexType & VTColorMask ) != 0 )
+		glDisableClientState( GL_COLOR_ARRAY );*/
 }
 
 void SetTexture( OglContext* context, int stage )
