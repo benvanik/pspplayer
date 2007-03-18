@@ -25,9 +25,6 @@
 // Define to support the native video interface
 #define NATIVEVIDEOINTERFACE
 
-// This will ignore all write attempts to the framebuffer
-#define IGNOREFRAMEBUFFER
-
 // Emit trace file
 //#define TRACE
 #define TRACEFILE		"Trace-Ultra.txt"

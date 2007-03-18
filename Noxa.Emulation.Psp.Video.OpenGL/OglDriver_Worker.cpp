@@ -11,12 +11,15 @@
 #pragma unmanaged
 #include <gl/gl.h>
 #include <gl/glu.h>
+#include <gl/glext.h>
+#include <gl/wglext.h>
 #pragma managed
 
 #include <string>
 #include "OglDriver.h"
 #include "VideoApi.h"
 #include "OglContext.h"
+#include "OglExtensions.h"
 
 using namespace System::Diagnostics;
 using namespace System::Threading;
@@ -168,6 +171,8 @@ void OglDriver::SetupOpenGL()
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
+
+	SetupExtensions();
 }
 
 void OglDriver::DestroyOpenGL()
@@ -186,10 +191,11 @@ void OglDriver::WorkerThread()
 
 	// Setup the context
 	bool supportInternalMemory = _emu->Cpu->Capabilities->InternalMemorySupported;
-	bool supportInternalMemoryPointer = supportInternalMemory && ( _emu->Cpu->Memory->InternalPointer != NULL );
+	bool supportInternalMemoryPointer = supportInternalMemory && ( _emu->Cpu->Memory->MainMemoryPointer != NULL );
 	// TODO: support non-pointer based internal memory
 	Debug::Assert( supportInternalMemoryPointer == true );
-	_context->MemoryPointer = ( byte* )_emu->Cpu->Memory->InternalPointer;
+	_context->MainMemoryPointer = ( byte* )_emu->Cpu->Memory->MainMemoryPointer;
+	_context->VideoMemoryPointer = ( byte* )_emu->Cpu->Memory->FrameBufferPointer;
 
 	_startTime = DateTime::Now;
 

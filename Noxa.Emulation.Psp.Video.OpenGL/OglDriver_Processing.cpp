@@ -13,12 +13,15 @@
 #pragma unmanaged
 #include <gl/gl.h>
 #include <gl/glu.h>
+#include <gl/glext.h>
+#include <gl/wglext.h>
 #pragma managed
 
 #include "OglDriver.h"
 #include "VideoApi.h"
 #include "OglContext.h"
 #include "OglTextures.h"
+#include "OglExtensions.h"
 
 using namespace System::Diagnostics;
 using namespace System::Threading;
@@ -32,97 +35,8 @@ __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
 int DetermineVertexSize( int vertexType );
 void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int vertexCount, byte* indexBuffer );
 void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr );
-void ClearBuffers( OglContext* context, int vertexType );
 
 void SetTexture( OglContext* context, int stage );
-
-enum VertexType
-{
-	VTNone = 0x0,
-
-	VTTextureMask = 0x3,
-	VTTextureFixed8 = 0x1,
-	VTTextureFixed16 = 0x2,
-	VTTextureFloat = 0x3,
-
-	VTColorMask = 0x7 << 2,
-	VTColorBGR5650 = 0x4 << 2,
-	VTColorABGR5551 = 0x5 << 2,
-	VTColorABGR4444 = 0x6 << 2,
-	VTColorABGR8888 = 0x7 << 2,
-
-	VTNormalMask = 0x3 << 5,
-	VTNormalFixed8 = 0x1 << 5,
-	VTNormalFixed16 = 0x2 << 5,
-	VTNormalFloat = 0x3 << 5,
-
-	VTPositionMask = 0x3 << 7,
-	VTPositionFixed8 = 0x1 << 7,
-	VTPositionFixed16 = 0x2 << 7,
-	VTPositionFloat = 0x3 << 7,
-
-	VTWeightMask = 0x3 << 9,
-	VTWeightFixed8 = 0x1 << 9,
-	VTWeightFixed16 = 0x2 << 9,
-	VTWeightFloat = 0x3 << 9,
-
-	VTIndexMask = 0x2 << 11,
-	VTIndex8 = 0x1 << 11,
-	VTIndex16 = 0x2 << 11,
-	//100011100
-	//0-1: Texture Format (2 values ST/UV)
-	//    00: Not present in vertex
-	//    01: 8-bit fixed
-	//    10: 16-bit fixed
-	//    11: 32-bit floats
-	//2-4: Color Format (1 value)
-	//    000: Not present in vertex
-	//    100: 16-bit BGR-5650
-	//    101: 16-bit ABGR-5551
-	//    110: 16-bit ABGR-4444
-	//    111: 32-bit ABGR-8888
-	//5-6: Normal Format (3 values XYZ)
-	//    00: Not present in vertex
-	//    01: 8-bit fixed
-	//    10: 16-bit fixed
-	//    11: 32-bit floats
-	//7-8: Position Format (3 values XYZ)
-	//    00: Not present in vertex
-	//    01: 8-bit fixed
-	//    10: 16-bit fixed
-	//    11: 32-bit floats
-	//9-10: Weight Format
-	//    00: Not present in vertex
-	//    01: 8-bit fixed
-	//    10: 16-bit fixed
-	//    11: 32-bit floats
-	//11-12: Index Format
-	//    00: Not using indices
-	//    01: 8-bit
-	//    10: 16-bit
-	//14-16: Number of weights (Skinning)
-	//    000-111: 1-8 weights
-	//18-20: Number of vertices (Morphing)
-	//    000-111: 1-8 vertices
-	//23: Bypass Transform Pipeline
-	//    0: Transformed Coordinates
-	//    1: Raw Coordinates
-};
-
-enum TexturePixelStorage
-{
-	TPSBGR5650 = 0,
-	TPSABGR5551 = 1,
-	TPSABGR4444 = 2,
-	TPSABGR8888 = 3,
-	TPSIndexed4 = 4,
-	TPSIndexed8 = 5,
-	TPSIndexed16 = 6,
-	TPSIndexed32 = 7,
-	TPSDXT1 = 8,
-	TPSDXT3 = 9,
-	TPSDXT5 = 10,
-};
 
 #pragma unmanaged
 
@@ -193,6 +107,112 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			// antialiasing enable
 			break;
 
+		case ABE:
+			// alpha blend enable
+			if( argi == 0 )
+				glDisable( GL_BLEND );
+			else
+				glEnable( GL_BLEND );
+			break;
+		case ATE:
+			// alpha test enable
+			break;
+		case ZTE:
+			// depth (z) test enable
+			break;
+		case ALPHA:
+			// alpha blend
+			// pspsdk: sendCommandi(223,src | (dest << 4) | (op << 8));
+			// psp_doc: op | src << 4 | dest << 8
+			{
+				switch( ( argi >> 8 ) & 0x3 )
+				{
+				case 0:		// GU_ADD
+					glBlendEquation( GL_FUNC_ADD );
+					break;
+				case 1:		// GU_SUBTRACT
+					glBlendEquation( GL_FUNC_SUBTRACT );
+					break;
+				case 2:		// GU_REVERSE_SUBTRACT
+					glBlendEquation( GL_FUNC_REVERSE_SUBTRACT );
+					break;
+				case 3:		// GU_MIN
+					glBlendEquation( GL_MIN );
+					break;
+				case 4:		// GU_MAX
+					glBlendEquation( GL_MAX );
+					break;
+				case 5:		// GU_ABS
+					glBlendEquation( GL_FUNC_ADD );
+					assert( false );
+					break;
+				}
+				int src;
+				switch( argi & 0xF )
+				{
+#ifndef _DEBUG
+				default:
+#endif
+				case 0:		// GU_SRC_COLOR
+					src = GL_SRC_COLOR;
+					break;
+				case 1:		// GU_ONE_MINUS_SRC_COLOR
+					src = GL_ONE_MINUS_SRC_COLOR;
+					break;
+				case 2:		// GU_SRC_ALPHA
+					src = GL_SRC_ALPHA;
+					break;
+				case 3:		// GU_ONE_MINUS_SRC_ALPHA
+					src = GL_ONE_MINUS_SRC_ALPHA;
+					break;
+				case 10:	// GU_FIX
+					break;
+#ifdef _DEBUG
+				default:
+					src = GL_SRC_COLOR;
+					break;
+#endif
+				}
+				int dest;
+				switch( ( argi >> 4 ) & 0xF )
+				{
+#ifndef _DEBUG
+				default:
+#endif
+				case 0:		// GU_DST_COLOR
+					dest = GL_DST_COLOR;
+					break;
+				case 1:		// GU_ONE_MINUS_DST_COLOR
+					dest = GL_ONE_MINUS_DST_COLOR;
+					break;
+				case 2:		// GU_SRC_ALPHA
+					dest = GL_SRC_ALPHA;
+					break;
+				case 3:		// GU_ONE_MINUS_SRC_ALPHA
+					dest = GL_ONE_MINUS_SRC_ALPHA;
+					break;
+				case 4:		// GU_DST_ALPHA
+					dest = GL_DST_ALPHA;
+					break;
+				case 5:		// GU_ONE_MINUS_DST_ALPHA
+					dest = GL_ONE_MINUS_DST_ALPHA;
+					break;
+				case 10:	// GU_FIX
+					break;
+#ifdef _DEBUG
+				default:
+					dest = GL_DST_COLOR;
+					break;
+#endif
+				}
+				glBlendFunc( src, dest );
+			}
+			break;
+		case SFIX:	// source fix color
+			break;
+		case DFIX:	// destination fix color
+			break;
+
 		case FGE:
 			// fog enable
 			if( argi == 1 )
@@ -254,8 +274,9 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 		case PRIM:
 			vertexCount = argi & 0xFFFF;
-			areSprites = false;
-			switch( ( argi >> 16 ) & 0x7 )
+			primitiveType = ( argi >> 16 ) & 0x7;
+			areSprites = ( primitiveType == 6 );
+			switch( primitiveType )
 			{
 				case 0x0: // Points
 					primitiveType = GL_POINTS;
@@ -275,10 +296,9 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				case 0x5: // Triangle fans
 					primitiveType = GL_TRIANGLE_FAN;
 					break;
-				case 0x6: // Sprites (2D rectangles)
-					areSprites = true;
-					break;
+				// 0x6 = Sprites (2D rectangles)
 			}
+
 			if( areSprites == false )
 			{
 				// Tris/etc
@@ -286,23 +306,25 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 
 				bool isIndexed = ( vertexType & ( VTIndex8 | VTIndex16 ) ) != 0;
 				
-				int offset = vertexBufferAddress - MainMemoryBase;
-				assert( offset > 0 );
-				byte* ptr = context->MemoryPointer + offset;
+				byte* ptr;
+				if( ( vertexBufferAddress & MainMemoryBase ) != 0 )
+					ptr = context->MainMemoryPointer + ( vertexBufferAddress - MainMemoryBase );
+				else
+					ptr = context->VideoMemoryPointer + ( vertexBufferAddress - FrameBufferBase );
 				
 				byte* iptr = 0;
 				if( isIndexed == true )
 				{
-					int ioffset = indexBufferAddress - MainMemoryBase;
-					assert( ioffset > 0 );
-					iptr = context->MemoryPointer + ioffset;
+					if( ( indexBufferAddress & MainMemoryBase ) != 0 )
+						iptr = context->MainMemoryPointer + ( indexBufferAddress - MainMemoryBase );
+					else
+						iptr = context->VideoMemoryPointer + ( indexBufferAddress - FrameBufferBase );
 				}
 				
-				//SetTexture( context, 0 );
+				SetTexture( context, 0 );
 
 				SetupVertexBuffers( context, vertexType, vertexCount, vertexSize, ptr );
 				DrawBuffers( context, primitiveType, vertexType, vertexCount, iptr );
-				ClearBuffers( context, vertexType );
 			}
 			else
 			{
@@ -310,6 +332,12 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			}
 			break;
 
+		case TME:
+			if( argi == 0 )
+				glDisable( GL_TEXTURE_2D );
+			else
+				glEnable( GL_TEXTURE_2D );
+			break;
 		case TMODE:
 			context->TexturesSwizzled = ( argi & 0x1 ) == 1 ? true : false;
 			context->MipMapLevel = ( argi >> 16 ) & 0x4;
@@ -399,10 +427,12 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 		case TBW0:
 			context->Textures[ 0 ].Address |= ( argi << 8 ) & 0xFF000000;
 			context->Textures[ 0 ].LineWidth = argi & 0x0000FFFF;
+			context->Textures[ 0 ].TextureID = 0;
 			break;
 		case TSIZE0:
 			context->Textures[ 0 ].Width = power( 2, argi & 0x000000FF );
 			context->Textures[ 0 ].Height = power( 2, ( argi >> 8 ) & 0x000000FF );
+			context->Textures[ 0 ].PixelStorage = context->TextureStorageMode;
 			break;
 
 		case PMS:
@@ -523,7 +553,7 @@ int DetermineVertexSize( int vertexType )
 	else if( textureType == VTTextureFloat )
 		size += 4 + 4;
 
-	// TODO: figure out weight format
+	int weightCount = ( vertexType & VTWeightCountMask ) >> 14;
 	int weightType = vertexType & VTWeightMask;
 	if( weightType == VTWeightFixed8 )
 		size += 1;
@@ -542,11 +572,7 @@ int DetermineVertexSize( int vertexType )
 	else if( colorType == VTColorABGR8888 )
 		size += 4;
 
-	/*int indexType = vertexType & VTIndexMask;
-	if( indexType == VTIndex8 )
-		size += 1;
-	else if( indexType == VTIndex16 )
-		size += 2;*/
+	int morphCount = ( vertexType & VTMorphCountMask ) >> 18;
 
 	return size;
 }
@@ -568,7 +594,7 @@ void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int ve
 
 void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr )
 {
-	bool transformed = false; // ??
+	bool transformed = ( vertexType & VTTransformedMask ) != 0;
 
 	// DO NOT SUPPORT WEIGHTS OR TRANSFORMED
 
@@ -702,20 +728,6 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 	}
 }
 
-void ClearBuffers( OglContext* context, int vertexType )
-{
-	//int weightType = ( vertexType & VTWeightMask );
-
-	/*if( ( vertexType & VTPositionMask ) != 0 )
-		glDisableClientState( GL_VERTEX_ARRAY );
-	if( ( vertexType & VTNormalMask ) != 0 )
-		glDisableClientState( GL_NORMAL_ARRAY );
-	if( ( vertexType & VTTextureMask ) != 0 )
-		glDisableClientState( GL_TEXTURE_COORD_ARRAY );
-	if( ( vertexType & VTColorMask ) != 0 )
-		glDisableClientState( GL_COLOR_ARRAY );*/
-}
-
 void SetTexture( OglContext* context, int stage )
 {
 	OglTexture* texture = &context->Textures[ stage ];
@@ -724,11 +736,11 @@ void SetTexture( OglContext* context, int stage )
 	if( textureValid == false )
 		return;
 
-	if( context->TexturesEnabled == false )
+	/*if( context->TexturesEnabled == false )
 	{
 		glEnable( GL_TEXTURE_2D );
 		context->TexturesEnabled = true;
-	}
+	}*/
 
 	if( texture->TextureID > 0 )
 	{

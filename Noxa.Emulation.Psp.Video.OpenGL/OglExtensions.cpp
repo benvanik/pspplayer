@@ -4,32 +4,35 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-// This is the main DLL file.
-
-#include "stdafx.h"
-
+#include "StdAfx.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <assert.h>
+#include <string>
+#include <cmath>
 #pragma unmanaged
 #include <gl/gl.h>
 #include <gl/glu.h>
 #include <gl/glext.h>
 #include <gl/wglext.h>
 #pragma managed
-
-#include "Noxa.Emulation.Psp.Video.OpenGL.h"
+#include "OglExtensions.h"
 
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Video;
 
-IList<ComponentIssue^>^ OpenGLVideo::Test( ComponentParameters^ parameters )
+#pragma unmanaged
+
+PFNGLBLENDEQUATIONPROC Noxa::Emulation::Psp::Video::glBlendEquation = NULL;
+
+bool Noxa::Emulation::Psp::Video::SetupExtensions()
 {
-	List<ComponentIssue^>^ issues = gcnew List<ComponentIssue^>();
+	glBlendEquation = (PFNGLBLENDEQUATIONPROC)wglGetProcAddress( "glBlendEquationEXT" );
+	assert( glBlendEquation != NULL );
+	if( glBlendEquation == NULL )
+		return false;
 
-	// Test for OGL extensions used:
-	// - GL_EXT_packed_pixels
-	// - GL_EXT_blend_subtract
-	// - GL_EXT_blend_minmax
-
-	return issues;
+	return true;
 }
+
+#pragma managed

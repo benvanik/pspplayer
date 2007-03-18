@@ -165,7 +165,7 @@ GenerationResult BLEZ( R4000GenContext^ context, int pass, int address, uint cod
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setle( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -189,7 +189,7 @@ GenerationResult BGTZ( R4000GenContext^ context, int pass, int address, uint cod
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setg( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -265,7 +265,7 @@ GenerationResult BLEZL( R4000GenContext^ context, int pass, int address, uint co
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setle( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -291,7 +291,7 @@ GenerationResult BGTZL( R4000GenContext^ context, int pass, int address, uint co
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setg( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -318,7 +318,7 @@ GenerationResult BLTZ( R4000GenContext^ context, int pass, int address, uint cod
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setl( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -343,7 +343,7 @@ GenerationResult BGEZ( R4000GenContext^ context, int pass, int address, uint cod
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setge( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -368,7 +368,7 @@ GenerationResult BLTZL( R4000GenContext^ context, int pass, int address, uint co
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setl( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -395,7 +395,7 @@ GenerationResult BGEZL( R4000GenContext^ context, int pass, int address, uint co
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setge( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -422,7 +422,7 @@ GenerationResult BLTZAL( R4000GenContext^ context, int pass, int address, uint c
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setl( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -456,7 +456,7 @@ GenerationResult BGEZAL( R4000GenContext^ context, int pass, int address, uint c
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setge( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -490,7 +490,7 @@ GenerationResult BLTZALL( R4000GenContext^ context, int pass, int address, uint 
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setl( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );
@@ -526,7 +526,7 @@ GenerationResult BGEZALL( R4000GenContext^ context, int pass, int address, uint 
 
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setge( AL );
 		g->movzx( EAX, AL );
 		g->mov( MPCVALID( CTX ), EAX );

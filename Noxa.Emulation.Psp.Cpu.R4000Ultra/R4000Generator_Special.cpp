@@ -230,7 +230,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				}
 
 #ifdef STATISTICS
-				g->inc( g->dword_ptr[ &_nativeSyscallCount ] );
+				g->add( g->dword_ptr[ &_nativeSyscallCount ], 1 );
 #endif
 
 				return GenerationResult::Syscall;

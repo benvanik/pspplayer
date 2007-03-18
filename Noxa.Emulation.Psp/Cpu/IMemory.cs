@@ -18,7 +18,12 @@ namespace Noxa.Emulation.Psp.Cpu
 		IMemorySegment FindSegment( string name );
 		IMemorySegment FindSegment( int baseAddress );
 
-		unsafe void* InternalPointer
+		unsafe void* MainMemoryPointer
+		{
+			get;
+		}
+
+		unsafe void* FrameBufferPointer
 		{
 			get;
 		}

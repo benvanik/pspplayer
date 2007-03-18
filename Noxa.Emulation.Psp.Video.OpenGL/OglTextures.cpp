@@ -19,6 +19,8 @@
 #pragma unmanaged
 #include <gl/gl.h>
 #include <gl/glu.h>
+#include <gl/glext.h>
+#include <gl/wglext.h>
 #pragma managed
 
 #include "OglDriver.h"
@@ -84,6 +86,32 @@ __inline uint lg2( uint x )
 	return ret;
 }
 
+static void CopyPixel( const TextureFormat* format, void* dest, const void* source, const uint width )
+{
+	memcpy( dest, source, width * format->Size );
+}
+
+static void CopyPixelIndexed4( const TextureFormat* format, void* dest, const void* source, const uint width )
+{
+	// 2 pixels/byte
+	memcpy( dest, source, width / 2 );
+}
+
+const TextureFormat __formats[] = {
+	// Format			Size	Copier				Flags			GL format
+	{ TPSBGR5650,		2,		CopyPixel,			0,				GL_UNSIGNED_SHORT_5_6_5_REV,		},
+	{ TPSABGR5551,		2,		CopyPixel,			TFAlpha,		GL_UNSIGNED_SHORT_1_5_5_5_REV,		},
+	{ TPSABGR4444,		2,		CopyPixel,			TFAlpha,		GL_UNSIGNED_SHORT_4_4_4_4_REV,		},
+	{ TPSABGR8888,		4,		CopyPixel,			TFAlpha,		GL_UNSIGNED_BYTE,					},
+	{ TPSIndexed4,		0,		CopyPixelIndexed4,	TFAlpha,		GL_UNSIGNED_BYTE,					},
+	{ TPSIndexed8,		1,		CopyPixel,			TFAlpha,		GL_UNSIGNED_BYTE,					},
+	{ TPSIndexed16,		2,		CopyPixel,			TFAlpha,		GL_UNSIGNED_SHORT,					},
+	{ TPSIndexed32,		4,		CopyPixel,			TFAlpha,		GL_UNSIGNED_INT,					},
+	{ TPSDXT1,			4,		CopyPixel,			TFAlpha,		GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,	},
+	{ TPSDXT3,			4,		CopyPixel,			TFAlpha,		GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,	},
+	{ TPSDXT5,			4,		CopyPixel,			TFAlpha,		GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,	},
+};
+
 /*
 Would be nice to replace Unswizzle with something like this
 void swizzle_fast( const byte* in, byte* out, uint width, uint height )
@@ -120,12 +148,7 @@ void swizzle_fast( const byte* in, byte* out, uint width, uint height )
 	}
 }*/
 
-void copy( const uint pixsize, void *to, const void *from, unsigned width )
-{
-	memcpy( to, from, width * pixsize );
-}
-
-__inline uint unswizzlenew( uint offset, uint log2_w )
+__inline uint UnswizzleInner( uint offset, uint log2_w )
 {
 	unsigned w_mask = ( 1 << log2_w ) - 1;
 	unsigned fixed = offset & ( ( ~7 << log2_w ) | 0xf );
@@ -135,24 +158,22 @@ __inline uint unswizzlenew( uint offset, uint log2_w )
 	return fixed | ( bx >> 3 ) | ( my << ( log2_w - 4 ) );
 }
 
-void Unswizzle( const byte* in, byte* out, uint width, uint height )
+void Unswizzle( const TextureFormat* format, const byte* in, byte* out, const uint width, const uint height )
 {
-	int pixsize = 4;
-	int hwsize = 4;
-	unsigned src_bytewidth = width * pixsize;
+	unsigned src_bytewidth = width * format->Size;
 	unsigned lg2_w = lg2( src_bytewidth );
 	unsigned src_chunk = 16;
-	unsigned pix_per_chunk = src_chunk / hwsize;
-	unsigned dst_chunk = pix_per_chunk * pixsize;
-	unsigned src_size = width * height * hwsize;
+	unsigned pix_per_chunk = src_chunk / format->Size;
+	unsigned dst_chunk = pix_per_chunk * format->Size;
+	unsigned src_size = width * height * format->Size;
 
 	for( uint src_off = 0, dst_off = 0;
 		src_off < src_size;
 		src_off += src_chunk, dst_off += dst_chunk)
 	{
-		unsigned swizoff = unswizzlenew( src_off, lg2_w );
+		unsigned swizoff = UnswizzleInner( src_off, lg2_w );
 
-		copy( pixsize, out + swizoff, in + src_off, pix_per_chunk );
+		(*format->Copy)( format, out + swizoff, in + src_off, pix_per_chunk );
 	}
 }
 
@@ -163,29 +184,36 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	//glBindTexture( GL_TEXTURE_2D, textureId );
 	texture->TextureID = textureId;
 
-	byte* address = context->MemoryPointer + ( texture->Address - MainMemoryBase );
+	byte* address;
+	if( ( texture->Address & FrameBufferBase ) != 0 )
+		address = context->VideoMemoryPointer + ( texture->Address - FrameBufferBase );
+	else
+		address = context->MainMemoryPointer + ( texture->Address - MainMemoryBase );
 
-	int bpp = 4;
-	int size = texture->LineWidth * texture->Height * bpp;
+	TextureFormat* format = ( TextureFormat* )&__formats[ texture->PixelStorage ];
+
+	int size = texture->LineWidth * texture->Height * format->Size;
 
 	byte* buffer = address;
 	if( context->TexturesSwizzled == true )
 	{
 		buffer = ( byte* )malloc( size );
-		Unswizzle( address, buffer, texture->Width, texture->Height );
+		Unswizzle( format, address, buffer, texture->Width, texture->Height );
 	}
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 	glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
 
-	/*HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
+	HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
 	int dummy1;
 	WriteFile( f, ( void* )buffer, size, ( LPDWORD )&dummy1, NULL );
-	CloseHandle( f );*/
+	CloseHandle( f );
 
-	glTexImage2D( GL_TEXTURE_2D, 0, 4,
+	glTexImage2D( GL_TEXTURE_2D, 0, format->Size,
 		texture->Width, texture->Height,
-		0, GL_RGBA, GL_UNSIGNED_BYTE,
+		0,
+		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
+		format->GLFormat,
 		( void* )buffer );
 
 	if( context->TexturesSwizzled == true )

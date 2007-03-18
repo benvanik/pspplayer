@@ -219,6 +219,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglExtensions.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OglStatistics.cpp"
 				>
 			</File>
@@ -266,6 +270,10 @@
 			</File>
 			<File
 				RelativePath=".\OglDriver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OglExtensions.h"
 				>
 			</File>
 			<File

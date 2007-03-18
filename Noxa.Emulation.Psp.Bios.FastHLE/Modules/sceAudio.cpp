@@ -41,7 +41,7 @@ int sceAudio::sceAudioOutput( IMemory^ memory, int channel, int vol, int buf )
 	if( _driver == nullptr )
 		return 0;
 
-	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->InternalPointer + ( MainMemoryBase - buf ) ) );
+	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->MainMemoryPointer + ( MainMemoryBase - buf ) ) );
 	_driver->Output( buffer, false, vol );
 
 	return 0;
@@ -53,7 +53,7 @@ int sceAudio::sceAudioOutputBlocking( IMemory^ memory, int channel, int vol, int
 	if( _driver == nullptr )
 		return 0;
 
-	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->InternalPointer + ( MainMemoryBase - buf ) ) );
+	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->MainMemoryPointer + ( MainMemoryBase - buf ) ) );
 	_driver->Output( buffer, true, vol );
 
 	return 0;
@@ -65,7 +65,7 @@ int sceAudio::sceAudioOutputPanned( IMemory^ memory, int channel, int leftvol, i
 	if( _driver == nullptr )
 		return 0;
 
-	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->InternalPointer + ( MainMemoryBase - buf ) ) );
+	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->MainMemoryPointer + ( MainMemoryBase - buf ) ) );
 	_driver->Output( buffer, false, leftvol, rightvol );
 
 	return 0;
@@ -77,7 +77,7 @@ int sceAudio::sceAudioOutputPannedBlocking( IMemory^ memory, int channel, int le
 	if( _driver == nullptr )
 		return 0;
 
-	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->InternalPointer + ( MainMemoryBase - buf ) ) );
+	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->MainMemoryPointer + ( MainMemoryBase - buf ) ) );
 	_driver->Output( buffer, true, leftvol, rightvol );
 
 	return 0;
