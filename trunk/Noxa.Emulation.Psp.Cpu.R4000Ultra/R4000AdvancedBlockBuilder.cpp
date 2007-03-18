@@ -166,7 +166,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 			{
 				// Instruction counter increment - note that it has to be here cause
 				// of null delay and the label marker above
-				g->inc( g->dword_ptr[ &_instructionsExecuted ] );
+				g->add( g->dword_ptr[ &_instructionsExecuted ], 1 );
 			}
 #endif
 #ifdef TRACE
@@ -643,7 +643,7 @@ void R4000AdvancedBlockBuilder::GeneratePreamble()
 
 #ifdef STATISTICS
 	// Block count
-	g->inc( g->dword_ptr[ &_codeBlocksExecuted ] );
+	g->add( g->dword_ptr[ &_codeBlocksExecuted ], 1 );
 #endif
 
 //#if 0
@@ -715,7 +715,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 			g->jz( nullPtrLabel );
 
 #ifdef STATISTICS
-			g->inc( g->dword_ptr[ &_jumpBlockInlineHits ] );
+			g->add( g->dword_ptr[ &_jumpBlockInlineHits ], 1 );
 #endif
 
 			// Jump!
@@ -725,10 +725,10 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 			g->label( nullPtrLabel );
 
 #ifdef STATISTICS
-			g->inc( g->dword_ptr[ &_jumpBlockInlineMisses ] );
+			g->add( g->dword_ptr[ &_jumpBlockInlineMisses ], 1 );
 #endif
 
-			g->mov( EAX, 0 );
+			g->xor( EAX, EAX );
 			g->ret();
 			//Debug::WriteLine( "returning when could build jump block" );
 
@@ -772,7 +772,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 	else
 	{
 		// Return (to bounce)
-		g->mov( EAX, 0 );
+		g->xor( EAX, EAX );
 		g->ret();
 
 #ifdef STATISTICS

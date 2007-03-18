@@ -197,7 +197,7 @@ GenerationResult MOVZ( R4000GenContext^ context, int pass, int address, uint cod
 		sprintf( label, "l%Xmz", address - 4 );
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rt ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->jne( label );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->mov( MREG( CTX, rd ), EAX );
@@ -220,7 +220,7 @@ GenerationResult MOVN( R4000GenContext^ context, int pass, int address, uint cod
 		sprintf( label, "l%Xmn", address - 4 );
 		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rt ) );
-		g->cmp( EAX, 0 );
+		g->test( EAX, EAX ); // cmp EAX, 0
 		g->je( label );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->mov( MREG( CTX, rd ), EAX );

@@ -16,7 +16,8 @@ namespace Noxa {
 				typedef struct OglContext_t
 				{
 					// Memory from the CPU
-					byte*			MemoryPointer;
+					byte*			MainMemoryPointer;
+					byte*			VideoMemoryPointer;
 
 					// FrameBuffer
 					uint			FrameBufferPointer;
@@ -37,6 +38,61 @@ namespace Noxa {
 
 					// Stuff
 				} OglContext;
+
+				enum VertexType
+				{
+					VTNone				= 0x0,
+
+					VTTextureMask		= 0x3,
+					VTTextureFixed8		= 0x1,
+					VTTextureFixed16	= 0x2,
+					VTTextureFloat		= 0x3,
+
+					VTColorMask			= 0x7 << 2,
+					VTColorBGR5650		= 0x4 << 2,
+					VTColorABGR5551		= 0x5 << 2,
+					VTColorABGR4444		= 0x6 << 2,
+					VTColorABGR8888		= 0x7 << 2,
+
+					VTNormalMask		= 0x3 << 5,
+					VTNormalFixed8		= 0x1 << 5,
+					VTNormalFixed16		= 0x2 << 5,
+					VTNormalFloat		= 0x3 << 5,
+
+					VTPositionMask		= 0x3 << 7,
+					VTPositionFixed8	= 0x1 << 7,
+					VTPositionFixed16	= 0x2 << 7,
+					VTPositionFloat		= 0x3 << 7,
+
+					VTWeightMask		= 0x3 << 9,
+					VTWeightFixed8		= 0x1 << 9,
+					VTWeightFixed16		= 0x2 << 9,
+					VTWeightFloat		= 0x3 << 9,
+
+					VTIndexMask			= 0x2 << 11,
+					VTIndex8			= 0x1 << 11,
+					VTIndex16			= 0x2 << 11,
+
+					VTWeightCountMask	= 0x3 << 14,	// skinning weight count
+					VTMorphCountMask	= 0x3 << 18,	// morphing vertex count
+
+					VTTransformedMask	= 0x1 << 23,	// 1 if raw
+				};
+
+				enum TexturePixelStorage
+				{
+					TPSBGR5650			= 0,
+					TPSABGR5551			= 1,
+					TPSABGR4444			= 2,
+					TPSABGR8888			= 3,
+					TPSIndexed4			= 4,
+					TPSIndexed8			= 5,
+					TPSIndexed16		= 6,
+					TPSIndexed32		= 7,
+					TPSDXT1				= 8,
+					TPSDXT3				= 9,
+					TPSDXT5				= 10,
+				};
 
 			}
 		}

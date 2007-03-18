@@ -21,10 +21,10 @@ namespace Noxa {
 				ref class R4000Memory : IMemory
 				{
 				public:
+					byte*			ScratchPad;
 					byte*			MainMemory;
+					byte*			FrameBuffer;
 				protected:
-					byte*			_scratchPad;
-					byte*			_frameBufferBytes;
 					IMemorySegment^	_frameBuffer;
 
 				protected:
@@ -42,11 +42,19 @@ namespace Noxa {
 					virtual IMemorySegment^ FindSegment( String^ name );
 					virtual IMemorySegment^ FindSegment( int baseAddress );
 
-					property void* InternalPointer
+					property void* MainMemoryPointer
 					{
 						virtual void* get()
 						{
 							return MainMemory;
+						}
+					}
+
+					property void* FrameBufferPointer
+					{
+						virtual void* get()
+						{
+							return FrameBuffer;
 						}
 					}
 

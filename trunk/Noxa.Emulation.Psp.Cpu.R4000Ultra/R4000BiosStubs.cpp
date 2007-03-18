@@ -64,12 +64,12 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->push( EAX );
 		g->call( ( int )sceRtcGetCurrentTick );
 		g->add( ESP, 4 );
-		g->mov( EAX, 0 );
+		g->xor( EAX, EAX );
 		return true;
 
 	// scePower --------------------------------------------
 	case 0xefd3c963:		// scePowerTick
-		g->mov( EAX, 0 );
+		g->xor( EAX, EAX );
 		return true;
 	case 0x737486f2:		// scePowerSetClockFrequency
 		g->push( MREG( CTX, 6 ) );
@@ -97,7 +97,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 	case 0x34b9fa9e:		// sceKernelDcacheWritebackInvalidateRange
 	case 0x920f104a:		// sceKernelIcacheInvalidateAll
 	case 0xc2df770e:		// sceKernelIcacheInvalidateRange
-		g->mov( EAX, 0 );
+		g->xor( EAX, EAX );
 		return true;
 	}
 
@@ -117,11 +117,11 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 			g->push( MREG( CTX, 4 ) );
 			g->call( ( int )sceDisplaySetFrameBuf );
 			g->add( ESP, 16 );
-			g->mov( EAX, 0 );
+			g->xor( EAX, EAX );
 			return true;
 		case 0x984c27e7:		// sceDisplayWaitVblankStart
 			g->call( ( int )sceDisplayWaitVblankStart );
-			g->mov( EAX, 0 );
+			g->xor( EAX, EAX );
 			return true;
 
 		// sceGeUser -------------------------------------------

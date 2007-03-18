@@ -19,11 +19,13 @@ extern uint _managedMemoryWriteCount;
 
 R4000Memory::R4000Memory()
 {
-	MainMemory = ( byte* )_aligned_malloc( MainMemorySize, 4 );
-	_scratchPad = ( byte* )_aligned_malloc( ScratchPadSize, 4 );
-	_frameBufferBytes = ( byte* )_aligned_malloc( FrameBufferSize, 4 );
+	MainMemory = ( byte* )_aligned_malloc( MainMemorySize, 16 );
+	ScratchPad = ( byte* )_aligned_malloc( ScratchPadSize, 16 );
+	FrameBuffer = ( byte* )_aligned_malloc( FrameBufferSize, 16 );
 
 	memset( MainMemory, 0x0, MainMemorySize );
+	memset( ScratchPad, 0x0, ScratchPadSize );
+	memset( FrameBuffer, 0x0, FrameBufferSize );
 }
 
 R4000Memory::~R4000Memory()
@@ -41,12 +43,12 @@ void R4000Memory::Clear()
 	if( MainMemory != NULL )
 		_aligned_free( MainMemory );
 	MainMemory = NULL;
-	if( _scratchPad != NULL )
-		_aligned_free( _scratchPad );
-	_scratchPad = NULL;
-	if( _frameBufferBytes != NULL )
-		_aligned_free( _frameBufferBytes );
-	_frameBufferBytes = NULL;
+	if( ScratchPad != NULL )
+		_aligned_free( ScratchPad );
+	ScratchPad = NULL;
+	if( FrameBuffer != NULL )
+		_aligned_free( FrameBuffer );
+	FrameBuffer = NULL;
 }
 
 IMemorySegment^ R4000Memory::DefineSegment( MemoryType type, String^ name, int baseAddress, int length )
@@ -58,8 +60,10 @@ void R4000Memory::RegisterSegment( IMemorySegment^ segment )
 {
 	if( segment->BaseAddress == FrameBufferBase )
 	{
-		SAFEFREE( _frameBufferBytes );
+		SAFEFREE( FrameBuffer );
 		_frameBuffer = segment;
+		//FrameBuffer = ptr?
+		throw gcnew NotImplementedException( "IMemorySegment does not support grabbing of the frame buffer bytes" );
 	}
 	else
 	{
@@ -91,7 +95,7 @@ int R4000Memory::ReadWord( int address )
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 	{
-		int* ptr = ( int* )( _scratchPad + ( address - ScratchPadBase ) );
+		int* ptr = ( int* )( ScratchPad + ( address - ScratchPadBase ) );
 		return *ptr;
 	}
 	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
@@ -100,7 +104,7 @@ int R4000Memory::ReadWord( int address )
 			return _frameBuffer->ReadWord( address );
 		else
 		{
-			int* ptr = ( int* )( _frameBufferBytes + ( address - FrameBufferBase ) );
+			int* ptr = ( int* )( FrameBuffer + ( address - FrameBufferBase ) );
 			return *ptr;
 		}
 	}
@@ -125,7 +129,7 @@ int64 R4000Memory::ReadDoubleWord( int address )
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 	{
-		int64* ptr = ( int64* )( _scratchPad + ( address - ScratchPadBase ) );
+		int64* ptr = ( int64* )( ScratchPad + ( address - ScratchPadBase ) );
 		return *ptr;
 	}
 	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
@@ -134,7 +138,7 @@ int64 R4000Memory::ReadDoubleWord( int address )
 			return _frameBuffer->ReadDoubleWord( address );
 		else
 		{
-			int64* ptr = ( int64* )( _frameBufferBytes + ( address - FrameBufferBase ) );
+			int64* ptr = ( int64* )( FrameBuffer + ( address - FrameBufferBase ) );
 			return *ptr;
 		}
 	}
@@ -215,7 +219,7 @@ void R4000Memory::WriteWord( int address, int width, int value )
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 	{
-		byte* ptr = _scratchPad + ( address - ScratchPadBase );
+		byte* ptr = ScratchPad + ( address - ScratchPadBase );
 		switch( width )
 		{
 		case 4:
@@ -244,7 +248,7 @@ void R4000Memory::WriteWord( int address, int width, int value )
 			_frameBuffer->WriteWord( address, width, value );
 		else
 		{
-			byte* ptr = _frameBufferBytes + ( address - FrameBufferBase );
+			byte* ptr = FrameBuffer + ( address - FrameBufferBase );
 			switch( width )
 			{
 			case 4:
@@ -291,7 +295,7 @@ void R4000Memory::WriteDoubleWord( int address, int64 value )
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 	{
-		byte* ptr = _scratchPad + ( address - ScratchPadBase );
+		byte* ptr = ScratchPad + ( address - ScratchPadBase );
 		int64* p = ( int64* )ptr;
 		*p = value;
 	}
@@ -301,7 +305,7 @@ void R4000Memory::WriteDoubleWord( int address, int64 value )
 			_frameBuffer->WriteDoubleWord( address, value );
 		else
 		{
-			byte* ptr = _frameBufferBytes + ( address - FrameBufferBase );
+			byte* ptr = FrameBuffer + ( address - FrameBufferBase );
 			int64* p = ( int64* )ptr;
 			*p = value;
 		}
@@ -327,7 +331,7 @@ void R4000Memory::WriteBytes( int address, array<byte>^ bytes )
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 	{
 		pin_ptr<byte> ptr = &bytes[ 0 ];
-		memcpy( _scratchPad + ( address - ScratchPadBase ), ptr, bytes->Length );
+		memcpy( ScratchPad + ( address - ScratchPadBase ), ptr, bytes->Length );
 	}
 	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
 	{
@@ -336,7 +340,7 @@ void R4000Memory::WriteBytes( int address, array<byte>^ bytes )
 		else
 		{
 			pin_ptr<byte> ptr = &bytes[ 0 ];
-			memcpy( _frameBufferBytes + ( address - FrameBufferBase ), ptr, bytes->Length );
+			memcpy( FrameBuffer + ( address - FrameBufferBase ), ptr, bytes->Length );
 		}
 	}
 	else

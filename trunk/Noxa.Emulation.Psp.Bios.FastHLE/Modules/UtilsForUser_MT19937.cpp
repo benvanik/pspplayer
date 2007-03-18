@@ -41,7 +41,7 @@ uint sceKernelUtilsMt19937UIntN( byte* memory, int pctx );
 // int sceKernelUtilsMt19937Init(SceKernelUtilsMt19937Context *ctx, u32 seed); (/user/psputils.h:96)
 int UtilsForUser::sceKernelUtilsMt19937Init( IMemory^ memory, int ctx, int seed )
 {
-	return sceKernelUtilsMt19937InitN( ( byte* )memory->InternalPointer, ctx, seed );
+	return sceKernelUtilsMt19937InitN( ( byte* )memory->MainMemoryPointer, ctx, seed );
 }
 
 #pragma unmanaged
@@ -73,7 +73,7 @@ int sceKernelUtilsMt19937InitN( byte* memory, int ctx, uint seed )
 // u32 sceKernelUtilsMt19937UInt(SceKernelUtilsMt19937Context *ctx); (/user/psputils.h:104)
 int UtilsForUser::sceKernelUtilsMt19937UInt( IMemory^ memory, int ctx )
 {
-	return sceKernelUtilsMt19937UIntN( ( byte* )memory->InternalPointer, ctx );
+	return sceKernelUtilsMt19937UIntN( ( byte* )memory->MainMemoryPointer, ctx );
 }
 
 #pragma unmanaged

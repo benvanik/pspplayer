@@ -56,7 +56,7 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	g->cmp( EAX, MainMemoryBound );
 	g->ja( label1 );
 
-	// else, do a direct read
+	// else, do a direct main memory read
 	g->sub( EAX, MainMemoryBase ); // get to offset in main memory
 	g->mov( EAX, g->dword_ptr[ EAX + (int)context->Memory->MainMemory ] );
 	g->jmp( label3 );
@@ -69,14 +69,11 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	g->jb( label2 );
 	g->cmp( EAX, FrameBufferBound );
 	g->ja( label2 );
-	
+
 	// else, do a direct fb read
-#ifdef IGNOREFRAMEBUFFER
-	// Don't do anything!
+	g->sub( EAX, FrameBufferBase );
+	g->mov( EAX, g->dword_ptr[ EAX + (int)context->Memory->FrameBuffer ] );
 	g->jmp( label3 );
-#else
-	// Not implemented! Fall through to memory call
-#endif
 
 	g->label( label2 );
 
@@ -143,12 +140,20 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 	g->ja( label2 );
 	
 	// else, do a direct fb read
-#ifdef IGNOREFRAMEBUFFER
-	// Don't do anything!
+	g->sub( EAX, FrameBufferBase ); // get to offset in fb
+	switch( width )
+	{
+	case 1:
+		g->mov( g->byte_ptr[ EAX + (int)context->Memory->FrameBuffer ], BL );
+		break;
+	case 2:
+		g->mov( g->word_ptr[ EAX + (int)context->Memory->FrameBuffer ], BX );
+		break;
+	case 4:
+		g->mov( g->dword_ptr[ EAX + (int)context->Memory->FrameBuffer ], EBX );
+		break;
+	}
 	g->jmp( label3 );
-#else
-	// Not implemented! Fall through to memory call
-#endif
 
 	g->label( label2 );
 
