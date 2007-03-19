@@ -38,7 +38,6 @@ GenerationResult BCzF( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MCP1CONDBIT( CTX ) );
 		// EAX = 1 if cond true, 0 if cond false
 		g->xor( EAX, 0x1 ); // <- flip, as we are F
@@ -63,7 +62,6 @@ GenerationResult BCzFL( R4000GenContext^ context, int pass, int address, uint co
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MCP1CONDBIT( CTX ) );
 		// EAX = 1 if cond true, 0 if cond false
 		g->xor( EAX, 0x1 ); // <- flip, as we are F
@@ -90,7 +88,6 @@ GenerationResult BCzT( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MCP1CONDBIT( CTX ) );
 		// EAX = 1 if cond true, 0 if cond false
 		g->mov( MPCVALID( CTX ), EAX );
@@ -114,7 +111,6 @@ GenerationResult BCzTL( R4000GenContext^ context, int pass, int address, uint co
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MCP1CONDBIT( CTX ) );
 		// EAX = 1 if cond true, 0 if cond false
 		g->mov( MPCVALID( CTX ), EAX );

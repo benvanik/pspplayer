@@ -31,6 +31,7 @@ namespace Noxa {
 				ref class UltraCpu;
 				ref class R4000BiosStubs;
 				ref class R4000VideoInterface;
+				ref class R4000BlockBuilder;
 
 				delegate void BiosShim( R4000Cpu^ cpu );
 
@@ -62,6 +63,7 @@ namespace Noxa {
 
 					R4000Cache^					_codeCache;
 					R4000GenContext^			_context;
+					R4000BlockBuilder^			_builder;
 					R4000BiosStubs^				_biosStubs;
 					R4000VideoInterface^		_videoInterface;
 

@@ -18,39 +18,18 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 String^ KernelHelpers::ReadString( IMemory^ memory, int address )
 {
-	StringBuilder^ sb = gcnew StringBuilder();
-	while( true )
-	{
-		byte c = ( byte )( memory->ReadWord( address ) & 0xFF );
-		if( c == 0 )
-			break;
-		sb->Append( ( wchar_t )c );
-		address++;
-	}
-	return sb->ToString();
+	return ReadString( ( byte* )memory->MainMemoryPointer, address );
 }
 
 int KernelHelpers::WriteString( IMemory^ memory, const int address, String^ value )
 {
-	array<byte>^ bytes = Encoding::ASCII->GetBytes( value );
-	memory->WriteBytes( address, bytes );
-	memory->WriteWord( address + bytes->Length, 1, 0 );
-	return bytes->Length + 1;
+	return WriteString( ( byte* )memory->MainMemoryPointer, address, value );
 }
 
 String^ KernelHelpers::ReadString( byte* memory, const int address )
 {
 	byte* ptr = memory + ( address - MainMemoryBase );
-	StringBuilder^ sb = gcnew StringBuilder();
-	while( true )
-	{
-		byte c = *ptr;
-		if( c == 0 )
-			break;
-		sb->Append( ( char )c );
-		ptr++;
-	}
-	return sb->ToString();
+	return gcnew String( ( char* )ptr );
 }
 
 int KernelHelpers::WriteString( byte* memory, const int address, String^ value )
@@ -74,29 +53,12 @@ int KernelHelpers::WriteString( byte* memory, const int address, String^ value )
 
 DateTime KernelHelpers::ReadTime( IMemory^ memory, const int address )
 {
-	ushort year = ( ushort )( memory->ReadWord( address ) & 0xFFFF );
-	ushort month = ( ushort )( memory->ReadWord( address + 2 ) & 0xFFFF );
-	ushort day = ( ushort )( memory->ReadWord( address + 4 ) & 0xFFFF );
-	ushort hour = ( ushort )( memory->ReadWord( address + 6 ) & 0xFFFF );
-	ushort minute = ( ushort )( memory->ReadWord( address + 8 ) & 0xFFFF );
-	ushort second = ( ushort )( memory->ReadWord( address + 10 ) & 0xFFFF );
-	uint microsecond = ( uint )( memory->ReadWord( address + 12 ) );
-
-	// 1000 microseconds per millisecond?
-	return DateTime( year, month, day, hour, minute, second, ( int )( microsecond / 1000 ) );
+	return ReadTime( ( byte* )memory->MainMemoryPointer, address );
 }
 
 int KernelHelpers::WriteTime( IMemory^ memory, const int address, DateTime time )
 {
-	memory->WriteWord( address, 2, time.Year );
-	memory->WriteWord( address + 2, 2, time.Month );
-	memory->WriteWord( address + 4, 2, time.Day );
-	memory->WriteWord( address + 6, 2, time.Hour );
-	memory->WriteWord( address + 8, 2, time.Minute );
-	memory->WriteWord( address + 10, 2, time.Second );
-	memory->WriteWord( address + 12, 4, time.Millisecond * 1000 );
-
-	return 16;
+	return WriteTime( ( byte* )memory->MainMemoryPointer, address, time );
 }
 
 DateTime KernelHelpers::ReadTime( byte* memory, const int address )

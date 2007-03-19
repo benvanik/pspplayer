@@ -31,7 +31,6 @@ GenerationResult JR( R4000GenContext^ context, int pass, int address, uint code,
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->mov( MPC( CTX ), EAX );
 		g->mov( MPCVALID( CTX ), 1 );
@@ -51,7 +50,6 @@ GenerationResult JALR( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 		g->mov( MREG( CTX, rd ), address + 4 );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->mov( MPC( CTX ), EAX );
@@ -73,7 +71,6 @@ GenerationResult J( R4000GenContext^ context, int pass, int address, uint code, 
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 		g->mov( MPC( CTX ), pc );
 		g->mov( MPCVALID( CTX ), 1 );
 	}
@@ -93,7 +90,6 @@ GenerationResult JAL( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 		g->mov( MREG( CTX, 31 ), address + 4 );
 		g->mov( MPC( CTX ), pc );
 		g->mov( MPCVALID( CTX ), 1 );
@@ -115,7 +111,6 @@ GenerationResult BEQ( R4000GenContext^ context, int pass, int address, uint code
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->cmp( EAX, MREG( CTX, rt ) );
 		g->sete( AL );
@@ -139,7 +134,6 @@ GenerationResult BNE( R4000GenContext^ context, int pass, int address, uint code
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->cmp( EAX, MREG( CTX, rt ) );
 		g->setne( AL );
@@ -163,7 +157,6 @@ GenerationResult BLEZ( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setle( AL );
@@ -187,7 +180,6 @@ GenerationResult BGTZ( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setg( AL );
@@ -211,7 +203,6 @@ GenerationResult BEQL( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->cmp( EAX, MREG( CTX, rt ) );
 		g->sete( AL );
@@ -237,7 +228,6 @@ GenerationResult BNEL( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->cmp( EAX, MREG( CTX, rt ) );
 		g->setne( AL );
@@ -263,7 +253,6 @@ GenerationResult BLEZL( R4000GenContext^ context, int pass, int address, uint co
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setle( AL );
@@ -289,7 +278,6 @@ GenerationResult BGTZL( R4000GenContext^ context, int pass, int address, uint co
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setg( AL );
@@ -316,7 +304,6 @@ GenerationResult BLTZ( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setl( AL );
@@ -341,7 +328,6 @@ GenerationResult BGEZ( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setge( AL );
@@ -366,7 +352,6 @@ GenerationResult BLTZL( R4000GenContext^ context, int pass, int address, uint co
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setl( AL );
@@ -393,7 +378,6 @@ GenerationResult BGEZL( R4000GenContext^ context, int pass, int address, uint co
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setge( AL );
@@ -420,7 +404,6 @@ GenerationResult BLTZAL( R4000GenContext^ context, int pass, int address, uint c
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setl( AL );
@@ -454,7 +437,6 @@ GenerationResult BGEZAL( R4000GenContext^ context, int pass, int address, uint c
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setge( AL );
@@ -488,7 +470,6 @@ GenerationResult BLTZALL( R4000GenContext^ context, int pass, int address, uint 
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setl( AL );
@@ -524,7 +505,6 @@ GenerationResult BGEZALL( R4000GenContext^ context, int pass, int address, uint 
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
 		g->setge( AL );

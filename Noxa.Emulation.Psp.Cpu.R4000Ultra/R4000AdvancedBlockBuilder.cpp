@@ -81,6 +81,8 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 	char nullDelayLabel[ 30 ];
 	char nullDelayLabelSkip[ 30 ];
 
+	byte* mainMemory = _memory->MainMemory;
+
 	int maxCodeLength = MAXCODELENGTH;
 	for( int pass = 0; pass <= 1; pass++ )
 	{
@@ -105,7 +107,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 			maxLengthHit = ( n == maxCodeLength - 1 );
 
 			bool inDelay = _ctx->InDelay;
-			uint code = ( uint )_memory->ReadWord( address );
+			uint code = *( ( uint* )( mainMemory + ( address - MainMemoryBase ) ) );
 
 			//this->EmitDebug( address, code );
 
@@ -733,13 +735,13 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 			//Debug::WriteLine( "returning when could build jump block" );
 
 #ifdef STATISTICS
-			R4000Cpu::GlobalCpu->_stats->JumpBlockLookupCount++;
+			_cpu->_stats->JumpBlockLookupCount++;
 #endif
 		}
 		else
 		{
 			// Bounce out
-			CodeBlock^ block = _ctx->_builder->_codeCache->Find( targetAddress );
+			CodeBlock^ block = _codeCache->Find( targetAddress );
 			if( block == nullptr )
 			{
 #ifdef VERBOSEBUILD
@@ -750,7 +752,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 				this->EmitJumpBlock( targetAddress );
 
 #ifdef STATISTICS
-				R4000Cpu::GlobalCpu->_stats->JumpBlockThunkCount++;
+				_cpu->_stats->JumpBlockThunkCount++;
 #endif
 			}
 			else
@@ -764,7 +766,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 				g->jmp( EAX );
 
 #ifdef STATISTICS
-				R4000Cpu::GlobalCpu->_stats->JumpBlockInlineCount++;
+				_cpu->_stats->JumpBlockInlineCount++;
 #endif
 			}
 		}
@@ -776,7 +778,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 		g->ret();
 
 #ifdef STATISTICS
-		R4000Cpu::GlobalCpu->_stats->CodeBlockRetCount++;
+		_cpu->_stats->CodeBlockRetCount++;
 #endif
 	}
 }

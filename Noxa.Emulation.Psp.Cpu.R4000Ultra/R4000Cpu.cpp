@@ -57,13 +57,13 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 
 	_hasExecuted = false;
 
-	R4000AdvancedBlockBuilder^ builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	R4000Generator* gen = new R4000Generator();
-	_context = gcnew R4000GenContext( builder, gen );
+	_context = gcnew R4000GenContext( gen, _memory->MainMemory, _memory->FrameBuffer );
+	_builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	_biosStubs = gcnew R4000BiosStubs();
 	_videoInterface = gcnew R4000VideoInterface( this );
 
-	_bounce = builder->BuildBounce();
+	_bounce = _builder->BuildBounce();
 
 	_privateMemoryFieldInfo = ( R4000Cpu::typeid )->GetField( "_memory", BindingFlags::Instance | BindingFlags::NonPublic );
 	_privateModuleInstancesFieldInfo = ( R4000Cpu::typeid )->GetField( "_moduleInstances", BindingFlags::Instance | BindingFlags::NonPublic );
@@ -139,7 +139,7 @@ int R4000Cpu::ExecuteBlock()
 	CodeBlock^ block = _codeCache->Find( pc );
 	if( block == nullptr )
 	{
-		block = _context->_builder->Build( pc );
+		block = _builder->Build( pc );
 #ifdef STATISTICS
 		_stats->CodeCacheMisses++;
 #endif

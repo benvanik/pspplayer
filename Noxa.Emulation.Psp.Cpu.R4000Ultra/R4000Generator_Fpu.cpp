@@ -120,7 +120,6 @@ GenerationResult FADD( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->addss( XMM0, MCP1REG( CTX, ft, fmt ) );
@@ -143,7 +142,6 @@ GenerationResult FSUB( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->subss( XMM0, MCP1REG( CTX, ft, fmt ) );
@@ -166,7 +164,6 @@ GenerationResult FMUL( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 #if 0
 		// ultra super debug version
@@ -221,7 +218,6 @@ GenerationResult FDIV( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 #ifdef DEBUGFPU
 		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
@@ -260,7 +256,6 @@ GenerationResult FSQRT( R4000GenContext^ context, int pass, int address, uint co
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 		g->sqrtss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		ASSERTXMM0VALID();
@@ -281,7 +276,6 @@ GenerationResult FABS( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 		// TODO: faster fabs
 		g->fld( MCP1REG( CTX, fs, fmt ) );
 		g->fabs();
@@ -311,7 +305,6 @@ GenerationResult FMOV( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 		g->mov( EAX, MCP1REG( CTX, fs, fmt ) );
 		PRINTEAX();
 		g->mov( MCP1REG( CTX, fd, fmt ), EAX );
@@ -328,7 +321,6 @@ GenerationResult FNEG( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifndef SSEOPT
 #ifdef CAUTIOUSFPU
 		// Safe way (no -0.0)
@@ -373,7 +365,6 @@ GenerationResult ROUNDW( R4000GenContext^ context, int pass, int address, uint c
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 		// MXCSR rounding mode to round even
 #ifdef SSE_ENSURERC
@@ -422,7 +413,6 @@ GenerationResult TRUNCW( R4000GenContext^ context, int pass, int address, uint c
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
 		// round towards zero
@@ -446,7 +436,6 @@ GenerationResult CEILW( R4000GenContext^ context, int pass, int address, uint co
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 //#ifdef SSE
 //		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
 //		g->cvtss2si( EAX, XMM0 );
@@ -470,7 +459,6 @@ GenerationResult FLOORW( R4000GenContext^ context, int pass, int address, uint c
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 //#ifdef SSE
 //		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
 //		g->cvttss2si( EAX, XMM0 );
@@ -494,7 +482,6 @@ GenerationResult CVTS( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 		g->cvtsi2ss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		ASSERTXMM0VALID();
@@ -516,7 +503,6 @@ GenerationResult CVTW( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		LOADCTXBASE( EDX );
 #ifdef SSE
 		g->cvtss2si( EAX, MCP1REG( CTX, fs, fmt ) );
 		PRINTEAX();
@@ -547,7 +533,6 @@ GenerationResult FCOMPARE( R4000GenContext^ context, int pass, int address, uint
 		bool unorderedBit = ( cond & 0x1 ) == 1 ? true : false;
 		bool un = lessBit && equalBit && unorderedBit;
 
-		LOADCTXBASE( EDX );
 #ifdef SSE
 		// TODO: support all FPU compare ops (ordered, etc)
 		// NOTE: could do this with COMISS and SETcc instead!
