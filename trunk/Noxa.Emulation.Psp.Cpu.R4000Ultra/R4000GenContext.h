@@ -8,8 +8,6 @@
 
 #include <string>
 
-#include "R4000BlockBuilder.h"
-
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::Diagnostics;
@@ -20,7 +18,6 @@ namespace Noxa {
 		namespace Psp {
 			namespace Cpu {
 
-				ref class R4000Memory;
 				class R4000Generator;
 
 				enum class GenerationResult
@@ -58,54 +55,39 @@ namespace Noxa {
 
 				ref class R4000GenContext
 				{
-				internal:
-					R4000BlockBuilder^	_builder;
-
-				protected:
-					R4000Generator*		_gen;
-
 				public:
-					R4000GenContext( R4000BlockBuilder^ builder, R4000Generator* generator )
+					R4000GenContext( R4000Generator* generator, byte* mainMemory, byte* frameBuffer )
 					{
-						_builder = builder;
-						_gen = generator;
+						Generator = generator;
+
+						MainMemory = mainMemory;
+						FrameBuffer = frameBuffer;
 
 						BranchLabels = gcnew Dictionary<int, LabelMarker^>();
 					}
 
-					property R4000Memory^ Memory
-					{
-						virtual R4000Memory^ get()
-						{
-							return _builder->_memory;
-						}
-					}
+					R4000Generator*		Generator;
 
-					property R4000Generator* Generator
-					{
-						virtual R4000Generator* get()
-						{
-							return _gen;
-						}
-					}
+					byte*				MainMemory;
+					byte*				FrameBuffer;
 
-					int StartAddress;
-					int EndAddress;
+					int					StartAddress;
+					int					EndAddress;
 
-					bool UpdatePC;
-					bool UseSyscalls;
-					bool LastSyscallStateless;
+					bool				UpdatePC;
+					bool				UseSyscalls;
+					bool				LastSyscallStateless;
 
 					Dictionary<int, LabelMarker^>^ BranchLabels;
-					int LastBranchTarget;
+					int					LastBranchTarget;
 
-					int JumpTarget;
-					int JumpRegister;
+					int					JumpTarget;
+					int					JumpRegister;
 
-					bool InDelay;
-					LabelMarker^ BranchTarget;
+					bool				InDelay;
+					LabelMarker^		BranchTarget;
 
-					void* CtxPointer;
+					void*				CtxPointer;
 
 					void Reset( int startAddress )
 					{

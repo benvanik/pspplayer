@@ -31,6 +31,8 @@ typedef union SysClock_u
 // Stupid standard...
 __inline int power( int base, int exponent )
 {
+	if( base == 2 )
+		return 1 << exponent;
 	if( exponent == 0 )
 		return 1;
 	else if( exponent == 1 )

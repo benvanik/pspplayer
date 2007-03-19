@@ -33,7 +33,7 @@ R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 	_memory = ( R4000Memory^ )_cpu->Memory;
 	_codeCache = _cpu->CodeCache;
 
-	_gen = new R4000Generator();
+	_gen = _cpu->_context->Generator;
 #ifndef GENECHOFILE
 	R4000Generator::disableListing();
 #endif
@@ -42,7 +42,7 @@ R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 	_gen->setEchoFile( GENECHOFILE );
 #endif
 
-	_ctx = gcnew R4000GenContext( this, _gen );
+	_ctx = _cpu->_context;
 
 	// LOL confusing
 	_ctx->CtxPointer = ( void* )_cpu->_ctx;
@@ -179,7 +179,7 @@ void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
 CodeBlock^ R4000BlockBuilder::Build( int address )
 {
 #ifdef STATISTICS
-	double blockStart = R4000Cpu::GlobalCpu->_timer->Elapsed;
+	double blockStart = _cpu->_timer->Elapsed;
 #endif
 
 	address &= 0x3FFFFFFF;
@@ -220,13 +220,13 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	_codeCache->Add( block );
 
 #ifdef STATISTICS
-	R4000Statistics^ stats = R4000Cpu::GlobalCpu->_stats;
+	R4000Statistics^ stats = _cpu->_stats;
 	stats->CodeBlocksGenerated++;
 
 	double ratio = block->Size / ( block->InstructionCount * 4 );
 	stats->AverageCodeSizeRatio = ( stats->AverageCodeSizeRatio * .5 ) + ( ratio * .5 );
 
-	double genTime = R4000Cpu::GlobalCpu->_timer->Elapsed - blockStart;
+	double genTime = _cpu->_timer->Elapsed - blockStart;
 	if( genTime <= 0.0 )
 		genTime = 0.000001;
 	stats->AverageGenerationTime += genTime;
@@ -364,7 +364,7 @@ void __fixupBlockJump( void* sourceAddress, int newTarget )
 // generate it. Once we do that, we go back and fix up the caller.
 int __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackPointer )
 {
-	R4000BlockBuilder^ builder = R4000Cpu::GlobalCpu->_context->_builder;
+	R4000BlockBuilder^ builder = R4000Cpu::GlobalCpu->_builder;
 	Debug::Assert( builder != nullptr );
 
 #ifdef STATISTICS

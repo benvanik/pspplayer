@@ -60,7 +60,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->mov( EAX, MREG( CTX, 4 ) );
 		g->and( EAX, 0x3FFFFFFF );
 		g->sub( EAX, MainMemoryBase );
-		g->add( EAX, ( int )context->Memory->MainMemory );
+		g->add( EAX, ( int )context->MainMemory );
 		g->push( EAX );
 		g->call( ( int )sceRtcGetCurrentTick );
 		g->add( ESP, 4 );

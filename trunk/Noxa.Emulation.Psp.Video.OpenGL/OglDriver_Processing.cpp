@@ -430,8 +430,8 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			context->Textures[ 0 ].TextureID = 0;
 			break;
 		case TSIZE0:
-			context->Textures[ 0 ].Width = power( 2, argi & 0x000000FF );
-			context->Textures[ 0 ].Height = power( 2, ( argi >> 8 ) & 0x000000FF );
+			context->Textures[ 0 ].Width = 1 << ( argi & 0x000000FF );
+			context->Textures[ 0 ].Height = 1 << ( ( argi >> 8 ) & 0x000000FF );
 			context->Textures[ 0 ].PixelStorage = context->TextureStorageMode;
 			break;
 
