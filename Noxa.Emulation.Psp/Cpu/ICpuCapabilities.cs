@@ -44,11 +44,6 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 		}
 
-		bool InternalMemorySupported
-		{
-			get;
-		}
-
 		CpuStatisticsCapabilities SupportedStatistics
 		{
 			get;

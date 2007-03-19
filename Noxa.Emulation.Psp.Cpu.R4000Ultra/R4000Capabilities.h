@@ -49,14 +49,6 @@ namespace Noxa {
 						}
 					}
 
-					property bool InternalMemorySupported
-					{
-						virtual bool get()
-						{
-							return true;
-						}
-					}
-
 					property Cpu::CpuStatisticsCapabilities SupportedStatistics
 					{
 						virtual Cpu::CpuStatisticsCapabilities get()
