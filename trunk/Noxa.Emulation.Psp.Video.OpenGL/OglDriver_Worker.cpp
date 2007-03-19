@@ -190,10 +190,8 @@ void OglDriver::WorkerThread()
 	this->SetupOpenGL();
 
 	// Setup the context
-	bool supportInternalMemory = _emu->Cpu->Capabilities->InternalMemorySupported;
-	bool supportInternalMemoryPointer = supportInternalMemory && ( _emu->Cpu->Memory->MainMemoryPointer != NULL );
-	// TODO: support non-pointer based internal memory
-	Debug::Assert( supportInternalMemoryPointer == true );
+	bool supportInternalMemory = ( _emu->Cpu->Memory->MainMemoryPointer != NULL );
+	Debug::Assert( supportInternalMemory == true );
 	_context->MainMemoryPointer = ( byte* )_emu->Cpu->Memory->MainMemoryPointer;
 	_context->VideoMemoryPointer = ( byte* )_emu->Cpu->Memory->FrameBufferPointer;
 
