@@ -31,6 +31,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Video.Op
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Bios.FastHLE", "Noxa.Emulation.Psp.Bios.FastHLE\Noxa.Emulation.Psp.Bios.FastHLE.vcproj", "{1448FED7-FABB-4197-A0AA-CBC48656546B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.CodeGen", "Noxa.Emulation.Psp.CodeGen\Noxa.Emulation.Psp.CodeGen.vcproj", "{3BA8A34E-E779-4282-9566-2E0FE1D507FC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CodeGenTest", "Tests\CodeGenTest\CodeGenTest.vcproj", "{56515130-22AA-4051-BBC8-E45CC9CB362B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC} = {3BA8A34E-E779-4282-9566-2E0FE1D507FC}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -180,6 +187,26 @@ Global
 		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Release|Win32.ActiveCfg = Release|Win32
 		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Release|Win32.Build.0 = Release|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Debug|Win32.Build.0 = Debug|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Release|Any CPU.ActiveCfg = Release|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Release|Win32.ActiveCfg = Release|Win32
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Release|Win32.Build.0 = Release|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Debug|Win32.Build.0 = Debug|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Release|Any CPU.ActiveCfg = Release|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Release|Win32.ActiveCfg = Release|Win32
+		{56515130-22AA-4051-BBC8-E45CC9CB362B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

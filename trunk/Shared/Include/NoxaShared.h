@@ -11,6 +11,9 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef long long int64;
 typedef unsigned long long uint64;
+typedef unsigned short word;
+typedef unsigned int dword;
+typedef unsigned long long qword;
 typedef void* ptr;
 
 typedef union SysClock_u

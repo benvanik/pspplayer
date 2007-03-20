@@ -26,6 +26,8 @@ void Tracer::CloseFile()
 	_file = NULL;
 }
 
+#pragma warning( disable: 4949 )
+
 #pragma unmanaged
 void Tracer::WriteLine( const char* line )
 {
