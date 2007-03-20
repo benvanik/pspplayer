@@ -382,10 +382,8 @@ void* R4000Cpu::EmitShimN( BiosFunction^ function, void* memory, void* registers
 	// This assumes caller address on top of the stack, which it should be
 	g->ret();
 
-	void* ptr = g->callable();
-	g->acquire();
-
-	g->reset();
+	FunctionPointer ptr = g->GenerateCode();
+	g->Reset();
 
 	return ptr;
 }

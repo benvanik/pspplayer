@@ -10,22 +10,15 @@
 #include "R4000Core.h"
 #include "R4000Memory.h"
 
-#include "Loader.hpp"
-#include "CodeGenerator.hpp"
+#include "CodeGenerator.h"
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
-using namespace SoftWire;
 
 R4000Generator::R4000Generator()
-	: CodeGenerator( false )
+	: CodeGenerator( 1024 * 20 )
 {
 	Setup();
-}
-
-int R4000Generator::getCodeLength()
-{
-	// Pad is cause the returned value may be bogus?
-	return loader->codeLength() - 64;
 }

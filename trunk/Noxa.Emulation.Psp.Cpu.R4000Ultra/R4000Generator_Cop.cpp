@@ -11,14 +11,13 @@
 #include "R4000Memory.h"
 #include "R4000GenContext.h"
 
-#include "Loader.hpp"
-#include "CodeGenerator.hpp"
+#include "CodeGenerator.h"
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
+using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
-using namespace SoftWire;
 
 #define g context->Generator
 

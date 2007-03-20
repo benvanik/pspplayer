@@ -7,11 +7,13 @@
 #pragma once
 
 #include <string>
+#include "Label.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::CodeGen;
 
 namespace Noxa {
 	namespace Emulation {
@@ -36,20 +38,13 @@ namespace Noxa {
 				{
 				public:
 
-					char*	Label;
+					Label*	Label;
 					bool	Found;
 					int		Address;
 
 					LabelMarker( int address )
 					{
 						Address = address;
-						Label = ( char* )malloc( 20 );
-						sprintf_s( Label, 20, "l%Xlm", address );
-					}
-
-					~LabelMarker()
-					{
-						SAFEFREE( Label );
 					}
 				};
 
@@ -89,39 +84,15 @@ namespace Noxa {
 
 					void*				CtxPointer;
 
-					void Reset( int startAddress )
-					{
-						StartAddress = startAddress;
-						EndAddress = startAddress;
+					void Reset( int startAddress );
 
-						UpdatePC = false;
-						UseSyscalls = false;
-
-						BranchLabels->Clear();
-						LastBranchTarget = 0;
-						InDelay = false;
-						BranchTarget = nullptr;
-						JumpTarget = 0;
-						JumpRegister = 0;
-					}
-
-					bool IsBranchLocal( int address )
+					__inline bool IsBranchLocal( int address )
 					{
 						return( ( address >= StartAddress ) &&
 							( address <= EndAddress ) );
 					}
 
-					void DefineBranchTarget( int address )
-					{
-						if( BranchLabels->ContainsKey( address ) == false )
-						{
-							//Debug::WriteLine( String::Format( "Defining branch target {0:X8}", address ) );
-							LabelMarker^ lm = gcnew LabelMarker( address );
-							BranchLabels->Add( address, lm );
-						}
-						if( LastBranchTarget < address )
-							LastBranchTarget = address;
-					}
+					void DefineBranchTarget( int address );
 				};
 
 			}

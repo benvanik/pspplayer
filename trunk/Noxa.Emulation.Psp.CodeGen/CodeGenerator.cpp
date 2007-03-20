@@ -144,6 +144,7 @@ void CodeGenerator::Encode( const int instructionId, const Operand& op1, const O
 	Instruction* instruction = &InstructionSet::Table[ instructionId ];
 
 	_synth->Reset();
+	assert( _synth->GetTarget() == 0 );
 
 	_synth->EncodeOperand1( op1 );
 	_synth->EncodeOperand2( op2 );
@@ -204,6 +205,8 @@ void CodeGenerator::Encode( const int instructionId, const Operand& op1, const O
 
 	if( target != NULL )
 		_synth->SetTarget( target );
+	else
+		assert( _synth->GetTarget() == 0 );
 
 	/*if( x64 && _synth->IsRipRelative() )
 	{

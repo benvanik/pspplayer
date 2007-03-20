@@ -709,7 +709,6 @@ namespace Noxa {
 				{
 					OperandR_M16() : Operand( OPERAND_R_M16 )
 					{
-						type = OPERAND_R_M16;
 						BaseReg = CodeGen::REG_UNKNOWN;
 						IndexReg = CodeGen::REG_UNKNOWN;
 						Scale = 0;
