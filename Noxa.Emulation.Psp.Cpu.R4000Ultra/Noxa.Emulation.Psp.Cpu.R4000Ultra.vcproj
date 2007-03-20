@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\Dependencies\SoftWire&quot;;&quot;$(SolutionDir)Shared\Include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Shared\Include&quot;;&quot;$(SolutionDir)Noxa.Emulation.Psp.CodeGen\&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)\Dependencies\SoftWire\Debug\SoftWire.lib $(NOINHERIT)"
+				AdditionalDependencies="$(TargetDir)Noxa.Emulation.Psp.CodeGen.lib $(NOINHERIT)"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
@@ -234,6 +234,10 @@
 			</File>
 			<File
 				RelativePath=".\R4000Cpu_Shim.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000GenContext.cpp"
 				>
 			</File>
 			<File

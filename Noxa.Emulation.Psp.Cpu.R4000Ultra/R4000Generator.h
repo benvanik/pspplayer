@@ -9,11 +9,11 @@
 #include "R4000GenContext.h"
 #include "R4000Ctx.h"
 
-#include "CodeGenerator.hpp"
+#include "CodeGenerator.h"
 
 using namespace System;
 using namespace Noxa::Emulation::Psp;
-using namespace SoftWire;
+using namespace Noxa::Emulation::Psp::CodeGen;
 
 #define EAX g->eax
 #define EBX g->ebx
@@ -36,17 +36,17 @@ using namespace SoftWire;
 #define SE( x ) ((int)(short)x)
 
 #define LOADCTXBASE( xr )	
-#define CTX					CTXP( context->CtxPointer )
-#define CTXP( x )			( ( int )x )
-#define MREG( xr, r )		g->dword_ptr[ xr + CTXREGS + ( r << 2 ) ]
-#define MLO( xr )			g->dword_ptr[ xr + CTXLO ]
-#define MHI( xr )			g->dword_ptr[ xr + CTXHI ]
-#define MNULLDELAY( xr )	g->dword_ptr[ xr + CTXNULLDELAY ]
-#define MPCVALID( xr )		g->dword_ptr[ xr + CTXPCVALID ]
-#define MPC( xr )			g->dword_ptr[ xr + CTXPC ]
+#define CTX						CTXP( context->CtxPointer )
+#define CTXP( x )				( ( int )x )
+#define MREG( xr, r )			g->dword_ptr[ xr + CTXREGS + ( r << 2 ) ]
+#define MLO( xr )				g->dword_ptr[ xr + CTXLO ]
+#define MHI( xr )				g->dword_ptr[ xr + CTXHI ]
+#define MNULLDELAY( xr )		g->dword_ptr[ xr + CTXNULLDELAY ]
+#define MPCVALID( xr )			g->dword_ptr[ xr + CTXPCVALID ]
+#define MPC( xr )				g->dword_ptr[ xr + CTXPC ]
 #define MCP1REG( xr, r, fmt )	g->dword_ptr[ xr + CTXCP1REGS + ( r << 4 ) ]
-#define MCP1CONDBIT( xr )	g->dword_ptr[ xr + CTXCP1CONDBIT ]
-#define MSTOPFLAG( xr )		g->dword_ptr[ xr + CTXSTOPFLAG ]
+#define MCP1CONDBIT( xr )		g->dword_ptr[ xr + CTXCP1CONDBIT ]
+#define MSTOPFLAG( xr )			g->dword_ptr[ xr + CTXSTOPFLAG ]
 
 namespace Noxa {
 	namespace Emulation {
@@ -65,8 +65,6 @@ namespace Noxa {
 				public:
 					R4000Generator();
 					void Setup();
-
-					int getCodeLength();
 
 				public:
 					static GenerateInstructionR TableR[ 64 ];

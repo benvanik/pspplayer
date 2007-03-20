@@ -11,13 +11,12 @@
 #include "R4000Memory.h"
 #include "R4000GenContext.h"
 
-#include "Loader.hpp"
-#include "CodeGenerator.hpp"
+#include "CodeGenerator.h"
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
-using namespace SoftWire;
 
 #define g context->Generator
 
@@ -43,39 +42,36 @@ void __writeMemoryThunk( int targetAddress, int width, int value )
 // EAX = address, result in EAX
 void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 {
-	char label1[20];
-	sprintf_s( label1, 20, "l%Xs1r", address - 4 );
-	char label2[20];
-	sprintf_s( label2, 20, "l%Xs2r", address - 4 );
-	char label3[20];
-	sprintf_s( label3, 20, "l%Xs3r", address - 4 );
+	Label* l1 = g->DefineLabel();
+	Label* l2 = g->DefineLabel();
+	Label* l3 = g->DefineLabel();
 
 	// if < 0x0800000 && > MainMemoryBound, skip and check framebuffer or do a read from method
 	g->cmp( EAX, MainMemoryBase );
-	g->jb( label1 );
+	g->jb( l1 );
 	g->cmp( EAX, MainMemoryBound );
-	g->ja( label1 );
+	g->ja( l1 );
 
 	// else, do a direct main memory read
 	g->sub( EAX, MainMemoryBase ); // get to offset in main memory
 	g->mov( EAX, g->dword_ptr[ EAX + (int)context->MainMemory ] );
-	g->jmp( label3 );
+	g->jmp( l3 );
 
 	// case to handle read call
-	g->label( label1 );
+	g->MarkLabel( l1 );
 
 	// if < 0x0400000 && > FrameBufferBound, skip and do a read from method
 	g->cmp( EAX, FrameBufferBase );
-	g->jb( label2 );
+	g->jb( l2 );
 	g->cmp( EAX, FrameBufferBound );
-	g->ja( label2 );
+	g->ja( l2 );
 
 	// else, do a direct fb read
 	g->sub( EAX, FrameBufferBase );
 	g->mov( EAX, g->dword_ptr[ EAX + (int)context->FrameBuffer ] );
-	g->jmp( label3 );
+	g->jmp( l3 );
 
-	g->label( label2 );
+	g->MarkLabel( l2 );
 
 	// TEST
 #if 0
@@ -95,24 +91,21 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	g->add( ESP, 4 );
 
 	// done
-	g->label( label3 );
+	g->MarkLabel( l3 );
 }
 
 // EAX = address, EBX = data
 void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 {
-	char label1[20];
-	sprintf_s( label1, 20, "l%Xs1w", address - 4 );
-	char label2[20];
-	sprintf_s( label2, 20, "l%Xs2w", address - 4 );
-	char label3[20];
-	sprintf_s( label3, 20, "l%Xs3w", address - 4 );
+	Label* l1 = g->DefineLabel();
+	Label* l2 = g->DefineLabel();
+	Label* l3 = g->DefineLabel();
 
 	// if < 0x0800000 && > MainMemoryBound, skip and do a write from method
 	g->cmp( EAX, MainMemoryBase );
-	g->jb( label1 );
+	g->jb( l1 );
 	g->cmp( EAX, MainMemoryBound );
-	g->ja( label1 );
+	g->ja( l1 );
 
 	// else, do a direct read
 	g->sub( EAX, MainMemoryBase ); // get to offset in main memory
@@ -128,16 +121,16 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 		g->mov( g->dword_ptr[ EAX + (int)context->MainMemory ], EBX );
 		break;
 	}
-	g->jmp( label3 );
+	g->jmp( l3 );
 
 	// case to handle read call
-	g->label( label1 );
+	g->MarkLabel( l1 );
 
 	// if < 0x0400000 && > FrameBufferBound, skip and do a read from method
 	g->cmp( EAX, FrameBufferBase );
-	g->jb( label2 );
+	g->jb( l2 );
 	g->cmp( EAX, FrameBufferBound );
-	g->ja( label2 );
+	g->ja( l2 );
 	
 	// else, do a direct fb read
 	g->sub( EAX, FrameBufferBase ); // get to offset in fb
@@ -153,9 +146,9 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 		g->mov( g->dword_ptr[ EAX + (int)context->FrameBuffer ], EBX );
 		break;
 	}
-	g->jmp( label3 );
+	g->jmp( l3 );
 
-	g->label( label2 );
+	g->MarkLabel( l2 );
 
 	switch( width )
 	{
@@ -174,7 +167,7 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 	g->add( ESP, 12 );
 
 	// done
-	g->label( label3 );
+	g->MarkLabel( l3 );
 }
 
 GenerationResult LB( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
@@ -313,7 +306,7 @@ GenerationResult LBU( R4000GenContext^ context, int pass, int address, uint code
 		EmitDirectMemoryRead( context, address );
 
 		// Byte mask
-		g->movzx( EAX, AL );
+		g->and( EAX, 0x000000FF );
 
 		g->mov( MREG( CTX, rt ), EAX );
 	}
@@ -335,7 +328,7 @@ GenerationResult LHU( R4000GenContext^ context, int pass, int address, uint code
 		EmitDirectMemoryRead( context, address );
 
 		// Short mask
-		g->movzx( EAX, AX );
+		g->and( EAX, 0x0000FFFF );
 
 		g->mov( MREG( CTX, rt ), EAX );
 	}

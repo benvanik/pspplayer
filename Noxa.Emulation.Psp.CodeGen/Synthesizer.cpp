@@ -820,6 +820,11 @@ void Synthesizer::SetCallOffset( int offset )
 	immediate = offset;
 }
 
+Reference* Synthesizer::GetTarget()
+{
+	return _target;
+}
+
 void Synthesizer::SetTarget( Reference* target )
 {
 	_target = target;

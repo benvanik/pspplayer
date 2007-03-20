@@ -45,6 +45,7 @@ namespace Noxa {
 					void SetReference( Label* reference );
 					void SetJumpOffset( int offset );
 					void SetCallOffset( int offset );
+					Reference* GetTarget();
 					void SetTarget( Reference* target );
 					void SetDisplacement( int displacement );
 					void AddDisplacement( int displacement );

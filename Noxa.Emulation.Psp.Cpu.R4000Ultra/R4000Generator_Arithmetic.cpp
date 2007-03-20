@@ -11,13 +11,12 @@
 #include "R4000Memory.h"
 #include "R4000GenContext.h"
 
-#include "Loader.hpp"
-#include "CodeGenerator.hpp"
+#include "CodeGenerator.h"
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
-using namespace SoftWire;
 
 #define g context->Generator
 
@@ -187,14 +186,13 @@ GenerationResult MOVZ( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		char label[20];
-		sprintf( label, "l%Xmz", address - 4 );
+		Label* l = g->DefineLabel();
 		g->mov( EAX, MREG( CTX, rt ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
-		g->jne( label );
+		g->jne( l );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->mov( MREG( CTX, rd ), EAX );
-		g->label( label );
+		g->MarkLabel( l );
 	}
 	return GenerationResult::Success;
 }
@@ -209,14 +207,13 @@ GenerationResult MOVN( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		char label[20];
-		sprintf( label, "l%Xmn", address - 4 );
+		Label* l = g->DefineLabel();
 		g->mov( EAX, MREG( CTX, rt ) );
 		g->test( EAX, EAX ); // cmp EAX, 0
-		g->je( label );
+		g->je( l );
 		g->mov( EAX, MREG( CTX, rs ) );
 		g->mov( MREG( CTX, rd ), EAX );
-		g->label( label );
+		g->MarkLabel( l );
 	}
 	return GenerationResult::Success;
 }

@@ -22,6 +22,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Media.Iso", "Noxa.Emulation.Psp.Media.Iso\Noxa.Emulation.Psp.Media.Iso.csproj", "{5724E076-9383-49DF-BFE2-21D206ED3E0A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Cpu.R4000Ultra", "Noxa.Emulation.Psp.Cpu.R4000Ultra\Noxa.Emulation.Psp.Cpu.R4000Ultra.vcproj", "{F8A92180-DC91-4FCB-8F69-9B3594C75A7D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3BA8A34E-E779-4282-9566-2E0FE1D507FC} = {3BA8A34E-E779-4282-9566-2E0FE1D507FC}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{102BC2E8-2DED-489C-851C-333302D03BFF}"
 EndProject

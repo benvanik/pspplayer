@@ -18,8 +18,8 @@ using namespace System::Diagnostics;
 using namespace System::Runtime::InteropServices;
 using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
-using namespace SoftWire;
 
 extern uint _jumpBlockThunkHits;
 
@@ -35,11 +35,11 @@ R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 
 	_gen = _cpu->_context->Generator;
 #ifndef GENECHOFILE
-	R4000Generator::disableListing();
+	//R4000Generator::disableListing();
 #endif
 
 #ifdef GENECHOFILE
-	_gen->setEchoFile( GENECHOFILE );
+	//_gen->setEchoFile( GENECHOFILE );
 #endif
 
 	_ctx = _cpu->_context;
@@ -200,13 +200,9 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 
 	block->InstructionCount = InternalBuild( address, block );
 
-	int codeLength;
-	void* ptr = _gen->callable( 0, &codeLength );
+	FunctionPointer ptr = _gen->GenerateCode();
 	block->Pointer = ptr;
-	block->Size = codeLength; //_gen->getCodeLength();
-
-	// Switch possession to us so the reset() doesn't free it
-	_gen->acquire();
+	block->Size = _gen->GetLength();
 
 #ifdef _DEBUG
 	// Listing
@@ -215,7 +211,7 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 #endif
 
 	// Reset so the generator is usable next build
-	_gen->reset();
+	_gen->Reset();
 
 	_codeCache->Add( block );
 
@@ -270,10 +266,8 @@ void* R4000BlockBuilder::BuildBounce()
 	// This assumes caller address on top of the stack, which it should be
 	_gen->ret();
 
-	void* ptr = _gen->callable();
-	_gen->acquire();
-
-	_gen->reset();
+	FunctionPointer ptr = _gen->GenerateCode();
+	_gen->Reset();
 
 	return ptr;
 }

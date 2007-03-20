@@ -41,6 +41,7 @@ namespace Noxa {
 					FunctionPointer GenerateCode();
 					void FreeCode( FunctionPointer pointer );
 					void Reset();
+					int GetLength(){ return _offset; }
 
 					Label* DefineLabel();
 					void MarkLabel( Label* label );

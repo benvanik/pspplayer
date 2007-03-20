@@ -12,14 +12,13 @@
 #include "R4000GenContext.h"
 #include "R4000BiosStubs.h"
 
-#include "Loader.hpp"
-#include "CodeGenerator.hpp"
+#include "CodeGenerator.h"
 
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
+using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
-using namespace SoftWire;
 
 extern uint _nativeSyscallCount;
 
@@ -197,14 +196,13 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		}
 
 		// Emit stop flag check - if the flag is set we return
-		char skipStopLabel[ 30 ];
-		sprintf_s( skipStopLabel, 30, "ssl%08d", address );
+		Label* skipStopLabel = g->DefineLabel();
 		g->mov( EAX, MSTOPFLAG( CTX ) );
 		g->cmp( EAX, 1 );
 		g->jne( skipStopLabel );
 		//g->int3();
 		g->ret();
-		g->label( skipStopLabel );
+		g->MarkLabel( skipStopLabel );
 
 		// Override if we can - we do this regardless of whether or not the BIOS implements it
 #ifdef OVERRIDESYSCALLS

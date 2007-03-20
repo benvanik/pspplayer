@@ -17,8 +17,8 @@
 using namespace System::Diagnostics;
 using namespace System::Runtime::InteropServices;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
-using namespace SoftWire;
 
 // #ifdef GENECHOFILE || VERBOSEANNOTATE
 #ifdef GENECHOFILE
@@ -78,8 +78,6 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 #ifdef EMITDEBUG
 	char codeString[ 150 ];
 #endif
-	char nullDelayLabel[ 30 ];
-	char nullDelayLabelSkip[ 30 ];
 
 	byte* mainMemory = _memory->MainMemory;
 
@@ -92,6 +90,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 		// Regarding maxCodeLength, we need to be able to pad out block lengths by 1 in
 		// the case of hitting the max while in a delay slot. Nasty, but it should work
 
+		Label* nullDelayLabel = NULL;
 		_ctx->InDelay = false;
 		_ctx->JumpTarget = NULL;
 		_ctx->JumpRegister = 0;
@@ -132,9 +131,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )
 			{
+				nullDelayLabel = g->DefineLabel();
 				g->mov( EAX, MNULLDELAY( CTXP( _ctx->CtxPointer ) ) );
 				g->cmp( EAX, 1 );
-				sprintf_s( nullDelayLabel, 30, "l%Xnd", address );
 				g->je( nullDelayLabel );
 			}
 
@@ -159,7 +158,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 #ifdef VERBOSEBUILD
 					Debug::WriteLine( String::Format( "Marking label for branch target {0:X8}", address ) );
 #endif
-					_gen->label( lm->Label );
+					_gen->MarkLabel( lm->Label );
 				}
 			}
 
@@ -397,15 +396,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )
 			{
-				sprintf_s( nullDelayLabelSkip, 30, "l%Xnds", address );
-				g->jmp( nullDelayLabelSkip );
+				Label* nullDelaySkipLabel = g->DefineLabel();
 
-				sprintf_s( nullDelayLabel, 30, "l%Xnd", address );
-				g->label( nullDelayLabel );
+				g->jmp( nullDelaySkipLabel );
 
+				g->MarkLabel( nullDelayLabel );
 				g->mov( MNULLDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
 
-				g->label( nullDelayLabelSkip );
+				g->MarkLabel( nullDelaySkipLabel );
 
 				checkNullDelay = false;
 			}
@@ -498,8 +496,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 #endif
 						Debug::Assert( lm->Address != 0 );
 
-						char noBranch[20];
-						sprintf( noBranch, "l%Xnobr", address - 4 );
+						Label* noBranch = g->DefineLabel();
 
 						g->cmp( MPCVALID( CTXP( _ctx->CtxPointer ) ), 1 );
 						//g->mov( MPCVALID(), 0 ); - keep valid because PC is set
@@ -509,7 +506,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block
 						// Generate tail to bounce to target block (jump block/etc)
 						GenerateTail( address - 4, true, lm->Address );
 
-						g->label( noBranch );
+						g->MarkLabel( noBranch );
 					}
 
 					_ctx->InDelay = false;
@@ -705,8 +702,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 	{
 		if( targetAddress == -1 )
 		{
-			char nullPtrLabel[ 30 ];
-			sprintf_s( nullPtrLabel, 30, "nullPtr%X", address );
+			Label* nullPtrLabel = g->DefineLabel();
 
 			g->push( EAX );
 			g->call( (int)QuickPointerLookup );
@@ -724,7 +720,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 			g->jmp( EAX );
 
 			// NULL, so just return
-			g->label( nullPtrLabel );
+			g->MarkLabel( nullPtrLabel );
 
 #ifdef STATISTICS
 			g->add( g->dword_ptr[ &_jumpBlockInlineMisses ], 1 );
