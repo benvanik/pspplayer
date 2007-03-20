@@ -35,28 +35,27 @@ InstructionSet::InstructionSet()
 		Operand::Type op2 = Operand::OPERAND_VOID;
 		Operand::Type op3 = Operand::OPERAND_VOID;
 
-		Specifier::Type specifier = Specifier::Scan( token );
-		if( specifier != Specifier::TYPE_UNKNOWN )
-		{
+		Table[ n ].Specifier = Specifier::Scan( token );
+		if( Table[ n ].Specifier != Specifier::TYPE_UNKNOWN )
 			token = strtok_s( 0, " ,", &tokctx );
-			if( token != 0 )
+
+		if( token != 0 )
+		{
+			op1 = Operand::Scan( token );
+			if( op1 != Operand::OPERAND_UNKNOWN )
 			{
-				op1 = Operand::Scan( token );
-				if( op1 != Operand::OPERAND_UNKNOWN )
+				token = strtok_s( 0, " ,", &tokctx );
+				if( token != 0 )
 				{
-					token = strtok_s( 0, " ,", &tokctx );
-					if( token != 0 )
+					op2 = Operand::Scan( token );
+					if( op2 != Operand::OPERAND_UNKNOWN )
 					{
-						op2 = Operand::Scan( token );
-						if( op2 != Operand::OPERAND_UNKNOWN )
+						token = strtok_s( 0, " ,", &tokctx );
+						if( token != 0 )
 						{
-							token = strtok_s( 0, " ,", &tokctx );
-							if( token != 0 )
-							{
-								op3 = Operand::Scan( token );
-								if( op3 != Operand::OPERAND_UNKNOWN )
-									token = strtok_s( 0, " ,", &tokctx );
-							}
+							op3 = Operand::Scan( token );
+							if( op3 != Operand::OPERAND_UNKNOWN )
+								token = strtok_s( 0, " ,", &tokctx );
 						}
 					}
 				}
@@ -72,7 +71,6 @@ InstructionSet::InstructionSet()
 			}
 		}
 
-		Table[ n ].Specifier = specifier;
 		Table[ n ].Op1 = op1;
 		Table[ n ].Op2 = op2;
 		Table[ n ].Op3 = op3;

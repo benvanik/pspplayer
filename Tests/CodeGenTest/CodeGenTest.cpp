@@ -16,6 +16,17 @@ void __x()
 	Debug::WriteLine( "Hello!" );
 }
 
+#pragma unmanaged
+void __y()
+{
+	__x();
+}
+void Bounce( FunctionPointer p )
+{
+	p();
+}
+#pragma managed
+
 int main(array<System::String ^> ^args)
 {
     CodeGenerator* g = new CodeGenerator( 1024 * 10 );
@@ -23,16 +34,23 @@ int main(array<System::String ^> ^args)
 	Label* l1 = g->DefineLabel();
 	Label* l2 = g->DefineLabel();
 
-	g->int3();
+	int a = 12345;
+
+	//g->int3();
 	g->push( g->eax );
 	g->MarkLabel( l1 );
+
+	g->push( g->ebx );
+	g->mov( g->ebx, g->dword_ptr[ &a ] );
+	g->add( g->ebx, 1 );
+	g->mov( g->dword_ptr[ &a ], g->ebx );
+	g->pop( g->ebx );
 
 	//g->jmp( l2 );
 
 	g->push( g->eax );
-	g->mov( g->eax, ( int )__x );
-	g->call( g->eax );
-	//g->call( ( int )__x );
+	//g->mov( g->eax, ( int )__x );
+	g->call( ( int )__y );
 	g->pop( g->eax );
 
 	g->add( g->eax, 1 );
@@ -46,7 +64,7 @@ int main(array<System::String ^> ^args)
 	FunctionPointer p = g->GenerateCode();
 	g->Reset();
 
-	p();
+	Bounce( p );
 
 	g->FreeCode( p );
 

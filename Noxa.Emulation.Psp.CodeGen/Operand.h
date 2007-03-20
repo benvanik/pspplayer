@@ -370,7 +370,7 @@ namespace Noxa {
 
 				struct OperandMEM8 : OperandMEM
 				{
-					OperandMEM8() {};
+					OperandMEM8() : Operand( OPERAND_MEM8 ) {};
 
 					explicit OperandMEM8(const OperandREF &ref) : Operand( OPERAND_MEM8 )
 					{
@@ -433,7 +433,7 @@ namespace Noxa {
 
 				struct OperandMEM16 : OperandMEM
 				{
-					OperandMEM16() {};
+					OperandMEM16() : Operand( OPERAND_MEM16 ) {};
 
 					explicit OperandMEM16(const OperandREF &ref) : Operand( OPERAND_MEM16 )
 					{
@@ -496,7 +496,7 @@ namespace Noxa {
 
 				struct OperandMEM32 : OperandMEM
 				{
-					OperandMEM32() {};
+					OperandMEM32() : Operand( OPERAND_MEM32 ) {};
 
 					explicit OperandMEM32(const OperandMEM &mem) : Operand( OPERAND_MEM32 )
 					{
@@ -559,7 +559,7 @@ namespace Noxa {
 
 				struct OperandMEM64 : OperandMEM
 				{
-					OperandMEM64() {};
+					OperandMEM64() : Operand( OPERAND_MEM64 ) {};
 
 					explicit OperandMEM64(const OperandMEM &mem) : Operand( OPERAND_MEM64 )
 					{
@@ -622,7 +622,7 @@ namespace Noxa {
 
 				struct OperandMEM128 : OperandMEM
 				{
-					OperandMEM128() {};
+					OperandMEM128() : Operand( OPERAND_MEM128 ) {};
 
 					explicit OperandMEM128(const OperandMEM &mem) : Operand( OPERAND_MEM128 )
 					{

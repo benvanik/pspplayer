@@ -162,7 +162,7 @@ void Synthesizer::EncodeBase( const Operand& base )
 void Synthesizer::EncodeIndex( const Operand& index )
 {
 	// Memory reference can't have multiple index registers
-	assert( _indexReg != CodeGen::REG_UNKNOWN );
+	assert( _indexReg == CodeGen::REG_UNKNOWN );
 
 	_indexReg = index.IndexReg;
 }
@@ -170,10 +170,10 @@ void Synthesizer::EncodeIndex( const Operand& index )
 void Synthesizer::SetScale( int scale )
 {
 	// Memory reference can't have multiple _scale factors
-	assert( _scale != 0 );
+	assert( _scale == 0 );
 
 	// Invalid _scale value
-	assert( scale != 0 && scale != 1 && scale != 2 && scale != 4 && scale != 8 );
+	assert( scale == 0 || scale == 1 || scale == 2 || scale == 4 || scale == 8 );
 
 	_scale = scale;
 }
