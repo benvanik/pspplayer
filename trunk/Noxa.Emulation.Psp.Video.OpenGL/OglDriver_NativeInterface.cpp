@@ -305,8 +305,10 @@ int niEnqueueList( VideoDisplayList* list, bool immediate )
 
 	UNLOCK;
 
+#ifdef _DEBUG
 	if( _listCount > LISTCOUNTALERTTHRESHOLD )
 		BREAK;
+#endif
 
 	return listId;
 }

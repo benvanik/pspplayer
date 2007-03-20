@@ -120,7 +120,7 @@
 				Name="VCCLCompilerTool"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\Dependencies\SoftWire&quot;;&quot;$(SolutionDir)Shared\Include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)Shared\Include&quot;;&quot;$(SolutionDir)Noxa.Emulation.Psp.CodeGen\&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="false"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(SolutionDir)\Dependencies\SoftWire\Debug\SoftWire.lib $(NOINHERIT)"
+				AdditionalDependencies="$(TargetDir)Noxa.Emulation.Psp.CodeGen.lib $(NOINHERIT)"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
