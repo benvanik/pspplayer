@@ -46,7 +46,7 @@ void sceCtrl::Clear()
 
 	_sampleCycle = 0;
 	_sampleMode = ControlSamplingMode::AnalogAndDigital;
-	_buffer = gcnew CircularList<ControlSample^>( 100 );
+	_buffer = gcnew CircularList<ControlSample^>( 3 );
 	_dataPresent = gcnew AutoResetEvent( false );
 }
 
