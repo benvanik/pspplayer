@@ -44,6 +44,7 @@ the old table to the new table. */
 
 #include "HashTable.h"
 
+#pragma warning( disable: 4949 )
 #pragma unmanaged
 
 #include <string.h>
