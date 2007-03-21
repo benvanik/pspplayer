@@ -38,7 +38,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_clock = gcnew R4000Clock();
 	_memory = gcnew R4000Memory();
 	_core0 = gcnew R4000Core( this, ( R4000Ctx* )_ctx );
-	_codeCache = gcnew R4000Cache();
+	_codeCache = new R4000Cache();
 
 	_stats = gcnew R4000Statistics();
 #ifdef STATISTICS
@@ -75,6 +75,7 @@ R4000Cpu::~R4000Cpu()
 		_aligned_free( _ctx );
 	_ctx = NULL;
 	SAFEFREE( _bounce );
+	SAFEDELETE( _codeCache );
 }
 
 int R4000Cpu::RegisterSyscall( unsigned int nid )
@@ -136,8 +137,8 @@ int R4000Cpu::ExecuteBlock()
 
 	// Get/build block
 	int pc = ctx->PC & 0x3FFFFFFF;
-	CodeBlock^ block = _codeCache->Find( pc );
-	if( block == nullptr )
+	CodeBlock* block = _codeCache->Find( pc );
+	if( block == NULL )
 	{
 		block = _builder->Build( pc );
 #ifdef STATISTICS

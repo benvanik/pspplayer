@@ -61,7 +61,7 @@ namespace Noxa {
 					R4000Memory^				_memory;
 					R4000Core^					_core0;
 
-					R4000Cache^					_codeCache;
+					R4000Cache*					_codeCache;
 					R4000GenContext^			_context;
 					R4000BlockBuilder^			_builder;
 					R4000BiosStubs^				_biosStubs;
@@ -229,9 +229,9 @@ namespace Noxa {
 						}
 					}
 
-					property R4000Cache^ CodeCache
+					property R4000Cache* CodeCache
 					{
-						virtual R4000Cache^ get()
+						virtual R4000Cache* get()
 						{
 							return _codeCache;
 						}
