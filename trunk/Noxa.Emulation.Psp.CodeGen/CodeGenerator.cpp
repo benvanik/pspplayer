@@ -14,35 +14,100 @@
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::CodeGen;
 
-#define DEFAULTMAXIMUMSIZE	512 * 5
+#define DEFAULTMAXIMUMSIZE			512 * 5
+#define DEFAULTSTORAGEBLOCKSIZE		1024 * 1024 * 8
+#define STORAGETABLESIZE			64
 
-CodeGenerator::CodeGenerator( int maximumSize )
+CodeGenerator::CodeGenerator( int maximumCodeSize, int storageBlockSize )
 {
-	if( maximumSize == 0 )
-		maximumSize = DEFAULTMAXIMUMSIZE;
-	_maximumSize = maximumSize;
+	if( maximumCodeSize == 0 )
+		maximumCodeSize = DEFAULTMAXIMUMSIZE;
+	_maximumCodeSize = maximumCodeSize;
+
+	if( storageBlockSize == 0 )
+		storageBlockSize = DEFAULTSTORAGEBLOCKSIZE;
+	_storageBlockSize = storageBlockSize;
+
+	_storage = new byte*[ STORAGETABLESIZE ];
+	memset( _storage, 0, sizeof( byte* ) * STORAGETABLESIZE );
+	_storageIndex = 0;
+	_currentStoragePointer = NULL;
+
+	// Initialize the first block
+	CommitStorageSpace( 0 );
 
 	// Initialize the instruction set (this will happen once)
 	InstructionSet* is = new InstructionSet();
 	delete is;
 
 	_offset = 0;
-	_buffer = ( byte* )calloc( 1, _maximumSize );
+	_buffer = ( byte* )calloc( 1, _maximumCodeSize );
 
 	_labelIndex = 0;
-	_labelTable = ( Label* )calloc( sizeof( Label ), _maximumSize );
+	_labelTable = ( Label* )calloc( sizeof( Label ), _maximumCodeSize );
 	_referenceIndex = 0;
-	_referenceTable = ( Reference* )calloc( sizeof( Reference ), _maximumSize );
+	_referenceTable = ( Reference* )calloc( sizeof( Reference ), _maximumCodeSize );
 
 	_synth = new Synthesizer();
 }
 
 CodeGenerator::~CodeGenerator()
 {
+	for( int n = 0; n <= _storageIndex; n++ )
+	{
+		VirtualFree( _storage[ _storageIndex ], 0, MEM_RELEASE );
+		_storage[ _storageIndex ] = 0;
+	}
+	if( _storage != NULL )
+		delete[] _storage;
+	_storage = NULL;
+
 	SAFEDELETE( _synth );
 	SAFEFREE( _buffer );
 	SAFEFREE( _labelTable );
 	SAFEFREE( _referenceTable );
+}
+
+byte* CodeGenerator::CommitStorageSpace( int size )
+{
+	// Check for startup case
+	if( _currentStoragePointer == NULL )
+	{
+#ifdef RESERVEANDCOMMITMEMORY
+		DWORD allocType = MEM_RESERVE;
+#else
+		DWORD allocType = MEM_COMMIT;
+#endif
+		_storage[ 0 ] = ( byte* )VirtualAlloc( NULL, _storageBlockSize, allocType, PAGE_EXECUTE_READWRITE );
+		_currentStoragePointer = _storage[ 0 ];
+		return NULL;
+	}
+	else
+	{
+		assert( size > 0 );
+
+		byte* block = _storage[ _storageIndex ];
+		int remaining = _storageBlockSize - ( _currentStoragePointer - block );
+		if( remaining < size )
+		{
+			_storageIndex++;
+#ifdef RESERVEANDCOMMITMEMORY
+		DWORD allocType = MEM_RESERVE;
+#else
+		DWORD allocType = MEM_COMMIT;
+#endif
+			_storage[ _storageIndex ] = ( byte* )VirtualAlloc( NULL, _storageBlockSize, allocType, PAGE_EXECUTE_READWRITE );
+			_currentStoragePointer = _storage[ _storageIndex ];
+		}
+
+		// Commit the block
+		byte* start = _currentStoragePointer;
+		_currentStoragePointer += size;
+#ifdef RESERVEANDCOMMITMEMORY
+		VirtualAlloc( start, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
+#endif
+		return start;
+	}
 }
 
 FunctionPointer CodeGenerator::GenerateCode()
@@ -54,7 +119,7 @@ FunctionPointer CodeGenerator::GenerateCode()
 		return 0;
 
 	// Allocate the target buffer (with execute privs) and copy over the code
-	void* ptr = VirtualAlloc( NULL, _offset, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
+	void* ptr = ( void* )CommitStorageSpace( _offset );
 	memcpy( ptr, _buffer, _offset );
 
 	// Perform fixups
@@ -84,12 +149,6 @@ FunctionPointer CodeGenerator::GenerateCode()
 	}
 
 	return ( FunctionPointer )ptr;
-}
-
-void CodeGenerator::FreeCode( FunctionPointer pointer )
-{
-	if( pointer != NULL )
-		VirtualFree( pointer, 0, MEM_RELEASE );
 }
 
 void CodeGenerator::Reset()

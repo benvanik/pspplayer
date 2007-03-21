@@ -10,6 +10,12 @@
 // be accessed from multiple threads will be gaurded with locks
 //#define MULTITHREADED
 
+// When defined, memory will first be reserved and only committed when it is
+// needed. This may slow down generation slightly, but has the advantage of
+// wasting much less memory. Since I care about speed and memory is cheap,
+// this will probably remain off.
+//#define RESERVEANDCOMMITMEMORY
+
 #define STATISTICS
 
 #define TRACE

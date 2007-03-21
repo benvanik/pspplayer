@@ -22,7 +22,12 @@ namespace Noxa {
 				class CodeGenerator
 				{
 				protected:
-					int				_maximumSize;
+					int				_maximumCodeSize;
+					int				_storageBlockSize;
+
+					byte**			_storage;
+					int				_storageIndex;
+					byte*			_currentStoragePointer;
 
 					byte*			_buffer;
 					int				_offset;
@@ -35,11 +40,10 @@ namespace Noxa {
 					Synthesizer*	_synth;
 
 				public:
-					CodeGenerator( int maximumSize );
+					CodeGenerator( int maximumCodeSize, int storageBlockSize );
 					~CodeGenerator();
 
 					FunctionPointer GenerateCode();
-					void FreeCode( FunctionPointer pointer );
 					void Reset();
 					int GetLength(){ return _offset; }
 
@@ -47,6 +51,8 @@ namespace Noxa {
 					void MarkLabel( Label* label );
 
 				protected:
+					byte* CommitStorageSpace( int size );
+
 					Reference* ReferenceLabel( enum ReferenceType type, Label* label, int offset );
 					byte* ResolveReference( Reference* reference );
 					void Encode( const int instructionId,
