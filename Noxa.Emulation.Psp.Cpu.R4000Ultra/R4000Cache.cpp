@@ -8,6 +8,10 @@
 #include <string>
 #include "R4000Cache.h"
 
+#ifdef STATISTICS
+#include "R4000Cpu.h"
+#endif
+
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
@@ -73,6 +77,10 @@ CodeBlock* R4000Cache::Add( int address )
 		CodeBlock** block0 = _lookup[ b0 ];
 		if( block0 == NULL )
 		{
+#ifdef STATISTICS
+			R4000Cpu::GlobalCpu->_stats->CodeCacheLevel2Count++;
+			R4000Cpu::GlobalCpu->_stats->CodeCacheTableSize += BLOCKSIZE * sizeof( CodeBlock* );
+#endif
 			block0 = ( CodeBlock** )calloc( BLOCKSIZE, sizeof( CodeBlock* ) );
 			_lookup[ b0 ] = block0;
 		}
@@ -80,9 +88,17 @@ CodeBlock* R4000Cache::Add( int address )
 		CodeBlock* block1 = block0[ b1 ];
 		if( block1 == NULL )
 		{
+#ifdef STATISTICS
+			R4000Cpu::GlobalCpu->_stats->CodeCacheLevel3Count++;
+			R4000Cpu::GlobalCpu->_stats->CodeCacheTableSize += BLOCKSIZE * sizeof( CodeBlock );
+#endif
 			block1 = ( CodeBlock* )calloc( BLOCKSIZE, sizeof( CodeBlock ) );
 			block0[ b1 ] = block1;
 		}
+
+#ifdef STATISTICS
+		R4000Cpu::GlobalCpu->_stats->CodeCacheBlockCount++;
+#endif
 
 		block = &block1[ b2 ];
 		block->Address = address;

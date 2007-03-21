@@ -30,6 +30,10 @@ namespace Noxa {
 
 					uint CodeCacheHits;
 					uint CodeCacheMisses;
+					uint CodeCacheBlockCount;					// # of blocks in the cache
+					uint CodeCacheLevel2Count;					// # of 2nd level lists
+					uint CodeCacheLevel3Count;					// # of 3rd level lists
+					uint CodeCacheTableSize;					// Size, in bytes, of the table
 
 					int AverageCodeBlockLength;
 					int LargestCodeBlockLength;
