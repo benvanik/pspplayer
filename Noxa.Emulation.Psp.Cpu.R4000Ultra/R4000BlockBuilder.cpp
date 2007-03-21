@@ -176,7 +176,7 @@ void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
    everything needed for execution.
 */
 
-CodeBlock^ R4000BlockBuilder::Build( int address )
+CodeBlock* R4000BlockBuilder::Build( int address )
 {
 #ifdef STATISTICS
 	double blockStart = _cpu->_timer->Elapsed;
@@ -184,11 +184,10 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 
 	address &= 0x3FFFFFFF;
 
-	CodeBlock^ block = gcnew CodeBlock();
-	block->Address = address;
-
 	// Don't try to re-add blocks
-	Debug::Assert( _codeCache->Find( address ) == nullptr );
+	Debug::Assert( _codeCache->Find( address ) == NULL );
+
+	CodeBlock* block = _codeCache->Add( address );
 
 #ifdef CLEARECHOFILE
 	_gen->clearEchoFile();
@@ -201,8 +200,8 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 	block->InstructionCount = InternalBuild( address, block );
 
 	FunctionPointer ptr = _gen->GenerateCode();
-	block->Pointer = ptr;
 	block->Size = _gen->GetLength();
+	_codeCache->UpdatePointer( block, ptr );
 
 #ifdef _DEBUG
 	// Listing
@@ -212,8 +211,6 @@ CodeBlock^ R4000BlockBuilder::Build( int address )
 
 	// Reset so the generator is usable next build
 	_gen->Reset();
-
-	_codeCache->Add( block );
 
 #ifdef STATISTICS
 	R4000Statistics^ stats = _cpu->_stats;
@@ -365,12 +362,12 @@ int __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackP
 	R4000Cpu::GlobalCpu->_stats->JumpBlockThunkCalls++;
 #endif
 
-	CodeBlock^ targetBlock = builder->_codeCache->Find( ( int )targetAddress );
-	if( targetBlock == nullptr )
+	CodeBlock* targetBlock = builder->_codeCache->Find( ( int )targetAddress );
+	if( targetBlock == NULL )
 	{
 		// Not found, must build
 		targetBlock = builder->Build( ( int )targetAddress );
-		Debug::Assert( targetBlock != nullptr );
+		Debug::Assert( targetBlock != NULL );
 
 #ifdef STATISTICS
 		R4000Cpu::GlobalCpu->_stats->JumpBlockThunkBuilds++;

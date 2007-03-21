@@ -60,7 +60,7 @@ R4000AdvancedBlockBuilder::~R4000AdvancedBlockBuilder()
 {
 }
 
-int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block )
+int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block )
 {
 	int count = 0;
 	int endAddress = startAddress;
@@ -737,8 +737,12 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 		else
 		{
 			// Bounce out
-			CodeBlock^ block = _codeCache->Find( targetAddress );
-			if( block == nullptr )
+			CodeBlock* block = _codeCache->Find( targetAddress );
+
+			// Note we have to check the case of us bouncing to ourselves - this is bad
+			// as at this point we don't have a pointer to ourselves, so we need to just write 0!
+			if( ( block == NULL ) ||
+				( block->Pointer == 0 ) )
 			{
 #ifdef VERBOSEBUILD
 				Debug::WriteLine( String::Format( "Target block 0x{0:X8} not found, emitting jumpblock", targetAddress ) );
@@ -758,6 +762,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 #endif
 
 				// Can do a direct jump to the translated block
+				Debug::Assert( block->Pointer != NULL );
 				g->mov( EAX, ( int )block->Pointer );
 				g->jmp( EAX );
 

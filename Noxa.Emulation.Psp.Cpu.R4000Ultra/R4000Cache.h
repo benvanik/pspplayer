@@ -15,13 +15,11 @@ namespace Noxa {
 		namespace Psp {
 			namespace Cpu {
 
-				//delegate int DynamicCodeDelegate( Core core0, Memory memory, int[] generalRegisters, BiosFunction[] syscallList, int branchTarget );
-
 #pragma unmanaged
 				int QuickPointerLookup( int address );
 #pragma managed
 
-				ref class CodeBlock
+				typedef struct CodeBlock_t
 				{
 				public:
 					int			Address;
@@ -31,22 +29,22 @@ namespace Noxa {
 					bool		EndsOnSyscall;
 					
 					int			ExecutionCount;
-				};
+				} CodeBlock;
 
-				ref class R4000Cache
+				class R4000Cache
 				{
 				protected:
-					array<array<array<CodeBlock^>^>^>^	_lookup;
+					CodeBlock***	_lookup;
 					int***			_ptrLookup;
-					Object^			_syncRoot;
 
 				public:
 					R4000Cache();
 					~R4000Cache();
 
 				public:
-					void Add( CodeBlock^ block );
-					CodeBlock^ Find( int address );
+					CodeBlock* Add( int address );
+					void UpdatePointer( CodeBlock* block, void* pointer );
+					CodeBlock* Find( int address );
 					void Invalidate( int address );
 					void Clear();
 					void Clear( bool realloc );

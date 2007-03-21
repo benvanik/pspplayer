@@ -29,7 +29,7 @@ R4000BasicBlockBuilder::~R4000BasicBlockBuilder()
 
 #define MAXCODELENGTH 100
 
-int R4000BasicBlockBuilder::InternalBuild( int startAddress, CodeBlock^ block )
+int R4000BasicBlockBuilder::InternalBuild( int startAddress, CodeBlock* block )
 {
 	//int count = 0;
 	//int endAddress = startAddress;

@@ -20,6 +20,8 @@ using namespace Noxa::Emulation::Psp::Cpu;
 #define UNLOCK
 #endif
 
+#define BLOCKSIZE 1024
+
 static int*** CCLookupTable;
 
 #pragma unmanaged
@@ -46,8 +48,8 @@ int Noxa::Emulation::Psp::Cpu::QuickPointerLookup( int address )
 
 R4000Cache::R4000Cache()
 {
+	_lookup = NULL;
 	_ptrLookup = NULL;
-	_syncRoot = gcnew Object();
 	this->Clear( true );
 }
 
@@ -56,7 +58,41 @@ R4000Cache::~R4000Cache()
 	this->Clear( false );
 }
 
-void R4000Cache::Add( CodeBlock^ block )
+CodeBlock* R4000Cache::Add( int address )
+{
+	uint addr = ( ( uint )address ) >> 2;
+
+	uint b0 = addr >> 20;
+	uint b1 = ( addr >> 10 ) & 0x3FF;
+	uint b2 = addr & 0x3FF;
+
+	CodeBlock* block = NULL;
+
+	LOCK;
+	{
+		CodeBlock** block0 = _lookup[ b0 ];
+		if( block0 == NULL )
+		{
+			block0 = ( CodeBlock** )calloc( BLOCKSIZE, sizeof( CodeBlock* ) );
+			_lookup[ b0 ] = block0;
+		}
+
+		CodeBlock* block1 = block0[ b1 ];
+		if( block1 == NULL )
+		{
+			block1 = ( CodeBlock* )calloc( BLOCKSIZE, sizeof( CodeBlock ) );
+			block0[ b1 ] = block1;
+		}
+
+		block = &block1[ b2 ];
+		block->Address = address;
+	}
+	UNLOCK;
+
+	return block;
+}
+
+void R4000Cache::UpdatePointer( CodeBlock* block, void* pointer )
 {
 	uint addr = ( ( uint )block->Address ) >> 2;
 
@@ -66,46 +102,28 @@ void R4000Cache::Add( CodeBlock^ block )
 
 	LOCK;
 	{
-		array<array<CodeBlock^>^>^ block0 = _lookup[ b0 ];
-		if( block0 == nullptr )
-		{
-			block0 = gcnew array<array<CodeBlock^>^>( 1024 );
-			_lookup[ b0 ] = block0;
-		}
-
-		array<CodeBlock^>^ block1 = block0[ b1 ];
-		if( block1 == nullptr )
-		{
-			block1 = gcnew array<CodeBlock^>( 1024 );
-			block0[ b1 ] = block1;
-		}
-
-		block1[ b2 ] = block;
-
-		// --
+		block->Pointer = pointer;
 
 		int** pblock0 = *( _ptrLookup + b0 );
 		if( pblock0 == NULL )
 		{
-			pblock0 = ( int** )malloc( 4 * 1024 );
-			memset( pblock0, 0, 4 * 1024 );
+			pblock0 = ( int** )calloc( BLOCKSIZE, sizeof( int* ) );
 			*( _ptrLookup + b0 ) = pblock0;
 		}
 
 		int* pblock1 = *( pblock0 + b1 );
 		if( pblock1 == NULL )
 		{
-			pblock1 = ( int* )malloc( 4 * 1024 );
-			memset( pblock1, 0, 4 * 1024 );
+			pblock1 = ( int* )calloc( BLOCKSIZE, sizeof( int ) );
 			*( pblock0 + b1 ) = pblock1;
 		}
 
-		*( pblock1 + b2 ) = ( int )block->Pointer;
+		*( pblock1 + b2 ) = ( int )pointer;
 	}
 	UNLOCK;
 }
 
-CodeBlock^ R4000Cache::Find( int address )
+CodeBlock* R4000Cache::Find( int address )
 {
 	uint addr = ( ( uint )address ) >> 2;
 
@@ -115,24 +133,27 @@ CodeBlock^ R4000Cache::Find( int address )
 
 	LOCK;
 	{
-		array<array<CodeBlock^>^>^ block0 = _lookup[ b0 ];
-		if( block0 == nullptr )
+		CodeBlock** block0 = _lookup[ b0 ];
+		if( block0 == NULL )
 		{
 			UNLOCK;
-			return nullptr;
+			return NULL;
 		}
 
-		array<CodeBlock^>^ block1 = block0[ b1 ];
-		if( block1 == nullptr )
+		CodeBlock* block1 = block0[ b1 ];
+		if( block1 == NULL )
 		{
 			UNLOCK;
-			return nullptr;
+			return NULL;
 		}
 
-		CodeBlock^ block = block1[ b2 ];
+		CodeBlock* block = &block1[ b2 ];
 
 		UNLOCK;
-		return block;
+		if( block->Address == address )
+			return block;
+		else
+			return NULL;
 	}
 }
 
@@ -145,15 +166,15 @@ void R4000Cache::Invalidate( int address )
 
 	LOCK;
 	{
-		array<array<CodeBlock^>^>^ block0 = _lookup[ b0 ];
-		if( block0 == nullptr )
+		CodeBlock** block0 = _lookup[ b0 ];
+		if( block0 == NULL )
 		{
 			UNLOCK;
 			return;
 		}
 
-		array<CodeBlock^>^ block1 = block0[ b1 ];
-		if( block1 == nullptr )
+		CodeBlock* block1 = block0[ b1 ];
+		if( block1 == NULL )
 		{
 			UNLOCK;
 			return;
@@ -164,10 +185,10 @@ void R4000Cache::Invalidate( int address )
 		int** pblock0 = *( _ptrLookup + b0 );
 		int* pblock1 = *( pblock0 + b1 );
 
-		for( int n = 0; n < block1->Length; n++ )
+		for( int n = 0; n < BLOCKSIZE; n++ )
 		{
-			CodeBlock^ block = block1[ n ];
-			if( block == nullptr )
+			CodeBlock* block = &block1[ n ];
+			if( block->Address == NULL )
 				continue;
 			
 			// If we have gone beyond the starting address, then break out
@@ -179,7 +200,7 @@ void R4000Cache::Invalidate( int address )
 			if( ( address >= block->Address ) &&
 				( address <= upper ) )
 			{
-				block1[ n ] = nullptr;
+				memset( &block1[ n ], 0, sizeof( CodeBlock ) );
 				*( pblock1 + n ) = NULL;
 			}
 		}
@@ -196,15 +217,24 @@ void R4000Cache::Clear( bool realloc )
 {
 	LOCK;
 	{
-		_lookup = nullptr;
-		if( _ptrLookup != NULL )
+		if( _lookup != NULL )
 		{
-			for( int n = 0; n < 1024; n++ )
+			for( int n = 0; n < BLOCKSIZE; n++ )
 			{
+				CodeBlock** b0 = _lookup[ n ];
+				if( b0 != NULL )
+				{
+					for( int m = 0; m < BLOCKSIZE; m++ )
+					{
+						CodeBlock* b1 = b0[ m ];
+						SAFEFREE( b1 );
+					}
+					SAFEFREE( b0 );
+				}
 				int** pb0 = *( _ptrLookup + n );
 				if( pb0 != NULL )
 				{
-					for( int m = 0; m < 1024; m++ )
+					for( int m = 0; m < BLOCKSIZE; m++ )
 					{
 						int* pb1 = *( pb0 + m );
 						SAFEFREE( pb1 );
@@ -212,15 +242,15 @@ void R4000Cache::Clear( bool realloc )
 					SAFEFREE( pb0 );
 				}
 			}
+			SAFEFREE( _lookup );
 			SAFEFREE( _ptrLookup );
 		}
 		CCLookupTable = NULL;
 
 		if( realloc == true )
 		{
-			_lookup = gcnew array<array<array<CodeBlock^>^>^>( 1024 );
-			_ptrLookup = ( int*** )malloc( 4 * 1024 );
-			memset( _ptrLookup, 0, 4 * 1024 );
+			_lookup = ( CodeBlock*** )calloc( BLOCKSIZE, sizeof( CodeBlock** ) );
+			_ptrLookup = ( int*** )calloc( BLOCKSIZE, sizeof( int** ) );
 			CCLookupTable = _ptrLookup;
 		}
 	}
