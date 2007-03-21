@@ -51,15 +51,8 @@ namespace Noxa {
 				ref class R4000GenContext
 				{
 				public:
-					R4000GenContext( R4000Generator* generator, byte* mainMemory, byte* frameBuffer )
-					{
-						Generator = generator;
-
-						MainMemory = mainMemory;
-						FrameBuffer = frameBuffer;
-
-						BranchLabels = gcnew Dictionary<int, LabelMarker^>();
-					}
+					R4000GenContext( R4000Generator* generator, byte* mainMemory, byte* frameBuffer );
+					~R4000GenContext();
 
 					R4000Generator*		Generator;
 

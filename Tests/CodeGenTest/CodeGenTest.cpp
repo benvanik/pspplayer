@@ -29,7 +29,7 @@ void Bounce( FunctionPointer p )
 
 int main(array<System::String ^> ^args)
 {
-    CodeGenerator* g = new CodeGenerator( 1024 * 10 );
+    CodeGenerator* g = new CodeGenerator( 1024 * 10, 1024 * 1024 * 4 );
 
 	Label* l1 = g->DefineLabel();
 	Label* l2 = g->DefineLabel();
@@ -66,7 +66,7 @@ int main(array<System::String ^> ^args)
 
 	Bounce( p );
 
-	g->FreeCode( p );
+	delete g;
 
     return 0;
 }

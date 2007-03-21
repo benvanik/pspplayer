@@ -13,6 +13,21 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
 
+R4000GenContext::R4000GenContext( R4000Generator* generator, byte* mainMemory, byte* frameBuffer )
+{
+	Generator = generator;
+
+	MainMemory = mainMemory;
+	FrameBuffer = frameBuffer;
+
+	BranchLabels = gcnew Dictionary<int, LabelMarker^>();
+}
+
+R4000GenContext::~R4000GenContext()
+{
+	SAFEDELETE( Generator );
+}
+
 void R4000GenContext::Reset( int startAddress )
 {
 	StartAddress = startAddress;
