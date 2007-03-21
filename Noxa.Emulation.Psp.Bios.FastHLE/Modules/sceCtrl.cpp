@@ -18,6 +18,18 @@ using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 using namespace Noxa::Emulation::Psp::Input;
 
+#define CTRLSAMPLECOUNT		3
+
+sceCtrl::sceCtrl( Kernel^ kernel ) : Module( kernel )
+{
+	_samples = ( ControlSample* )calloc( CTRLSAMPLECOUNT, sizeof( ControlSample ) );
+}
+
+sceCtrl::~sceCtrl()
+{
+	SAFEFREE( _samples );
+}
+
 void sceCtrl::Start()
 {
 	if( _threadRunning == true )
@@ -46,8 +58,10 @@ void sceCtrl::Clear()
 
 	_sampleCycle = 0;
 	_sampleMode = ControlSamplingMode::AnalogAndDigital;
-	_buffer = gcnew CircularList<ControlSample^>( 3 );
 	_dataPresent = gcnew AutoResetEvent( false );
+
+	memset( _samples, 0, sizeof( ControlSample ) );
+	_sampleIndex = 0;
 }
 
 void sceCtrl::InputThread()
@@ -64,7 +78,7 @@ void sceCtrl::InputThread()
 
 		while( _threadRunning == true )
 		{
-			ControlSample^ sample = gcnew ControlSample();
+			ControlSample* sample = &_samples[ _sampleIndex ];
 			sample->Timestamp = ( uint )( _kernel->RunTime * 1000 );
 
 			device->Poll();
@@ -77,9 +91,10 @@ void sceCtrl::InputThread()
 
 			Monitor::Enter( this );
 			{
-				_buffer->Add( sample );
-				if( _buffer->Count == 1 )
-					_dataPresent->Set();
+				_sampleIndex++;
+				if( _sampleIndex >= CTRLSAMPLECOUNT )
+					_sampleIndex = 0;
+				_dataPresent->Set();
 
 				// Set pressed buttons list
 				uint oldPressed = _pressedButtons;
@@ -143,33 +158,28 @@ int sceCtrl::sceCtrlGetSamplingMode( IMemory^ memory, int pmode )
 // int sceCtrlPeekBufferPositive(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:148)
 int sceCtrl::sceCtrlPeekBufferPositive( IMemory^ memory, int pad_data, int count )
 {
-	array<ControlSample^>^ samples;
-	int toRead;
-	Monitor::Enter( this );
-	{
-		toRead = MIN2( count, _buffer->Count );
-		samples = gcnew array<ControlSample^>( toRead );
-		for( int n = 0; n < toRead; n++ )
-			samples[ n ] = _buffer->PeekAhead( n );
-	}
-	Monitor::Exit( this );
+	if( pad_data == NULL )
+		return 0;
 
-	if( pad_data != 0x0 )
+	int addr = pad_data;
+	int read = 0;
+	while( read < count )
 	{
-		int addr = pad_data;
-		for( int n = 0; n < toRead; n++ )
-		{
-			ControlSample^ sample = samples[ n ];
-			memory->WriteWord( addr + 0, 4, ( int )sample->Timestamp );
-			memory->WriteWord( addr + 4, 4, ( int )sample->Buttons );
-			memory->WriteWord( addr + 8, 1, ( byte )sample->AnalogX );
-			memory->WriteWord( addr + 9, 1, ( byte )sample->AnalogY );
-			// 6 bytes of junk
-			addr += 16;
-		}
+		Monitor::Enter( this );
+		ControlSample* sample = &_samples[ _sampleIndex ];
+		memory->WriteWord( addr + 0, 4, ( int )sample->Timestamp );
+		memory->WriteWord( addr + 4, 4, ( int )sample->Buttons );
+		memory->WriteWord( addr + 8, 1, ( byte )sample->AnalogX );
+		memory->WriteWord( addr + 9, 1, ( byte )sample->AnalogY );
+		Monitor::Exit( this );
+
+		// 6 bytes of junk
+		addr += 16;
+
+		read++;
 	}
 
-	return toRead;
+	return read;
 }
 
 // int sceCtrlPeekBufferNegative(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:150)
@@ -177,63 +187,52 @@ int sceCtrl::sceCtrlPeekBufferNegative( IMemory^ memory, int pad_data, int count
 {
 	// Same as above, but complement button mask
 
-	array<ControlSample^>^ samples;
-	int toRead;
-	Monitor::Enter( this );
-	{
-		toRead = MIN2( count, _buffer->Count );
-		samples = gcnew array<ControlSample^>( toRead );
-		for( int n = 0; n < toRead; n++ )
-			samples[ n ] = _buffer->PeekAhead( n );
-	}
-	Monitor::Exit( this );
+	if( pad_data == NULL )
+		return 0;
 
-	if( pad_data != 0x0 )
+	int addr = pad_data;
+	int read = 0;
+	while( read < count )
 	{
-		int addr = pad_data;
-		for( int n = 0; n < toRead; n++ )
-		{
-			ControlSample^ sample = samples[ n ];
-			memory->WriteWord( addr + 0, 4, ( int )sample->Timestamp );
-			memory->WriteWord( addr + 4, 4, ~( int )sample->Buttons );
-			memory->WriteWord( addr + 8, 1, ( byte )sample->AnalogX );
-			memory->WriteWord( addr + 9, 1, ( byte )sample->AnalogY );
-			// 6 bytes of junk
-			addr += 16;
-		}
+		Monitor::Enter( this );
+		ControlSample* sample = &_samples[ _sampleIndex ];
+		memory->WriteWord( addr + 0, 4, ( int )sample->Timestamp );
+		memory->WriteWord( addr + 4, 4, ~( int )sample->Buttons );
+		memory->WriteWord( addr + 8, 1, ( byte )sample->AnalogX );
+		memory->WriteWord( addr + 9, 1, ( byte )sample->AnalogY );
+		Monitor::Exit( this );
+
+		// 6 bytes of junk
+		addr += 16;
+
+		read++;
 	}
 
-	return toRead;
+	return read;
 }
 
 // int sceCtrlReadBufferPositive(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:168)
 int sceCtrl::sceCtrlReadBufferPositive( IMemory^ memory, int pad_data, int count )
 {
-	array<ControlSample^>^ samples = gcnew array<ControlSample^>( count );
+	if( pad_data == NULL )
+		return 0;
+
+	int addr = pad_data;
 	int read = 0;
 	while( read < count )
 	{
 		Monitor::Enter( this );
-		if( _buffer->Count == 0 )
-			_dataPresent->WaitOne( InputPollInterval * 2, true );
-		while( ( _buffer->Count > 0 ) && ( read < count ) )
-			samples[ read++ ] = _buffer->Dequeue();
+		ControlSample* sample = &_samples[ _sampleIndex ];
+		memory->WriteWord( addr + 0, 4, ( int )sample->Timestamp );
+		memory->WriteWord( addr + 4, 4, ( int )sample->Buttons );
+		memory->WriteWord( addr + 8, 1, ( byte )sample->AnalogX );
+		memory->WriteWord( addr + 9, 1, ( byte )sample->AnalogY );
 		Monitor::Exit( this );
-	}
 
-	if( pad_data != 0x0 )
-	{
-		int addr = pad_data;
-		for( int n = 0; n < read; n++ )
-		{
-			ControlSample^ sample = samples[ n ];
-			memory->WriteWord( addr + 0, 4, ( int )sample->Timestamp );
-			memory->WriteWord( addr + 4, 4, ( int )sample->Buttons );
-			memory->WriteWord( addr + 8, 1, ( byte )sample->AnalogX );
-			memory->WriteWord( addr + 9, 1, ( byte )sample->AnalogY );
-			// 6 bytes of junk
-			addr += 16;
-		}
+		// 6 bytes of junk
+		addr += 16;
+
+		read++;
 	}
 
 	return read;
@@ -242,31 +241,25 @@ int sceCtrl::sceCtrlReadBufferPositive( IMemory^ memory, int pad_data, int count
 // int sceCtrlReadBufferNegative(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:170)
 int sceCtrl::sceCtrlReadBufferNegative( IMemory^ memory, int pad_data, int count )
 {
-	array<ControlSample^>^ samples = gcnew array<ControlSample^>( count );
+	if( pad_data == NULL )
+		return 0;
+
+	int addr = pad_data;
 	int read = 0;
 	while( read < count )
 	{
 		Monitor::Enter( this );
-		if( _buffer->Count == 0 )
-			_dataPresent->WaitOne( InputPollInterval * 2, true );
-		while( _buffer->Count > 0 )
-			samples[ read++ ] = _buffer->Dequeue();
+		ControlSample* sample = &_samples[ _sampleIndex ];
+		memory->WriteWord( addr + 0, 4, ( int )sample->Timestamp );
+		memory->WriteWord( addr + 4, 4, ~( int )sample->Buttons );
+		memory->WriteWord( addr + 8, 1, ( byte )sample->AnalogX );
+		memory->WriteWord( addr + 9, 1, ( byte )sample->AnalogY );
 		Monitor::Exit( this );
-	}
 
-	if( pad_data != 0x0 )
-	{
-		int addr = pad_data;
-		for( int n = 0; n < read; n++ )
-		{
-			ControlSample^ sample = samples[ n ];
-			memory->WriteWord( addr + 0, 4, ( int )sample->Timestamp );
-			memory->WriteWord( addr + 4, 4, ~( int )sample->Buttons );
-			memory->WriteWord( addr + 8, 1, ( byte )sample->AnalogX );
-			memory->WriteWord( addr + 9, 1, ( byte )sample->AnalogY );
-			// 6 bytes of junk
-			addr += 16;
-		}
+		// 6 bytes of junk
+		addr += 16;
+
+		read++;
 	}
 
 	return read;

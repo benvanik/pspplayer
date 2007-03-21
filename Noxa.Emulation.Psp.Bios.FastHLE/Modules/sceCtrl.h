@@ -9,6 +9,7 @@
 #include "NoxaShared.h"
 #include "ModulesShared.h"
 #include "Module.h"
+#include <malloc.h>
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -23,6 +24,15 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
+					class ControlSample
+					{
+					public:
+						uint		Timestamp;
+						PadButtons	Buttons;
+						int			AnalogX;
+						int			AnalogY;
+					};
+
 					public ref class sceCtrl : public Module
 					{
 					internal:
@@ -32,19 +42,11 @@ namespace Noxa {
 							AnalogAndDigital = 1
 						};
 
-						ref class ControlSample
-						{
-						public:
-							uint		Timestamp;
-							PadButtons	Buttons;
-							int			AnalogX;
-							int			AnalogY;
-						};
-
 						int								_sampleCycle;
 						ControlSamplingMode				_sampleMode;
-						CircularList<ControlSample^>^	_buffer;
 						AutoResetEvent^					_dataPresent;
+						ControlSample*					_samples;
+						int								_sampleIndex;
 
 						uint							_pressedButtons;
 						uint							_makedButtons;
@@ -53,11 +55,11 @@ namespace Noxa {
 						bool							_threadRunning;
 						Thread^							_thread;
 
-						static const int				InputPollInterval = 75;
+						static const int				InputPollInterval = 50;
 
 					public:
-						sceCtrl( Kernel^ kernel ) : Module( kernel ) {}
-						~sceCtrl(){}
+						sceCtrl( Kernel^ kernel );
+						~sceCtrl();
 
 					public:
 						property String^ Name { virtual String^ get() override { return "sceCtrl"; } }

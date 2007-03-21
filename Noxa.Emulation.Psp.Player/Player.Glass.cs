@@ -546,60 +546,63 @@ namespace Noxa.Emulation.Psp.Player
 
 		private void PaintMe()
 		{
-			Graphics g = this.CreateGraphics();
-
-			if( VisualStyleInformation.IsEnabledByUser == true )
+			using( Graphics g = this.CreateGraphics() )
 			{
-				if( _theme == IntPtr.Zero )
-					_theme = NativeHelpers.OpenThemeData( this.Handle, "WINDOW" );
-				Debug.Assert( _theme != IntPtr.Zero );
+				if( ( VisualStyleInformation.IsEnabledByUser == true ) &&
+					( ( _theme == IntPtr.Zero ) ||
+					  ( _textFont == null ) ) )
+				{
+					if( _theme == IntPtr.Zero )
+						_theme = NativeHelpers.OpenThemeData( this.Handle, "WINDOW" );
+					Debug.Assert( _theme != IntPtr.Zero );
+					if( _theme == IntPtr.Zero )
+						return;
+
+					VisualStyleElement windowType = VisualStyleElement.CreateElement( "WINDOW", 0, 0 );
+					VisualStyleRenderer r = new VisualStyleRenderer( windowType );
+					TextMetrics tm = r.GetTextMetrics( g );
+
+					NativeHelpers.LOGFONT lf;
+					NativeHelpers.GetThemeSysFont( _theme, ( int )NativeHelpers.SysFontType.TMT_MSGBOXFONT, out lf );
+					_textFont = Font.FromLogFont( lf );
+					Debug.Assert( _textFont != null );
+					if( _textFont == null )
+						_textFont = new Font( "Tahoma", 12 );
+					//NONCLIENTMETRICS ncm = { sizeof( NONCLIENTMETRICS ) };
+					//SystemParametersInfo(
+					//    SPI_GETNONCLIENTMETRICS, sizeof( NONCLIENTMETRICS ),
+					//    &ncm, false );
+					//lf = ncm.lfMessageFont;
+				}
+
 				if( _theme == IntPtr.Zero )
 					return;
 
-				VisualStyleElement windowType = VisualStyleElement.CreateElement( "WINDOW", 0, 0 );
-				VisualStyleRenderer r = new VisualStyleRenderer( windowType );
-				TextMetrics tm = r.GetTextMetrics( g );
+				if( _glassEnabled == true )
+				{
+					Rectangle[] rects = new Rectangle[ 4 ];
+					rects[ 0 ] = _glassBounds.Left;
+					rects[ 1 ] = _glassBounds.Right;
+					rects[ 2 ] = _glassBounds.Top;
+					rects[ 3 ] = _glassBounds.Bottom;
+					g.FillRectangles( Brushes.Black, rects );
+				}
 
-				NativeHelpers.LOGFONT lf;
-				NativeHelpers.GetThemeSysFont( _theme, ( int )NativeHelpers.SysFontType.TMT_MSGBOXFONT, out lf );
-				_textFont = Font.FromLogFont( lf );
-				Debug.Assert( _textFont != null );
-				if( _textFont == null )
-					_textFont = new Font( "Tahoma", 12 );
-				//NONCLIENTMETRICS ncm = { sizeof( NONCLIENTMETRICS ) };
-				//SystemParametersInfo(
-				//    SPI_GETNONCLIENTMETRICS, sizeof( NONCLIENTMETRICS ),
-				//    &ncm, false );
-				//lf = ncm.lfMessageFont;
-			}
+				int statusTop = this.ClientSize.Height - _glassMargins.Bottom;
+				int statusHeight = _glassMargins.Bottom;
+				Rectangle statusBounds = new Rectangle( 0, statusTop, this.ClientSize.Width, statusHeight );
 
-			if( _theme == IntPtr.Zero )
-				return;
+				// 21 pixels of space to draw our stuff - glass may or may not be enabled, so make sure we do it right!
 
-			if( _glassEnabled == true )
-			{
-				Rectangle[] rects = new Rectangle[ 4 ];
-				rects[ 0 ] = _glassBounds.Left;
-				rects[ 1 ] = _glassBounds.Right;
-				rects[ 2 ] = _glassBounds.Top;
-				rects[ 3 ] = _glassBounds.Bottom;
-				g.FillRectangles( Brushes.Black, rects );
-			}
+				string statusText = this.GetStatusText();
 
-			int statusTop = this.ClientSize.Height - _glassMargins.Bottom;
-			int statusHeight = _glassMargins.Bottom;
-			Rectangle statusBounds = new Rectangle( 0, statusTop, this.ClientSize.Width, statusHeight );
-			
-			// 21 pixels of space to draw our stuff - glass may or may not be enabled, so make sure we do it right!
-
-			string statusText = this.GetStatusText();
-
-			if( _glassEnabled == true )
-				this.RenderGlassText( g, statusBounds, statusText );
-			else
-			{
-				g.FillRectangle( SystemBrushes.Control, statusBounds );
-				g.DrawString( statusText, _textFont, SystemBrushes.WindowText, 5, statusTop + 1 );
+				if( _glassEnabled == true )
+					this.RenderGlassText( g, statusBounds, statusText );
+				else
+				{
+					g.FillRectangle( SystemBrushes.Control, statusBounds );
+					g.DrawString( statusText, _textFont, SystemBrushes.WindowText, 5, statusTop + 1 );
+				}
 			}
 		}
 
