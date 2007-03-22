@@ -614,6 +614,10 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 	//float nx,ny,nz;
 	//float x,y,z;
 
+	// Must be word (4 byte) aligned - if it's not, there will be padding we need to skip
+	if( ( vertexSize & 0x3 ) != 0 )
+		vertexSize += 4 - ( vertexSize & 0x3 );
+
 	GLenum format = 0;
 
 	int careMasks = VTPositionMask | VTNormalMask | VTTextureMask | VTColorMask;
@@ -756,14 +760,17 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	int colorType = ( vertexType & VTColorMask );
 	int positionType = ( vertexType & VTPositionMask );
 	bool transformed = ( vertexType & VTTransformedMask ) != 0;
-	//bool transformed = true;
-
+	
 	// Disable clipping
 	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
 
+	// Disable depth testing (we place in the order we get it)
+	bool depthTestEnabled = glIsEnabled( GL_DEPTH_TEST );
+	if( depthTestEnabled == true )
+		glDisable( GL_DEPTH_TEST );
+
 	if( transformed == true )
 	{
-		glDisable( GL_DEPTH_TEST );
 		glDisable( GL_CULL_FACE );
 
 		glMatrixMode( GL_PROJECTION );
@@ -780,15 +787,15 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	glPushMatrix();
 	//glLoadMatrixf( context->ViewMatrix );
 
+	glBegin( GL_QUADS );
+
+	float vpos[ 4 ][ 3 ];
+	float vtex[ 4 ][ 2 ];
+	byte vclr[ 4 ][ 4 ];
 	for( int n = 0; n < vertexCount / 2; n++ )
 	{
 		// Now on sprite n
 
-		float vpos[ 4 ][ 3 ];
-		float vtex[ 4 ][ 2 ];
-		byte vclr[ 4 ][ 4 ];
-
-		//for( int m = 1; m <= 2; m++ )
 		int m = 0;
 		do
 		{
@@ -862,18 +869,21 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 		// |      |
 		// 3 ---- 2
 		// Given 0 and 2, populate 1 and 3
-		vpos[ 1 ][ 0 ] = vpos[ 2 ][ 0 ];
-		vpos[ 1 ][ 1 ] = vpos[ 0 ][ 1 ];
-		vpos[ 1 ][ 2 ] = vpos[ 0 ][ 2 ];
+		vpos[ 1 ][ 0 ] = vpos[ 2 ][ 0 ];	// x
+		vpos[ 1 ][ 1 ] = vpos[ 0 ][ 1 ];	// y
+		vpos[ 1 ][ 2 ] = vpos[ 0 ][ 2 ];	// z
 		vpos[ 3 ][ 0 ] = vpos[ 0 ][ 0 ];
 		vpos[ 3 ][ 1 ] = vpos[ 2 ][ 1 ];
 		vpos[ 3 ][ 2 ] = vpos[ 2 ][ 2 ];
+		vtex[ 1 ][ 0 ] = vtex[ 2 ][ 0 ];	// s
+		vtex[ 1 ][ 1 ] = vtex[ 0 ][ 1 ];	// t
+		vtex[ 3 ][ 0 ] = vtex[ 0 ][ 0 ];
+		vtex[ 3 ][ 1 ] = vtex[ 2 ][ 1 ];
 
 		*( ( int* )vclr[ 0 ] ) = *( ( int* )vclr[ 2 ] );
 		*( ( int* )vclr[ 1 ] ) = *( ( int* )vclr[ 2 ] );
 		*( ( int* )vclr[ 3 ] ) = *( ( int* )vclr[ 2 ] );
 		
-		glBegin( GL_QUADS );
 		for( m = 0; m < 4; m++ )
 		{
 			if( textureType != 0 )
@@ -882,48 +892,9 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 				glColor4ubv( vclr[ m ] );
 			glVertex3fv( vpos[ m ] );
 		}
-		glEnd();
-
-		// 1 ------- 0
-		// | \       |
-		// |   \     |
-		// |     \   |
-		// |       \ |
-		// 3 ------- 2
-		// We are given vertex 1 and 2, so figure out vertex 0 and 3
-/*
-		vpos[ 0 ][ 0 ] = vpos[ 1 ][ 0 ];	// x
-		vpos[ 0 ][ 1 ] = vpos[ 2 ][ 1 ];	// y
-		vpos[ 0 ][ 2 ] = vpos[ 1 ][ 2 ];	// z --- RIGHT???
-		vpos[ 3 ][ 0 ] = vpos[ 2 ][ 0 ];
-		vpos[ 3 ][ 1 ] = vpos[ 1 ][ 1 ];
-		vpos[ 3 ][ 2 ] = vpos[ 2 ][ 2 ];
-		vtex[ 0 ][ 0 ] = vtex[ 2 ][ 0 ];	// s
-		vtex[ 0 ][ 1 ] = vtex[ 1 ][ 1 ];	// t
-		vtex[ 3 ][ 0 ] = vtex[ 1 ][ 0 ];
-		vtex[ 3 ][ 1 ] = vtex[ 2 ][ 1 ];
-
-		// Color from vertex 2?
-		*( ( int* )vclr[ 0 ] ) = *( ( int* )vclr[ 2 ] );
-		*( ( int* )vclr[ 1 ] ) = *( ( int* )vclr[ 2 ] );
-		*( ( int* )vclr[ 3 ] ) = *( ( int* )vclr[ 2 ] );
-
-		// Now draw the triangle strip
-		glBegin( GL_TRIANGLE_STRIP );
-		for( int m = 0; m < 4; m++ )
-		{
-			if( textureType != 0 )
-				glTexCoord2fv( vtex[ m ] );
-			if( colorType != 0 )
-				glColor4ubv( vclr[ m ] );
-			if( transformed == true )
-				glVertex2fv( &vpos[ m ][ 1 ] );
-			else
-				glVertex3fv( vpos[ m ] );
-		}
-		glEnd();
-		*/
 	}
+
+	glEnd();
 
 	glPopMatrix();
 
@@ -934,9 +905,12 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 		glMatrixMode( GL_PROJECTION );
 		glPopMatrix();
 
-		glEnable( GL_DEPTH_TEST );
 		glEnable( GL_CULL_FACE );
 	}
+
+	// Re-enable depth testing
+	if( depthTestEnabled == true )
+		glEnable( GL_DEPTH_TEST );
 
 	// Re-enable clipping
 	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
