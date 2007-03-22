@@ -87,6 +87,8 @@ int R4000Memory::ReadWord( int address )
 	_managedMemoryReadCount++;
 #endif
 
+	address &= 0x0FFFFFFF;
+
 	//Debug::WriteLine( String::Format( "RW @ 0x{0:X8}", address ) );
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{

@@ -16,12 +16,12 @@ namespace Noxa.Emulation.Psp.Player
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main()
+		static void Main( string[] args )
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault( false );
 
-			Host host = new Host();
+			Host host = new Host( args );
 			Application.Run( host.Player );
 		}
 	}

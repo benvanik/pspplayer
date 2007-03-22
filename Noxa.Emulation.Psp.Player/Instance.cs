@@ -50,14 +50,17 @@ namespace Noxa.Emulation.Psp.Player
 		protected bool _shutDown = false;
 		protected InstanceState _state = InstanceState.Idle;
 		protected AutoResetEvent _stateChangeEvent = new AutoResetEvent( false );
+		protected bool _switchToXmb = true;
 
-		public Instance( Host host, EmulationParameters parameters )
+		public Instance( Host host, EmulationParameters parameters, bool suppressXmb )
 		{
 			Debug.Assert( host != null );
 			Debug.Assert( parameters != null );
 
 			_host = host;
 			_params = parameters;
+
+			_switchToXmb = !suppressXmb;
 		}
 
 		public IEmulationHost Host
@@ -385,7 +388,7 @@ namespace Noxa.Emulation.Psp.Player
 			if( _isCreated == false )
 				return;
 
-			this.Stop();
+			this.Destroy();
 			this.Create();
 			this.Start( ( _host.Debugger != null ) );
 		}
@@ -439,7 +442,8 @@ namespace Noxa.Emulation.Psp.Player
 		{
 			try
 			{
-				this.SwitchToXmb();
+				if( _switchToXmb == true )
+					this.SwitchToXmb();
 
 				while( _shutDown == false )
 				{
@@ -457,23 +461,25 @@ namespace Noxa.Emulation.Psp.Player
 						case InstanceState.Running:
 							if( _bios.Kernel.Game == null )
 							{
-#if XMB
-								if( _xmb.IsEnabled == false )
-#else
-#endif
+								if( _switchToXmb == true )
 								{
-									_cpu.PrintStatistics();
-									Debug.WriteLine( "Instance: kernel game ended" );
-									this.SwitchToXmb();
-								}
-
-								// Run XMB if not game set
 #if XMB
-								_xmb.Update();
-								Thread.Sleep( 10 );
-#else
-								Thread.Sleep( 100 );
+									if( _xmb.IsEnabled == false )
 #endif
+									{
+										_cpu.PrintStatistics();
+										Debug.WriteLine( "Instance: kernel game ended" );
+										this.SwitchToXmb();
+									}
+
+									// Run XMB if not game set
+#if XMB
+									_xmb.Update();
+									Thread.Sleep( 10 );
+#else
+									Thread.Sleep( 100 );
+#endif
+								}
 							}
 							else
 							{

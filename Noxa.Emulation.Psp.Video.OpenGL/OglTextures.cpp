@@ -112,9 +112,7 @@ const TextureFormat __formats[] = {
 	{ TPSDXT5,			4,		CopyPixel,			TFAlpha,		GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,	},
 };
 
-/*
-Would be nice to replace Unswizzle with something like this
-void swizzle_fast( const byte* in, byte* out, uint width, uint height )
+void Unswizzle1( const TextureFormat* format, const byte* in, byte* out, const uint width, const uint height )
 {
 	unsigned int blockx, blocky;
 	unsigned int j;
@@ -146,13 +144,13 @@ void swizzle_fast( const byte* in, byte* out, uint width, uint height )
 		}
 		ysrc += src_row;
 	}
-}*/
+}
 
 __inline uint UnswizzleInner( uint offset, uint log2_w )
 {
 	unsigned w_mask = ( 1 << log2_w ) - 1;
 	unsigned fixed = offset & ( ( ~7 << log2_w ) | 0xf );
-	unsigned bx = offset & ( ( w_mask & 0xF ) << 7 );
+	unsigned bx = offset & ( ( w_mask & 0xF ) << 7 ); // 1F?
 	unsigned my = offset & 0x70;
 
 	return fixed | ( bx >> 3 ) | ( my << ( log2_w - 4 ) );
@@ -164,12 +162,9 @@ void Unswizzle( const TextureFormat* format, const byte* in, byte* out, const ui
 	unsigned lg2_w = lg2( src_bytewidth );
 	unsigned src_chunk = 16;
 	unsigned pix_per_chunk = src_chunk / format->Size;
-	unsigned dst_chunk = pix_per_chunk * format->Size;
 	unsigned src_size = width * height * format->Size;
 
-	for( uint src_off = 0, dst_off = 0;
-		src_off < src_size;
-		src_off += src_chunk, dst_off += dst_chunk)
+	for( uint src_off = 0; src_off < src_size; src_off += src_chunk )
 	{
 		unsigned swizoff = UnswizzleInner( src_off, lg2_w );
 
@@ -199,6 +194,46 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	{
 		buffer = ( byte* )malloc( size );
 		Unswizzle( format, address, buffer, texture->Width, texture->Height );
+	}
+
+	if( format->Format != TPSABGR8888 )
+	{
+		// Special handling... Nasty!
+		if( format->Format == TPSABGR5551 )
+		{
+			assert( context->TexturesSwizzled == false );
+			int oldSize = size;
+			short* input = ( short* )buffer;
+			size = texture->Width * texture->Height * 4;
+			buffer = ( byte* )malloc( size );
+			format = ( TextureFormat *)&__formats[ 3 ];
+
+			// Copy 1555 to 8888
+			uint* output = ( uint* )buffer;
+			for( int n = 0; n < texture->Width * texture->Height; n++ )
+			{
+				short spixel = *input;
+				/*
+				  RRRRRGGGGGBBBBBA	<- GL
+				  ABBBBBGGGGGRRRRR	<- PSP
+				 */
+				unsigned short r = ( (spixel & 0xf800) >> 11 ) * 8;
+				unsigned short g = ( (spixel & 0x07c0) >> 6 ) * 8;
+				unsigned short b = ( (spixel & 0x003E) >> 1 ) * 8;
+				unsigned short a = (spixel & 0x0001);
+
+				uint dpixel = a ? 0x000000FF : 0x0;
+				dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
+				/*dpixel |=
+					( 8 * ( spixel & 0x1F ) ) |
+					( 8 * ( spixel >> 5 ) & 0x1F ) |
+					( 8 * ( spixel >> 10 ) & 0x1F );*/
+				*output = dpixel;
+
+				input++;
+				output++;
+			}
+		}
 	}
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );

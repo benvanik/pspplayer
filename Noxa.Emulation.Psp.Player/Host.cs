@@ -22,7 +22,7 @@ namespace Noxa.Emulation.Psp.Player
 		protected IDebugger _debugger;
 		protected Settings _componentSettings;
 
-		public Host()
+		public Host( string[] args )
 		{
 			// Ensure settings are proper
 			if( Properties.Settings.Default.PluginSearchPaths == null )
@@ -40,6 +40,12 @@ namespace Noxa.Emulation.Psp.Player
 			_player = new Player( this );
 
 			this.Load();
+
+			// If we have args, try to start the player
+			if( args.Length > 0 )
+			{
+				_player.StartGameDirect( args[ 0 ] );
+			}
 		}
 
 		public Player Player
@@ -98,7 +104,7 @@ namespace Noxa.Emulation.Psp.Player
 			Properties.Settings.Default.Save();
 		}
 
-		public bool CreateInstance()
+		public bool CreateInstance( bool suppressXmb )
 		{
 			EmulationParameters emulationParams = new EmulationParameters();
 
@@ -195,7 +201,7 @@ namespace Noxa.Emulation.Psp.Player
 				}
 			}
 
-			_instance = new Instance( this, emulationParams );
+			_instance = new Instance( this, emulationParams, suppressXmb );
 
 			List<ComponentIssue> issues = _instance.Test();
 			bool showReport = false;
