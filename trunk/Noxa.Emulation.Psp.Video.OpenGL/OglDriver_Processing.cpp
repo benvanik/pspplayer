@@ -35,6 +35,7 @@ __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
 int DetermineVertexSize( int vertexType );
 void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int vertexCount, byte* indexBuffer );
 void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr );
+void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr );
 
 void SetTexture( OglContext* context, int stage );
 
@@ -264,7 +265,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			verticesTransformed = ( argi >> 23 ) == 0;
 			skinningWeightCount = ( argi >> 14 ) & 0x3;
 			morphingVertexCount = ( argi >> 18 ) & 0x3;
-			vertexType = argi & 0x1FFF;
+			vertexType = argi & 0x801FFF; // so we keep transformed bit
 			break;
 		case VADDR:
 			vertexBufferAddress = list->Base | argi;
@@ -299,36 +300,39 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				// 0x6 = Sprites (2D rectangles)
 			}
 
-			if( areSprites == false )
 			{
-				// Tris/etc
+				SetTexture( context, 0 );
+
 				int vertexSize = DetermineVertexSize( vertexType );
 
-				bool isIndexed = ( vertexType & ( VTIndex8 | VTIndex16 ) ) != 0;
-				
 				byte* ptr;
 				if( ( vertexBufferAddress & MainMemoryBase ) != 0 )
 					ptr = context->MainMemoryPointer + ( vertexBufferAddress - MainMemoryBase );
 				else
 					ptr = context->VideoMemoryPointer + ( vertexBufferAddress - FrameBufferBase );
-				
-				byte* iptr = 0;
-				if( isIndexed == true )
-				{
-					if( ( indexBufferAddress & MainMemoryBase ) != 0 )
-						iptr = context->MainMemoryPointer + ( indexBufferAddress - MainMemoryBase );
-					else
-						iptr = context->VideoMemoryPointer + ( indexBufferAddress - FrameBufferBase );
-				}
-				
-				SetTexture( context, 0 );
 
-				SetupVertexBuffers( context, vertexType, vertexCount, vertexSize, ptr );
-				DrawBuffers( context, primitiveType, vertexType, vertexCount, iptr );
-			}
-			else
-			{
-				// Sprite list
+				if( areSprites == false )
+				{
+					// Normal vertex list
+
+					bool isIndexed = ( vertexType & ( VTIndex8 | VTIndex16 ) ) != 0;
+					byte* iptr = 0;
+					if( isIndexed == true )
+					{
+						if( ( indexBufferAddress & MainMemoryBase ) != 0 )
+							iptr = context->MainMemoryPointer + ( indexBufferAddress - MainMemoryBase );
+						else
+							iptr = context->VideoMemoryPointer + ( indexBufferAddress - FrameBufferBase );
+					}
+
+					SetupVertexBuffers( context, vertexType, vertexCount, vertexSize, ptr );
+					DrawBuffers( context, primitiveType, vertexType, vertexCount, iptr );
+				}
+				else
+				{
+					// Sprite list
+					DrawSpriteList( context, vertexType, vertexCount, vertexSize, ptr );
+				}
 			}
 			break;
 
@@ -436,43 +440,49 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 
 		case PMS:
+			// Next 16 packets are 4x4 projection matrix
+			for( int m = 0; m < 16; m++ )
+			{
+				argx = list->Packets[ n + m + 1 ].Argument << 8;
+				matrixTemp[ m ] = *reinterpret_cast<float*>( &argx );
+			}
+			n += 16;
+			glMatrixMode( GL_PROJECTION );
+			glLoadMatrixf( matrixTemp );
+			break;
 		case VMS:
+			// Next 12 packets are 3x4 view matrix
+			for( int m = 0; m < 12; m++ )
+			{
+				argx = list->Packets[ n + m + 1 ].Argument << 8;
+				matrixTemp[ m ] = *reinterpret_cast<float*>( &argx );
+			}
+			n += 12;
+			WidenMatrix( matrixTemp, context->ViewMatrix );
+			glMatrixMode( GL_MODELVIEW );
+			glLoadMatrixf( context->ViewMatrix );
+			break;
 		case WMS:
+			// Next 12 packets are 3x4 world matrix
+			for( int m = 0; m < 12; m++ )
+			{
+				argx = list->Packets[ n + m + 1 ].Argument << 8;
+				matrixTemp[ m ] = *reinterpret_cast<float*>( &argx );
+			}
+			n += 12;
+			WidenMatrix( matrixTemp, context->WorldMatrix );
+			glMatrixMode( GL_MODELVIEW );
+			glLoadMatrixf( context->ViewMatrix );
+			glMultMatrixf( context->WorldMatrix );
+			break;
 		case TMS:
 			temp = 0;
 			break;
-		case PROJ: // 4x4
-			matrixTemp[ temp++ ] = argf;
-			if( temp == 16 )
-			{
-				temp = 0;
-				//context->ProjectionMatrix = matrixTemp;
-				glMatrixMode( GL_PROJECTION );
-				glLoadMatrixf( matrixTemp );
-			}
+		case PROJ: // handled by PMS
 			break;
-		case VIEW: // 3x4
-			matrixTemp[ temp++ ] = argf;
-			if( temp == 12 )
-			{
-				WidenMatrix( matrixTemp, context->ViewMatrix );
-				temp = 0;
-				glMatrixMode( GL_MODELVIEW );
-				glLoadMatrixf( context->ViewMatrix );
-			}
+		case VIEW: // handled by VMS
 			break;
-		case WORLD: // 3x4
-			matrixTemp[ temp++ ] = argf;
-			assert( argf == argf );
-			if( temp == 12 )
-			{
-				WidenMatrix( matrixTemp, context->WorldMatrix );
-				temp = 0;
-				//context->WorldMatrix = matrixTemp;
-				glMatrixMode( GL_MODELVIEW );
-				glLoadMatrixf( context->ViewMatrix );
-				glMultMatrixf( context->WorldMatrix );
-			}
+		case WORLD: // handled by WMS
 			break;
 		case TMATRIX: // 3x4
 			matrixTemp[ temp++ ] = argf;
@@ -532,8 +542,7 @@ int DetermineVertexSize( int vertexType )
 	if( positionMask == VTPositionFixed8 )
 		size += 1 + 1 + 1;
 	else if( positionMask == VTPositionFixed16 )
-		//size += 2 + 2 + 2;
-		size += 4 + 4 + 4;
+		size += 2 + 2 + 2;
 	else if( positionMask == VTPositionFloat )
 		size += 4 + 4 + 4;
 
@@ -728,6 +737,211 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 	}
 }
 
+void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr )
+{
+	// Sprite lists contain 2*n vertices for n sprites
+	// Each sprite has 2 vertices, the first being the top left corner, and the second being
+	// the bottom right
+	// Since OpenGL doesn't support anything like this, we will emulate it by determining the other
+	// two points and drawing a triangle list
+	// A good optimization would be to find a way to do this so we can cache the results
+
+	// I don't think these are supported
+	assert( ( vertexType & VTNormalMask ) == 0 );
+	assert( ( vertexType & VTWeightMask ) == 0 );
+
+	byte* src = ptr;
+
+	int textureType = ( vertexType & VTTextureMask );
+	int colorType = ( vertexType & VTColorMask );
+	int positionType = ( vertexType & VTPositionMask );
+	bool transformed = ( vertexType & VTTransformedMask ) != 0;
+	//bool transformed = true;
+
+	// Disable clipping
+	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
+
+	if( transformed == true )
+	{
+		glDisable( GL_DEPTH_TEST );
+		glDisable( GL_CULL_FACE );
+
+		glMatrixMode( GL_PROJECTION );
+		glPushMatrix();
+		glLoadIdentity();
+		glOrtho( 0.0f, 480.0f, 272.0f, 0.0f, -1.0f, 1.0f );
+
+		glMatrixMode( GL_MODELVIEW );
+		glPushMatrix();
+		glLoadIdentity();
+	}
+
+	glMatrixMode( GL_MODELVIEW );
+	glPushMatrix();
+	//glLoadMatrixf( context->ViewMatrix );
+
+	for( int n = 0; n < vertexCount / 2; n++ )
+	{
+		// Now on sprite n
+
+		float vpos[ 4 ][ 3 ];
+		float vtex[ 4 ][ 2 ];
+		byte vclr[ 4 ][ 4 ];
+
+		//for( int m = 1; m <= 2; m++ )
+		int m = 0;
+		do
+		{
+			switch( textureType )
+			{
+			case VTTextureFixed8:
+				assert( false );
+				src += 2;
+				break;
+			case VTTextureFixed16:
+				vtex[ m ][ 0 ] = *( ( short* )src );
+				vtex[ m ][ 1 ] = *( ( short* )src + 1 );
+				src += 4;
+				break;
+			case VTTextureFloat:
+				vtex[ m ][ 0 ] = *( ( float* )src );
+				vtex[ m ][ 1 ] = *( ( float* )src + 1 );
+				src += 8;
+				break;
+			}
+
+			switch( colorType )
+			{
+			case VTColorBGR5650:
+				assert( false );
+				src += 2;
+				break;
+			case VTColorABGR4444:
+				assert( false );
+				src += 2;
+				break;
+			case VTColorABGR5551:
+				assert( false );
+				src += 2;
+				break;
+			case VTColorABGR8888:
+				*( ( int* )vclr[ m ] ) = *( ( int* )src );
+				src += 4;
+				break;
+			}
+
+			switch( positionType )
+			{
+			case VTPositionFixed8:
+				assert( false );
+				src += 3;
+				break;
+			case VTPositionFixed16:
+				vpos[ m ][ 0 ] = *( ( short* )src );
+				vpos[ m ][ 1 ] = *( ( short* )src + 1 );
+				vpos[ m ][ 2 ] = *( ( short* )src + 2 );
+				src += 6;
+				break;
+			case VTPositionFloat:
+				vpos[ m ][ 0 ] = *( ( float* )src );
+				vpos[ m ][ 1 ] = *( ( float* )src + 1 );
+				vpos[ m ][ 2 ] = *( ( float* )src + 2 );
+				src += 12;
+				break;
+			}
+
+			// Must be word (4 byte) aligned
+			if( ( vertexSize & 0x3 ) != 0 )
+				src += 4 - ( vertexSize & 0x3 );
+
+			m += 2;
+		} while( m <= 2 );
+
+		// 0 ---- 1
+		// |      |
+		// |      |
+		// 3 ---- 2
+		// Given 0 and 2, populate 1 and 3
+		vpos[ 1 ][ 0 ] = vpos[ 2 ][ 0 ];
+		vpos[ 1 ][ 1 ] = vpos[ 0 ][ 1 ];
+		vpos[ 1 ][ 2 ] = vpos[ 0 ][ 2 ];
+		vpos[ 3 ][ 0 ] = vpos[ 0 ][ 0 ];
+		vpos[ 3 ][ 1 ] = vpos[ 2 ][ 1 ];
+		vpos[ 3 ][ 2 ] = vpos[ 2 ][ 2 ];
+
+		*( ( int* )vclr[ 0 ] ) = *( ( int* )vclr[ 2 ] );
+		*( ( int* )vclr[ 1 ] ) = *( ( int* )vclr[ 2 ] );
+		*( ( int* )vclr[ 3 ] ) = *( ( int* )vclr[ 2 ] );
+		
+		glBegin( GL_QUADS );
+		for( m = 0; m < 4; m++ )
+		{
+			if( textureType != 0 )
+				glTexCoord2fv( vtex[ m ] );
+			if( colorType != 0 )
+				glColor4ubv( vclr[ m ] );
+			glVertex3fv( vpos[ m ] );
+		}
+		glEnd();
+
+		// 1 ------- 0
+		// | \       |
+		// |   \     |
+		// |     \   |
+		// |       \ |
+		// 3 ------- 2
+		// We are given vertex 1 and 2, so figure out vertex 0 and 3
+/*
+		vpos[ 0 ][ 0 ] = vpos[ 1 ][ 0 ];	// x
+		vpos[ 0 ][ 1 ] = vpos[ 2 ][ 1 ];	// y
+		vpos[ 0 ][ 2 ] = vpos[ 1 ][ 2 ];	// z --- RIGHT???
+		vpos[ 3 ][ 0 ] = vpos[ 2 ][ 0 ];
+		vpos[ 3 ][ 1 ] = vpos[ 1 ][ 1 ];
+		vpos[ 3 ][ 2 ] = vpos[ 2 ][ 2 ];
+		vtex[ 0 ][ 0 ] = vtex[ 2 ][ 0 ];	// s
+		vtex[ 0 ][ 1 ] = vtex[ 1 ][ 1 ];	// t
+		vtex[ 3 ][ 0 ] = vtex[ 1 ][ 0 ];
+		vtex[ 3 ][ 1 ] = vtex[ 2 ][ 1 ];
+
+		// Color from vertex 2?
+		*( ( int* )vclr[ 0 ] ) = *( ( int* )vclr[ 2 ] );
+		*( ( int* )vclr[ 1 ] ) = *( ( int* )vclr[ 2 ] );
+		*( ( int* )vclr[ 3 ] ) = *( ( int* )vclr[ 2 ] );
+
+		// Now draw the triangle strip
+		glBegin( GL_TRIANGLE_STRIP );
+		for( int m = 0; m < 4; m++ )
+		{
+			if( textureType != 0 )
+				glTexCoord2fv( vtex[ m ] );
+			if( colorType != 0 )
+				glColor4ubv( vclr[ m ] );
+			if( transformed == true )
+				glVertex2fv( &vpos[ m ][ 1 ] );
+			else
+				glVertex3fv( vpos[ m ] );
+		}
+		glEnd();
+		*/
+	}
+
+	glPopMatrix();
+
+	if( transformed == true )
+	{
+		glPopMatrix();
+
+		glMatrixMode( GL_PROJECTION );
+		glPopMatrix();
+
+		glEnable( GL_DEPTH_TEST );
+		glEnable( GL_CULL_FACE );
+	}
+
+	// Re-enable clipping
+	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
+}
+
 void SetTexture( OglContext* context, int stage )
 {
 	OglTexture* texture = &context->Textures[ stage ];
@@ -744,7 +958,6 @@ void SetTexture( OglContext* context, int stage )
 	else
 	{
 		// Grab and decode texture, then create in OGL
-
 		if( GenerateTexture( context, texture ) == false )
 		{
 			// Failed? Not much we can do...
