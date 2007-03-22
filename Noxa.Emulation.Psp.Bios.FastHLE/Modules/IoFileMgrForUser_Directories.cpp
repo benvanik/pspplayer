@@ -110,7 +110,7 @@ int IoFileMgrForUser::sceIoDread( IMemory^ memory, int fd, int dir )
 		IMediaItem^ child = folder->Items[ offset ];
 		IMediaFolder^ childFolder = nullptr;
 		IMediaFile^ childFile = nullptr;
-		if( child->GetType() == IMediaFolder::typeid )
+		if( child->GetType()->GetInterface( "IMediaFolder", false ) != nullptr )
 			childFolder = ( IMediaFolder^ )child;
 		else
 			childFile = ( IMediaFile^ )child;

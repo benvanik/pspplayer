@@ -66,29 +66,31 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 		internal void AddItemInternal( IMediaItem item )
 		{
 			_items.Add( item );
-			_itemLookup.Add( item.Name, item );
+			_itemLookup.Add( item.Name.ToLowerInvariant(), item );
 			_itemCache = null;
 		}
 
 		internal void RenameItemInternal( IMediaItem item, string newName )
 		{
+			string oldName = item.Name.ToLowerInvariant();
 			if( ( _items.Contains( item ) == false ) ||
-				( _itemLookup.ContainsKey( item.Name ) == false ) )
+				( _itemLookup.ContainsKey( oldName ) == false ) )
 				Debug.Assert( false, "Consistancy issue during rename - original not found" );
 			else
-				_itemLookup.Remove( item.Name );
-			_itemLookup.Add( newName, item );
+				_itemLookup.Remove( oldName );
+			_itemLookup.Add( newName.ToLowerInvariant(), item );
 			_itemCache = null;
 		}
 
 		internal void RemoveItemInternal( IMediaItem item )
 		{
+			string oldName = item.Name.ToLowerInvariant();
 			if( ( _items.Contains( item ) == false ) ||
-				( _itemLookup.ContainsKey( item.Name ) == false ) )
+				( _itemLookup.ContainsKey( oldName ) == false ) )
 				Debug.Assert( false, "Consistancy issue during remove - original not found" );
 			else
 			{
-				_itemLookup.Remove( item.Name );
+				_itemLookup.Remove( oldName );
 				_items.Remove( item );
 			}
 			_itemCache = null;
@@ -154,8 +156,10 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 		{
 			get
 			{
-				if( _itemLookup.ContainsKey( name ) == true )
-					return _itemLookup[ name ];
+				name = name.ToLowerInvariant();
+				IMediaItem value;
+				if( _itemLookup.TryGetValue( name, out value ) == true )
+					return value;
 				else
 					return null;
 			}

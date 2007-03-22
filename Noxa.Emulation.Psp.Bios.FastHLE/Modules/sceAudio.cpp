@@ -50,6 +50,10 @@ int sceAudio::sceAudioOutput( IMemory^ memory, int channel, int vol, int buf )
 // int sceAudioOutputBlocking(int channel, int vol, void *buf); (/audio/pspaudio.h:79)
 int sceAudio::sceAudioOutputBlocking( IMemory^ memory, int channel, int vol, int buf )
 {
+	// Context switch
+	_kernel->ActiveThread->State = KernelThreadState::Suspended;
+	_kernel->ContextSwitch();
+
 	if( _driver == nullptr )
 		return 0;
 
@@ -74,6 +78,10 @@ int sceAudio::sceAudioOutputPanned( IMemory^ memory, int channel, int leftvol, i
 // int sceAudioOutputPannedBlocking(int channel, int leftvol, int rightvol, void *buffer); (/audio/pspaudio.h:91)
 int sceAudio::sceAudioOutputPannedBlocking( IMemory^ memory, int channel, int leftvol, int rightvol, int buf )
 {
+	// Context switch
+	_kernel->ActiveThread->State = KernelThreadState::Suspended;
+	_kernel->ContextSwitch();
+
 	if( _driver == nullptr )
 		return 0;
 
