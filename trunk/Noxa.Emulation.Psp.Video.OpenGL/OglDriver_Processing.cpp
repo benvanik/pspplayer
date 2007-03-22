@@ -765,7 +765,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
 
 	// Disable depth testing (we place in the order we get it)
-	bool depthTestEnabled = glIsEnabled( GL_DEPTH_TEST );
+	bool depthTestEnabled = ( glIsEnabled( GL_DEPTH_TEST ) == GL_TRUE );
 	if( depthTestEnabled == true )
 		glDisable( GL_DEPTH_TEST );
 
@@ -887,7 +887,13 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 		for( m = 0; m < 4; m++ )
 		{
 			if( textureType != 0 )
-				glTexCoord2fv( vtex[ m ] );
+			{
+				// The texture coords are not normalized
+				//glTexCoord2fv( vtex[ m ] );
+				glTexCoord2f(
+					vtex[ m ][ 0 ] / context->Textures[ 0 ].Width,
+					vtex[ m ][ 1 ] / context->Textures[ 0 ].Height );
+			}
 			if( colorType != 0 )
 				glColor4ubv( vclr[ m ] );
 			glVertex3fv( vpos[ m ] );

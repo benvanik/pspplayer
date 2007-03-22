@@ -261,7 +261,7 @@ namespace Noxa.Emulation.Psp.Games
 
 		#region Information
 
-		private GameInformation GetEbootGameInformation( IMediaFolder folder )
+		public GameInformation GetEbootGameInformation( IMediaFolder folder )
 		{
 			IMediaFile file = folder[ "EBOOT.PBP" ] as IMediaFile;
 			if( file == null )
@@ -291,7 +291,7 @@ namespace Noxa.Emulation.Psp.Games
 			}
 		}
 
-		private GameInformation GetUmdGameInformation( IMediaDevice device )
+		public GameInformation GetUmdGameInformation( IMediaDevice device )
 		{
 			IMediaFolder folder = device.Root;
 			IMediaFile umdData = folder[ "UMD_DATA.BIN" ] as IMediaFile;

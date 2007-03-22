@@ -12,6 +12,8 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using Noxa.Emulation.Psp.Player.Configuration;
+using System.Diagnostics;
+using Noxa.Emulation.Psp.Media;
 //using Noxa.Emulation.Psp.Player.Development;
 
 namespace Noxa.Emulation.Psp.Player
@@ -149,14 +151,12 @@ namespace Noxa.Emulation.Psp.Player
 			this.Invoke( del );
 		}
 
-		private void StartInstance( bool debugging )
+		private void StartInstance( bool startXmb, bool debugging )
 		{
 			if( _host.CurrentInstance != null )
-			{
 				_host.CurrentInstance.StateChanged -= new EventHandler( CurrentInstance_StateChanged );
-			}
 
-			if( _host.CreateInstance() == false )
+			if( _host.CreateInstance( !startXmb ) == false )
 				return;
 
 			_host.CurrentInstance.StateChanged += new EventHandler( CurrentInstance_StateChanged );
@@ -166,9 +166,31 @@ namespace Noxa.Emulation.Psp.Player
 			_host.CurrentInstance.Start( debugging );
 		}
 
+		public void StartGameDirect( string path )
+		{
+			if( path == null )
+				return;
+
+			this.StartInstance( false, false );
+
+			// We need to get the folder on the memory stick device of this path
+			IMediaFolder folder = _host.CurrentInstance.MemoryStick.Root.FindFolder( path );
+			Games.GameLoader loader = new Noxa.Emulation.Psp.Games.GameLoader();
+			Games.GameInformation game = loader.GetEbootGameInformation( folder );
+			if( game == null )
+			{
+				Debug.WriteLine( string.Format( "Unable to find eboot at path {0}", path ) );
+				return;
+			}
+
+			Debug.WriteLine( string.Format( "Direct starting eboot '{0}' from {1}", game.Parameters.Title, path ) );
+
+			( _host.CurrentInstance as Instance ).SwitchToGame( game );
+		}
+
 		private void startToolStripButton_Click( object sender, EventArgs e )
 		{
-			this.StartInstance( false );
+			this.StartInstance( true, false );
 		}
 
 		private void pauseToolStripButton_Click( object sender, EventArgs e )
@@ -202,7 +224,7 @@ namespace Noxa.Emulation.Psp.Player
 
 		private void debugToolStripButton_Click( object sender, EventArgs e )
 		{
-			this.StartInstance( true );
+			this.StartInstance( true, true );
 		}
 
 		private void attachToolStripButton_Click( object sender, EventArgs e )

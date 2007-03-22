@@ -43,7 +43,7 @@ static int*** CCLookupTable;
 #pragma unmanaged
 int Noxa::Emulation::Psp::Cpu::QuickPointerLookup( int address )
 {
-	uint addr = address >> 2;
+	uint addr = ( address & 0x0FFFFFFF ) >> 2;
 
 	uint b0 = addr >> 20;
 	uint b1 = ( addr >> L2SHIFT ) & L2MASK;
