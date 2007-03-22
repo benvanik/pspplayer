@@ -20,6 +20,10 @@ using namespace Noxa::Emulation::Psp::Input;
 
 #define CTRLSAMPLECOUNT		3
 
+static uint _makedButtons;
+static uint _breakedButtons;
+static uint _pressedButtons;
+
 sceCtrl::sceCtrl( Kernel^ kernel ) : Module( kernel )
 {
 	_samples = ( ControlSample* )calloc( CTRLSAMPLECOUNT, sizeof( ControlSample ) );
@@ -28,6 +32,22 @@ sceCtrl::sceCtrl( Kernel^ kernel ) : Module( kernel )
 sceCtrl::~sceCtrl()
 {
 	SAFEFREE( _samples );
+}
+
+int sceCtrlPeekLatchN( byte* memory, int latch_data );
+int sceCtrlReadLatchN( byte* memory, int latch_data );
+
+void* sceCtrl::QueryNativePointer( uint nid )
+{
+	switch( nid )
+	{
+	case 0xB1D0E5CD:
+		return &sceCtrlPeekLatchN;
+	case 0x0B588501:
+		return &sceCtrlReadLatchN;
+	};
+
+	return 0;
 }
 
 void sceCtrl::Start()
@@ -59,6 +79,10 @@ void sceCtrl::Clear()
 	_sampleCycle = 0;
 	_sampleMode = ControlSamplingMode::AnalogAndDigital;
 	_dataPresent = gcnew AutoResetEvent( false );
+
+	_makedButtons = 0;
+	_breakedButtons = 0;
+	_pressedButtons = 0;
 
 	memset( _samples, 0, sizeof( ControlSample ) );
 	_sampleIndex = 0;
@@ -272,6 +296,18 @@ int sceCtrl::sceCtrlReadBufferNegative( IMemory^ memory, int pad_data, int count
 //	unsigned int 	uiRelease;	// bitmask of released keys?
 //} SceCtrlLatch;
 
+#pragma unmanaged
+int sceCtrlPeekLatchN( byte* memory, int latch_data )
+{
+	int* ptr = ( int* )( memory + ( latch_data - MainMemoryBase ) );
+	*ptr			= _makedButtons;
+	*( ptr + 1 )	= _breakedButtons;
+	*( ptr + 2 )	= _pressedButtons;
+	*( ptr + 3 )	= ~_pressedButtons;
+	return 0;
+}
+#pragma managed
+
 // int sceCtrlPeekLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:172)
 int sceCtrl::sceCtrlPeekLatch( IMemory^ memory, int latch_data )
 {
@@ -282,6 +318,22 @@ int sceCtrl::sceCtrlPeekLatch( IMemory^ memory, int latch_data )
 
 	return 0;
 }
+
+#pragma unmanaged
+int sceCtrlReadLatchN( byte* memory, int latch_data )
+{
+	int* ptr = ( int* )( memory + ( latch_data - MainMemoryBase ) );
+	*ptr			= _makedButtons;
+	*( ptr + 1 )	= _breakedButtons;
+	*( ptr + 2 )	= _pressedButtons;
+	*( ptr + 3 )	= ~_pressedButtons;
+
+	_makedButtons = 0;
+	_breakedButtons = 0;
+
+	return 0;
+}
+#pragma managed
 
 // int sceCtrlReadLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:174)
 int sceCtrl::sceCtrlReadLatch( IMemory^ memory, int latch_data )
