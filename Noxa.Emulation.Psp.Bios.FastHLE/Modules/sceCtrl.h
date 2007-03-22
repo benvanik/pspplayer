@@ -48,10 +48,6 @@ namespace Noxa {
 						ControlSample*					_samples;
 						int								_sampleIndex;
 
-						uint							_pressedButtons;
-						uint							_makedButtons;
-						uint							_breakedButtons;
-						
 						bool							_threadRunning;
 						Thread^							_thread;
 
@@ -69,7 +65,7 @@ namespace Noxa {
 						virtual void Clear() override;
 
 					internal:
-						//virtual void* QueryNativePointer( uint nid ) override;
+						virtual void* QueryNativePointer( uint nid ) override;
 						void InputThread();
 
 					public: // ------ Implemented calls ------
