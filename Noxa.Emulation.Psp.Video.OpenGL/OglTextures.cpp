@@ -112,63 +112,32 @@ const TextureFormat __formats[] = {
 	{ TPSDXT5,			4,		CopyPixel,			TFAlpha,		GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,	},
 };
 
-void Unswizzle1( const TextureFormat* format, const byte* in, byte* out, const uint width, const uint height )
-{
-	unsigned int blockx, blocky;
-	unsigned int j;
-
-	unsigned int width_blocks = (width / 16);
-	unsigned int height_blocks = (height / 8);
-
-	unsigned int src_pitch = (width-16)/4;
-	unsigned int src_row = width * 8;
-
-	const byte* ysrc = in;
-	uint* dst = (uint*)out;
-
-	for (blocky = 0; blocky < height_blocks; ++blocky)
-	{
-		const byte* xsrc = ysrc;
-		for (blockx = 0; blockx < width_blocks; ++blockx)
-		{
-			const uint* src = (uint*)xsrc;
-			for (j = 0; j < 8; ++j)
-			{
-				*(dst++) = *(src++);
-				*(dst++) = *(src++);
-				*(dst++) = *(src++);
-				*(dst++) = *(src++);
-				src += src_pitch;
-			}
-			xsrc += 16;
-		}
-		ysrc += src_row;
-	}
-}
-
-__inline uint UnswizzleInner( uint offset, uint log2_w )
-{
-	unsigned w_mask = ( 1 << log2_w ) - 1;
-	unsigned fixed = offset & ( ( ~7 << log2_w ) | 0xf );
-	unsigned bx = offset & ( ( w_mask & 0xF ) << 7 ); // 1F?
-	unsigned my = offset & 0x70;
-
-	return fixed | ( bx >> 3 ) | ( my << ( log2_w - 4 ) );
-}
-
 void Unswizzle( const TextureFormat* format, const byte* in, byte* out, const uint width, const uint height )
 {
-	unsigned src_bytewidth = width * format->Size;
-	unsigned lg2_w = lg2( src_bytewidth );
-	unsigned src_chunk = 16;
-	unsigned pix_per_chunk = src_chunk / format->Size;
-	unsigned src_size = width * height * format->Size;
+	int rowWidth = width * format->Size;
+	int pitch = ( rowWidth - 16 ) / 4;
+	int bxc = rowWidth / 16;
+	int byc = height / 8;
 
-	for( uint src_off = 0; src_off < src_size; src_off += src_chunk )
+	uint* src = ( uint* )in;
+	const byte* ydest = out;
+	for( int by = 0; by < byc; by++ )
 	{
-		unsigned swizoff = UnswizzleInner( src_off, lg2_w );
-
-		(*format->Copy)( format, out + swizoff, in + src_off, pix_per_chunk );
+		const byte* xdest = ydest;
+		for( int bx = 0; bx < bxc; bx++ )
+		{
+			uint* dest = ( uint* )xdest;
+			for( int n = 0; n < 8; n++ )
+			{
+				*( dest++ ) = *( src++ );
+				*( dest++ ) = *( src++ );
+				*( dest++ ) = *( src++ );
+				*( dest++ ) = *( src++ );
+				dest += pitch;
+			}
+			xdest += 16;
+		}
+		ydest += rowWidth * 8;
 	}
 }
 
