@@ -21,30 +21,31 @@ namespace Noxa {
 
 				ref class KernelThread;
 
-				enum class KernelCallbackType
-				{
-					AsyncIO,
-					Exit,
-					Umd,
-				};
-
-				//typedef int (*SceKernelCallbackFunction)(int count, int arg, void *common);
-				ref class KernelCallback : public KernelHandle
+				ref class KernelInterruptHandler : public KernelHandle
 				{
 				public:
-					String^				Name;
+					int					InterruptCode;
+					int					SubCode;
+					int					InterruptLevel;
 
+					bool				Enabled;
+
+					// Note that the thread that it runs on doesn't matter
 					KernelThread^		Thread;
 
-					int					FunctionAddress;
-					int					CommonAddress;
+					int					Argument;
+					int					EntryAddress;
+					//int					CommonAddress;
+					//int					GlobalPointer;
 
-					int					NotifyCount;
-					int					NotifyArguments;
+					int					CallCount;
+
+					// Timing info?
+					// total clock (int64), min clock (int64), max clock (int64)?
 
 				public:
-					KernelCallback( int id )
-						: KernelHandle( KernelHandleType::Callback, id ){}
+					KernelInterruptHandler( int id )
+						: KernelHandle( KernelHandleType::InterruptHandler, id ){}
 				};
 
 			}

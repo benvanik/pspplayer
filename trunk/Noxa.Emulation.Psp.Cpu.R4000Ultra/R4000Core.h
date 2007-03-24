@@ -225,6 +225,26 @@ namespace Noxa {
 							return state;
 						}
 					}
+
+					property bool InterruptsEnabled
+					{
+						virtual bool get()
+						{
+							return ( InterruptState != 0x0 );
+						}
+					}
+
+					property uint InterruptsFlag
+					{
+						virtual uint get()
+						{
+							return InterruptState;
+						}
+						virtual void set( uint value )
+						{
+							InterruptState = value;
+						}
+					}
 				};
 
 			}

@@ -35,36 +35,31 @@ namespace Noxa {
 						//virtual void Clear() override;
 
 					internal:
-						//virtual void* QueryNativePointer( uint nid ) override;
+						virtual void* QueryNativePointer( uint nid ) override;
 
 					public: // ------ Implemented calls ------
 
 					public: // ------ Stubbed calls ------
 
-						[NotImplemented]
 						[BiosFunction( 0xCA04A2B9, "sceKernelRegisterSubIntrHandler" )] [Stateless]
 						// int sceKernelRegisterSubIntrHandler(int intno, int no, void *handler, void *arg); (/user/pspintrman.h:119)
-						int sceKernelRegisterSubIntrHandler( int intno, int no, int handler, int arg ){ return NISTUBRETURN; }
+						int sceKernelRegisterSubIntrHandler( int intno, int no, int handler, int arg );
 
-						[NotImplemented]
 						[BiosFunction( 0xD61E6961, "sceKernelReleaseSubIntrHandler" )] [Stateless]
 						// int sceKernelReleaseSubIntrHandler(int intno, int no); (/user/pspintrman.h:129)
-						int sceKernelReleaseSubIntrHandler( int intno, int no ){ return NISTUBRETURN; }
+						int sceKernelReleaseSubIntrHandler( int intno, int no );
 
-						[NotImplemented]
 						[BiosFunction( 0xFB8E22EC, "sceKernelEnableSubIntr" )] [Stateless]
 						// int sceKernelEnableSubIntr(int intno, int no); (/user/pspintrman.h:139)
-						int sceKernelEnableSubIntr( int intno, int no ){ return NISTUBRETURN; }
+						int sceKernelEnableSubIntr( int intno, int no );
 
-						[NotImplemented]
 						[BiosFunction( 0x8A389411, "sceKernelDisableSubIntr" )] [Stateless]
 						// int sceKernelDisableSubIntr(int intno, int no); (/user/pspintrman.h:149)
-						int sceKernelDisableSubIntr( int intno, int no ){ return NISTUBRETURN; }
+						int sceKernelDisableSubIntr( int intno, int no );
 
-						[NotImplemented]
 						[BiosFunction( 0xD2E8363F, "QueryIntrHandlerInfo" )] [Stateless]
 						// int QueryIntrHandlerInfo(SceUID intr_code, SceUID sub_intr_code, PspIntrHandlerOptionParam *data); (/user/pspintrman.h:170)
-						int QueryIntrHandlerInfo( int intr_code, int sub_intr_code, int data ){ return NISTUBRETURN; }
+						int QueryIntrHandlerInfo( IMemory^ memory, int intr_code, int sub_intr_code, int data );
 
 					};
 				

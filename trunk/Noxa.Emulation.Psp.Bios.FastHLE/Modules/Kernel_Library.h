@@ -35,36 +35,31 @@ namespace Noxa {
 						//virtual void Clear() override;
 
 					internal:
-						//virtual void* QueryNativePointer( uint nid ) override;
+						virtual void* QueryNativePointer( uint nid ) override;
 
 					public: // ------ Implemented calls ------
 
 					public: // ------ Stubbed calls ------
 
-						[NotImplemented]
 						[BiosFunction( 0x092968F4, "sceKernelCpuSuspendIntr" )] [Stateless]
 						// unsigned int sceKernelCpuSuspendIntr(); (/user/pspintrman.h:77)
-						int sceKernelCpuSuspendIntr(){ return NISTUBRETURN; }
+						int sceKernelCpuSuspendIntr();
 
-						[NotImplemented]
 						[BiosFunction( 0x5F10D406, "sceKernelCpuResumeIntr" )] [Stateless]
 						// void sceKernelCpuResumeIntr(unsigned int flags); (/user/pspintrman.h:84)
-						void sceKernelCpuResumeIntr( int flags ){}
+						void sceKernelCpuResumeIntr( int flags );
 
-						[NotImplemented]
 						[BiosFunction( 0x3B84732D, "sceKernelCpuResumeIntrWithSync" )] [Stateless]
 						// void sceKernelCpuResumeIntrWithSync(unsigned int flags); (/user/pspintrman.h:91)
-						void sceKernelCpuResumeIntrWithSync( int flags ){}
+						void sceKernelCpuResumeIntrWithSync( int flags );
 
-						[NotImplemented]
 						[BiosFunction( 0x47A0B729, "sceKernelIsCpuIntrSuspended" )] [Stateless]
 						// int sceKernelIsCpuIntrSuspended(unsigned int flags); (/user/pspintrman.h:100)
-						int sceKernelIsCpuIntrSuspended( int flags ){ return NISTUBRETURN; }
+						int sceKernelIsCpuIntrSuspended( int flags );
 
-						[NotImplemented]
 						[BiosFunction( 0xB55249D2, "sceKernelIsCpuIntrEnable" )] [Stateless]
 						// int sceKernelIsCpuIntrEnable(); (/user/pspintrman.h:107)
-						int sceKernelIsCpuIntrEnable(){ return NISTUBRETURN; }
+						int sceKernelIsCpuIntrEnable();
 
 					};
 				

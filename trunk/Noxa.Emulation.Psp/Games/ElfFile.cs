@@ -481,6 +481,10 @@ namespace Noxa.Emulation.Psp.Games
 
 			_programType = ( ElfType )ehdr.Type;
 			_entryAddress = ehdr.Entry;
+
+			// Easy test for relocation:
+			if( _entryAddress < 0x08000000 )
+				_needsRelocation = true;
 			
 			reader.BaseStream.Seek( ehdr.Phoff, SeekOrigin.Begin );
 			List<NativeElfPhdr> phdrs = new List<NativeElfPhdr>();
@@ -527,7 +531,7 @@ namespace Noxa.Emulation.Psp.Games
 					( ( _sections[ ( int )section.LinkInfo ].Flags & ElfSectionFlags.Alloc ) != 0 ) )
 				{
 					section.Reference = _sections[ ( int )section.LinkInfo ];
-					_needsRelocation = true;
+					//_needsRelocation = true;
 				}
 
 				if( ( section.Name != null ) &&

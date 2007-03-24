@@ -26,7 +26,8 @@ namespace Noxa {
 					Callback,
 					GeCallback,
 					Semaphore,
-					Event
+					Event,
+					InterruptHandler,
 				};
 
 				ref class KernelHandle

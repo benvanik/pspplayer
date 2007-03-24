@@ -270,6 +270,28 @@
 				Name="Modules"
 				>
 				<File
+					RelativePath=".\Modules\InterruptManager.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath=".\Modules\IoFileMgrForUser.cpp"
 					>
 				</File>
@@ -284,6 +306,28 @@
 				<File
 					RelativePath=".\Modules\IoFileMgrForUser_Files.cpp"
 					>
+				</File>
+				<File
+					RelativePath=".\Modules\Kernel_Library.cpp"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath=".\Modules\LoadExecForUser.cpp"
@@ -394,6 +438,10 @@
 			</File>
 			<File
 				RelativePath=".\KernelHelpers.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelInterruptHandler.h"
 				>
 			</File>
 			<File

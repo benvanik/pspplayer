@@ -36,6 +36,7 @@ Kernel::Kernel( FastBios^ bios )
 	_deviceMap = gcnew Dictionary<String^, KernelDevice^>();
 
 	Callbacks = gcnew Dictionary<KernelCallbackType, KernelCallback^>();
+	InterruptHandlers = gcnew array<array<KernelInterruptHandler^>^>( 80 );
 
 	_emu = _bios->Emulator;
 
