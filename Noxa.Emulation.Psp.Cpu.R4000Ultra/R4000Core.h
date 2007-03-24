@@ -203,29 +203,6 @@ namespace Noxa {
 						}
 					}
 
-					property CoreState^ State
-					{
-						virtual CoreState^ get()
-						{
-							CoreState^ state = gcnew CoreState();
-
-							state->ProgramCounter = *PC;
-							state->GeneralRegisters = this->GeneralRegisters;
-							state->Hi = *HI;
-							state->Lo = *LO;
-							state->LL = ( *LL == 1 ) ? true : false;
-
-							state->Cp0ControlRegisters = Cp0->Control;
-							state->Cp0Registers = Cp0->Registers;
-							state->Cp0ConditionBit = Cp0->ConditionBit;
-
-							state->FpuControlRegister = Cp1->Control;
-							state->FpuRegisters = Cp1->Registers;
-
-							return state;
-						}
-					}
-
 					property bool InterruptsEnabled
 					{
 						virtual bool get()

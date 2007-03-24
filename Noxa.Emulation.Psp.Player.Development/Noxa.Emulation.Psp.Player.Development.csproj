@@ -59,8 +59,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasicBreakpoint.cs" />
-    <Compile Include="BasicCallstackFrame.cs" />
+    <Compile Include="Model\BasicBreakpoint.cs" />
+    <Compile Include="Model\BasicCallstackFrame.cs" />
     <Compile Include="DebugControl.cs" />
     <Compile Include="Debugger.cs" />
     <Compile Include="DebugInspector.cs" />
@@ -93,6 +93,12 @@
     </Compile>
     <Compile Include="Tools\CallstackPane.Designer.cs">
       <DependentUpon>CallstackPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\BiosPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\BiosPane.Designer.cs">
+      <DependentUpon>BiosPane.cs</DependentUpon>
     </Compile>
     <Compile Include="Tools\DisassemblyDocument.cs">
       <SubType>Form</SubType>
@@ -264,6 +270,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ToggleBreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OsIcon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

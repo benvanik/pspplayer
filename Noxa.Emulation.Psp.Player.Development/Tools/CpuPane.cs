@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using Noxa.Utilities.Controls;
 
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp.Player.Development.Tools
 {
@@ -56,7 +57,6 @@ namespace Noxa.Emulation.Psp.Player.Development.Tools
 			_core0 = _cpu.Cores[ 0 ];
 
 			_studio.GlobalRefreshRequested += new EventHandler( StudioGlobalRefreshRequested );
-			_cpu.BreakpointTriggered += new EventHandler<Noxa.Emulation.Psp.Debugging.BreakpointEventArgs>( CpuBreakpointTriggered );
 
 			this.generalRegistersLabel_SizeChanged( this, EventArgs.Empty );
 
@@ -67,11 +67,6 @@ namespace Noxa.Emulation.Psp.Player.Development.Tools
 		}
 
 		private void StudioGlobalRefreshRequested( object sender, EventArgs e )
-		{
-			this.UpdateValues();
-		}
-
-		private void CpuBreakpointTriggered( object sender, Noxa.Emulation.Psp.Debugging.BreakpointEventArgs e )
 		{
 			this.UpdateValues();
 		}
@@ -87,7 +82,7 @@ namespace Noxa.Emulation.Psp.Player.Development.Tools
 
 		private void UpdateValuesInternal()
 		{
-			CoreState state = _core0.State;
+			CoreState state = _studio.Debugger.CpuHook.GetCoreState( 0 );
 
 			this.pcLabel.Text = string.Format( "0x{0:X8}", state.ProgramCounter );
 

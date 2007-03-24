@@ -174,7 +174,10 @@ namespace Noxa.Emulation.Psp.Games
 //#endif
 
 			// Setup the CPU
+			instance.Bios.Kernel.BootStream = bootStream;
 			instance.Cpu.SetupGame( game, bootStream );
+			if( instance.Host.Debugger != null )
+				instance.Host.Debugger.SetupGame( game, bootStream );
 
 			// Set arguments - we put these right below user space, and right above the stack
 			int args = 0;

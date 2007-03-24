@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Cpu_Debugging.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Cpu_Shim.cpp"
 				>
 			</File>

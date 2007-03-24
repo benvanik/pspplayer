@@ -12,6 +12,8 @@ using namespace System::Reflection;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Debugging;
+using namespace Noxa::Emulation::Psp::Debugging::DebugData;
+using namespace Noxa::Emulation::Psp::Debugging::DebugModel;
 using namespace Noxa::Emulation::Psp::Games;
 using namespace Noxa::Emulation::Psp::Utilities;
 
@@ -35,7 +37,7 @@ namespace Noxa {
 
 				delegate void BiosShim( R4000Cpu^ cpu );
 
-				ref class R4000Cpu : ICpu
+				ref class R4000Cpu : ICpu, ICpuHook
 				{
 				public:
 					static R4000Cpu^			GlobalCpu;
@@ -45,8 +47,6 @@ namespace Noxa {
 					ComponentParameters^		_params;
 					R4000Capabilities^			_caps;
 					R4000Clock^					_clock;
-					
-					EventHandler<BreakpointEventArgs^>^ _breakpointTriggeredHandler;
 
 					bool						_hasExecuted;
 
@@ -58,6 +58,8 @@ namespace Noxa {
 #endif
 
 				internal:
+					IDebugger^					_debugger;
+
 					R4000Memory^				_memory;
 					R4000Core^					_core0;
 
@@ -88,18 +90,6 @@ namespace Noxa {
 #endif
 
 				public:
-
-					event EventHandler<BreakpointEventArgs^>^ BreakpointTriggered
-					{
-						virtual void add( EventHandler<BreakpointEventArgs^>^ value )
-						{
-							_breakpointTriggeredHandler += value;
-						}
-						virtual void remove( EventHandler<BreakpointEventArgs^>^ value )
-						{
-							_breakpointTriggeredHandler -= value;
-						}
-					}
 
 					property ComponentParameters^ Parameters
 					{
@@ -197,35 +187,27 @@ namespace Noxa {
 						}
 					}
 
-					property ExecutionMode ExecutionMode
-					{
-						virtual Cpu::ExecutionMode get()
-						{
-							return Cpu::ExecutionMode::Run;
-						}
-						virtual void set( Cpu::ExecutionMode value )
-						{
-							throw gcnew NotImplementedException();
-						}
-					}
-
-					property int ExecutionParameter
-					{
-						virtual int get()
-						{
-							return 0;
-						}
-						virtual void set( int value )
-						{
-							throw gcnew NotImplementedException();
-						}
-					}
-
 					property bool DebuggingEnabled
 					{
 						virtual bool get()
 						{
-							return false;
+							return ( _debugger != nullptr );
+						}
+					}
+					
+					property IDebugger^ Debugger
+					{
+						virtual IDebugger^ get()
+						{
+							return _debugger;
+						}
+					}
+
+					property ICpuHook^ DebugHook
+					{
+						virtual ICpuHook^ get()
+						{
+							return this;
 						}
 					}
 
@@ -240,24 +222,14 @@ namespace Noxa {
 					R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters );
 					~R4000Cpu();
 
-					virtual void EnableDebugging()
-					{
-						throw gcnew NotImplementedException();
-					}
+					virtual void EnableDebugging( IDebugger^ debugger );
 
 					virtual void Cleanup();
 
 					virtual int RegisterSyscall( unsigned int nid );
 
-					virtual void Resume()
-					{
-						throw gcnew NotImplementedException();
-					}
-
-					virtual void Break()
-					{
-						throw gcnew NotImplementedException();
-					}
+					virtual void Resume();
+					virtual void Break();
 
 					virtual void SetupGame( GameInformation^ game, Stream^ bootStream );
 					virtual int ExecuteBlock();
@@ -269,6 +241,10 @@ namespace Noxa {
 					int LookupOrAddModule( IModule^ module );
 					BiosShim^ EmitShim( BiosFunction^ function, void* memory, void* registers );
 					void* EmitShimN( BiosFunction^ function, void* memory, void* registers );
+
+				public:
+					virtual CoreState^ GetCoreState( int core );
+					virtual array<Frame^>^ GetCallstack();
 				};
 
 			}

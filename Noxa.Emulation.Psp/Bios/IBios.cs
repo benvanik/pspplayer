@@ -7,7 +7,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Debugging;
 
 namespace Noxa.Emulation.Psp.Bios
 {
@@ -33,5 +35,22 @@ namespace Noxa.Emulation.Psp.Bios
 
 		void RegisterFunction( BiosFunction function );
 		void UnregisterFunction( uint nid );
+
+		bool DebuggingEnabled
+		{
+			get;
+		}
+
+		IDebugger Debugger
+		{
+			get;
+		}
+
+		IBiosHook DebugHook
+		{
+			get;
+		}
+
+		void EnableDebugging( IDebugger debugger );
 	}
 }

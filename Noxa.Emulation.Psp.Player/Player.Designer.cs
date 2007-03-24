@@ -192,16 +192,14 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
 			this.toolStripSeparator3.Size = new System.Drawing.Size( 6, 25 );
-			this.toolStripSeparator3.Visible = false;
 			// 
 			// debugToolStripButton
 			// 
-			this.debugToolStripButton.Image = ( ( System.Drawing.Image )( resources.GetObject( "debugToolStripButton.Image" ) ) );
+			this.debugToolStripButton.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.StatementCallIcon;
 			this.debugToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.debugToolStripButton.Name = "debugToolStripButton";
 			this.debugToolStripButton.Size = new System.Drawing.Size( 139, 22 );
 			this.debugToolStripButton.Text = "Start with Debugging";
-			this.debugToolStripButton.Visible = false;
 			this.debugToolStripButton.Click += new System.EventHandler( this.debugToolStripButton_Click );
 			// 
 			// attachToolStripButton

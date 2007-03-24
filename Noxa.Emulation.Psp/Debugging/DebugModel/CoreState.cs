@@ -8,8 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Noxa.Emulation.Psp.Cpu
+namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
+	/// <summary>
+	/// CPU core state.
+	/// </summary>
 	public class CoreState
 	{
 		public int ProgramCounter;
@@ -25,9 +28,9 @@ namespace Noxa.Emulation.Psp.Cpu
 		public uint FpuControlRegister;
 		public float[] FpuRegisters;
 		
-		//internal bool InDelaySlot;
-		//internal int DelayPc;
-		//internal bool DelayNop;
-		//internal int InterruptState;
+		//bool InDelaySlot;
+		//int DelayPc;
+		//bool DelayNop;
+		//int InterruptState;
 	}
 }

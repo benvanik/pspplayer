@@ -21,6 +21,7 @@ using namespace System::Diagnostics;
 using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
+using namespace Noxa::Emulation::Psp::Debugging::DebugData;
 
 extern uint _instructionsExecuted;
 
@@ -112,7 +113,7 @@ void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 
 #ifdef TRACESYMBOLS
 		Debug::Assert( bootStream != nullptr );
-		_symbols = Debugging::ProgramDebugData::Load( Debugging::DebugDataType::Symbols, bootStream );
+		_symbols = ProgramDebugData::Load( Debugging::DebugDataType::Symbols, bootStream );
 #endif
 
 		// Has to happen late in the game because we need to

@@ -17,51 +17,32 @@ namespace Noxa.Emulation.Psp.Player.Development
 	{
 		private Debugger _debugger;
 
-		private Stack<CallstackFrame> _callstack;
-
 		public DebugInspector( Debugger debugger )
 		{
 			Debug.Assert( debugger != null );
 			if( debugger == null )
 				throw new ArgumentNullException( "debugger" );
 			_debugger = debugger;
-
-			_callstack = new Stack<CallstackFrame>();
 		}
 
-		public void Update( int newAddress )
+		public void OnStepComplete( int address )
 		{
-			Debug.WriteLine( string.Format( "updated: {0:X8}", newAddress ) );
+			throw new Exception( "The method or operation is not implemented." );
 		}
 
-		#region Callstacks
-
-		public CallstackFrame[] Callstack
+		public void OnBreakpointHit( int address )
 		{
-			get
-			{
-				return _callstack.ToArray();
-			}
+			throw new Exception( "The method or operation is not implemented." );
 		}
 
-		public void PushCall( int address, string name )
+		public void OnCpuError( int address, CpuError error )
 		{
-			BasicCallstackFrame frame = new BasicCallstackFrame( address, name );
-
-			_callstack.Push( frame );
+			throw new Exception( "The method or operation is not implemented." );
 		}
 
-		public void PopCall()
+		public void OnBiosError( int address, BiosError error )
 		{
-			if( _callstack.Count == 0 )
-			{
-				Debug.WriteLine( "DebugInspector: callstack pop count mismatch" );
-				return;
-			}
-
-			_callstack.Pop();
+			throw new Exception( "The method or operation is not implemented." );
 		}
-
-		#endregion
 	}
 }

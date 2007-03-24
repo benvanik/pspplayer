@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Noxa.Emulation.Psp.Debugging
+namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
 	public enum BreakpointType
 	{

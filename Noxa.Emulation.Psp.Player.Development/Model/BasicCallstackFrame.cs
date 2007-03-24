@@ -8,15 +8,16 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Noxa.Emulation.Psp.Debugging
-{
-	public interface IProgramDebugData
-	{
-		Method[] Methods
-		{
-			get;
-		}
+using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
-		Method FindMethod( int address );
+namespace Noxa.Emulation.Psp.Player.Development.Model
+{
+	class BasicCallstackFrame : Frame
+	{
+		public BasicCallstackFrame( int address, string name )
+			: base( address, name )
+		{
+		}
 	}
 }

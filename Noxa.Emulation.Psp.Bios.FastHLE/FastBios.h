@@ -9,6 +9,7 @@
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::Debugging;
 
 namespace Noxa {
 	namespace Emulation {
@@ -19,7 +20,7 @@ namespace Noxa {
 				ref class Module;
 				ref class Kernel;
 
-				ref class FastBios : public IBios
+				ref class FastBios : public IBios, public IBiosHook
 				{
 				private:
 					IEmulationInstance^					_emulator;
@@ -30,6 +31,8 @@ namespace Noxa {
 					Dictionary<uint, BiosFunction^>^	_functions;
 
 				internal:
+					IDebugger^							_debugger;
+
 					Kernel^								_kernel;
 
 				public:
@@ -83,6 +86,32 @@ namespace Noxa {
 							return _functionList->ToArray();
 						}
 					}
+
+					property bool DebuggingEnabled
+					{
+						virtual bool get()
+						{
+							return ( _debugger != nullptr );
+						}
+					}
+					
+					property IDebugger^ Debugger
+					{
+						virtual IDebugger^ get()
+						{
+							return _debugger;
+						}
+					}
+
+					property IBiosHook^ DebugHook
+					{
+						virtual IBiosHook^ get()
+						{
+							return this;
+						}
+					}
+
+					virtual void EnableDebugging( IDebugger^ debugger );
 
 					virtual void Cleanup();
 

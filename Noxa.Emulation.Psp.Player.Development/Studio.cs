@@ -13,7 +13,9 @@ using System.Windows.Forms;
 using System.Diagnostics;
 
 using Noxa.Emulation.Psp.Player.Development.Tools;
+
 using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp.Player.Development
 {
@@ -77,12 +79,12 @@ namespace Noxa.Emulation.Psp.Player.Development
 		{
 			CpuPane pane = new CpuPane( this );
 			pane.Show( this.dockPanel );
-			Method m = _debugger.DebugData.FindMethod( 0x08900000 );
-			if( m == null )
-				m = _debugger.DebugData.FindMethod( 0x08900018 );
-			foreach( int addr in m.Instructions.Keys )
-				_debugger.Control.AddBreakpoint( addr );
-			this.CleanupBreakpoint();
+			//Method m = _debugger.DebugData.FindMethod( 0x08900000 );
+			//if( m == null )
+			//    m = _debugger.DebugData.FindMethod( 0x08900018 );
+			//foreach( int addr in m.Instructions.Keys )
+			//    _debugger.Control.AddBreakpoint( addr );
+			//this.CleanupBreakpoint();
 			_debugger.Control.Run();
 		}
 
@@ -146,32 +148,71 @@ namespace Noxa.Emulation.Psp.Player.Development
 			}
 		}
 
-		public void OnBreakpointTriggered( Breakpoint breakpoint )
-		{
-			switch( breakpoint.Type )
-			{
-				default:
-				case BreakpointType.UserSet:
-					this.UpdateStatusMessage( string.Format( "Stopped at breakpoint 0x{0:X8}", breakpoint.Address ) );
-					break;
-				case BreakpointType.Stepping:
-					this.UpdateStatusMessage( string.Format( "Finished stepping at 0x{0:X8}", breakpoint.Address ) );
-					break;
-			}
+		//public void OnBreakpointTriggered( Breakpoint breakpoint )
+		//{
+		//    switch( breakpoint.Type )
+		//    {
+		//        default:
+		//        case BreakpointType.UserSet:
+		//            this.UpdateStatusMessage( string.Format( "Stopped at breakpoint 0x{0:X8}", breakpoint.Address ) );
+		//            break;
+		//        case BreakpointType.Stepping:
+		//            this.UpdateStatusMessage( string.Format( "Finished stepping at 0x{0:X8}", breakpoint.Address ) );
+		//            break;
+		//    }
 
-			if( this.InvokeRequired == true )
-				this.Invoke( new OnBreakpointTriggereDelegate( this.OnBreakpointTriggeredHandler ), breakpoint );
-			else
-				this.OnBreakpointTriggeredHandler( breakpoint );
+		//    if( this.InvokeRequired == true )
+		//        this.Invoke( new OnBreakpointTriggereDelegate( this.OnBreakpointTriggeredHandler ), breakpoint );
+		//    else
+		//        this.OnBreakpointTriggeredHandler( breakpoint );
+		//}
+
+		//private delegate void OnBreakpointTriggereDelegate( Breakpoint breakpoint );
+		//private void OnBreakpointTriggeredHandler( Breakpoint breakpoint )
+		//{
+		//    _debugger.Inspector.Update( breakpoint.Address );
+		//    if( this.ShowDisassembly( breakpoint.Address ) == false )
+		//        return;
+		//    _steppingStatement = _disasmDoc.AddStatement( StatementType.Current, breakpoint.Address );
+		//}
+
+		#endregion
+
+		#region UI utilities
+
+		private void registersToolStripButton_Click( object sender, EventArgs e )
+		{
+
 		}
 
-		private delegate void OnBreakpointTriggereDelegate( Breakpoint breakpoint );
-		private void OnBreakpointTriggeredHandler( Breakpoint breakpoint )
+		private void memoryToolStripButton_Click( object sender, EventArgs e )
 		{
-			_debugger.Inspector.Update( breakpoint.Address );
-			if( this.ShowDisassembly( breakpoint.Address ) == false )
-				return;
-			_steppingStatement = _disasmDoc.AddStatement( StatementType.Current, breakpoint.Address );
+
+		}
+
+		private void callstackToolStripButton_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void threadsToolStripButton_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void osToolStripButton_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void breakpointsToolStripButton_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void watchesToolStripButton_Click( object sender, EventArgs e )
+		{
+
 		}
 
 		#endregion

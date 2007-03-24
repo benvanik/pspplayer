@@ -6,12 +6,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 using Noxa.Emulation.Psp.Debugging;
-using System.Diagnostics;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
-namespace Noxa.Emulation.Psp.Player.Development
+namespace Noxa.Emulation.Psp.Player.Development.Model
 {
 	class BasicBreakpoint : Breakpoint
 	{

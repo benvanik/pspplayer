@@ -8,14 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Noxa.Emulation.Psp.Debugging
+namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
-	public abstract class CallstackFrame
+	public abstract class Frame
 	{
 		protected int _address;
 		protected string _name;
 
-		public CallstackFrame( int address, string name )
+		public Frame( int address, string name )
 		{
 			_address = address;
 			_name = name;

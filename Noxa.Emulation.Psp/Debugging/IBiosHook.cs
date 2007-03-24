@@ -6,27 +6,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 
-using Noxa.Emulation.Psp.Games;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
-namespace Noxa.Emulation.Psp.Bios
+namespace Noxa.Emulation.Psp.Debugging
 {
-	public interface IKernel
+	/// <summary>
+	/// Hook inside of the BIOS that allows the debugger to extract information.
+	/// </summary>
+	public interface IBiosHook
 	{
-		GameInformation Game
-		{
-			get;
-			set;
-		}
-
-		Stream BootStream
-		{
-			get;
-			set;
-		}
-
-		void Execute();
 	}
 }

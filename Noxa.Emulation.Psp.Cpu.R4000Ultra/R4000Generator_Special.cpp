@@ -397,7 +397,7 @@ GenerationResult MFIC( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->call( __mfic );
+		g->call( ( int )__mfic );
 		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
@@ -415,7 +415,10 @@ GenerationResult MTIC( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->push( MREG( CTX, rt ) );
+		if( rt == 0 )
+			g->push( ( uint )0 );
+		else
+			g->push( MREG( CTX, rt ) );
 		g->call( ( int )__mtic );
 		g->add( ESP, 4 );
 	}
