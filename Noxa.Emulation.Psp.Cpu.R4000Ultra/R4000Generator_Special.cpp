@@ -23,73 +23,73 @@ using namespace Noxa::Emulation::Psp::Cpu;
 extern uint _nativeSyscallCount;
 
 #define LOGSYSCALLS
+#define NIRETURN		0
 
 #define g context->Generator
 
-void __syscallBounce( int syscallId, int address )
+void __logSyscall( int syscallId, int address )
 {
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
 
-#ifdef LOGSYSCALLS
 	BiosFunction^ function = cpu->_syscalls[ syscallId ];
 	Debug::Assert( function != nullptr );
 	if( function != nullptr )
 	{
+		if( ( function->NID == 0x42EC03AC ) ||		// ignore sceIoWrite
+			( function->NID == 0x0B588501 ) ||		// ignore sceCtrlReadLatch
+			( function->NID == 0x3A622550 ) ||		// ignore sceCtrlPeekBufferPositive
+			( function->NID == 0x1F803938 ) ||		// ignore sceCtrlReadBufferPositive
+			( function->NID == 0x0892448C ) )		// ignore sceKernelStdout
+			return;
+	
 		R4000Ctx* ctx = ( R4000Ctx* )cpu->_ctx;
-
-		if( ( function->NID != 0x42EC03AC ) &&		// ignore sceIoWrite
-			( function->NID != 0x0B588501 ) &&		// ignore sceCtrlReadLatch
-			( function->NID != 0x3A622550 ) &&		// ignore sceCtrlPeekBufferPositive
-			( function->NID != 0x1F803938 ) )		// ignore sceCtrlReadBufferPositive
+		String^ args;
+		Debug::Assert( function->ParameterCount <= 12 );
+		switch( function->ParameterCount )
 		{
-			String^ args;
-			Debug::Assert( function->ParameterCount <= 12 );
-			switch( function->ParameterCount )
-			{
-			case 1:
-				args = String::Format( "{0:X8}", ctx->Registers[ 4 ] );
-				break;
-			case 2:
-				args = String::Format( "{0:X8}, {1:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ] );
-				break;
-			case 3:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ] );
-				break;
-			case 4:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ] );
-				break;
-			case 5:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ] );
-				break;
-			case 6:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ] );
-				break;
-			case 7:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ] );
-				break;
-			case 8:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ] );
-				break;
-			case 9:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1 );
-				break;
-			case 10:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1 );
-				break;
-			case 11:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1 );
-				break;
-			case 12:
-				args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1, -1 );
-				break;
-			default:
-				args = "";
-				break;
-			}
-			String^ log = String::Format( "{0}::{1}({2}) from 0x{3:X8}",
-				function->Module->Name, function->Name, args, address - 4 );
-			Debug::WriteLine( log );
+		case 1:
+			args = String::Format( "{0:X8}", ctx->Registers[ 4 ] );
+			break;
+		case 2:
+			args = String::Format( "{0:X8}, {1:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ] );
+			break;
+		case 3:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ] );
+			break;
+		case 4:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ] );
+			break;
+		case 5:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ] );
+			break;
+		case 6:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ] );
+			break;
+		case 7:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ] );
+			break;
+		case 8:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ] );
+			break;
+		case 9:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1 );
+			break;
+		case 10:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1 );
+			break;
+		case 11:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1 );
+			break;
+		case 12:
+			args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}, {8:X8}, {9:X8}, {10:X8}, {11:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ], -1, -1, -1, -1 );
+			break;
+		default:
+			args = "";
+			break;
 		}
+		String^ log = String::Format( "{0}::{1}({2}) from 0x{3:X8}{4}",
+			function->Module->Name, function->Name, args, address - 4, function->IsImplemented ? "" : " (NI)" );
+		Debug::WriteLine( log );
 	}
 	else
 	{
@@ -97,6 +97,33 @@ void __syscallBounce( int syscallId, int address )
 		Debug::WriteLine( log );
 		Debugger::Break();
 	}
+}
+
+void __unimplementedSyscall( int syscallId, int address )
+{
+	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
+
+#ifdef LOGSYSCALLS
+	__logSyscall( syscallId, address );
+#endif
+
+#ifdef STATISTICS
+	cpu->_stats->UnimplementedSyscallCount++;
+#endif
+
+#ifdef SYSCALLSTATS
+	//int currentStat = cpu->_syscallCounts[ syscallId ];
+	//cpu->_syscallCounts[ syscallId ] = currentStat + 1;
+	cpu->_syscallCounts[ syscallId ]++;
+#endif
+}
+
+void __syscallBounce( int syscallId, int address )
+{
+	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
+
+#ifdef LOGSYSCALLS
+	__logSyscall( syscallId, address );
 #endif
 
 #ifdef STATISTICS
@@ -257,19 +284,24 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		{
 			// No native stub AND not implemented - uh oh!
 
+			g->push( MREG( CTX, 31 ) );
+			g->push( ( uint )syscall );
+			g->call( ( int )__unimplementedSyscall );
+			g->add( ESP, 8 );
+
 			if( function != nullptr )
 			{
 				if( hasReturn == true )
 				{
-					g->mov( MREG( CTX, 2 ), ( int )-1 );
+					g->mov( MREG( CTX, 2 ), ( int )NIRETURN );
 					if( wideReturn == true )
-						g->mov( MREG( CTX, 3 ), ( int )-1 );
+						g->mov( MREG( CTX, 3 ), ( int )NIRETURN );
 				}
 			}
 			else
 			{
 				// We don't even have a freaking function - just put -1 in $v0 and call it a day
-				g->mov( MREG( CTX, 2 ), ( int )-1 );
+				g->mov( MREG( CTX, 2 ), ( int )NIRETURN );
 			}
 		}
 	}

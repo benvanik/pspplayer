@@ -25,6 +25,8 @@ namespace Noxa {
 						void (*Setup)( MemoryPool* pool );
 						void (*Cleanup)();
 
+						uint (*GetVcount)();
+
 						// Switch framebuffer (used to doublebuffer, etc)
 						void (*SwitchFrameBuffer)( int address, int bufferWidth, int pixelFormat, int syncMode );
 

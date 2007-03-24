@@ -52,8 +52,9 @@ namespace Noxa {
 					uint ManagedMemoryReadCount;				// # of times R4000Memory was used to read instead of the inline code
 					uint ManagedMemoryWriteCount;				// # of times R4000Memory was used to write instead of the inline code
 
-					uint ManagedSyscallCount;						// # of syscalls that go to the BIOS (managed)
+					uint ManagedSyscallCount;					// # of syscalls that go to the BIOS (managed)
 					uint NativeSyscallCount;					// # of syscalls that use overriden stubs (native)
+					uint UnimplementedSyscallCount;				// # of syscalls attempted against unimplemented calls
 
 					double AverageCodeSizeRatio;				// Ratio of MIPS code size to x86 code size
 

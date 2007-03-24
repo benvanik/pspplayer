@@ -151,6 +151,13 @@ void Kernel::DelayedThreadTimerElapsed( Object^ sender, Timers::ElapsedEventArgs
 	Monitor::Exit( _delayedThreads );
 }
 
+int Kernel::ThreadDelayComparer( KernelThread^ a, KernelThread^ b )
+{
+	int64 aend = a->WaitTimestamp + a->WaitTimeout;
+	int64 bend = b->WaitTimestamp + a->WaitTimeout;
+	return aend.CompareTo( bend );
+}
+
 int Kernel::ThreadPriorityComparer( KernelThread^ a, KernelThread^ b )
 {
 	if( a->Priority < b->Priority )

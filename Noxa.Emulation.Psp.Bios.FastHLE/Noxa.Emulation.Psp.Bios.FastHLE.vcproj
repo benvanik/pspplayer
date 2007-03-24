@@ -366,6 +366,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\ThreadManForUser.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\ThreadManForUser_Callbacks.cpp"
 					>
 				</File>

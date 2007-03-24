@@ -80,7 +80,6 @@ namespace Noxa {
 						// int sceDisplayWaitVblank(); (/display/pspdisplay.h:104)
 						int sceDisplayWaitVblank();
 
-						[NotImplemented]
 						[BiosFunction( 0x8EB9EC49, "sceDisplayWaitVblankCB" )]
 						// int sceDisplayWaitVblankCB(); (/display/pspdisplay.h:109)
 						int sceDisplayWaitVblankCB();
