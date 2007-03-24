@@ -125,8 +125,7 @@ namespace Noxa {
 					int						WaitTimeout;
 					KernelEvent^			WaitEvent;
 					int						OutAddress;				// Helps with wait states that may need output
-
-					// Thread options?
+					int64					WaitTimestamp;			// Tick at which the wait was issued
 
 				public:
 					KernelThread( int id, String^ name, int entryAddress, int priority, uint stackSize, int attributes );

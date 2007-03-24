@@ -281,6 +281,8 @@ GenerationResult FABS( R4000GenContext^ context, int pass, int address, uint cod
 		ASSERTX87VALID();
 		g->fstp( MREG( CTX, fd ) );
 
+		//*(((int *) &x) + 1) &= 0x7fffffff;
+
 //#ifdef SSE
 //		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
 //		g->movd( XMM1, 0 );

@@ -36,6 +36,7 @@ namespace Noxa {
 
 					internal:
 						//virtual void* QueryNativePointer( uint nid ) override;
+						int ThreadDelayComparer( KernelThread^ a, KernelThread^ b );
 
 					public: // So many they are all inline... good luck!
 

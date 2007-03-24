@@ -31,6 +31,10 @@ Kernel::Kernel( FastBios^ bios )
 	_handles = gcnew Dictionary<int, KernelHandle^>();
 	Threads = gcnew Dictionary<int, KernelThread^>();
 	_threadsWaitingOnEvents = gcnew List<KernelThread^>();
+	_delayedThreads = gcnew List<KernelThread^>();
+	_delayedThreadTimer = gcnew Timers::Timer();
+	_delayedThreadTimer->AutoReset = false;
+	_delayedThreadTimer->Elapsed += gcnew Timers::ElapsedEventHandler( this, &Kernel::DelayedThreadTimerElapsed );
 
 	_devices = gcnew List<KernelDevice^>();
 	_deviceMap = gcnew Dictionary<String^, KernelDevice^>();
