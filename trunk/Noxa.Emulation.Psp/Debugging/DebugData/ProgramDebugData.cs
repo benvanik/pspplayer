@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace Noxa.Emulation.Psp.Debugging
+namespace Noxa.Emulation.Psp.Debugging.DebugData
 {
 	public static class ProgramDebugData
 	{

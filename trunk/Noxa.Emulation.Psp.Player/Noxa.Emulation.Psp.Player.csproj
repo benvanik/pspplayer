@@ -203,6 +203,10 @@
       <Project>{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}</Project>
       <Name>Noxa.Emulation.Psp.Configuration</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Player.Development\Noxa.Emulation.Psp.Player.Development.csproj">
+      <Project>{CC484F2B-C009-4756-8A3F-2E488EE611BE}</Project>
+      <Name>Noxa.Emulation.Psp.Player.Development</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
       <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
       <Name>Noxa.Emulation.Psp</Name>
@@ -241,6 +245,7 @@
     <Content Include="Resources\StartIcon.png" />
     <Content Include="Resources\PauseIcon.png" />
     <Content Include="Resources\RestartIcon.png" />
+    <None Include="Resources\StatementCallIcon.png" />
     <Content Include="Resources\StopIcon.png" />
     <Content Include="Resources\UmdIcon.png" />
     <None Include="Web References\CompatibilityService\AddResult1.datasource">

@@ -65,7 +65,7 @@ namespace Noxa {
 					{
 						virtual bool get()
 						{
-							return false;
+							return true;
 						}
 					}
 				};

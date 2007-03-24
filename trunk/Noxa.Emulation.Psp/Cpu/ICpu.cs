@@ -24,8 +24,6 @@ namespace Noxa.Emulation.Psp.Cpu
 
 	public interface ICpu : IComponentInstance
 	{
-		event EventHandler<BreakpointEventArgs> BreakpointTriggered;
-
 		ICpuCapabilities Capabilities
 		{
 			get;
@@ -66,24 +64,22 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 		}
 
-		ExecutionMode ExecutionMode
-		{
-			get;
-			set;
-		}
-
-		int ExecutionParameter
-		{
-			get;
-			set;
-		}
-
 		bool DebuggingEnabled
 		{
 			get;
 		}
 
-		void EnableDebugging();
+		IDebugger Debugger
+		{
+			get;
+		}
+
+		ICpuHook DebugHook
+		{
+			get;
+		}
+
+		void EnableDebugging( IDebugger debugger );
 
 		int RegisterSyscall( uint nid );
 

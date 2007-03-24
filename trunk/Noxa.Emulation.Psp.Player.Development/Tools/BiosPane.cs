@@ -6,45 +6,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Text;
+using System.Windows.Forms;
 
-namespace Noxa.Emulation.Psp.Cpu
+namespace Noxa.Emulation.Psp.Player.Development.Tools
 {
-	public interface ICpuCore
+	partial class BiosPane : Noxa.Emulation.Psp.Player.Development.Tools.ToolPane
 	{
-		string Name
+		public BiosPane()
 		{
-			get;
-		}
-
-		int ProgramCounter
-		{
-			get;
-			set;
-		}
-
-		int[] GeneralRegisters
-		{
-			get;
-		}
-
-		void SetGeneralRegister( int register, int value );
-
-		object Context
-		{
-			get;
-			set;
-		}
-
-		bool InterruptsEnabled
-		{
-			get;
-		}
-
-		uint InterruptsFlag
-		{
-			get;
-			set;
+			InitializeComponent();
 		}
 	}
 }
+

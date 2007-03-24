@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using Noxa.Emulation.Psp.Debugging.DebugData;
+
 namespace Noxa.Emulation.Psp.Debugging
 {
 	public class NullDebugger : IDebugger
@@ -51,6 +53,28 @@ namespace Noxa.Emulation.Psp.Debugging
 			}
 		}
 
+		public ICpuHook CpuHook
+		{
+			get
+			{
+				return null;
+			}
+			set
+			{
+			}
+		}
+
+		public IBiosHook BiosHook
+		{
+			get
+			{
+				return null;
+			}
+			set
+			{
+			}
+		}
+
 		public IProgramDebugData DebugData
 		{
 			get
@@ -65,6 +89,11 @@ namespace Noxa.Emulation.Psp.Debugging
 			{
 				return DebuggerState.Running;
 			}
+		}
+
+		public void SetupGame( Noxa.Emulation.Psp.Games.GameInformation game, System.IO.Stream bootStream )
+		{
+			throw new Exception( "The method or operation is not implemented." );
 		}
 
 		public bool LoadDebugData( DebugDataType dataType, System.IO.Stream stream )

@@ -94,6 +94,10 @@ namespace Noxa {
 						{
 							return _bootStream;
 						}
+						virtual void set( Stream^ value )
+						{
+							_bootStream = value;
+						}
 					}
 
 					property KernelThread^ ActiveThread

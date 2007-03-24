@@ -19,6 +19,7 @@ using Puzzle.SourceCode;
 using Noxa.Utilities.Controls;
 
 using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp.Player.Development.Tools
 {

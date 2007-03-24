@@ -244,10 +244,11 @@ namespace Noxa.Emulation.Psp.Player
 			if( _debugger != null )
 				return;
 
-			//_debugger = new Noxa.Emulation.Psp.Player.Development.Debugger( this );
-			//_debugger.Show();
+			_debugger = new Noxa.Emulation.Psp.Player.Development.Debugger( this );
+			_debugger.Show();
 
-			_instance.Cpu.EnableDebugging();
+			_instance.Cpu.EnableDebugging( _debugger );
+			_instance.Bios.EnableDebugging( _debugger );
 		}
 	}
 }

@@ -6,13 +6,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Globalization;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
 
-namespace Noxa.Emulation.Psp.Debugging
+using Noxa.Emulation.Psp.Debugging.DebugModel;
+
+namespace Noxa.Emulation.Psp.Debugging.DebugData
 {
 	class ObjdumpDebugData : IProgramDebugData
 	{

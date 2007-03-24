@@ -207,6 +207,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FastBios_Debugging.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Kernel.cpp"
 				>
 			</File>

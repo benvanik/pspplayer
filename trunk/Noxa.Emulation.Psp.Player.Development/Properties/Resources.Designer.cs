@@ -158,6 +158,13 @@ namespace Noxa.Emulation.Psp.Player.Development.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap OsIcon {
+            get {
+                object obj = ResourceManager.GetObject("OsIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap PauseIcon {
             get {
                 object obj = ResourceManager.GetObject("PauseIcon", resourceCulture);
