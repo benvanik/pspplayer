@@ -885,6 +885,8 @@ GenerationResult CLZ( R4000GenContext^ context, int pass, int address, uint code
 				return 31 - n;
 		}
 		return 32;*/
+
+		// USE BSR?
 		
 		Label* loop = g->DefineLabel();
 		Label* found = g->DefineLabel();

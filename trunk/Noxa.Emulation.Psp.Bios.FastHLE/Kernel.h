@@ -49,6 +49,8 @@ namespace Noxa {
 
 					KernelThread^						_activeThread;
 					List<KernelThread^>^				_threadsWaitingOnEvents;
+					List<KernelThread^>^				_delayedThreads;
+					Timers::Timer^						_delayedThreadTimer;	// Set to go off at the time that the next thread should wake up
 
 					List<KernelDevice^>^				_devices;
 					Dictionary<String^, KernelDevice^>^	_deviceMap;
@@ -145,6 +147,8 @@ namespace Noxa {
 
 				private:
 					void CreateStdio();
+					void SpawnDelayedThreadTimer( int64 targetTick );
+					void DelayedThreadTimerElapsed( Object^ sender, Timers::ElapsedEventArgs^ e );
 					int ThreadPriorityComparer( KernelThread^ a, KernelThread^ b );
 
 				internal:

@@ -104,6 +104,53 @@ void Kernel::SignalEvent( KernelEvent^ ev )
 		this->ContextSwitch();
 }
 
+void Kernel::SpawnDelayedThreadTimer( int64 targetTick )
+{
+	Debug::Assert( _delayedThreadTimer->Enabled == false );
+	TimeSpan duration = DateTime( targetTick ) - DateTime::Now;
+	_delayedThreadTimer->Interval = duration.TotalMilliseconds;
+	_delayedThreadTimer->Start();
+}
+
+void Kernel::DelayedThreadTimerElapsed( Object^ sender, Timers::ElapsedEventArgs^ e )
+{
+	if( _delayedThreads->Count == 0 )
+		return;
+
+	Monitor::Enter( _delayedThreads );
+	if( _delayedThreads->Count == 0 )
+	{
+		Monitor::Exit( _delayedThreads );
+		return;
+	}
+
+	// We assume that if we have been called, the thread at the head is dead (hah)
+	_delayedThreads[ 0 ]->State = KernelThreadState::Ready;
+	_delayedThreads->RemoveAt( 0 );
+
+	// If there are more, reset us - we will awaken any other expired waits here too
+	int64 tick = DateTime::Now.Ticks;
+	while( _delayedThreads->Count > 0 )
+	{
+		int64 nextTick = _delayedThreads[ 0 ]->WaitTimeout + _delayedThreads[ 0 ]->WaitTimeout;
+		if( nextTick < tick )
+		{
+			_delayedThreads[ 0 ]->State = KernelThreadState::Ready;
+			_delayedThreads->RemoveAt( 0 );
+		}
+		else
+		{
+			// Schedule us for later
+			TimeSpan duration = DateTime( nextTick ) - DateTime( tick );
+			_delayedThreadTimer->Interval = duration.TotalMilliseconds;
+			_delayedThreadTimer->Start();
+			break;
+		}
+	}
+
+	Monitor::Exit( _delayedThreads );
+}
+
 int Kernel::ThreadPriorityComparer( KernelThread^ a, KernelThread^ b )
 {
 	if( a->Priority < b->Priority )
@@ -145,7 +192,19 @@ void Kernel::ContextSwitch()
 						// Cannot un-wait automatically
 						break;
 					case KernelThreadWait::Delay:
-						// Time
+						// Time - check to see if it has expired - if so, wake it up and use it
+						{
+							int64 remaining = ( DateTime::Now.Ticks - ( thread->WaitTimestamp + thread->WaitTimeout ) );
+							if( remaining <= 0 )
+							{
+								// Wake up!
+								thread->State = KernelThreadState::Ready;
+								Monitor::Enter( _delayedThreads );
+								if( _delayedThreads->Contains( thread ) == true )
+									_delayedThreads->Remove( thread );
+								Monitor::Exit( _delayedThreads );
+							}
+						}
 						break;
 					case KernelThreadWait::ThreadEnd:
 						// Check thread
@@ -186,6 +245,20 @@ void Kernel::ContextSwitch()
 	{
 		// No threads to run
 		_activeThread = nullptr;
+
+		// Check to see if we have any delayed threads
+		if( _delayedThreads->Count > 0 )
+		{
+			// Wait until one of those is awake
+			int64 end = _delayedThreads[ 0 ]->WaitTimestamp + _delayedThreads[ 0 ]->WaitTimeout;
+			int64 now = DateTime::Now.Ticks;
+			if( end - now > 0 )
+				Thread::Sleep( ( int )( ( ( end - now ) / TimeSpan::TicksPerSecond ) * 1000 ) );
+
+			// Re-context switch to select it again
+			this->ContextSwitch();
+		}
+
 		Debug::WriteLine( "Kernel: ran out of threads to run, ending sim" );
 		_emu->Stop();
 		return;
