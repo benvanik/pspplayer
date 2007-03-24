@@ -41,6 +41,11 @@ namespace Noxa {
 
 					public: // ------ Stubbed calls ------
 
+						[NotImplemented]
+						[BiosFunction( 0xDBA6C4C4, "sceDisplayGetFramePerSec" )] [Stateless]
+						// manual add - is this int or float return?
+						int sceDisplayGetFramePerSec(){ return NISTUBRETURN; }
+
 						[BiosFunction( 0x0E20F177, "sceDisplaySetMode" )] [Stateless]
 						// int sceDisplaySetMode(int mode, int width, int height); (/display/pspdisplay.h:53)
 						int sceDisplaySetMode( int mode, int width, int height );
@@ -60,6 +65,16 @@ namespace Noxa {
 						[BiosFunction( 0x9C6EAAD7, "sceDisplayGetVcount" )] [Stateless]
 						// unsigned int sceDisplayGetVcount(); (/display/pspdisplay.h:89)
 						int sceDisplayGetVcount();
+
+						[BiosFunction( 0x773DD3A3, "sceDisplayGetCurrentHcount" )] [Stateless]
+						// manual add
+						int sceDisplayGetCurrentHcount(){ return 0; }
+
+						// This should be a video api call
+						[NotImplemented]
+						[BiosFunction( 0x210EAB3A, "sceDisplayGetAccumulatedHcount" )] [Stateless]
+						// manual add
+						int sceDisplayGetAccumulatedHcount(){ return NISTUBRETURN; }
 
 						[BiosFunction( 0x36CDFADE, "sceDisplayWaitVblank" )] [Stateless]
 						// int sceDisplayWaitVblank(); (/display/pspdisplay.h:104)

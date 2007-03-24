@@ -121,6 +121,7 @@ namespace Noxa {
 					void WaitThreadOnEvent( KernelThread^ thread, KernelEvent^ ev, KernelThreadWaitTypes waitType, int bitMask, int outAddress );
 					void SignalEvent( KernelEvent^ ev );
 					void ContextSwitch();
+					void SpawnDelayedThreadTimer( int64 targetTick );
 
 				public:
 					/// <summary>
@@ -147,7 +148,6 @@ namespace Noxa {
 
 				private:
 					void CreateStdio();
-					void SpawnDelayedThreadTimer( int64 targetTick );
 					void DelayedThreadTimerElapsed( Object^ sender, Timers::ElapsedEventArgs^ e );
 					int ThreadPriorityComparer( KernelThread^ a, KernelThread^ b );
 

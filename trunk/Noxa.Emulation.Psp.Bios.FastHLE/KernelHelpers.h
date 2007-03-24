@@ -10,15 +10,20 @@ using namespace System;
 using namespace System::Collections::Generic;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
+using namespace Noxa::Emulation::Psp::Media;
 
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
 			namespace Bios {
 				
+				ref class Kernel;
+
 				ref class KernelHelpers
 				{
 				public:
+
+					static IMediaItem^ FindPath( Kernel^ kernel, String^ path );
 
 					static String^ ReadString( IMemory^ memory, int address );
 					static int WriteString( IMemory^ memory, const int address, String^ value );

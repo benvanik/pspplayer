@@ -109,6 +109,11 @@ namespace Noxa {
 						// int sceAtracSetLoopNum(int atracID, int nloops); (/atrac3/pspatrac3.h:77)
 						int sceAtracSetLoopNum( int atracID, int nloops ){ return NISTUBRETURN; }
 
+						[NotImplemented]
+						[BiosFunction( 0xE88F759B, "sceAtracGetInternalErrorInfo" )] [Stateless]
+						// manual add
+						int sceAtracGetInternalErrorInfo(){ return NISTUBRETURN; }
+
 					};
 				
 				}

@@ -580,6 +580,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\sceImpose.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\scePower.h"
 					>
 				</File>

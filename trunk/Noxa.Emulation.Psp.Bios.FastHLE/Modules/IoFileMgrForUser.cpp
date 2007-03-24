@@ -18,39 +18,6 @@ using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 using namespace Noxa::Emulation::Psp::Media;
 
-IMediaItem^ IoFileMgrForUser::FindPath( String^ path )
-{
-	if( path->IndexOf( ':' ) >= 0 )
-	{
-		KernelFileDevice^ device = ( KernelFileDevice^ )_kernel->FindDevice( path );
-		if( device == nullptr )
-		{
-			// Perhaps a block device?
-			Debug::WriteLine( String::Format( "IoFileMgrForUser::FindPath: unable to find device for path {0}", path ) );
-			return nullptr;
-		}
-
-		path = path->Substring( path->IndexOf( ':' ) + 1 );
-		if( ( device->MediaDevice->State == MediaState::Present ) &&
-			( device->MediaRoot != nullptr ) )
-		{
-			return device->MediaRoot->Find( path );
-		}
-		else
-		{
-			Debug::WriteLine( String::Format( "IoFileMgrForUser::FindPath: unable to find root for path {0}", path ) );
-			return nullptr;
-		}
-	}
-	else
-	{
-		IMediaFolder^ root = _kernel->CurrentPath;
-		Debug::Assert( root != nullptr );
-
-		return root->Find( path );
-	}
-}
-
 // int sceIoPollAsync(SceUID fd, SceInt64 *res); (/user/pspiofilemgr.h:419)
 int IoFileMgrForUser::sceIoPollAsync( IMemory^ memory, int fd, int64 res ){ return NISTUBRETURN; }
 

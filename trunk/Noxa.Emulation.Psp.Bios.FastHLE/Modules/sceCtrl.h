@@ -66,9 +66,7 @@ namespace Noxa {
 						virtual void* QueryNativePointer( uint nid ) override;
 						void InputThread();
 
-					public: // ------ Implemented calls ------
-
-					public: // ------ Stubbed calls ------
+					public:
 
 						[BiosFunction( 0x6A2774F3, "sceCtrlSetSamplingCycle" )] [Stateless]
 						// int sceCtrlSetSamplingCycle(int cycle); (/ctrl/pspctrl.h:119)
@@ -85,6 +83,11 @@ namespace Noxa {
 						[BiosFunction( 0xDA6B76A1, "sceCtrlGetSamplingMode" )] [Stateless]
 						// int sceCtrlGetSamplingMode(int *pmode); (/ctrl/pspctrl.h:146)
 						int sceCtrlGetSamplingMode( IMemory^ memory, int pmode );
+
+						[NotImplemented]
+						[BiosFunction( 0xA7144800, "sceCtrlSetIdleCancelThreshold" )] [Stateless]
+						// manual add
+						int sceCtrlSetIdleCancelThreshold(){ return NISTUBRETURN; }
 
 						[BiosFunction( 0x3A622550, "sceCtrlPeekBufferPositive" )] [Stateless]
 						// int sceCtrlPeekBufferPositive(SceCtrlData *pad_data, int count); (/ctrl/pspctrl.h:148)

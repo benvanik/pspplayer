@@ -27,3 +27,35 @@ int ModuleMgrForUser::sceKernelStopUnloadSelfModule( int argsize, int argp, int 
 
 	return 0;
 }
+
+// SceUID sceKernelLoadModuleByID(SceUID fid, int flags, SceKernelLMOption *option); (/user/pspmodulemgr.h:91)
+int ModuleMgrForUser::sceKernelLoadModuleByID( IMemory^ memory, int fid, int flags, int option )
+{
+	KernelFileHandle^ handle = ( KernelFileHandle^ )_kernel->FindHandle( fid );
+	if( handle == nullptr )
+		return -1;
+
+	return 0;
+}
+
+// SceUID sceKernelLoadModule(const char *path, int flags, SceKernelLMOption *option); (/user/pspmodulemgr.h:68)
+int ModuleMgrForUser::sceKernelLoadModule( IMemory^ memory, int path, int flags, int option )
+{
+	String^ modulePath = KernelHelpers::ReadString( memory, path );
+	IMediaFile^ file = ( IMediaFile^ )KernelHelpers::FindPath( _kernel, modulePath );
+	if( file == nullptr )
+	{
+		Debug::WriteLine( String::Format( "sceKernelLoadModule: module not found: {0}", modulePath ) );
+		return -1;
+	}
+
+	Debug::WriteLine( String::Format( "sceKernelLoadModule: loading module {0}", modulePath ) );
+	
+	return 0;
+}
+
+// int sceKernelStartModule(SceUID modid, SceSize argsize, void *argp, int *status, SceKernelSMOption *option); (/user/pspmodulemgr.h:119)
+int ModuleMgrForUser::sceKernelStartModule( IMemory^ memory, int modid, int argsize, int argp, int status, int option )
+{
+	return 0;
+}

@@ -20,6 +20,7 @@
 #include "Modules/sceDmac.h"
 #include "Modules/sceGe_user.h"
 #include "Modules/sceHprm.h"
+#include "Modules/sceImpose.h"
 #include "Modules/scePower.h"
 #include "Modules/sceReg.h"
 #include "Modules/sceRtc.h"
