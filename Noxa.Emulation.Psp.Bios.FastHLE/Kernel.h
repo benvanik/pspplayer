@@ -56,7 +56,8 @@ namespace Noxa {
 				public:
 					PerformanceTimer^					Timer;
 					double								StartTime;
-					uint								StartTick;
+					int64								StartTick;
+					DateTime							StartDateTime;
 					DateTime							UnixBaseTime;
 
 					KernelStatistics^					Statistics;

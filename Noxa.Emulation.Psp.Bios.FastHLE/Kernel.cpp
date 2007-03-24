@@ -73,7 +73,8 @@ void Kernel::StartGame()
 {
 	Timer->Reset();
 	StartTime = 0.0;
-	StartTick = ( uint )Environment::TickCount;
+	StartTick = DateTime::Now.Ticks;
+	StartDateTime = DateTime::Now;
 
 	_cpu = _emu->Cpu;
 	_core0 = _cpu->Cores[ 0 ];
