@@ -878,8 +878,41 @@ GenerationResult CLZ( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
+		// rd = # of leading 0's in rs
+		/*for( int n = 31; n >= 0; n-- )
+		{
+			if( rs >> n == 1 )
+				return 31 - n;
+		}
+		return 32;*/
+		
+		Label* loop = g->DefineLabel();
+		Label* found = g->DefineLabel();
+		Label* done = g->DefineLabel();
+
+		g->mov( EBX, MREG( CTX, rs ) );
+		g->mov( CL, 32 );
+		g->MarkLabel( loop );
+		g->sub( CL, 1 );				// n--
+		g->mov( EAX, EBX );
+		g->shr( EAX, CL );
+		g->cmp( EAX, 1 );				// if( rs >> n == 1 )...
+		g->je( found );
+
+		g->cmp( CL, 0 );
+		g->jge( loop );					// loop while n >= 0
+		g->mov( MREG( CTX, rd ), 32 );	// return 32
+		g->jmp( done );
+
+		g->MarkLabel( found );
+		g->mov( EAX, 31 );
+		g->movzx( ECX, CL );
+		g->sub( EAX, ECX );
+		g->mov( MREG( CTX, rd ), EAX );	// return 31 - n
+		
+		g->MarkLabel( done );
 	}
-	return GenerationResult::Invalid;
+	return GenerationResult::Success;
 }
 
 GenerationResult CLO( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
@@ -889,6 +922,40 @@ GenerationResult CLO( R4000GenContext^ context, int pass, int address, uint code
 	}
 	else if( pass == 1 )
 	{
+		// rd = # of leading 1's in rs
+		/*for( int n = 31; n >= 0; n-- )
+		{
+			if( ( rs >> n ) & 0x1 == 0 )
+				return 31 - n;
+		}
+		return 32;*/
+		
+		Label* loop = g->DefineLabel();
+		Label* found = g->DefineLabel();
+		Label* done = g->DefineLabel();
+
+		g->mov( EBX, MREG( CTX, rs ) );
+		g->mov( CL, 32 );
+		g->MarkLabel( loop );
+		g->sub( CL, 1 );				// n--
+		g->mov( EAX, EBX );
+		g->shr( EAX, CL );
+		g->and( EAX, 1 );				// & 0x1 so that we ignore the other 1's
+		g->cmp( EAX, 0 );				// if( ( rs >> n ) & 0x1 == 0 )...
+		g->je( found );
+
+		g->cmp( CL, 0 );
+		g->jge( loop );					// loop while n >= 0
+		g->mov( MREG( CTX, rd ), 32 );	// return 32
+		g->jmp( done );
+
+		g->MarkLabel( found );
+		g->mov( EAX, 31 );
+		g->movzx( ECX, CL );
+		g->sub( EAX, ECX );
+		g->mov( MREG( CTX, rd ), EAX );	// return 31 - n
+		
+		g->MarkLabel( done );
 	}
-	return GenerationResult::Invalid;
+	return GenerationResult::Success;
 }

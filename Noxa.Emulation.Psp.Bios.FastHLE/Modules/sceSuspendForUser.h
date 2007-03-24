@@ -51,10 +51,9 @@ namespace Noxa {
 						// manual add
 						int sceKernelPowerUnlock( int type ){ return NISTUBRETURN; }
 
-						[NotImplemented]
 						[BiosFunction( 0x090CCB3F, "sceKernelPowerTick" )] [Stateless]
 						// int sceKernelPowerTick(int ticktype); (/include/kernelutils.h:167)
-						int sceKernelPowerTick( int type ){ return NISTUBRETURN; }
+						int sceKernelPowerTick( int type ){ return 0; }
 
 					};
 				
