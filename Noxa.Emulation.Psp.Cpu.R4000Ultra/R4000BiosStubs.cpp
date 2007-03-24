@@ -29,6 +29,7 @@ int scePowerSetBusClockFrequency( int busFreq );
 int scePowerSetCpuClockFrequency( int cpuFreq );
 
 // sceDisplayUser --------------------------------------
+//int sceDisplayGetCurrentHcount(); <-- inlined
 extern int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int syncMode );
 extern void sceDisplayWaitVblankStart();
 
@@ -99,6 +100,11 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 	case 0x34b9fa9e:		// sceKernelDcacheWritebackInvalidateRange
 	case 0x920f104a:		// sceKernelIcacheInvalidateAll
 	case 0xc2df770e:		// sceKernelIcacheInvalidateRange
+		g->xor( EAX, EAX );
+		return true;
+
+	// sceDisplay ------------------------------------------
+	case 0x773DD3A3:		// sceDisplayGetCurrentHcount
 		g->xor( EAX, EAX );
 		return true;
 	}

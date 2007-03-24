@@ -38,8 +38,6 @@ namespace Noxa {
 					internal:
 						//virtual void* QueryNativePointer( uint nid ) override;
 
-						IMediaItem^ IoFileMgrForUser::FindPath( String^ path );
-
 					public:
 
 						// - Misc IO --------------------------------------------------------------------------------------------

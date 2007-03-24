@@ -75,6 +75,21 @@ namespace Noxa {
 
 					public: // ------ Stubbed calls ------
 
+						[NotImplemented]
+						[BiosFunction( 0xF77D77CB, "sceKernelSetCompilerVersion" )] [Stateless]
+						// manual add - check?
+						int sceKernelSetCompilerVersion( int version ){ return 0; }
+
+						[NotImplemented]
+						[BiosFunction( 0x7591C7DB, "sceKernelSetCompiledSdkVersion" )] [Stateless]
+						// manual add - check?
+						int sceKernelSetCompiledSdkVersion( int version ){ return 0; }
+
+						[NotImplemented]
+						[BiosFunction( 0x13A5ABEF, "sceKernelPrintf" )] [Stateless]
+						// manual add - printf( char* format, ... ) <-- right 2nd arg?
+						int sceKernelPrintf( IMemory^ memory, int format, int varg ){ return NISTUBRETURN; }
+
 					};
 				
 				}

@@ -7,6 +7,8 @@
 #include "Stdafx.h"
 #include "KernelHelpers.h"
 #include <memory>
+#include "KernelDevice.h"
+#include "Kernel.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -15,6 +17,40 @@ using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Cpu;
+using namespace Noxa::Emulation::Psp::Media;
+
+IMediaItem^ KernelHelpers::FindPath( Kernel^ kernel, String^ path )
+{
+	if( path->IndexOf( ':' ) >= 0 )
+	{
+		KernelFileDevice^ device = ( KernelFileDevice^ )kernel->FindDevice( path );
+		if( device == nullptr )
+		{
+			// Perhaps a block device?
+			Debug::WriteLine( String::Format( "KernelHelpers::FindPath: unable to find device for path {0}", path ) );
+			return nullptr;
+		}
+
+		path = path->Substring( path->IndexOf( ':' ) + 1 );
+		if( ( device->MediaDevice->State == MediaState::Present ) &&
+			( device->MediaRoot != nullptr ) )
+		{
+			return device->MediaRoot->Find( path );
+		}
+		else
+		{
+			Debug::WriteLine( String::Format( "KernelHelpers::FindPath: unable to find root for path {0}", path ) );
+			return nullptr;
+		}
+	}
+	else
+	{
+		IMediaFolder^ root = kernel->CurrentPath;
+		Debug::Assert( root != nullptr );
+
+		return root->Find( path );
+	}
+}
 
 String^ KernelHelpers::ReadString( IMemory^ memory, int address )
 {

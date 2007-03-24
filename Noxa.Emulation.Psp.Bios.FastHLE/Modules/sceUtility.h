@@ -72,6 +72,11 @@ namespace Noxa {
 						void sceUtilityMsgDialogShutdownStart(){}
 
 						[NotImplemented]
+						[BiosFunction( 0x4928BD96, "sceUtilityMsgDialogAbort" )] [Stateless]
+						// manual add
+						void sceUtilityMsgDialogAbort(){}
+
+						[NotImplemented]
 						[BiosFunction( 0x95FC253B, "sceUtilityMsgDialogUpdate" )] [Stateless]
 						// void sceUtilityMsgDialogUpdate(int n); (/utility/psputility_msgdialog.h:73)
 						void sceUtilityMsgDialogUpdate( int n ){}

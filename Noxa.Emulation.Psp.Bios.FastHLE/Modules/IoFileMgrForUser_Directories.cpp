@@ -22,7 +22,7 @@ using namespace Noxa::Emulation::Psp::Media;
 int IoFileMgrForUser::sceIoDopen( IMemory^ memory, int dirname )
 {
 	String^ path = KernelHelpers::ReadString( memory, dirname );
-	IMediaFolder^ folder = ( IMediaFolder^ )this->FindPath( path );
+	IMediaFolder^ folder = ( IMediaFolder^ )KernelHelpers::FindPath( _kernel, path );
 	if( folder == nullptr )
 	{
 		Debug::WriteLine( String::Format( "sceIoDopen: could not find path {0}", path ) );
@@ -180,7 +180,7 @@ int IoFileMgrForUser::sceIoDclose( int fd )
 int IoFileMgrForUser::sceIoRemove( IMemory^ memory, int fileName )
 {
 	String^ path = KernelHelpers::ReadString( memory, fileName );
-	IMediaFile^ file = ( IMediaFile^ )this->FindPath( path );
+	IMediaFile^ file = ( IMediaFile^ )KernelHelpers::FindPath( _kernel, path );
 	if( file == nullptr )
 	{
 		Debug::WriteLine( String::Format( "sceIoRemove: could not find path '{0}'", path ) );
@@ -199,7 +199,7 @@ int IoFileMgrForUser::sceIoMkdir( IMemory^ memory, int dir, int mode )
 	String^ path = KernelHelpers::ReadString( memory, dir );
 
 	// Ensure the path does not exist
-	if( this->FindPath( path ) != nullptr )
+	if( KernelHelpers::FindPath( _kernel, path ) != nullptr )
 		return 0;
 
 	if( path[ path->Length - 1 ] == '/' )
@@ -207,7 +207,7 @@ int IoFileMgrForUser::sceIoMkdir( IMemory^ memory, int dir, int mode )
 	String^ parentPath = path->Substring( 0, path->LastIndexOf( '/' ) );
 	String^ newName = path->Substring( path->LastIndexOf( '/' ) + 1 );
 
-	IMediaFolder^ folder = ( IMediaFolder^ )this->FindPath( parentPath );
+	IMediaFolder^ folder = ( IMediaFolder^ )KernelHelpers::FindPath( _kernel, parentPath );
 	if( folder == nullptr )
 	{
 		Debug::WriteLine( String::Format( "sceIoMkdir: could not find path '{0}'", path ) );
@@ -224,7 +224,7 @@ int IoFileMgrForUser::sceIoMkdir( IMemory^ memory, int dir, int mode )
 int IoFileMgrForUser::sceIoRmdir( IMemory^ memory, int pathName )
 {
 	String^ path = KernelHelpers::ReadString( memory, pathName );
-	IMediaFolder^ folder = ( IMediaFolder^ )this->FindPath( path );
+	IMediaFolder^ folder = ( IMediaFolder^ )KernelHelpers::FindPath( _kernel, path );
 	if( folder == nullptr )
 	{
 		Debug::WriteLine( String::Format( "sceIoRmdir: could not find path '{0}'", path ) );
@@ -240,7 +240,7 @@ int IoFileMgrForUser::sceIoRmdir( IMemory^ memory, int pathName )
 int IoFileMgrForUser::sceIoChdir( IMemory^ memory, int pathName )
 {
 	String^ path = KernelHelpers::ReadString( memory, pathName );
-	IMediaFolder^ folder = ( IMediaFolder^ )this->FindPath( path );
+	IMediaFolder^ folder = ( IMediaFolder^ )KernelHelpers::FindPath( _kernel, path );
 	if( folder == nullptr )
 	{
 		Debug::WriteLine( String::Format( "sceIoChdir: could not find path '{0}'", path ) );
@@ -261,7 +261,7 @@ int IoFileMgrForUser::sceIoGetstat( IMemory^ memory, int fileName, int stat )
 	int address = stat;
 
 	String^ path = KernelHelpers::ReadString( memory, fileName );
-	IMediaItem^ item = this->FindPath( path );
+	IMediaItem^ item = KernelHelpers::FindPath( _kernel, path );
 	if( item == nullptr )
 	{
 		Debug::WriteLine( String::Format( "sceIoGetstat: could not find path '{0}'", path ) );

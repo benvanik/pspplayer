@@ -966,6 +966,11 @@ namespace Noxa.Emulation.Psp.Games
 		protected List<StubReference> FixupStubs( BinaryReader reader, ICpu cpu, IMemory memory, IBios bios, uint baseAddress )
 		{
 			List<StubReference> stubs = new List<StubReference>();
+			int nidGoodCount = 0;
+			int nidNotFoundCount = 0;
+			int nidNotImplementedCount = 0;
+			int moduleNotFoundCount = 0;
+			List<string> missingModules = new List<string>();
 
 			ElfSection libEnt = _sectionLookup[ ".lib.ent.top" ];
 			ElfSection libEntBottom = _sectionLookup[ ".lib.ent.btm" ];
@@ -1015,24 +1020,42 @@ namespace Noxa.Emulation.Psp.Games
 
 							Debug.WriteLine( string.Format( "FixupStubs: 0x{1:X8} found and patched at 0x{2:X8} -> 0x{3:X8} {0}::{4} {5}", moduleName, nid, syscallAddress, syscall, function.Name, ( function.IsImplemented == true ) ? "" : "(NI)" ) );
 							if( function.IsImplemented == false )
+							{
 								stubs.Add( StubReference.NidNotImplemented( moduleName, nid, function ) );
+								nidNotImplementedCount++;
+							}
 							else
+							{
 								stubs.Add( StubReference.Success( moduleName, nid, function ) );
+								nidGoodCount++;
+							}
 						}
 						else
 						{
 							Debug.WriteLine( string.Format( "FixupStubs: {0} 0x{1:X8} not found (nid not present)", moduleName, nid ) );
 							stubs.Add( StubReference.NidNotFound( moduleName, nid ) );
+							nidNotFoundCount++;
 						}
 					}
 					else
 					{
 						Debug.WriteLine( string.Format( "FixupStubs: {0} 0x{1:X8} not found (module not present)", moduleName, nid ) );
 						stubs.Add( StubReference.ModuleNotFound( moduleName, nid ) );
+						if( missingModules.Contains( moduleName ) == false )
+							missingModules.Add( moduleName );
+						moduleNotFoundCount++;
 					}
 
 					address += 4;
 				}
+			}
+
+			Debug.WriteLine( string.Format( "FixupStubs: {0}/{1} ({2}%) NIDs good; {3} not implemented, {4} not found, {5} in missing modules = {6} total", nidGoodCount, stubs.Count - moduleNotFoundCount, ( nidGoodCount / ( float )( stubs.Count - moduleNotFoundCount ) ) * 100.0f, nidNotImplementedCount, nidNotFoundCount, moduleNotFoundCount, stubs.Count ) );
+			if( missingModules.Count > 0 )
+			{
+				Debug.WriteLine( string.Format( "FixupStubs: {0} missing modules (contain {1} NIDs ({2}% of total)):", missingModules.Count, moduleNotFoundCount, ( moduleNotFoundCount / ( float )stubs.Count ) * 100.0f ) );
+				foreach( string moduleName in missingModules )
+					Debug.WriteLine( string.Format( "\t\t{0}", moduleName ) );
 			}
 
 			return stubs;

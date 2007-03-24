@@ -128,6 +128,11 @@ namespace Noxa {
 						// int sceRtcGetTick(const pspTime* date, u64 *tick); (/rtc/psprtc.h:142)
 						int sceRtcGetTick( IMemory^ memory, int date, int tick );
 
+						[NotImplemented]
+						[BiosFunction( 0x011F03C1, "sceRtcGetAccumulativeTime" )] [Stateless]
+						// manual add - probably like sceRtcGetTick?
+						int sceRtcGetAccumulativeTime( IMemory^ memory, int date, int tick ){ return NISTUBRETURN; }
+
 						[BiosFunction( 0x9ED0AE87, "sceRtcCompareTick" )] [Stateless]
 						// int sceRtcCompareTick(const u64* tick1, const u64* tick2); (/rtc/psprtc.h:151)
 						int sceRtcCompareTick( IMemory^ memory, int tick1, int tick2 );

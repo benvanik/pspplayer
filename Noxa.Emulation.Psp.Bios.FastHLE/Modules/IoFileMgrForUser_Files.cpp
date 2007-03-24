@@ -21,7 +21,7 @@ using namespace Noxa::Emulation::Psp::Bios::Modules;
 int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int mode )
 {
 	String^ path = KernelHelpers::ReadString( memory, fileName );
-	IMediaFile^ file = ( IMediaFile^ )this->FindPath( path );
+	IMediaFile^ file = ( IMediaFile^ )KernelHelpers::FindPath( _kernel, path );
 	if( file == nullptr )
 	{
 		// Create if needed
@@ -29,7 +29,7 @@ int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int m
 		{
 			String^ parentPath = path->Substring( 0, path->LastIndexOf( '/' ) );
 			String^ newName = path->Substring( path->LastIndexOf( '/' ) + 1 );
-			IMediaFolder^ parent = ( IMediaFolder^ )this->FindPath( parentPath );
+			IMediaFolder^ parent = ( IMediaFolder^ )KernelHelpers::FindPath( _kernel, parentPath );
 			if( parent == nullptr )
 			{
 				Debug::WriteLine( String::Format( "sceIoOpen: could not find parent to create file '{0}' in on open", path ) );
