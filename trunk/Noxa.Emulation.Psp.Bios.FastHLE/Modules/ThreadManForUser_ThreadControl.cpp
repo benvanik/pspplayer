@@ -157,13 +157,6 @@ int ThreadManForUser::sceKernelWaitThreadEndCB( IMemory^ memory, int thid, int t
 	return 0;
 }
 
-int ThreadManForUser::ThreadDelayComparer( KernelThread^ a, KernelThread^ b )
-{
-	int64 aend = a->WaitTimestamp + a->WaitTimeout;
-	int64 bend = b->WaitTimestamp + a->WaitTimeout;
-	return aend.CompareTo( bend );
-}
-
 // int sceKernelDelayThread(SceUInt delay); (/user/pspthreadman.h:323)
 int ThreadManForUser::sceKernelDelayThread( int delay )
 {
@@ -179,7 +172,7 @@ int ThreadManForUser::sceKernelDelayThread( int delay )
 	thread->CanHandleCallbacks = false;
 
 	_kernel->_delayedThreads->Add( thread );
-	_kernel->_delayedThreads->Sort( gcnew Comparison<KernelThread^>( this, &ThreadManForUser::ThreadDelayComparer ) );
+	_kernel->_delayedThreads->Sort( gcnew Comparison<KernelThread^>( _kernel, &Kernel::ThreadDelayComparer ) );
 
 	if( _kernel->_delayedThreadTimer->Enabled == false )
 		_kernel->SpawnDelayedThreadTimer( thread->WaitTimeout + thread->WaitTimestamp );
@@ -204,7 +197,7 @@ int ThreadManForUser::sceKernelDelayThreadCB( int delay )
 	thread->CanHandleCallbacks = true;
 
 	_kernel->_delayedThreads->Add( thread );
-	_kernel->_delayedThreads->Sort( gcnew Comparison<KernelThread^>( this, &ThreadManForUser::ThreadDelayComparer ) );
+	_kernel->_delayedThreads->Sort( gcnew Comparison<KernelThread^>( _kernel, &Kernel::ThreadDelayComparer ) );
 
 	if( _kernel->_delayedThreadTimer->Enabled == false )
 		_kernel->SpawnDelayedThreadTimer( thread->WaitTimeout + thread->WaitTimestamp );

@@ -57,6 +57,7 @@ MemoryPool* _pool;
 // Statistics
 extern uint _processedFrames;
 extern uint _skippedFrames;
+extern uint _vcount;
 
 void __break()
 {
@@ -230,6 +231,11 @@ void niCleanup()
 	UNLOCK;
 }
 
+uint niGetVcount()
+{
+	return _vcount;
+}
+
 void niSwitchFrameBuffer( int address, int bufferWidth, int pixelFormat, int syncMode )
 {
 	// TODO: switch frame buffer
@@ -382,6 +388,7 @@ void OglDriver::SetupNativeInterface()
 
 	ni->Setup = &niSetup;
 	ni->Cleanup = &niCleanup;
+	ni->GetVcount = &niGetVcount;
 	ni->SwitchFrameBuffer = &niSwitchFrameBuffer;
 	ni->FindList = &niFindList;
 	ni->EnqueueList = &niEnqueueList;

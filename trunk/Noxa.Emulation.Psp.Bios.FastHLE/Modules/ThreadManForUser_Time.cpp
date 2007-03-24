@@ -18,6 +18,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 
+extern int64 _startTick;
+
 // These can all be native
 //0x0E927AED _sceKernelReturnFromTimerHandler
 //0x110DEC9A sceKernelUSec2SysClock
@@ -97,6 +99,16 @@ int64 ThreadManForUser::sceKernelGetSystemTimeWide()
 	int64 ticks = DateTime::Now.Ticks - _kernel->StartTick;
 	return ticks / 10;
 }
+
+#pragma unmanaged
+int sceKernelGetSystemTimeLowN()
+{
+	ULARGE_INTEGER time;
+	GetSystemTimeAsFileTime( ( FILETIME* )&time );
+	return ( int )( ( time.QuadPart - _startTick ) / 10 );
+
+}
+#pragma managed
 
 // unsigned int sceKernelGetSystemTimeLow(); (/user/pspthreadman.h:1517)
 int ThreadManForUser::sceKernelGetSystemTimeLow()

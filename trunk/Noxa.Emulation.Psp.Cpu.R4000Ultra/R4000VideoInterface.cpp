@@ -248,6 +248,12 @@ bool ReadMorePackets( void* memoryAddress, VideoDisplayList* vdl, uint newStallA
 
 // sceDisplayForUser -----------------------------------
 
+int sceDisplayGetVcount()
+{
+	VideoApi* ni = _videoApi;
+	return ni->GetVcount();
+}
+
 int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int syncMode )
 {
 	VideoApi* ni = _videoApi;
@@ -256,6 +262,12 @@ int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int sy
 }
 
 void sceDisplayWaitVblankStart()
+{
+	VideoApi* ni = _videoApi;
+	ni->WaitForVsync();
+}
+
+void sceDisplayWaitVblankCB()
 {
 	VideoApi* ni = _videoApi;
 	ni->WaitForVsync();

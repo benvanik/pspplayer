@@ -101,7 +101,26 @@ int sceDisplay::sceDisplayWaitVblank()
 
 // int sceDisplayWaitVblankCB(); (/display/pspdisplay.h:109)
 int sceDisplay::sceDisplayWaitVblankCB()
-{ return NISTUBRETURN; }
+{
+	IVideoDriver^ video = _kernel->_emu->Video;
+
+	KernelThread^ thread = _kernel->_activeThread;
+	thread->WaitClass = KernelThreadWait::Delay;
+	thread->WaitID = 0;
+	thread->WaitTimeout = 1000000;
+	thread->WaitTimestamp = DateTime::Now.Ticks;
+	thread->CanHandleCallbacks = true;
+
+	_kernel->_delayedThreads->Add( thread );
+	_kernel->_delayedThreads->Sort( gcnew Comparison<KernelThread^>( _kernel, &Kernel::ThreadDelayComparer ) );
+
+	if( _kernel->_delayedThreadTimer->Enabled == false )
+		_kernel->SpawnDelayedThreadTimer( thread->WaitTimeout + thread->WaitTimestamp );
+	
+	_kernel->ContextSwitch();
+
+	return 0;
+}
 
 // int sceDisplayWaitVblankStart(); (/display/pspdisplay.h:94)
 int sceDisplay::sceDisplayWaitVblankStart()
@@ -115,4 +134,6 @@ int sceDisplay::sceDisplayWaitVblankStart()
 
 // int sceDisplayWaitVblankStartCB(); (/display/pspdisplay.h:99)
 int sceDisplay::sceDisplayWaitVblankStartCB()
-{ return NISTUBRETURN; }
+{
+	return NISTUBRETURN;
+}

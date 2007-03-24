@@ -5,6 +5,8 @@
 // ----------------------------------------------------------------------------
 
 #include "Stdafx.h"
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 #include "Kernel.h"
 #include "FastBios.h"
 #include "KernelDevice.h"
@@ -17,6 +19,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace Noxa::Emulation::Psp::Media;
+
+int64 _startTick;
 
 Kernel::Kernel( FastBios^ bios )
 {
@@ -79,6 +83,9 @@ void Kernel::StartGame()
 	StartTime = 0.0;
 	StartTick = DateTime::Now.Ticks;
 	StartDateTime = DateTime::Now;
+	ULARGE_INTEGER time;
+	GetSystemTimeAsFileTime( ( FILETIME* )&time );
+	_startTick = time.QuadPart;
 
 	_cpu = _emu->Cpu;
 	_core0 = _cpu->Cores[ 0 ];

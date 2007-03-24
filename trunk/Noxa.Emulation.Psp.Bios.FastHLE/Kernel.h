@@ -15,6 +15,7 @@
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::IO;
+using namespace System::Runtime::CompilerServices;
 using namespace System::Threading;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Games;
@@ -120,8 +121,10 @@ namespace Noxa {
 					__inline KernelThread^ FindThread( int id );
 					void WaitThreadOnEvent( KernelThread^ thread, KernelEvent^ ev, KernelThreadWaitTypes waitType, int bitMask, int outAddress );
 					void SignalEvent( KernelEvent^ ev );
-					void ContextSwitch();
 					void SpawnDelayedThreadTimer( int64 targetTick );
+
+					[MethodImpl( MethodImplOptions::Synchronized )]
+					void ContextSwitch();
 
 				public:
 					/// <summary>
@@ -149,7 +152,10 @@ namespace Noxa {
 				private:
 					void CreateStdio();
 					void DelayedThreadTimerElapsed( Object^ sender, Timers::ElapsedEventArgs^ e );
+
+				internal:
 					int ThreadPriorityComparer( KernelThread^ a, KernelThread^ b );
+					int ThreadDelayComparer( KernelThread^ a, KernelThread^ b );
 
 				internal:
 					int AllocateID()

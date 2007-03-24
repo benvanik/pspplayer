@@ -247,8 +247,8 @@ void R4000Cpu::PrintStatistics()
 		BiosFunction^ func = _syscalls[ n ];
 		float p = value / ( float )callCount;
 		p *= 100.0f;
-		Debug::WriteLine( String::Format( "{0,-50} {1,10}x, {2,3}%",
-			String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p ) );
+		Debug::WriteLine( String::Format( "{0,-50} {1,10}x, {2,3}%\t{3}",
+			String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p, func->IsImplemented ? "" : "(NI)" ) );
 	}
 #endif
 	Debug::WriteLine( "" );
