@@ -353,26 +353,39 @@ GenerationResult HALT( R4000GenContext^ context, int pass, int address, uint cod
 	return GenerationResult::Success;
 }
 
+int __mfic()
+{
+	return R4000Cpu::GlobalCpu->_core0->InterruptState;
+}
+
 GenerationResult MFIC( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
 	if( pass == 0 )
 	{
-		Debug::WriteLine( String::Format( "R4000Generator: MFIC not implemented (at 0x{0:X8})", address ) );
 	}
 	else if( pass == 1 )
 	{
+		g->call( __mfic );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
+}
+
+void __mtic( int value )
+{
+	R4000Cpu::GlobalCpu->_core0->InterruptState = value;
 }
 
 GenerationResult MTIC( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
 	if( pass == 0 )
 	{
-		Debug::WriteLine( String::Format( "R4000Generator: MTIC not implemented (at 0x{0:X8})", address ) );
 	}
 	else if( pass == 1 )
 	{
+		g->push( MREG( CTX, rt ) );
+		g->call( ( int )__mtic );
+		g->add( ESP, 4 );
 	}
 	return GenerationResult::Success;
 }

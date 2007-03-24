@@ -35,7 +35,6 @@ using namespace Noxa::Emulation::Psp::CodeGen;
 #define ZE( x ) ((int)(uint)x)
 #define SE( x ) ((int)(short)x)
 
-#define LOADCTXBASE( xr )	
 #define CTX						CTXP( context->CtxPointer )
 #define CTXP( x )				( ( int )x )
 #define MREG( xr, r )			g->dword_ptr[ xr + CTXREGS + ( r << 2 ) ]

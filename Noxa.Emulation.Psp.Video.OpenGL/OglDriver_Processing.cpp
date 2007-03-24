@@ -36,6 +36,7 @@ int DetermineVertexSize( int vertexType );
 void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int vertexCount, byte* indexBuffer );
 void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr );
 void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr );
+void TextureTransfer( OglContext* context );
 
 void SetTexture( OglContext* context, int stage );
 
@@ -476,23 +477,51 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			glMultMatrixf( context->WorldMatrix );
 			break;
 		case TMS:
-			temp = 0;
+			// Next 12 packets are 3x4 texture matrix
+			for( int m = 0; m < 12; m++ )
+			{
+				argx = list->Packets[ n + m + 1 ].Argument << 8;
+				matrixTemp[ m ] = *reinterpret_cast<float*>( &argx );
+			}
+			n += 12;
+			// TODO: texture matrix
 			break;
 		case PROJ: // handled by PMS
-			break;
 		case VIEW: // handled by VMS
-			break;
 		case WORLD: // handled by WMS
+		case TMATRIX: // handled by TMS
 			break;
-		case TMATRIX: // 3x4
-			matrixTemp[ temp++ ] = argf;
-			if( temp == 12 )
-			{
-				temp = 0;
-				//context->TextureMatrix = matrixTemp;
-				//glMatrixMode( GL_TEXTURE );
-				//glLoadMatrixf( matrixTemp );
-			}
+
+			// -- Following commands are for texture copy (to video ram)
+		case TRXSBP: // Transmission Source Buffer Pointer
+			context->TextureTx.SourceAddress = argi;
+			break;
+		case TRXSBW: // Transmission Source Buffer Width
+			context->TextureTx.SourceAddress |= ( argi << 8 ) & 0xFF000000;
+			context->TextureTx.SourceLineWidth = argi & 0x0000FFFF;
+			break;
+		case TRXDBP: // Transmission Destination Buffer Pointer
+			context->TextureTx.DestinationAddress = argi;
+			break;
+		case TRXDBW: // Transmission Destination Buffer Width
+			context->TextureTx.DestinationAddress |= ( argi << 8 ) & 0xFF000000;
+			context->TextureTx.DestinationLineWidth = argi & 0x0000FFFF;
+			break;
+		case TRXSIZE: // Transfer Size
+			context->TextureTx.Width = ( argi & 0x3FF ) + 1;
+			context->TextureTx.Height = ( ( argi >> 10 ) & 0x1FF ) + 1;
+			break;
+		case TRXSPOS: // Transfer Source Position
+			context->TextureTx.SX = argi & 0x1FF;
+			context->TextureTx.SY = ( argi >> 10 ) & 0x1FF;
+			break;
+		case TRXDPOS: // Transfer Destination Position
+			context->TextureTx.DX = argi & 0x3FF;
+			context->TextureTx.DY = ( argi >> 10 ) & 0x1FF;
+			break;
+		case TRXKICK: // Transmission Kick
+			context->TextureTx.PixelSize = ( argi & 0x1 );
+			TextureTransfer( context );
 			break;
 
 		case BASE:
@@ -920,6 +949,83 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 
 	// Re-enable clipping
 	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
+}
+
+void TextureTransfer( OglContext* context )
+{
+	// There are two ways we can do this:
+	// a) copy the bits directy to the frame buffer
+	// b) copy the bits to a texture and render it as a billboard
+	// I don't know which one will be faster - texture uploads are slow, but
+	// frame buffer writes are too. At least with the texture method we can
+	// better handle weird texture formats as we can use our texture loading
+	// code to do things.
+
+	//glFlush();
+
+	byte* buffer;
+	int sourceAddress = context->TextureTx.SourceAddress;
+	if( sourceAddress & MainMemoryBase )
+		buffer = context->MainMemoryPointer + ( sourceAddress - MainMemoryBase );
+	else
+		buffer = context->VideoMemoryPointer + ( sourceAddress - FrameBufferBase );
+	// move to source position
+
+	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+	glPixelStorei( GL_UNPACK_ROW_LENGTH, context->TextureTx.SourceLineWidth );
+
+	glPushAttrib( GL_ENABLE_BIT );
+	glDisable( GL_TEXTURE_2D );
+	glDisable( GL_DEPTH_TEST );
+
+	glMatrixMode( GL_PROJECTION );
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho( 0.0f, 480.0f, 0.0f, 272.0f, -1.0f, 1.0f );
+	glMatrixMode( GL_MODELVIEW );
+	glPushMatrix();
+	glLoadIdentity();
+
+	/*byte* b = ( byte* )malloc( context->TextureTx.Width * context->TextureTx.Height * 4 );
+	memset( b, 0xCDCDCDCD, context->TextureTx.Width * context->TextureTx.Height * 4 );
+
+	glEnable( GL_TEXTURE_2D );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA,
+		context->TextureTx.Width, context->TextureTx.Height,
+		0, GL_RGBA, GL_UNSIGNED_BYTE,
+        b );*/
+
+	// 0 ---- 1
+	// |      |
+	// |      |
+	// 3 ---- 2
+	
+	glBegin(GL_QUADS);
+		glColor4ub( 255, 255, 255, 255 );
+        glTexCoord3f(0, 0, 0); glVertex3f(10, 10, 0);
+        glTexCoord3f(1, 0, 0); glVertex3f(100, 10, 0);
+        glTexCoord3f(1, -1, 0); glVertex3f(100, 100, 0);
+        glTexCoord3f(0, -1, 0); glVertex3f(10, 100, 0);
+    glEnd();
+
+	//free( b );
+
+	//glPixelZoom( 1.0f, -1.0f );
+	//glRasterPos2f( -0.5f, 0.1f );
+	//glRasterPos3i( -100, 0, 1 );
+	//glRasterPos2i( context->TextureTx.DX + 16, context->TextureTx.DY + 16 );
+	/*glDrawPixels(
+		context->TextureTx.Width, context->TextureTx.Height,
+		GL_RGBA, GL_UNSIGNED_BYTE,
+		buffer );*/
+
+	//glPixelZoom( 1.0f, 1.0f );
+
+	glPopMatrix();
+	glMatrixMode( GL_PROJECTION );
+	glPopMatrix();
+
+	glPopAttrib();
 }
 
 void SetTexture( OglContext* context, int stage )

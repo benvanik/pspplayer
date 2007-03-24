@@ -7,6 +7,7 @@
 #include "Stdafx.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <time.h>
 
 #include "sceRtc.h"
 #include "Kernel.h"
@@ -28,6 +29,17 @@ using namespace Noxa::Emulation::Psp::Bios::Modules;
 
 int sceRtcGetTickResolutionN();
 int sceRtcGetCurrentTickN( LARGE_INTEGER* tick );
+int sceRtcGetCurrentClockLocalTimeN( byte* memory, int time );
+int sceRtcCompareTickN( byte* memory, int tick1, int tick2 );
+int sceRtcTickAddTicksN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddMicrosecondsN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddSecondsN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddMinutesN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddHoursN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddDaysN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddWeeksN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddMonthsN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddYearsN( byte* memory, int destTick, int srcTick, int numYears );
 
 void* sceRtc::QueryNativePointer( uint nid )
 {
@@ -37,6 +49,31 @@ void* sceRtc::QueryNativePointer( uint nid )
 		return &sceRtcGetTickResolutionN;
 	case 0x3F7AD767:
 		return &sceRtcGetCurrentTickN;
+
+	/*case 0x7ED29E40:
+		return &sceRtcSetTickN;
+	case 0x6FF40ACC:
+		return &sceRtcGetTickN;*/
+	case 0x9ED0AE87:
+		return &sceRtcCompareTickN;
+	case 0x44F45E05:
+		return &sceRtcTickAddTicksN;
+	case 0x26D25A5D:
+		return &sceRtcTickAddMicrosecondsN;
+	case 0xF2A4AFE5:
+		return &sceRtcTickAddSecondsN;
+	case 0xE6605BCA:
+		return &sceRtcTickAddMinutesN;
+	case 0x26D7A24A:
+		return &sceRtcTickAddHoursN;
+	case 0xE51B4B7A:
+		return &sceRtcTickAddDaysN;
+	case 0xCF3A2CA8:
+		return &sceRtcTickAddWeeksN;
+	case 0xDBF74F1B:
+		return &sceRtcTickAddMonthsN;
+	case 0x42842C77:
+		return &sceRtcTickAddYearsN;
 	};
 
 	return 0;
@@ -80,8 +117,29 @@ int sceRtcGetCurrentTickN( LARGE_INTEGER* tick )
 // int sceRtcGetCurrentClock(pspTime *time, int tz); (/rtc/psprtc.h:63)
 int sceRtc::sceRtcGetCurrentClock( IMemory^ memory, int time, int tz ){ return NISTUBRETURN; }
 
+#pragma unmanaged
+int sceRtcGetCurrentClockLocalTimeN( byte* memory, int time )
+{
+	SYSTEMTIME t;
+	GetLocalTime( &t );
+	ushort* ptr = ( ushort* )( memory + ( time - MainMemoryBase ) );
+	*ptr = ( ushort )t.wYear;
+	*( ptr + 1 ) = ( ushort )t.wMonth;
+	*( ptr + 2 ) = ( ushort )t.wDay;
+	*( ptr + 3 ) = ( ushort )t.wHour;
+	*( ptr + 4 ) = ( ushort )t.wMinute;
+	*( ptr + 5 ) = ( ushort )t.wSecond;
+	*( ( uint* )( ptr + 6 ) ) = ( ushort )t.wMilliseconds * 1000;
+	return 0;
+}
+#pragma managed
+
 // int sceRtcGetCurrentClockLocalTime(pspTime *time); (/rtc/psprtc.h:71)
-int sceRtc::sceRtcGetCurrentClockLocalTime( IMemory^ memory, int time ){ return NISTUBRETURN; }
+int sceRtc::sceRtcGetCurrentClockLocalTime( IMemory^ memory, int time )
+{
+	KernelHelpers::WriteTime( memory, time, DateTime::Now );
+	return 0;
+}
 
 // int sceRtcConvertUtcToLocalTime(const u64* tickUTC, u64* tickLocal); (/rtc/psprtc.h:80)
 int sceRtc::sceRtcConvertUtcToLocalTime( IMemory^ memory, int tickUTC, int tickLocal ){ return NISTUBRETURN; }
@@ -125,8 +183,42 @@ int sceRtc::sceRtcSetTick( IMemory^ memory, int date, int tick ){ return NISTUBR
 // int sceRtcGetTick(const pspTime* date, u64 *tick); (/rtc/psprtc.h:142)
 int sceRtc::sceRtcGetTick( IMemory^ memory, int date, int tick ){ return NISTUBRETURN; }
 
+#pragma unmanaged
+int sceRtcCompareTickN( byte* memory, int tick1, int tick2 )
+{
+	int64 t1 = *( int64* )( memory + ( tick1 - MainMemoryBase ) );
+	int64 t2 = *( int64* )( memory + ( tick2 - MainMemoryBase ) );
+	if( t1 == t2 )
+		return 0;
+	else if( t1 < t2 )
+		return -1;
+	else
+		return 1;
+}
+#pragma managed
+
 // int sceRtcCompareTick(const u64* tick1, const u64* tick2); (/rtc/psprtc.h:151)
-int sceRtc::sceRtcCompareTick( IMemory^ memory, int tick1, int tick2 ){ return NISTUBRETURN; }
+int sceRtc::sceRtcCompareTick( IMemory^ memory, int tick1, int tick2 )
+{
+	int64 t1 = memory->ReadDoubleWord( tick1 );
+	int64 t2 = memory->ReadDoubleWord( tick2 );
+	if( t1 == t2 )
+		return 0;
+	else if( t1 < t2 )
+		return -1;
+	else
+		return 1;
+}
+
+#pragma unmanaged
+int sceRtcTickAddTicksN( byte* memory, int destTick, int srcTick, int numTicks )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + numTicks;
+	return 0;
+}
+#pragma managed
 
 // int sceRtcTickAddTicks(u64* destTick, const u64* srcTick, u64 numTicks); (/rtc/psprtc.h:161)
 int sceRtc::sceRtcTickAddTicks( IMemory^ memory, int destTick, int srcTick, int numTicks )
@@ -138,6 +230,16 @@ int sceRtc::sceRtcTickAddTicks( IMemory^ memory, int destTick, int srcTick, int 
 	return 0;
 }
 
+#pragma unmanaged
+int sceRtcTickAddMicrosecondsN( byte* memory, int destTick, int srcTick, int numMS )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + ( numMS * TICKSPERUS );
+	return 0;
+}
+#pragma managed
+
 // int sceRtcTickAddMicroseconds(u64* destTick, const u64* srcTick, u64 numMS); (/rtc/psprtc.h:171)
 int sceRtc::sceRtcTickAddMicroseconds( IMemory^ memory, int destTick, int srcTick, int numMS )
 {
@@ -147,6 +249,16 @@ int sceRtc::sceRtcTickAddMicroseconds( IMemory^ memory, int destTick, int srcTic
 
 	return 0;
 }
+
+#pragma unmanaged
+int sceRtcTickAddSecondsN( byte* memory, int destTick, int srcTick, int numSecs )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + ( numSecs * TICKSPERSEC );
+	return 0;
+}
+#pragma managed
 
 // int sceRtcTickAddSeconds(u64* destTick, const u64* srcTick, u64 numSecs); (/rtc/psprtc.h:181)
 int sceRtc::sceRtcTickAddSeconds( IMemory^ memory, int destTick, int srcTick, int numSecs )
@@ -158,6 +270,16 @@ int sceRtc::sceRtcTickAddSeconds( IMemory^ memory, int destTick, int srcTick, in
 	return 0;
 }
 
+#pragma unmanaged
+int sceRtcTickAddMinutesN( byte* memory, int destTick, int srcTick, int numMins )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + ( numMins * TICKSPERMIN );
+	return 0;
+}
+#pragma managed
+
 // int sceRtcTickAddMinutes(u64* destTick, const u64* srcTick, u64 numMins); (/rtc/psprtc.h:191)
 int sceRtc::sceRtcTickAddMinutes( IMemory^ memory, int destTick, int srcTick, int numMins )
 {
@@ -167,6 +289,16 @@ int sceRtc::sceRtcTickAddMinutes( IMemory^ memory, int destTick, int srcTick, in
 
 	return 0;
 }
+
+#pragma unmanaged
+int sceRtcTickAddHoursN( byte* memory, int destTick, int srcTick, int numHours )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + ( numHours * TICKSPERHOUR );
+	return 0;
+}
+#pragma managed
 
 // int sceRtcTickAddHours(u64* destTick, const u64* srcTick, int numHours); (/rtc/psprtc.h:201)
 int sceRtc::sceRtcTickAddHours( IMemory^ memory, int destTick, int srcTick, int numHours )
@@ -178,6 +310,16 @@ int sceRtc::sceRtcTickAddHours( IMemory^ memory, int destTick, int srcTick, int 
 	return 0;
 }
 
+#pragma unmanaged
+int sceRtcTickAddDaysN( byte* memory, int destTick, int srcTick, int numDays )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + ( numDays * TICKSPERDAY );
+	return 0;
+}
+#pragma managed
+
 // int sceRtcTickAddDays(u64* destTick, const u64* srcTick, int numDays); (/rtc/psprtc.h:211)
 int sceRtc::sceRtcTickAddDays( IMemory^ memory, int destTick, int srcTick, int numDays )
 {
@@ -187,6 +329,16 @@ int sceRtc::sceRtcTickAddDays( IMemory^ memory, int destTick, int srcTick, int n
 
 	return 0;
 }
+
+#pragma unmanaged
+int sceRtcTickAddWeeksN( byte* memory, int destTick, int srcTick, int numWeeks )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + ( numWeeks * TICKSPERWEEK );
+	return 0;
+}
+#pragma managed
 
 // int sceRtcTickAddWeeks(u64* destTick, const u64* srcTick, int numWeeks); (/rtc/psprtc.h:221)
 int sceRtc::sceRtcTickAddWeeks( IMemory^ memory, int destTick, int srcTick, int numWeeks )
@@ -198,6 +350,16 @@ int sceRtc::sceRtcTickAddWeeks( IMemory^ memory, int destTick, int srcTick, int 
 	return 0;
 }
 
+#pragma unmanaged
+int sceRtcTickAddMonthsN( byte* memory, int destTick, int srcTick, int numMonths )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + ( numMonths * TICKSPERMONTH );
+	return 0;
+}
+#pragma managed
+
 // int sceRtcTickAddMonths(u64* destTick, const u64* srcTick, int numMonths); (/rtc/psprtc.h:232)
 int sceRtc::sceRtcTickAddMonths( IMemory^ memory, int destTick, int srcTick, int numMonths )
 {
@@ -207,6 +369,16 @@ int sceRtc::sceRtcTickAddMonths( IMemory^ memory, int destTick, int srcTick, int
 
 	return 0;
 }
+
+#pragma unmanaged
+int sceRtcTickAddYearsN( byte* memory, int destTick, int srcTick, int numYears )
+{
+	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
+	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	*dp = *sp + ( numYears * TICKSPERYEAR );
+	return 0;
+}
+#pragma managed
 
 // int sceRtcTickAddYears(u64* destTick, const u64* srcTick, int numYears); (/rtc/psprtc.h:242)
 int sceRtc::sceRtcTickAddYears( IMemory^ memory, int destTick, int srcTick, int numYears )

@@ -49,19 +49,42 @@ namespace Noxa {
 						// int sceUmdActivate(int unit, const char *drive); (/umd/pspumd.h:66)
 						int sceUmdActivate( IMemory^ memory, int unit, int drive );
 
+						[BiosFunction( 0xE83742BA, "sceUmdDeactivate" )] [Stateless]
+						// manual add
+						int sceUmdDeactivate( IMemory^ memory, int unit, int drive );
+
 						[BiosFunction( 0x6B4A146C, "sceUmdGetDriveStat" )] [Stateless]
 						// manual add
 						int sceUmdGetDriveStat();
 
-						[NotImplemented]
+						[BiosFunction( 0x20628E6F, "sceUmdGetErrorStat" )] [Stateless]
+						// manual add
+						int sceUmdGetErrorStat();
+
 						[BiosFunction( 0x8EF08FCE, "sceUmdWaitDriveStat" )] [Stateless]
 						// int sceUmdWaitDriveStat(int stat); (/umd/pspumd.h:75)
-						int sceUmdWaitDriveStat( int stat ){ return NISTUBRETURN; }
+						int sceUmdWaitDriveStat( int stat );
 
 						[NotImplemented]
+						[BiosFunction( 0x56202973, "sceUmdWaitDriveStatWithTimer" )] [Stateless]
+						// manual add - params not right?
+						int sceUmdWaitDriveStatWithTimer( int stat );
+
+						[BiosFunction( 0x4A9E5E29, "sceUmdWaitDriveStatCB" )] [Stateless]
+						// manual add
+						int sceUmdWaitDriveStatCB( int stat );
+
 						[BiosFunction( 0xAEE7404D, "sceUmdRegisterUMDCallBack" )] [Stateless]
 						// int sceUmdRegisterUMDCallBack(int cbid); (/umd/pspumd.h:89)
-						int sceUmdRegisterUMDCallBack( int cbid ){ return NISTUBRETURN; }
+						int sceUmdRegisterUMDCallBack( int cbid );
+
+						[BiosFunction( 0xBD2BDE07, "sceUmdUnRegisterUMDCallBack" )] [Stateless]
+						// manual add
+						int sceUmdUnRegisterUMDCallBack( int cbid );
+
+						[BiosFunction( 0x340B7686, "sceUmdGetDiscInfo" )] [Stateless]
+						// manual add
+						int sceUmdGetDiscInfo( IMemory^ memory, int discInfo );
 
 					};
 				

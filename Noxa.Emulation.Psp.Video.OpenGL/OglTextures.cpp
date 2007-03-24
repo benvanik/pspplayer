@@ -141,12 +141,20 @@ void Unswizzle( const TextureFormat* format, const byte* in, byte* out, const ui
 	}
 }
 
+extern void __break();
 bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTexture* texture )
 {
 	uint textureId;
 	glGenTextures( 1, &textureId );
 	//glBindTexture( GL_TEXTURE_2D, textureId );
 	texture->TextureID = textureId;
+
+	/*static bool stop = true;
+	if( stop == true )
+	{
+		if( texture->Height >= 272 )
+			__break();
+	}*/
 
 	byte* address;
 	if( ( texture->Address & FrameBufferBase ) != 0 )

@@ -40,5 +40,16 @@ namespace Noxa.Emulation.Psp.Cpu
 		{
 			get;
 		}
+
+		bool InterruptsEnabled
+		{
+			get;
+		}
+
+		uint InterruptsFlag
+		{
+			get;
+			set;
+		}
 	}
 }

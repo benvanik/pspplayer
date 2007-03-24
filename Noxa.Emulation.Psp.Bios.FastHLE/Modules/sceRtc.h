@@ -54,7 +54,6 @@ namespace Noxa {
 						// int sceRtcGetCurrentClock(pspTime *time, int tz); (/rtc/psprtc.h:63)
 						int sceRtcGetCurrentClock( IMemory^ memory, int time, int tz );
 
-						[NotImplemented]
 						[BiosFunction( 0xE7C27D1B, "sceRtcGetCurrentClockLocalTime" )] [Stateless]
 						// int sceRtcGetCurrentClockLocalTime(pspTime *time); (/rtc/psprtc.h:71)
 						int sceRtcGetCurrentClockLocalTime( IMemory^ memory, int time );
@@ -129,7 +128,6 @@ namespace Noxa {
 						// int sceRtcGetTick(const pspTime* date, u64 *tick); (/rtc/psprtc.h:142)
 						int sceRtcGetTick( IMemory^ memory, int date, int tick );
 
-						[NotImplemented]
 						[BiosFunction( 0x9ED0AE87, "sceRtcCompareTick" )] [Stateless]
 						// int sceRtcCompareTick(const u64* tick1, const u64* tick2); (/rtc/psprtc.h:151)
 						int sceRtcCompareTick( IMemory^ memory, int tick1, int tick2 );

@@ -10,6 +10,7 @@
 #include "KernelCallback.h"
 #include "KernelEvent.h"
 #include "KernelPartition.h"
+#include "KernelInterruptHandler.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -72,6 +73,7 @@ namespace Noxa {
 					IMediaFolder^						CurrentPath;
 
 					Dictionary<KernelCallbackType, KernelCallback^>^	Callbacks;
+					array<array<KernelInterruptHandler^>^>^				InterruptHandlers;
 
 				public:
 					Kernel( FastBios^ bios );

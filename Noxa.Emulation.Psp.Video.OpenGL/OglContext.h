@@ -24,7 +24,7 @@ namespace Noxa {
 					uint			FrameBufferWidth;
 
 					// Matrices
-					float			ProjectionMatrix[ 16 ];
+					//float			ProjectionMatrix[ 16 ];
 					float			ViewMatrix[ 16 ];
 					float			WorldMatrix[ 16 ];
 					float			TextureMatrix[ 16 ];
@@ -34,6 +34,22 @@ namespace Noxa {
 					int				MipMapLevel;
 					int				TextureStorageMode;
 					OglTexture		Textures[ 8 ];
+
+					// Texture transmission (sceGuCopyImage...)
+					struct
+					{
+						int			SourceAddress;
+						int			SourceLineWidth;
+						int			DestinationAddress;
+						int			DestinationLineWidth;
+
+						int			PixelSize;	// 0 = 16 bit, 1 = 32 bit
+						int			Width;
+						int			Height;
+
+						int			SX, SY;
+						int			DX, DY;
+					} TextureTx;
 
 					// Stuff
 				} OglContext;
