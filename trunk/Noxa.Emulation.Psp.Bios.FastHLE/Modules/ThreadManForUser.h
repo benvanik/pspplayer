@@ -504,42 +504,35 @@ namespace Noxa {
 						[NotImplemented]
 						[BiosFunction( 0x0E927AED, "_sceKernelReturnFromTimerHandler" )] [Stateless]
 						// void _sceKernelReturnFromTimerHandler(); (/user/pspthreadman.h:1447)
-						void _sceKernelReturnFromTimerHandler(){}
+						void _sceKernelReturnFromTimerHandler();
 
-						[NotImplemented]
 						[BiosFunction( 0x110DEC9A, "sceKernelUSec2SysClock" )] [Stateless]
 						// int sceKernelUSec2SysClock(unsigned int usec, SceKernelSysClock *clock); (/user/pspthreadman.h:1463)
-						int sceKernelUSec2SysClock( int usec, int clock ){ return NISTUBRETURN; }
+						int sceKernelUSec2SysClock( IMemory^ memory, int usec, int clock );
 
-						[NotImplemented]
 						[BiosFunction( 0xC8CD158C, "sceKernelUSec2SysClockWide" )] [Stateless]
 						// SceInt64 sceKernelUSec2SysClockWide(unsigned int usec); (/user/pspthreadman.h:1472)
-						int64 sceKernelUSec2SysClockWide( int usec ){ return NISTUBRETURN; }
+						int64 sceKernelUSec2SysClockWide( int usec );
 
-						[NotImplemented]
 						[BiosFunction( 0xBA6B92E2, "sceKernelSysClock2USec" )] [Stateless]
 						// int sceKernelSysClock2USec(SceKernelSysClock *clock, unsigned int *low, unsigned int *high); (/user/pspthreadman.h:1483)
-						int sceKernelSysClock2USec( int clock, int low, int high ){ return NISTUBRETURN; }
+						int sceKernelSysClock2USec( IMemory^ memory, int clock, int sec, int usec );
 
-						[NotImplemented]
 						[BiosFunction( 0xE1619D7C, "sceKernelSysClock2USecWide" )] [Stateless]
 						// int sceKernelSysClock2USecWide(SceInt64 clock, unsigned *low, unsigned int *high); (/user/pspthreadman.h:1494)
-						int sceKernelSysClock2USecWide( int64 clock, int low, int high ){ return NISTUBRETURN; }
+						int sceKernelSysClock2USecWide( IMemory^ memory, int64 clock, int sec, int usec );
 
-						[NotImplemented]
 						[BiosFunction( 0xDB738F35, "sceKernelGetSystemTime" )] [Stateless]
 						// int sceKernelGetSystemTime(SceKernelSysClock *time); (/user/pspthreadman.h:1503)
-						int sceKernelGetSystemTime( int time ){ return NISTUBRETURN; }
+						int sceKernelGetSystemTime( IMemory^ memory, int time );
 
-						[NotImplemented]
 						[BiosFunction( 0x82BC5777, "sceKernelGetSystemTimeWide" )] [Stateless]
 						// SceInt64 sceKernelGetSystemTimeWide(); (/user/pspthreadman.h:1510)
-						int64 sceKernelGetSystemTimeWide(){ return NISTUBRETURN; }
+						int64 sceKernelGetSystemTimeWide();
 
-						[NotImplemented]
 						[BiosFunction( 0x369ED59D, "sceKernelGetSystemTimeLow" )] [Stateless]
 						// unsigned int sceKernelGetSystemTimeLow(); (/user/pspthreadman.h:1517)
-						int sceKernelGetSystemTimeLow(){ return NISTUBRETURN; }
+						int sceKernelGetSystemTimeLow();
 
 						// - Alarms ---------------------------------------------------------------------------------------------
 

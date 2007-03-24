@@ -43,6 +43,8 @@ extern int sceGeDrawSync( int syncType );
 
 // sceUtilsForUser -------------------------------------
 // All D(ata) and I(nstruction) cache inval calls are nop'ed
+// Perhaps we should be smarter and pass invals to the video plugin if they
+// are in the FB range?
 
 #pragma managed
 
