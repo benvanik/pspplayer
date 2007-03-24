@@ -261,13 +261,13 @@ int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int sy
 	return 0;
 }
 
-void sceDisplayWaitVblankStart()
+void sceDisplayWaitVblank()
 {
 	VideoApi* ni = _videoApi;
 	ni->WaitForVsync();
 }
 
-void sceDisplayWaitVblankCB()
+void sceDisplayWaitVblankStart()
 {
 	VideoApi* ni = _videoApi;
 	ni->WaitForVsync();
