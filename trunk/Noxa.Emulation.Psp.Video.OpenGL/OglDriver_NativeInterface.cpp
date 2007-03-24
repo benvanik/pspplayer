@@ -378,6 +378,11 @@ void niSync()
 
 void niWaitForVsync()
 {
+	// Wait for 1/60th of a second - we do it a little less than 16ms cause
+	// we do take time to render - ideally we wouldn't call Sleep cause it causes
+	// a context switch and has poor accuracy
+	Sleep( 16 );
+	//WaitForSingleObject( _hSyncEvent, 60 / 1000 );
 }
 
 #pragma managed
