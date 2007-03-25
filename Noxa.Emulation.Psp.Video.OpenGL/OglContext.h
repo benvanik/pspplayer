@@ -23,6 +23,9 @@ namespace Noxa {
 					uint			FrameBufferPointer;
 					uint			FrameBufferWidth;
 
+					// Misc state
+					int				Scissor[ 4 ];
+
 					// Matrices
 					//float			ProjectionMatrix[ 16 ];
 					float			ViewMatrix[ 16 ];

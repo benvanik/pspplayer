@@ -220,6 +220,28 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 		case DFIX:	// destination fix color
 			break;
 
+		case SCISSOR1:	// scissor start
+			context->Scissor[ 0 ] = argi & 0x3FF;
+			context->Scissor[ 1 ] = ( ( argi >> 10 ) & 0x3FF );
+			break;
+		case SCISSOR2:	// scissor end - I think this always follows a start
+			context->Scissor[ 2 ] = ( argi & 0x3FF ) + 1;
+			context->Scissor[ 3 ] = ( ( argi >> 10 ) & 0x3FF ) + 1;
+			if( ( context->Scissor[ 0 ] == 0 ) &&
+				( context->Scissor[ 1 ] == 0 ) &&
+				( context->Scissor[ 2 ] == 480 ) &&
+				( context->Scissor[ 3 ] == 272 ) )
+				glDisable( GL_SCISSOR_TEST );
+			else
+			{
+				// We are given x1,y1 x2,y2, NOT width,height!
+				glEnable( GL_SCISSOR_TEST );
+				glScissor(
+					context->Scissor[ 0 ], 272 - context->Scissor[ 3 ],
+					context->Scissor[ 2 ] - context->Scissor[ 0 ], context->Scissor[ 3 ] - context->Scissor[ 1 ] );
+			}
+			break;
+
 		case FGE:
 			// fog enable
 			if( argi == 1 )
