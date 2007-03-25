@@ -175,6 +175,11 @@ namespace Noxa.Emulation.Psp.Player
 
 			// We need to get the folder on the memory stick device of this path
 			IMediaFolder folder = _host.CurrentInstance.MemoryStick.Root.FindFolder( path );
+			if( folder == null )
+			{
+				Debug.WriteLine( string.Format( "Unable to find path {0}", path ) );
+				return;
+			}
 			Games.GameLoader loader = new Noxa.Emulation.Psp.Games.GameLoader();
 			Games.GameInformation game = loader.GetEbootGameInformation( folder );
 			if( game == null )
