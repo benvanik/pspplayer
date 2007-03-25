@@ -54,6 +54,8 @@ int _pendingCount;
 
 MemoryPool* _pool;
 
+int64 _lastVsync;
+
 // Statistics
 extern uint _processedFrames;
 extern uint _skippedFrames;
@@ -378,10 +380,22 @@ void niSync()
 
 void niWaitForVsync()
 {
+	int64 tick;
+	GetSystemTimeAsFileTime( ( FILETIME* )&tick );
+	int64 duration = ( tick - _lastVsync );
+	_lastVsync = tick;
+	
+	// ticks are 100ns, we need ms
+	duration /= 1000000;
+
+	// If we are under 16ms, wait until 16ms
+	if( duration < 16 )
+		Sleep( 16 - ( int )duration );
+
 	// Wait for 1/60th of a second - we do it a little less than 16ms cause
 	// we do take time to render - ideally we wouldn't call Sleep cause it causes
 	// a context switch and has poor accuracy
-	Sleep( 16 );
+	//Sleep( 16 );
 	//WaitForSingleObject( _hSyncEvent, 60 / 1000 );
 }
 
@@ -405,6 +419,8 @@ void OglDriver::SetupNativeInterface()
 	InitializeCriticalSection( &_cs );
 
 	_hSyncEvent = CreateEvent( NULL, false, false, NULL );
+
+	_lastVsync = 0;
 }
 
 void OglDriver::DestroyNativeInterface()
