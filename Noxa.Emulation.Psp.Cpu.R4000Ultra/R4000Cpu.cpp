@@ -23,6 +23,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace Noxa::Emulation::Psp::Debugging::DebugData;
 
+//#define DEBUGBOUNCE
+
 extern uint _instructionsExecuted;
 
 R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters )
@@ -124,6 +126,15 @@ void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 	}
 }
 
+#ifdef DEBUGBOUNCE
+#pragma unmanaged
+int __debugBounce( bouncefn f, int pointer )
+{
+	return f( pointer );
+}
+#pragma managed
+#endif
+
 int R4000Cpu::ExecuteBlock()
 {
 #ifdef STATISTICS
@@ -172,7 +183,11 @@ int R4000Cpu::ExecuteBlock()
 
 	// Bounce in to it
 	bouncefn bounce = ( bouncefn )_bounce;
+#ifdef DEBUGBOUNCE
+	int x = __debugBounce( bounce, ( int )block->Pointer );
+#else
 	int x = bounce( ( int )block->Pointer );
+#endif
 
 	// PC updated via __updateCorePC
 	_core0->DelayNop = ( ctx->NullifyDelay == 1 ) ? true : false;

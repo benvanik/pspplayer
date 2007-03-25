@@ -146,7 +146,7 @@ void R4000BlockBuilder::EmitTrace( int address, int code )
 #ifdef TRACE
 	_gen->push( ( uint )code );
 	_gen->push( ( uint )address );
-	_gen->call( ( int )__traceLine );
+	_gen->call( ( uint )&__traceLine );
 	_gen->add( _gen->esp, 8 );
 #endif
 }
@@ -161,13 +161,13 @@ void R4000BlockBuilder::EmitDebug( int address, int code, char* codeString )
 	_gen->push( ( uint )code );
 	_gen->push( ( uint )address );
 
-	_gen->call( ( int )__runtimeDebugPrint );
+	_gen->call( ( uint )&__runtimeDebugPrint );
 
 	_gen->add( _gen->esp, 8 );
 #endif
 
 #ifdef RUNTIMEREGS
-	_gen->call( ( int )__runtimeRegsPrint );
+	_gen->call( ( uint )&__runtimeRegsPrint );
 #endif
 }
 
@@ -244,7 +244,6 @@ void* R4000BlockBuilder::BuildBounce()
 	_gen->mov( _gen->ebp, _gen->esp );
 
 	_gen->push( _gen->eax );
-
 	_gen->mov( _gen->eax, _gen->dword_ptr[ _gen->esp + 12 ] ); // target address
 
 	// Nasty, but oh well - note we do this after the above command so we can get those values first
@@ -423,8 +422,8 @@ void __missingBlockThunk( void* targetAddress, void* stackPointer )
 	// We cannot do RET, so need to do jump, but must fix up stack pointer first
 	__asm
 	{
-		mov esp, stackPointer
 		mov eax, jumpTarget
+		mov esp, stackPointer
 		jmp eax
 	}
 }

@@ -61,9 +61,9 @@ using namespace Noxa::Emulation::Psp::Cpu;
 #endif
 
 #ifdef DEBUGFPU
-#define ASSERTXMM0VALID() { g->push( ( uint )address ); g->call( ( int )assertXmm0 ); g->add( ESP, 4 ); }
-#define ASSERTX87VALID() { g->push( ( uint )address ); g->call( ( int )assertFpu ); g->add( ESP, 4 ); }
-#define PRINTEAX() { g->push( EAX ); g->push( ( uint )address ); g->call( ( int )printEax ); g->add( ESP, 4 ); g->pop( EAX ); }
+#define ASSERTXMM0VALID() { g->push( ( uint )address ); g->call( ( uint )&assertXmm0 ); g->add( ESP, 4 ); }
+#define ASSERTX87VALID() { g->push( ( uint )address ); g->call( ( uint )&assertFpu ); g->add( ESP, 4 ); }
+#define PRINTEAX() { g->push( EAX ); g->push( ( uint )address ); g->call( ( uint )&printEax ); g->add( ESP, 4 ); g->pop( EAX ); }
 #else
 #define ASSERTXMM0VALID()
 #define ASSERTX87VALID()
