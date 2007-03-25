@@ -215,6 +215,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglDriver_Sprites.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OglDriver_Textures.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OglDriver_VertexLists.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OglDriver_Worker.cpp"
 				>
 			</File>
