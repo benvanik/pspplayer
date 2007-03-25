@@ -59,7 +59,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 	{
 	// sceRtc ----------------------------------------------
 	case 0xc41c2853:		// sceRtcGetTickResolution
-		g->call( ( int )sceRtcGetTickResolution );
+		g->call( ( uint )&sceRtcGetTickResolution );
 		return true;
 	case 0x3f7ad767:		// sceRtcGetCurrentTick
 		g->mov( EAX, MREG( CTX, 4 ) );
@@ -67,7 +67,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->sub( EAX, MainMemoryBase );
 		g->add( EAX, ( int )context->MainMemory );
 		g->push( EAX );
-		g->call( ( int )sceRtcGetCurrentTick );
+		g->call( ( uint )&sceRtcGetCurrentTick );
 		g->add( ESP, 4 );
 		g->xor( EAX, EAX );
 		return true;
@@ -80,17 +80,17 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->push( MREG( CTX, 6 ) );
 		g->push( MREG( CTX, 5 ) );
 		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )scePowerSetClockFrequency );
+		g->call( ( uint )&scePowerSetClockFrequency );
 		g->add( ESP, 12 );
 		return true;
 	case 0xb8d7b3fb:		// scePowerSetBusClockFrequency
 		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )scePowerSetBusClockFrequency );
+		g->call( ( uint )&scePowerSetBusClockFrequency );
 		g->add( ESP, 4 );
 		return true;
 	case 0x843fbf43:		// scePowerSetCpuClockFrequency
 		g->push( MREG( CTX, 4 ) );
-		g->call( ( int )scePowerSetCpuClockFrequency );
+		g->call( ( uint )&scePowerSetCpuClockFrequency );
 		g->add( ESP, 4 );
 		return true;
 
@@ -125,20 +125,20 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 			g->push( MREG( CTX, 6 ) );
 			g->push( MREG( CTX, 5 ) );
 			g->push( MREG( CTX, 4 ) );
-			g->call( ( int )sceDisplaySetFrameBuf );
+			g->call( ( uint )&sceDisplaySetFrameBuf );
 			g->add( ESP, 16 );
 			g->xor( EAX, EAX );
 			return true;
 		case 0x36CDFADE:		// sceDisplayWaitVblank
-			g->call( ( int )sceDisplayWaitVblank );
+			g->call( ( uint )&sceDisplayWaitVblank );
 			g->xor( EAX, EAX );
 			return true;
 		case 0x984c27e7:		// sceDisplayWaitVblankStart
-			g->call( ( int )sceDisplayWaitVblankStart );
+			g->call( ( uint )&sceDisplayWaitVblankStart );
 			g->xor( EAX, EAX );
 			return true;
 		case 0x9C6EAAD7:		// sceDisplayGetVcount
-			g->call( ( int )sceDisplayGetVcount );
+			g->call( ( uint )&sceDisplayGetVcount );
 			return true;
 
 		// sceGeUser -------------------------------------------
@@ -154,7 +154,7 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 			g->push( MREG( CTX, 6 ) );
 			g->push( MREG( CTX, 5 ) );
 			g->push( MREG( CTX, 4 ) );
-			g->call( ( int )sceGeListEnQueue );
+			g->call( ( uint )&sceGeListEnQueue );
 			g->add( ESP, 20 );
 			return true;
 		case 0x1c0d95a6:		// sceGeListEnQueueHead
@@ -163,29 +163,29 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 			g->push( MREG( CTX, 6 ) );
 			g->push( MREG( CTX, 5 ) );
 			g->push( MREG( CTX, 4 ) );
-			g->call( ( int )sceGeListEnQueue );
+			g->call( ( uint )&sceGeListEnQueue );
 			g->add( ESP, 20 );
 			return true;
 		case 0x5fb86ab0:		// sceGeListDeQueue
 			g->push( MREG( CTX, 4 ) );
-			g->call( ( int )sceGeListDeQueue );
+			g->call( ( uint )&sceGeListDeQueue );
 			g->add( ESP, 4 );
 			return true;
 		case 0xe0d68148:		// sceGeListUpdateStallAddr
 			g->push( MREG( CTX, 5 ) );
 			g->push( MREG( CTX, 4 ) );
-			g->call( ( int )sceGeListUpdateStallAddr );
+			g->call( ( uint )&sceGeListUpdateStallAddr );
 			g->add( ESP, 8 );
 			return true;
 		case 0x03444eb4:		// sceGeListSync
 			g->push( MREG( CTX, 5 ) );
 			g->push( MREG( CTX, 4 ) );
-			g->call( ( int )sceGeListSync );
+			g->call( ( uint )&sceGeListSync );
 			g->add( ESP, 8 );
 			return true;
 		case 0xb287bd61:		// sceGeDrawSync
 			g->push( MREG( CTX, 4 ) );
-			g->call( ( int )sceGeDrawSync );
+			g->call( ( uint )&sceGeDrawSync );
 			g->add( ESP, 4 );
 			return true;
 		}

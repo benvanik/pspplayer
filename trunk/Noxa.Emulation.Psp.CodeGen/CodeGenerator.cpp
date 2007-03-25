@@ -44,9 +44,9 @@ CodeGenerator::CodeGenerator( int maximumCodeSize, int storageBlockSize )
 	_buffer = ( byte* )calloc( 1, _maximumCodeSize );
 
 	_labelIndex = 0;
-	_labelTable = ( Label* )calloc( sizeof( Label ), _maximumCodeSize );
+	_labelTable = ( Label* )calloc( sizeof( Label ), _maximumCodeSize / 10 );
 	_referenceIndex = 0;
-	_referenceTable = ( Reference* )calloc( sizeof( Reference ), _maximumCodeSize );
+	_referenceTable = ( Reference* )calloc( sizeof( Reference ), _maximumCodeSize / 10 );
 
 	_synth = new Synthesizer();
 }

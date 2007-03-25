@@ -57,9 +57,8 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
 
 	// Disable depth testing (we place in the order we get it)
-	bool depthTestEnabled = ( glIsEnabled( GL_DEPTH_TEST ) == GL_TRUE );
-	if( depthTestEnabled == true )
-		glDisable( GL_DEPTH_TEST );
+	glPushAttrib( GL_ENABLE_BIT );
+	glDisable( GL_DEPTH_TEST );
 
 	if( transformed == true )
 	{
@@ -202,13 +201,10 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 
 		glMatrixMode( GL_PROJECTION );
 		glPopMatrix();
-
-		glEnable( GL_CULL_FACE );
 	}
 
-	// Re-enable depth testing
-	if( depthTestEnabled == true )
-		glEnable( GL_DEPTH_TEST );
+	// Re-enable depth testing/etc
+	glPopAttrib();
 
 	// Re-enable clipping
 	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );

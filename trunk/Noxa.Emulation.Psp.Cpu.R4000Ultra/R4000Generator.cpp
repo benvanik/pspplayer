@@ -18,7 +18,7 @@ using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
 
 R4000Generator::R4000Generator()
-	: CodeGenerator( 1024 * 20, 1024 * 1024 * 8 )
+	: CodeGenerator( 1024 * 128, 1024 * 1024 * 8 )
 {
 	Setup();
 }

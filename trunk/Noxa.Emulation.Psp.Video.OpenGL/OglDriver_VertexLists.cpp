@@ -36,6 +36,22 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 
 void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int vertexCount, byte* indexBuffer )
 {
+	bool transformed = ( vertexType & VTTransformedMask ) != 0;
+
+	if( transformed == true )
+	{
+		glDisable( GL_CULL_FACE );
+
+		glMatrixMode( GL_PROJECTION );
+		glPushMatrix();
+		glLoadIdentity();
+		glOrtho( 0.0f, 480.0f, 272.0f, 0.0f, -1.0f, 1.0f );
+
+		glMatrixMode( GL_MODELVIEW );
+		glPushMatrix();
+		glLoadIdentity();
+	}
+
 	if( indexBuffer == NULL )
 	{
 		glDrawArrays( primitiveType, 0, vertexCount );
@@ -47,13 +63,21 @@ void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int ve
 		else if( ( vertexType & VTIndex16 ) != 0 )
 			glDrawElements( primitiveType, vertexCount, GL_UNSIGNED_SHORT, indexBuffer );
 	}
+
+	if( transformed == true )
+	{
+		glPopMatrix();
+
+		glMatrixMode( GL_PROJECTION );
+		glPopMatrix();
+
+		glEnable( GL_CULL_FACE );
+	}
 }
 
 void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr )
 {
-	bool transformed = ( vertexType & VTTransformedMask ) != 0;
-
-	// DO NOT SUPPORT WEIGHTS OR TRANSFORMED
+	// DO NOT SUPPORT WEIGHTS/MORPHING
 
 	// PSP comes in this order:
 	//float skinWeight[WEIGHTS_PER_VERTEX];

@@ -38,9 +38,9 @@ using namespace Noxa::Emulation::Psp::Cpu;
 #define MAXCODELENGTH 200
 
 // Debugging addresses
-//#define BREAKADDRESS1		0x08906A00
-//#define BREAKADDRESS2		0x08906B14
-//#define GENBREAKADDRESS		0x08900ae4
+//#define BREAKADDRESS1		0x089534E8
+//#define BREAKADDRESS2		0x0896BF30
+//#define GENBREAKADDRESS		0x089534E4
 
 extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
@@ -117,13 +117,13 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 #endif
 #ifdef BREAKADDRESS1
 			if( pass == 1 ){ if( address == BREAKADDRESS1 ){
-				g->call( ( int )&__flushTrace );
+				g->call( ( uint )&__flushTrace );
 				g->int3();
 			} }
 #endif
 #ifdef BREAKADDRESS2
 			if( pass == 1 ){ if( address == BREAKADDRESS2 ){
-				g->call( ( int )&__flushTrace );
+				g->call( ( uint )&__flushTrace );
 				g->int3();
 			} }
 #endif
@@ -657,7 +657,7 @@ void R4000AdvancedBlockBuilder::GeneratePreamble()
 		g->push( ( uint )method->EntryAddress );
 	else
 		g->push( ( uint )0 );
-	g->call( ( int )&__traceMethod );
+	g->call( ( uint )&__traceMethod );
 	g->add( ESP, 8 );
 #endif
 }
@@ -694,7 +694,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 		// Store ctx PC back in to real ctx
 		// This is only needed when we aren't tail jumping
 		//g->push( MPC( CTXP( _ctx->CtxPointer ) ) );
-		//g->call( (int)__updateCorePC );
+		//g->call( ( uint )&__updateCorePC );
 		//g->add( g->esp, 4 );
 	}
 
@@ -705,7 +705,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 			Label* nullPtrLabel = g->DefineLabel();
 
 			g->push( EAX );
-			g->call( (int)QuickPointerLookup );
+			g->call( ( uint )&QuickPointerLookup );
 			g->add( ESP, 4 );
 
 			// EAX = NULL or address to jump to
@@ -763,8 +763,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 
 				// Can do a direct jump to the translated block
 				Debug::Assert( block->Pointer != NULL );
-				g->mov( EAX, ( int )block->Pointer );
-				g->jmp( EAX );
+				g->jmp( ( int )block->Pointer );
 
 #ifdef STATISTICS
 				_cpu->_stats->JumpBlockInlineCount++;

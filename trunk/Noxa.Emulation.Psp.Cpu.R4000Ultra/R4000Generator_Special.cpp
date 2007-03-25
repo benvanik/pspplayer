@@ -278,7 +278,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				// We push $ra as the address cause it is where the stub will go back to
 				g->push( MREG( CTX, 31 ) );
 				g->push( ( uint )syscall );
-				g->call( ( int )__syscallBounce );
+				g->call( ( uint )&__syscallBounce );
 				g->add( ESP, 8 );
 			}
 		}
@@ -288,7 +288,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 
 			g->push( MREG( CTX, 31 ) );
 			g->push( ( uint )syscall );
-			g->call( ( int )__unimplementedSyscall );
+			g->call( ( uint )&__unimplementedSyscall );
 			g->add( ESP, 8 );
 
 			if( function != nullptr )
@@ -330,10 +330,10 @@ GenerationResult BREAK( R4000GenContext^ context, int pass, int address, uint co
 #ifdef _DEBUG
 		g->push( ( uint )code );
 		g->push( ( uint )( address - 4 ) );
-		g->call( ( int )&__runtimeDebugPrintForce );
+		g->call( ( uint )&__runtimeDebugPrintForce );
 		g->add( ESP, 8 );
-		g->call( ( int )&__runtimeRegsPrint );
-		g->call( ( int )&__dumpMemory );
+		g->call( ( uint )&__runtimeRegsPrint );
+		g->call( ( uint )&__dumpMemory );
 		g->int3();
 #endif
 	}
@@ -399,7 +399,7 @@ GenerationResult MFIC( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->call( ( int )__mfic );
+		g->call( ( uint )&__mfic );
 		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
@@ -421,7 +421,7 @@ GenerationResult MTIC( R4000GenContext^ context, int pass, int address, uint cod
 			g->push( ( uint )0 );
 		else
 			g->push( MREG( CTX, rt ) );
-		g->call( ( int )__mtic );
+		g->call( ( uint )&__mtic );
 		g->add( ESP, 4 );
 	}
 	return GenerationResult::Success;

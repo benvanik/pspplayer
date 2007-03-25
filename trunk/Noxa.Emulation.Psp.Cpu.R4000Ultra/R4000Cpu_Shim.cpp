@@ -355,7 +355,7 @@ void* R4000Cpu::EmitShimN( BiosFunction^ function, void* memory, void* registers
 		g->push( ( uint )memory );
 
 	// Invoke method
-	g->call( ( int )function->NativeMethod.ToPointer() );
+	g->call( ( uint )function->NativeMethod.ToPointer() );
 
 	g->add( ESP, ( x86regOffset - 1 ) * 4 );
 
