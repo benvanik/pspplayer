@@ -32,24 +32,15 @@ namespace Noxa {
 							AnalogAndDigital = 1
 						};
 
-						ref class ControlSample
-						{
-						public:
-							uint		Timestamp;
-							PadButtons	Buttons;
-							int			AnalogX;
-							int			AnalogY;
-						};
+						IInputDevice^					_device;
 
 						int								_sampleCycle;
 						ControlSamplingMode				_sampleMode;
-						CircularList<ControlSample^>^	_buffer;
-						AutoResetEvent^					_dataPresent;
 
 						bool							_threadRunning;
 						Thread^							_thread;
 
-						static const int				InputPollInterval = 75;
+						static const int				InputPollInterval = 50;
 
 					public:
 						sceCtrl( Kernel^ kernel ) : Module( kernel ) {}
@@ -65,6 +56,8 @@ namespace Noxa {
 					internal:
 						virtual void* QueryNativePointer( uint nid ) override;
 						void InputThread();
+
+						void UpdateButtons( PadButtons buttons );
 
 					public:
 
