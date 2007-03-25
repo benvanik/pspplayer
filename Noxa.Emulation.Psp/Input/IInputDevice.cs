@@ -33,9 +33,6 @@ namespace Noxa.Emulation.Psp.Input
 
 	public interface IInputDevice : IComponentInstance
 	{
-		event EventHandler Connected;
-		event EventHandler Disconnected;
-
 		IntPtr WindowHandle
 		{
 			get;
