@@ -167,9 +167,10 @@ void OglDriver::SetupOpenGL()
 	
 	glShadeModel( GL_SMOOTH );
 	glClearColor( 0.0f, 0.0f, 0.0f, 0.5f );
-	glClearDepth( 1.0f );
+	glClearDepth( 0.0f );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
+	glDepthRange( 1.0f, 0.0f );
 	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 
 	SetupExtensions();

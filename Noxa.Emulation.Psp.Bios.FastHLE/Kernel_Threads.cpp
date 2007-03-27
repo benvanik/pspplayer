@@ -108,6 +108,9 @@ void Kernel::SpawnDelayedThreadTimer( int64 targetTick )
 {
 	Debug::Assert( _delayedThreadTimer->Enabled == false );
 	TimeSpan duration = DateTime( targetTick ) - DateTime::Now;
+	double value = duration.TotalMilliseconds;
+	if( value <= 0 )
+		return;
 	_delayedThreadTimer->Interval = duration.TotalMilliseconds;
 	_delayedThreadTimer->Start();
 }

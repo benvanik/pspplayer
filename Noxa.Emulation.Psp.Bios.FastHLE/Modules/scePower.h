@@ -61,30 +61,26 @@ namespace Noxa {
 						// int scePowerIdleTimerDisable(int unknown); (/power/psppower.h:218)
 						int scePowerIdleTimerDisable( int unknown ){ return NISTUBRETURN; }
 
-						[NotImplemented]
 						[BiosFunction( 0x87440F5E, "scePowerIsPowerOnline" )] [Stateless]
 						// int scePowerIsPowerOnline(); (/power/psppower.h:66)
-						int scePowerIsPowerOnline(){ return NISTUBRETURN; }
+						int scePowerIsPowerOnline(){ return 1; }
 
-						[NotImplemented]
 						[BiosFunction( 0x0AFD0D8B, "scePowerIsBatteryExist" )] [Stateless]
 						// int scePowerIsBatteryExist(); (/power/psppower.h:71)
-						int scePowerIsBatteryExist(){ return NISTUBRETURN; }
+						int scePowerIsBatteryExist(){ return 1; }
 
-						[NotImplemented]
 						[BiosFunction( 0x1E490401, "scePowerIsBatteryCharging" )] [Stateless]
 						// int scePowerIsBatteryCharging(); (/power/psppower.h:76)
-						int scePowerIsBatteryCharging(){ return NISTUBRETURN; }
+						int scePowerIsBatteryCharging(){ return 0; }
 
 						[NotImplemented]
 						[BiosFunction( 0xB4432BC8, "scePowerGetBatteryChargingStatus" )] [Stateless]
 						// int scePowerGetBatteryChargingStatus(); (/power/psppower.h:81)
 						int scePowerGetBatteryChargingStatus(){ return NISTUBRETURN; }
 
-						[NotImplemented]
 						[BiosFunction( 0xD3075926, "scePowerIsLowBattery" )] [Stateless]
 						// int scePowerIsLowBattery(); (/power/psppower.h:86)
-						int scePowerIsLowBattery(){ return NISTUBRETURN; }
+						int scePowerIsLowBattery(){ return 0; }
 
 						[NotImplemented]
 						[BiosFunction( 0x2085D15D, "scePowerGetBatteryLifePercent" )] [Stateless]
@@ -136,15 +132,13 @@ namespace Noxa {
 						// int scePowerRegisterCallback(int slot, SceUID cbid); (/power/psppower.h:61)
 						int scePowerRegisterCallback( int slot, int cbid ){ return NISTUBRETURN; }
 
-						[NotImplemented]
 						[BiosFunction( 0x843FBF43, "scePowerSetCpuClockFrequency" )] [Stateless]
 						// int scePowerSetCpuClockFrequency(int cpufreq); (/power/psppower.h:118)
-						int scePowerSetCpuClockFrequency( int cpufreq ){ return NISTUBRETURN; }
+						int scePowerSetCpuClockFrequency( int cpufreq ){ return 0; }
 
-						[NotImplemented]
 						[BiosFunction( 0xB8D7B3FB, "scePowerSetBusClockFrequency" )] [Stateless]
 						// int scePowerSetBusClockFrequency(int busfreq); (/power/psppower.h:124)
-						int scePowerSetBusClockFrequency( int busfreq ){ return NISTUBRETURN; }
+						int scePowerSetBusClockFrequency( int busfreq ){ return 0; }
 
 						[NotImplemented]
 						[BiosFunction( 0xFEE03A2F, "scePowerGetCpuClockFrequency" )] [Stateless]
@@ -176,10 +170,9 @@ namespace Noxa {
 						// float scePowerGetBusClockFrequencyFloat(); (/power/psppower.h:160)
 						int scePowerGetBusClockFrequencyFloat(){ return NISTUBRETURN; }
 
-						[NotImplemented]
 						[BiosFunction( 0x737486F2, "scePowerSetClockFrequency" )] [Stateless]
 						// int scePowerSetClockFrequency(int cpufreq, int ramfreq, int busfreq); (/power/psppower.h:173)
-						int scePowerSetClockFrequency( int cpufreq, int ramfreq, int busfreq ){ return NISTUBRETURN; }
+						int scePowerSetClockFrequency( int cpufreq, int ramfreq, int busfreq ){ return 0; }
 
 					};
 				

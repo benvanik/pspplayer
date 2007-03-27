@@ -151,10 +151,42 @@ GenerationResult MTCz( R4000GenContext^ context, int pass, int address, uint cod
 
 GenerationResult CFCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
-	return GenerationResult::Invalid;
+	Debug::Assert( opcode == 1, "Only support COP1" );
+	
+	// gpr[ rt ] = copc[ rd ]
+
+	int rd = ( imm >> 11 ) & 0x1F;
+	Debug::Assert( rd == 31 );
+
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		g->mov( EAX, 0 );
+		g->mov( MREG( CTX, rt ), EAX );
+	}
+	
+	return GenerationResult::Success;
 }
 
 GenerationResult CTCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
-	return GenerationResult::Invalid;
+	Debug::Assert( opcode == 1, "Only support COP1" );
+	
+	// copc[ rd ] = gpr[ rt ]
+
+	int rd = ( imm >> 11 ) & 0x1F;
+	Debug::Assert( rd == 31 );
+
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		//g->mov( EAX, 0 );
+		//g->mov( MREG( CTX, rt ), EAX );
+	}
+
+	return GenerationResult::Success;
 }

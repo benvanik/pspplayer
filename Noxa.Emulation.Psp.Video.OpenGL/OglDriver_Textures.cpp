@@ -44,6 +44,10 @@ void TextureTransfer( OglContext* context )
 	// better handle weird texture formats as we can use our texture loading
 	// code to do things.
 
+	// We only support writes to the current framebuffer pointer
+	//if( context->TextureTx.DestinationAddress != context->FrameBufferPointer )
+	//	return;
+
 	byte* buffer;
 	int sourceAddress = context->TextureTx.SourceAddress;
 	if( sourceAddress & MainMemoryBase )
@@ -65,6 +69,8 @@ void TextureTransfer( OglContext* context )
     glDisable( GL_LIGHTING );
     glDisable( GL_LOGIC_OP );
     glDisable( GL_STENCIL_TEST );
+	glDepthMask( GL_FALSE );
+	glDepthFunc( GL_ALWAYS );
 
 	glMatrixMode( GL_PROJECTION );
 	glPushMatrix();
@@ -131,6 +137,7 @@ void TextureTransfer( OglContext* context )
 	glMatrixMode( GL_PROJECTION );
 	glPopMatrix();
 
+	glDepthMask( GL_TRUE );
 	glPopAttrib();
 }
 
