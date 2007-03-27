@@ -103,7 +103,7 @@ void OglDriver::PrintStatistics()
 		sb = gcnew StringBuilder( 10000 );
 		for( int n = 0; n < _stats->CommandCounts->Length; n++ )
 		{
-			if( _stats->CommandCounts[ n ] <= 1 )
+			if( _stats->CommandCounts[ n ] == 0 )
 				continue;
 			sb->AppendFormat( "{0:X2}: {1}\n", n, _stats->CommandCounts[ n ] );
 		}

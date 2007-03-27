@@ -163,10 +163,10 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 
 		case ZTE:
 			// depth (z) test enable
-			//if( argi == 0 )
-			//	glDisable( GL_DEPTH_TEST );
-			//else
-			//	glEnable( GL_DEPTH_TEST );
+			if( argi == 0 )
+				glDisable( GL_DEPTH_TEST );
+			else
+				glEnable( GL_DEPTH_TEST );
 			break;
 		case ZTST:
 			/*
@@ -207,7 +207,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				temp = GL_GEQUAL;
 				break;
 			}
-			//glDepthFunc( temp );
+			glDepthFunc( temp );
 			break;
 
 		case ABE:
