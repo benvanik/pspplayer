@@ -128,45 +128,88 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				glEnable( GL_ALPHA_TEST );
 			break;
 		case ATST:
+			switch( argi & 0xFF )
 			{
-				int func;
-				switch( argi & 0xFF )
-				{
-				default:
-				case 0:
-					func = GL_NEVER;
-					break;
-				case 1:
-					func = GL_ALWAYS;
-					break;
-				case 2:
-					func = GL_EQUAL;
-					break;
-				case 3:
-					func = GL_NOTEQUAL;
-					break;
-				case 4:
-					func = GL_LESS;
-					break;
-				case 5:
-					func = GL_LEQUAL;
-					break;
-				case 6:
-					func = GL_GREATER;
-					break;
-				case 7:
-					func = GL_GEQUAL;
-					break;
-				}
-				glAlphaFunc( func, ( ( argi >> 8 ) & 0xFF ) / 255.0f );
-				// @param mask - Specifies the mask that both values are ANDed with before comparison.
-				//mask = ( argi >> 16 ) & 0xFF;
+			default:
+			case 0:
+				temp = GL_NEVER;
+				break;
+			case 1:
+				temp = GL_ALWAYS;
+				break;
+			case 2:
+				temp = GL_EQUAL;
+				break;
+			case 3:
+				temp = GL_NOTEQUAL;
+				break;
+			case 4:
+				temp = GL_LESS;
+				break;
+			case 5:
+				temp = GL_LEQUAL;
+				break;
+			case 6:
+				temp = GL_GREATER;
+				break;
+			case 7:
+				temp = GL_GEQUAL;
+				break;
 			}
+			glAlphaFunc( temp, ( ( argi >> 8 ) & 0xFF ) / 255.0f );
+			// @param mask - Specifies the mask that both values are ANDed with before comparison.
+			//mask = ( argi >> 16 ) & 0xFF;
 			break;
 
 		case ZTE:
 			// depth (z) test enable
+			//if( argi == 0 )
+			//	glDisable( GL_DEPTH_TEST );
+			//else
+			//	glEnable( GL_DEPTH_TEST );
 			break;
+		case ZTST:
+			/*
+			  *   - GU_NEVER - No pixels pass the depth-test
+			  *   - GU_ALWAYS - All pixels pass the depth-test
+			  *   - GU_EQUAL - Pixels that match the depth-test pass
+			  *   - GU_NOTEQUAL - Pixels that doesn't match the depth-test pass
+			  *   - GU_LESS - Pixels that are less in depth passes
+			  *   - GU_LEQUAL - Pixels that are less or equal in depth passes
+			  *   - GU_GREATER - Pixels that are greater in depth passes
+			  *   - GU_GEQUAL - Pixels that are greater or equal passes
+			  */
+			switch( argi )
+			{
+			default:
+			case 0:
+				temp = GL_NEVER;
+				break;
+			case 1:
+				temp = GL_ALWAYS;
+				break;
+			case 2:
+				temp = GL_EQUAL;
+				break;
+			case 3:
+				temp = GL_NOTEQUAL;
+				break;
+			case 4:
+				temp = GL_LESS;
+				break;
+			case 5:
+				temp = GL_LEQUAL;
+				break;
+			case 6:
+				temp = GL_GREATER;
+				break;
+			case 7:
+				temp = GL_GEQUAL;
+				break;
+			}
+			//glDepthFunc( temp );
+			break;
+
 		case ABE:
 			// alpha blend enable
 			if( argi == 0 )
@@ -472,30 +515,27 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			  *
 			  * tcc is GU_TCC_RGB or GU_TCC_RGBA
 			  */
+			switch( argi & 0xFF )
 			{
-				int mode;
-				switch( argi & 0xFF )
-				{
-				default:
-				case 0:
-					mode = GL_MODULATE;
-					break;
-				case 1:
-					mode = GL_DECAL;
-					break;
-				case 2:
-					mode = GL_BLEND;
-					break;
-				case 3:
-					mode = GL_REPLACE;
-					break;
-				case 4:
-					// I think this works
-					mode = GL_ADD;
-					break;
-				}
-				glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, mode );
+			default:
+			case 0:
+				temp = GL_MODULATE;
+				break;
+			case 1:
+				temp = GL_DECAL;
+				break;
+			case 2:
+				temp = GL_BLEND;
+				break;
+			case 3:
+				temp = GL_REPLACE;
+				break;
+			case 4:
+				// I think this works
+				temp = GL_ADD;
+				break;
 			}
+			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, temp );
 			break;
 		case TEC:
 			color4[ 0 ] = ( ( argi >> 16 ) & 0xFF ) / 255.0f;
