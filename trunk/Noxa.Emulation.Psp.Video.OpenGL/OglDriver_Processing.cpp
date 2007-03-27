@@ -29,6 +29,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Video;
 using namespace Noxa::Emulation::Psp::Video::Native;
 
+extern uint _commandCounts[ 256 ];
+
 #define COLORSWIZZLE( bgra ) bgra
 
 __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
@@ -52,7 +54,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 	int temp;
 	float matrixTemp[ 16 ];
 	float color3[ 3 ] = { 0.0f, 0.0f, 0.0f };
-	float color4[ 4 ] = { 0.0f, 0.0f, 0.0f };
+	float color4[ 4 ] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	bool verticesTransformed;
 	int skinningWeightCount;
@@ -73,6 +75,10 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 		int argi = packet.Argument;
 		int argx = argi << 8;
 		float argf = *reinterpret_cast<float*>( &argx );
+
+#ifdef STATISTICS
+		_commandCounts[ packet.Command ]++;
+#endif
 
 		switch( packet.Command )
 		{
@@ -114,18 +120,59 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			// antialiasing enable
 			break;
 
+		case ATE:
+			// alpha test enable
+			if( argi == 0 )
+				glDisable( GL_ALPHA_TEST );
+			else
+				glEnable( GL_ALPHA_TEST );
+			break;
+		case ATST:
+			{
+				int func;
+				switch( argi & 0xFF )
+				{
+				default:
+				case 0:
+					func = GL_NEVER;
+					break;
+				case 1:
+					func = GL_ALWAYS;
+					break;
+				case 2:
+					func = GL_EQUAL;
+					break;
+				case 3:
+					func = GL_NOTEQUAL;
+					break;
+				case 4:
+					func = GL_LESS;
+					break;
+				case 5:
+					func = GL_LEQUAL;
+					break;
+				case 6:
+					func = GL_GREATER;
+					break;
+				case 7:
+					func = GL_GEQUAL;
+					break;
+				}
+				glAlphaFunc( func, ( ( argi >> 8 ) & 0xFF ) / 255.0f );
+				// @param mask - Specifies the mask that both values are ANDed with before comparison.
+				//mask = ( argi >> 16 ) & 0xFF;
+			}
+			break;
+
+		case ZTE:
+			// depth (z) test enable
+			break;
 		case ABE:
 			// alpha blend enable
 			if( argi == 0 )
 				glDisable( GL_BLEND );
 			else
 				glEnable( GL_BLEND );
-			break;
-		case ATE:
-			// alpha test enable
-			break;
-		case ZTE:
-			// depth (z) test enable
 			break;
 		case ALPHA:
 			// alpha blend
@@ -157,9 +204,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				int src;
 				switch( argi & 0xF )
 				{
-#ifndef _DEBUG
 				default:
-#endif
 				case 0:		// GU_SRC_COLOR
 					src = GL_SRC_COLOR;
 					break;
@@ -173,19 +218,13 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 					src = GL_ONE_MINUS_SRC_ALPHA;
 					break;
 				case 10:	// GU_FIX
+					assert( false );
 					break;
-#ifdef _DEBUG
-				default:
-					src = GL_SRC_COLOR;
-					break;
-#endif
 				}
 				int dest;
 				switch( ( argi >> 4 ) & 0xF )
 				{
-#ifndef _DEBUG
 				default:
-#endif
 				case 0:		// GU_DST_COLOR
 					dest = GL_DST_COLOR;
 					break;
@@ -205,12 +244,8 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 					dest = GL_ONE_MINUS_DST_ALPHA;
 					break;
 				case 10:	// GU_FIX
+					assert( false );
 					break;
-#ifdef _DEBUG
-				default:
-					dest = GL_DST_COLOR;
-					break;
-#endif
 				}
 				glBlendFunc( src, dest );
 			}
@@ -378,15 +413,6 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			// TexturePixelStorage (TPS*)
 			context->TextureStorageMode = argi;
 			break;
-		case TEC:
-			{
-				// TODO: texture environment color
-				//int color = ( packet.Argument & 0x0000FF00 ) | unchecked( ( int )0xFF000000 );
-				//color |= ( ( packet.Argument & 0x00FF0000 ) >> 16 );
-				//color |= ( ( packet.Argument & 0x000000FF ) << 16 );
-				//_device.Material.Diffuse = Color.FromArgb( color );
-			}
-			break;
 		case TFLT:
 			{
 				// bits 0-2 have minifying filter
@@ -437,6 +463,46 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 		case TFUNC:
 			// texture function
+			/*
+			  *   - GU_TFX_MODULATE - Cv=Ct*Cf TCC_RGB: Av=Af TCC_RGBA: Av=At*Af
+			  *   - GU_TFX_DECAL - TCC_RGB: Cv=Ct,Av=Af TCC_RGBA: Cv=Cf*(1-At)+Ct*At Av=Af
+			  *   - GU_TFX_BLEND - Cv=(Cf*(1-Ct))+(Cc*Ct) TCC_RGB: Av=Af TCC_RGBA: Av=At*Af
+			  *   - GU_TFX_REPLACE - Cv=Ct TCC_RGB: Av=Af TCC_RGBA: Av=At
+			  *   - GU_TFX_ADD - Cv=Cf+Ct TCC_RGB: Av=Af TCC_RGBA: Av=At*Af
+			  *
+			  * tcc is GU_TCC_RGB or GU_TCC_RGBA
+			  */
+			{
+				int mode;
+				switch( argi & 0xFF )
+				{
+				default:
+				case 0:
+					mode = GL_MODULATE;
+					break;
+				case 1:
+					mode = GL_DECAL;
+					break;
+				case 2:
+					mode = GL_BLEND;
+					break;
+				case 3:
+					mode = GL_REPLACE;
+					break;
+				case 4:
+					// I think this works
+					mode = GL_ADD;
+					break;
+				}
+				glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, mode );
+			}
+			break;
+		case TEC:
+			color4[ 0 ] = ( ( argi >> 16 ) & 0xFF ) / 255.0f;
+			color4[ 1 ] = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
+			color4[ 2 ] = ( argi & 0xFF ) / 255.0f;
+			color4[ 3 ] = 0;
+			glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color4 );
 			break;
 		case TFLUSH:
 			// texturesvalid = false

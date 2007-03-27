@@ -99,5 +99,16 @@ void OglDriver::PrintStatistics()
 		Debug::WriteLine( "OpenGL Video Driver Statistics: -----------------------------" );
 		Debug::WriteLine( sb->ToString() );
 		Debug::WriteLine( "" );
+
+		sb = gcnew StringBuilder( 10000 );
+		for( int n = 0; n < _stats->CommandCounts->Length; n++ )
+		{
+			if( _stats->CommandCounts[ n ] <= 1 )
+				continue;
+			sb->AppendFormat( "{0:X2}: {1}\n", n, _stats->CommandCounts[ n ] );
+		}
+		Debug::WriteLine( "Video Command Usage Count: ----------------------------------" );
+		Debug::WriteLine( sb->ToString() );
+		Debug::WriteLine( "" );
 #endif
 }

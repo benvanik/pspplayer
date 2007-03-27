@@ -15,11 +15,19 @@ uint _processedFrames;
 uint _skippedFrames;
 uint _displayListsProcessed;
 
+uint _commandCounts[ 256 ];
+
 void OglStatistics::GatherStats()
 {
 	ProcessedFrames = _processedFrames;
 	SkippedFrames = _skippedFrames;
 	DisplayListsProcessed = _displayListsProcessed;
+	CommandCounts = gcnew array<uint>( 256 );
+	for( int n = 0; n < 256; n++ )
+	{
+		CommandCounts[ n ] = _commandCounts[ n ];
+		_commandCounts[ n ] = 0;
+	}
 
 	_processedFrames = 0;
 	_skippedFrames = 0;
