@@ -8,6 +8,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include "XInput.h"
+#include <dinput.h>
 
 #include "InputDriver.h"
 //#include "InputApi.h"
@@ -19,6 +20,9 @@ using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Input;
 //using namespace Noxa::Emulation::Psp::Input::Native;
+
+LPDIRECTINPUT8       g_pDI       = NULL; // The DirectInput object
+LPDIRECTINPUTDEVICE8 g_pKeyboard = NULL; // The keyboard device
 
 InputDriver::InputDriver( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 {
@@ -63,6 +67,17 @@ PadButtons InputDriver::Buttons::get()
 void InputDriver::Cleanup()
 {
 	XInputEnable( false );
+
+	if( g_pKeyboard != NULL )
+	{
+		g_pKeyboard->Unacquire();
+		g_pKeyboard->Release();
+	}
+	g_pKeyboard = NULL;
+	if( g_pDI != NULL )
+		g_pDI->Release();
+	g_pDI = NULL;
+
 }
 
 enum PadButtons_e
@@ -85,6 +100,93 @@ enum PadButtons_e
 	PADMusicNote		= 0x800000,
 };
 
+// ---- DirectInput ----
+#pragma unmanaged
+void SetupDirectInput( HWND handle )
+{
+	HRESULT	hr;
+	if( FAILED( hr = DirectInput8Create(	GetModuleHandle( NULL ),
+											DIRECTINPUT_VERSION,
+											IID_IDirectInput8,
+											(VOID**)&g_pDI,
+											NULL ) ) )
+		return;
+	if( FAILED( hr = g_pDI->CreateDevice( GUID_SysKeyboard, &g_pKeyboard, NULL ) ) )
+		return;
+    
+    // This tells DirectInput that we will be passing an array
+    // of 256 bytes to IDirectInputDevice::GetDeviceState.
+    if( FAILED( hr = g_pKeyboard->SetDataFormat( &c_dfDIKeyboard ) ) )
+        return;
+    
+	hr = g_pKeyboard->SetCooperativeLevel( handle, DISCL_EXCLUSIVE | DISCL_FOREGROUND );
+    
+	g_pKeyboard->Acquire();
+}
+
+void PollDirectInput( int* buttons, short* analogX, short* analogY )
+{
+	BYTE diks[ 256 ];
+	ZeroMemory( diks, sizeof( diks ) );
+
+	HRESULT hr = g_pKeyboard->GetDeviceState( sizeof( diks ), diks );
+	if( FAILED( hr ) )
+	{
+		// If input is lost then acquire and keep trying 
+		hr = g_pKeyboard->Acquire();
+		while( hr == DIERR_INPUTLOST )
+			hr = g_pKeyboard->Acquire();
+
+		// hr may be DIERR_OTHERAPPHASPRIO or other errors.  This
+		// may occur when the app is minimized or in the process of 
+		// switching, so just try again later
+		*buttons = 0;
+		*analogX = 0;
+		*analogY = 0;
+		return;
+	}
+
+	#define KEYDOWN( key ) ( diks[ key ] & 0x80 )
+
+	int btns = 0;
+	if( KEYDOWN( DIK_SEMICOLON ) ||
+		KEYDOWN( DIK_RETURN ) )
+		btns |= PADCross;
+	if( KEYDOWN( DIK_APOSTROPHE ) )
+		btns |= PADCircle;
+	if( KEYDOWN( DIK_L ) )
+		btns |= PADSquare;
+	if( KEYDOWN( DIK_P ) )
+		btns |= PADTriangle;
+	if( KEYDOWN( DIK_Z ) )
+		btns |= PADStart;
+	if( KEYDOWN( DIK_X ) )
+		btns |= PADSelect;
+	if( KEYDOWN( DIK_C ) )
+		btns |= PADHome;
+	if( KEYDOWN( DIK_W ) ||
+		KEYDOWN( DIK_UP ) )
+		btns |= PADDigitalUp;
+	if( KEYDOWN( DIK_S ) ||
+		KEYDOWN( DIK_DOWN ) )
+		btns |= PADDigitalDown;
+	if( KEYDOWN( DIK_A ) ||
+		KEYDOWN( DIK_LEFT ) )
+		btns |= PADDigitalLeft;
+	if( KEYDOWN( DIK_D ) ||
+		KEYDOWN( DIK_RIGHT ) )
+		btns |= PADDigitalRight;
+	if( KEYDOWN( DIK_LSHIFT ) )
+		btns |= PADLeftTrigger;
+	if( KEYDOWN( DIK_RSHIFT ) )
+		btns |= PADRightTrigger;
+	*buttons |= btns;
+
+	*analogX = 0;
+	*analogY = 0;
+}
+#pragma managed
+
 // ---- XInput ----
 #pragma unmanaged
 DWORD _lastPacket = 0;
@@ -96,7 +198,12 @@ void PollXInput( int padIndex, bool* connected, int* buttons, short* analogX, sh
 		DWORD ret = XInputGetState( padIndex, &state );
 		*connected = ( ret != ERROR_DEVICE_NOT_CONNECTED );
 		if( *connected == false )
+		{
+			*buttons = 0;
+			*analogX = 0;
+			*analogY = 0;
 			return;
+		}
 
 		if( ret == ERROR_SUCCESS )
 		{
@@ -154,13 +261,23 @@ void PollXInput( int padIndex, bool* connected, int* buttons, short* analogX, sh
 
 void InputDriver::Poll()
 {
+	if( _dinputSetup == false )
+	{
+		SetupDirectInput( ( HWND )_handle );
+		_dinputSetup = true;
+	}
+
 	bool connected;
 	int buttons;
 	short analogX;
 	short analogY;
 	PollXInput( _padIndex, &connected, &buttons, &analogX, &analogY );
 	_isConnected = connected;
-	_buttons = ( PadButtons )buttons;
 	_analogX = analogX;
 	_analogY = analogY;
+
+	if( g_pKeyboard != NULL )
+		PollDirectInput( &buttons, &analogX, &analogY );
+
+	_buttons = ( PadButtons )buttons;
 }

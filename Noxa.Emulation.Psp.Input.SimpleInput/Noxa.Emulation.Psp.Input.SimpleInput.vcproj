@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\Shared\Include&quot;;&quot;$(DXSDK_DIR)\Include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\Shared\Include&quot;;&quot;$(DXSDK_DIR)\Include&quot;;&quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="2"
@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(NoInherit); &quot;$(DXSDK_DIR)Lib\x86\XInput.lib&quot;"
+				AdditionalDependencies="&quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\XInput.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dxguid.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dxerr.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dinput8.lib&quot; $(NOINHERIT)"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
