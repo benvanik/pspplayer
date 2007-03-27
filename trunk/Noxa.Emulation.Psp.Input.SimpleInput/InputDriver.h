@@ -38,6 +38,9 @@ namespace Noxa {
 					int							_padIndex;
 					bool						_isConnected;
 
+					// DInput
+					bool						_dinputSetup;
+
 				public:
 
 					property ComponentParameters^ Parameters
