@@ -74,6 +74,11 @@ namespace Noxa {
 						// Most of these functions are really not implemented, but are inlined by
 						// the native interface and are never called here. I marked them as implemented
 						// so that I wouldn't see the debug spew.
+						
+						[NotImplemented]
+						[BiosFunction( 0xB77905EA, "sceGeEdramSetAddrTranslation" )] [Stateless]
+						// manual add
+						int sceGeEdramSetAddrTranslation( int translation ){ return NISTUBRETURN; }
 
 						[NotImplemented]
 						[BiosFunction( 0xDC93CFEF, "sceGeGetCmd" )] [Stateless]

@@ -156,6 +156,26 @@ namespace Noxa {
 						// int sceUtilitySetNetParam(int param, const void *val); (/utility/psputility_netparam.h:92)
 						int sceUtilitySetNetParam( int param, int val ){ return NISTUBRETURN; }
 
+						[NotImplemented]
+						[BiosFunction( 0x4DB1E739, "sceUtilityNetconfInitStart" )]
+						// int sceUtilityNetconfInitStart(pspUtilityNetconfData *data); (/utility/psputility_netconf.h:51)
+						int sceUtilityNetconfInitStart( IMemory^ memory, int data ){ return NISTUBRETURN; }
+						
+						[NotImplemented]
+						[BiosFunction( 0xF88155F6, "sceUtilityNetconfShutdownStart" )]
+						// int sceUtilityNetconfShutdownStart(void); (/utility/psputility_netconf.h:58)
+						int sceUtilityNetconfShutdownStart(){ return NISTUBRETURN; } 
+						
+						[NotImplemented]
+						[BiosFunction( 0x91E70E35, "sceUtilityNetconfUpdate" )]
+						// int sceUtilityNetconfUpdate(int unknown = 1); (/utility/psputility_netconf.h:66)
+						int sceUtilityNetconfUpdate( int unknown ){ return NISTUBRETURN; }
+						
+						[NotImplemented]
+						[BiosFunction( 0x6332AA39, "sceUtilityNetconfGetStatus" )]
+						// int sceUtilityNetconfGetStatus(void); (/utility/psputility_netconf.h:73)
+						int sceUtilityNetconfGetStatus(){ return NISTUBRETURN; }
+
 					};
 				
 				}

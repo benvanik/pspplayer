@@ -59,6 +59,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	// Disable depth testing (we place in the order we get it)
 	glPushAttrib( GL_ENABLE_BIT );
 	glDisable( GL_DEPTH_TEST );
+	glDepthMask( GL_FALSE );
 
 	if( transformed == true )
 	{
@@ -104,6 +105,14 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 			case VTTextureFloat:
 				vtex[ m ][ 0 ] = *( ( float* )src );
 				vtex[ m ][ 1 ] = *( ( float* )src + 1 );
+				/*if( vtex[ m ][ 0 ] != 0.0f )
+				{
+					assert( vtex[ m ][ 0 ] > 0.001f );
+				}*/
+				if( vtex[ m ][ 0 ] < 0.0001f ) vtex[ m ][ 0 ] = 0.0f;
+				else if( vtex[ m ][ 0 ] > 10000.0f ) vtex[ m ][ 0 ] = 1.0f;
+				if( vtex[ m ][ 1 ] < 0.0001f ) vtex[ m ][ 1 ] = 0.0f;
+				else if( vtex[ m ][ 1 ] > 10000.0f ) vtex[ m ][ 1 ] = 1.0f;
 				src += 8;
 				break;
 			}
@@ -182,8 +191,8 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 				// The texture coords are not normalized
 				//glTexCoord2fv( vtex[ m ] );
 				glTexCoord2f(
-					vtex[ m ][ 0 ] / context->Textures[ 0 ].Width,
-					vtex[ m ][ 1 ] / context->Textures[ 0 ].Height );
+					vtex[ m ][ 0 ] / ( float )context->Textures[ 0 ].Width,
+					vtex[ m ][ 1 ] / ( float )context->Textures[ 0 ].Height );
 			}
 			if( colorType != 0 )
 				glColor4ubv( vclr[ m ] );
@@ -204,6 +213,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	}
 
 	// Re-enable depth testing/etc
+	glDepthMask( GL_TRUE );
 	glPopAttrib();
 
 	// Re-enable clipping

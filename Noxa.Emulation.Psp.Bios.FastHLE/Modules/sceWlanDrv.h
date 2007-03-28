@@ -41,20 +41,28 @@ namespace Noxa {
 
 					public: // ------ Stubbed calls ------
 
-						[NotImplemented]
+						// Not implemented - just return values to convince host we are not enabled
+
+						//[NotImplemented]
 						[BiosFunction( 0x93440B11, "sceWlanDevIsPowerOn" )] [Stateless]
 						// int sceWlanDevIsPowerOn(); (/wlan/pspwlan.h:24)
-						int sceWlanDevIsPowerOn(){ return NISTUBRETURN; }
+						int sceWlanDevIsPowerOn(){ return 0; }
 
-						[NotImplemented]
+						//[NotImplemented]
 						[BiosFunction( 0xD7763699, "sceWlanGetSwitchState" )] [Stateless]
 						// int sceWlanGetSwitchState(); (/wlan/pspwlan.h:31)
-						int sceWlanGetSwitchState(){ return NISTUBRETURN; }
+						int sceWlanGetSwitchState(){ return 0; }
 
-						[NotImplemented]
+						//[NotImplemented]
 						[BiosFunction( 0x0C622081, "sceWlanGetEtherAddr" )] [Stateless]
 						// int sceWlanGetEtherAddr(char *etherAddr); (/wlan/pspwlan.h:39)
-						int sceWlanGetEtherAddr( int etherAddr ){ return NISTUBRETURN; }
+						int sceWlanGetEtherAddr( IMemory^ memory, int etherAddr )
+						{
+							// 5 bytes of MAC address
+							memory->WriteWord( etherAddr, 4, 0 );
+							memory->WriteWord( etherAddr + 4, 1, 0 );
+							return 0;
+						}
 
 						[NotImplemented]
 						[BiosFunction( 0x482CAE9A, "sceWlanDevAttach" )] [Stateless]

@@ -354,6 +354,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\sceDmac.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\sceGe_user.cpp"
 					>
 				</File>

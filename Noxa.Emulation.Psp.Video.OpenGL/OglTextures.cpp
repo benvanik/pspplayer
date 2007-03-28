@@ -221,7 +221,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	WriteFile( f, ( void* )buffer, size, ( LPDWORD )&dummy1, NULL );
 	CloseHandle( f );*/
 
-	glTexImage2D( GL_TEXTURE_2D, 0, format->Size,
+	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
 		texture->Width, texture->Height,
 		0,
 		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
