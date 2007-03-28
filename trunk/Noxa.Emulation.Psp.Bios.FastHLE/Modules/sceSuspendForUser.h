@@ -41,15 +41,16 @@ namespace Noxa {
 
 					public: // ------ Stubbed calls ------
 
-						[NotImplemented]
+						// Currently just ignore power switch locking - maybe one day
+						// we should obey it so saves don't get corrupt/etc?
+
 						[BiosFunction( 0xEADB1BD7, "sceKernelPowerLock" )] [Stateless]
 						// manual add
-						int sceKernelPowerLock( int type ){ return NISTUBRETURN; }
+						int sceKernelPowerLock( int type ){ return 0; }
 
-						[NotImplemented]
 						[BiosFunction( 0x3AEE7261, "sceKernelPowerUnlock" )] [Stateless]
 						// manual add
-						int sceKernelPowerUnlock( int type ){ return NISTUBRETURN; }
+						int sceKernelPowerUnlock( int type ){ return 0; }
 
 						[BiosFunction( 0x090CCB3F, "sceKernelPowerTick" )] [Stateless]
 						// int sceKernelPowerTick(int ticktype); (/include/kernelutils.h:167)

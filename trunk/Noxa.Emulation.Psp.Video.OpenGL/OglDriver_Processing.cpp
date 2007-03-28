@@ -448,6 +448,9 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			else
 				glEnable( GL_TEXTURE_2D );
 			break;
+		case TSYNC:
+			//SetTexture( context, 0 );
+			break;
 		case TMODE:
 			context->TexturesSwizzled = ( argi & 0x1 ) == 1 ? true : false;
 			context->MipMapLevel = ( argi >> 16 ) & 0x4;
@@ -504,6 +507,26 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				}
 			}
 			break;
+		//case TWRAP:
+		//	switch( argi & 0xFF )
+		//	{
+		//	case 0: // GU_REPEAT
+		//		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+		//		break;
+		//	case 1:	// GU_CLAMP
+		//		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+		//		break;
+		//	}
+		//	switch( ( argi >> 8 ) & 0xFF )
+		//	{
+		//	case 0: // GU_REPEAT
+		//		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+		//		break;
+		//	case 1:	// GU_CLAMP
+		//		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+		//		break;
+		//	}
+		//	break;
 		case TFUNC:
 			// texture function
 			/*
@@ -546,18 +569,23 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 		case TFLUSH:
 			// texturesvalid = false
+			context->Textures[ 0 ].TextureID = 0;
 			break;
 		case USCALE:
 			// (float) should be 1
+			//assert( argf == 1.0f );
 			break;
 		case VSCALE:
 			// (float) should be 1
+			//assert( argf == 1.0f );
 			break;
 		case UOFFSET:
 			// (float) should be 0
+			//assert( argf == 0.0f );
 			break;
 		case VOFFSET:
 			// (float) should be 0
+			//assert( argf == 0.0f );
 			break;
 		case TBP0:
 			context->Textures[ 0 ].Address = argi;
@@ -571,6 +599,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			context->Textures[ 0 ].Width = 1 << ( argi & 0x000000FF );
 			context->Textures[ 0 ].Height = 1 << ( ( argi >> 8 ) & 0x000000FF );
 			context->Textures[ 0 ].PixelStorage = context->TextureStorageMode;
+			context->Textures[ 0 ].TextureID = 0;
 			break;
 
 		case PMS:

@@ -82,10 +82,9 @@ namespace Noxa {
 						// int scePowerIsLowBattery(); (/power/psppower.h:86)
 						int scePowerIsLowBattery(){ return 0; }
 
-						[NotImplemented]
 						[BiosFunction( 0x2085D15D, "scePowerGetBatteryLifePercent" )] [Stateless]
 						// int scePowerGetBatteryLifePercent(); (/power/psppower.h:92)
-						int scePowerGetBatteryLifePercent(){ return NISTUBRETURN; }
+						int scePowerGetBatteryLifePercent(){ return 100; }
 
 						[NotImplemented]
 						[BiosFunction( 0x8EFB3FA2, "scePowerGetBatteryLifeTime" )] [Stateless]
@@ -131,6 +130,11 @@ namespace Noxa {
 						[BiosFunction( 0x04B7766E, "scePowerRegisterCallback" )] [Stateless]
 						// int scePowerRegisterCallback(int slot, SceUID cbid); (/power/psppower.h:61)
 						int scePowerRegisterCallback( int slot, int cbid ){ return NISTUBRETURN; }
+
+						[NotImplemented]
+						[BiosFunction( 0xDFA8BAF8, "scePowerUnregisterCallback" )] [Stateless]
+						// manual add
+						int scePowerUnregisterCallback( int slot ){ return NISTUBRETURN; }
 
 						[BiosFunction( 0x843FBF43, "scePowerSetCpuClockFrequency" )] [Stateless]
 						// int scePowerSetCpuClockFrequency(int cpufreq); (/power/psppower.h:118)

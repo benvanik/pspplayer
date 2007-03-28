@@ -35,16 +35,15 @@ namespace Noxa {
 						//virtual void Clear() override;
 
 					internal:
-						//virtual void* QueryNativePointer( uint nid ) override;
+						virtual void* QueryNativePointer( uint nid ) override;
 
 					public: // ------ Implemented calls ------
 
 					public: // ------ Stubbed calls ------
 
-						[NotImplemented]
 						[BiosFunction( 0x617F3FE6, "sceDmacMemcpy" )] [Stateless]
 						// manual add
-						int sceDmacMemcpy( int destination, int source, int num ){ return NISTUBRETURN; }
+						int sceDmacMemcpy( IMemory^ memory, int dest, int source, int size );
 
 					};
 				
