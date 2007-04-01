@@ -410,12 +410,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				SetTexture( context, 0 );
 
 				int vertexSize = DetermineVertexSize( vertexType );
-
-				byte* ptr;
-				if( ( vertexBufferAddress & MainMemoryBase ) != 0 )
-					ptr = context->MainMemoryPointer + ( vertexBufferAddress - MainMemoryBase );
-				else
-					ptr = context->VideoMemoryPointer + ( vertexBufferAddress - VideoMemoryBase );
+				byte* ptr = context->Memory->Translate( vertexBufferAddress );
 
 				if( areSprites == false )
 				{
@@ -424,12 +419,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 					bool isIndexed = ( vertexType & ( VTIndex8 | VTIndex16 ) ) != 0;
 					byte* iptr = 0;
 					if( isIndexed == true )
-					{
-						if( ( indexBufferAddress & MainMemoryBase ) != 0 )
-							iptr = context->MainMemoryPointer + ( indexBufferAddress - MainMemoryBase );
-						else
-							iptr = context->VideoMemoryPointer + ( indexBufferAddress - VideoMemoryBase );
-					}
+						iptr = context->Memory->Translate( indexBufferAddress );
 
 					SetupVertexBuffers( context, vertexType, vertexCount, vertexSize, ptr );
 					DrawBuffers( context, primitiveType, vertexType, vertexCount, iptr );

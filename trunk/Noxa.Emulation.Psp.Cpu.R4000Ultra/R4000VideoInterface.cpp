@@ -30,7 +30,7 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 VdlRef* _outstandingLists;
 VdlRef* _outstandingListsTail;
 
-void* _memoryAddress;
+MemorySystem* _memory;
 VideoApi* _videoApi;
 MemoryPool* _memoryPool;
 
@@ -57,10 +57,10 @@ R4000VideoInterface::~R4000VideoInterface()
 
 void R4000VideoInterface::Prepare()
 {
-	_memoryAddress = _cpu->_memory->MainMemory;
+	_memory = _cpu->_memory->SystemInstance;
 	_videoApi = ( VideoApi* )_cpu->Emulator->Video->NativeInterface.ToPointer();
 	if( _videoApi != NULL )
-		_videoApi->Setup( _pool );
+		_videoApi->Setup( _cpu->_memory->SystemInstance, _pool );
 }
 
 void __break()
@@ -180,7 +180,7 @@ void __inline GetVideoPacket( int code, int baseAddress, VideoPacket* packet )
 	}
 }
 
-bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDisplayList* list )
+bool ReadPackets( uint pointer, uint stallAddress, VideoDisplayList* list )
 {
 	if( stallAddress == 0 )
 		stallAddress = 0xFFFFFFFF;
@@ -190,8 +190,6 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 	stallAddress &= 0x3FFFFFFF;
 
 	int packetCount = list->PacketCount;
-
-	int* memptr = ( int* )memoryAddress;
 	while( pointer < stallAddress )
 	{
 		if( packetCount >= list->PacketCapacity )
@@ -201,7 +199,7 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 			BREAK;
 		}
 
-		int code = *( ( int* )( ( byte* )memptr + ( pointer - MainMemoryBase ) ) );
+		int code = *( ( int* )( _memory->Translate( pointer ) ) );
 		VideoPacket* packet = list->Packets + packetCount;
 		GetVideoPacket( code, list->Base, packet );
 		packetCount++;
@@ -237,11 +235,11 @@ bool ReadPackets( void* memoryAddress, uint pointer, uint stallAddress, VideoDis
 	return false;
 }
 
-bool ReadMorePackets( void* memoryAddress, VideoDisplayList* vdl, uint newStallAddress )
+bool ReadMorePackets( VideoDisplayList* vdl, uint newStallAddress )
 {
 	int oldStallAddress = vdl->StallAddress;
 	vdl->StallAddress = newStallAddress;
-	bool done = ReadPackets( memoryAddress, oldStallAddress, vdl->StallAddress, vdl );
+	bool done = ReadPackets( oldStallAddress, vdl->StallAddress, vdl );
 	vdl->Ready = done;
 	return done;
 }
@@ -295,7 +293,7 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 		vdl->Ready = true;
 
 		// Read all now
-		bool done = ReadPackets( _memoryAddress, list, 0, vdl );
+		bool done = ReadPackets( list, 0, vdl );
 		BREAKIF( done == false );
 	}
 	else
@@ -304,7 +302,7 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 		vdl->StallAddress = stall;
 
 		// Rest will follow
-		bool done = ReadPackets( _memoryAddress, list, stall, vdl );
+		bool done = ReadPackets( list, stall, vdl );
 		BREAKIF( done == true );
 
 		AddOutstandingList( vdl );
@@ -342,7 +340,7 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 
 	if( vdl->Ready == false )
 	{
-		bool done = ReadMorePackets( _memoryAddress, vdl, stall );
+		bool done = ReadMorePackets( vdl, stall );
 		if( done == true )
 		{
 			RemoveOutstandingList( vdl );
@@ -367,7 +365,7 @@ int sceGeListSync( int qid, int syncType )
 
 	if( vdl->Ready == false )
 	{
-		bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
+		bool done = ReadMorePackets( vdl, 0 );
 		if( done == false )
 			BREAK;
 		else
@@ -392,7 +390,7 @@ int sceGeDrawSync( int syncType )
 		VideoDisplayList* vdl = ref->List;
 		if( vdl->Ready == false )
 		{
-			bool done = ReadMorePackets( _memoryAddress, vdl, 0 );
+			bool done = ReadMorePackets( vdl, 0 );
 			BREAKIF( done == false );
 		}
 		ref = ref->Next;

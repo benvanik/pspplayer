@@ -54,7 +54,7 @@ int R4000Cpu::LookupOrAddModule( IModule^ module )
 // as the first parameter will we pass it through.
 
 // Here we are in the x86 dynarec CPU emitting MSIL. I'm craaazzy ----___----
-BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* registers )
+BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem* memory, void* registers )
 {
 	//Type^ voidStar = ( void::typeid )->MakePointerType();
 	array<Type^>^ shimArgs = { R4000Cpu::typeid };
@@ -185,7 +185,7 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 			ilgen->Emit( OpCodes::Ldc_I4, spOffset );		// offset + 0..4 words
 			ilgen->Emit( OpCodes::Conv_I );
 			ilgen->Emit( OpCodes::Add );					// addr = ( $sp - 0x08000000 ) + offset
-			ilgen->Emit( OpCodes::Ldc_I4, ( int )memory );	// load memory
+			ilgen->Emit( OpCodes::Ldc_I4, ( int )( memory->MainMemory ) );	// load memory
 			ilgen->Emit( OpCodes::Conv_I );
 			ilgen->Emit( OpCodes::Add );					// finaladdr = addr + memory ptr
 			ilgen->Emit( OpCodes::Ldind_I4 );				// load value
@@ -260,7 +260,7 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 	return del;
 }
 
-void* R4000Cpu::EmitShimN( BiosFunction^ function, void* memory, void* registers )
+void* R4000Cpu::EmitShimN( BiosFunction^ function, MemorySystem* memory, void* registers )
 {
 	R4000Generator* g = _context->Generator;
 

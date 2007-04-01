@@ -89,10 +89,9 @@ int R4000Cpu::RegisterSyscall( unsigned int nid )
 	int sid = ++_lastSyscall;
 	_syscalls[ sid ] = function;
 
-	void* memory = ( void* )_memory->MainMemory;
 	void* registers = ( ( R4000Ctx* )_ctx )->Registers;
-	_syscallShims[ sid ] = EmitShim( function, memory, registers );
-	_syscallShimsN[ sid ] = IntPtr( EmitShimN( function, memory, registers ) );
+	_syscallShims[ sid ] = EmitShim( function, _memory->SystemInstance, registers );
+	_syscallShimsN[ sid ] = IntPtr( EmitShimN( function, _memory->SystemInstance, registers ) );
 
 	return sid;
 }
