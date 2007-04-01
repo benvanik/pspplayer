@@ -11,6 +11,8 @@ using System.Threading;
 
 namespace Noxa.Emulation.Psp.Video
 {
+	#pragma warning disable 1591
+
 	public enum VideoCommand : byte
 	{
 		NOP = 0x00,
@@ -338,4 +340,6 @@ namespace Noxa.Emulation.Psp.Video
 		public int CallbackId;
 		public int Argument;
 	}
+
+	#pragma warning restore 1591
 }

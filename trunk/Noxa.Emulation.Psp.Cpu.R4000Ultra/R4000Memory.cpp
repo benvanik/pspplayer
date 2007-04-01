@@ -21,11 +21,11 @@ R4000Memory::R4000Memory()
 {
 	MainMemory = ( byte* )_aligned_malloc( MainMemorySize, 16 );
 	ScratchPad = ( byte* )_aligned_malloc( ScratchPadSize, 16 );
-	FrameBuffer = ( byte* )_aligned_malloc( FrameBufferSize, 16 );
+	VideoMemory = ( byte* )_aligned_malloc( VideoMemorySize, 16 );
 
 	memset( MainMemory, 0x0, MainMemorySize );
 	memset( ScratchPad, 0x0, ScratchPadSize );
-	memset( FrameBuffer, 0x0, FrameBufferSize );
+	memset( VideoMemory, 0x0, VideoMemorySize );
 }
 
 R4000Memory::~R4000Memory()
@@ -46,9 +46,9 @@ void R4000Memory::Clear()
 	if( ScratchPad != NULL )
 		_aligned_free( ScratchPad );
 	ScratchPad = NULL;
-	if( FrameBuffer != NULL )
-		_aligned_free( FrameBuffer );
-	FrameBuffer = NULL;
+	if( VideoMemory != NULL )
+		_aligned_free( VideoMemory );
+	VideoMemory = NULL;
 }
 
 IMemorySegment^ R4000Memory::DefineSegment( MemoryType type, String^ name, int baseAddress, int length )
@@ -58,16 +58,16 @@ IMemorySegment^ R4000Memory::DefineSegment( MemoryType type, String^ name, int b
 
 void R4000Memory::RegisterSegment( IMemorySegment^ segment )
 {
-	if( segment->BaseAddress == FrameBufferBase )
+	if( segment->BaseAddress == VideoMemoryBase )
 	{
-		SAFEFREE( FrameBuffer );
+		SAFEFREE( VideoMemory );
 		_frameBuffer = segment;
-		//FrameBuffer = ptr?
+		//VideoMemory = ptr?
 		throw gcnew NotImplementedException( "IMemorySegment does not support grabbing of the frame buffer bytes" );
 	}
 	else
 	{
-		Debug::Assert( false, "Cannot override any segmenet but the framebuffer." );
+		Debug::Assert( false, "Cannot override any segmenet but the VideoMemory." );
 	}
 }
 
@@ -100,13 +100,13 @@ int R4000Memory::ReadWord( int address )
 		int* ptr = ( int* )( ScratchPad + ( address - ScratchPadBase ) );
 		return *ptr;
 	}
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 	{
 		if( _frameBuffer != nullptr )
 			return _frameBuffer->ReadWord( address );
 		else
 		{
-			int* ptr = ( int* )( FrameBuffer + ( address - FrameBufferBase ) );
+			int* ptr = ( int* )( VideoMemory + ( address - VideoMemoryBase ) );
 			return *ptr;
 		}
 	}
@@ -134,13 +134,13 @@ int64 R4000Memory::ReadDoubleWord( int address )
 		int64* ptr = ( int64* )( ScratchPad + ( address - ScratchPadBase ) );
 		return *ptr;
 	}
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 	{
 		if( _frameBuffer != nullptr )
 			return _frameBuffer->ReadDoubleWord( address );
 		else
 		{
-			int64* ptr = ( int64* )( FrameBuffer + ( address - FrameBufferBase ) );
+			int64* ptr = ( int64* )( VideoMemory + ( address - VideoMemoryBase ) );
 			return *ptr;
 		}
 	}
@@ -162,7 +162,7 @@ array<byte>^ R4000Memory::ReadBytes( int address, int count )
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 		throw gcnew NotImplementedException();
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 		throw gcnew NotImplementedException();
 	else
 		return nullptr;
@@ -182,7 +182,7 @@ int R4000Memory::ReadStream( int address, Stream^ destination, int count )
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 		throw gcnew NotImplementedException();
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 		throw gcnew NotImplementedException();
 	else
 		return 0;
@@ -244,13 +244,13 @@ void R4000Memory::WriteWord( int address, int width, int value )
 			break;
 		}
 	}
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 	{
 		if( _frameBuffer != nullptr )
 			_frameBuffer->WriteWord( address, width, value );
 		else
 		{
-			byte* ptr = FrameBuffer + ( address - FrameBufferBase );
+			byte* ptr = VideoMemory + ( address - VideoMemoryBase );
 			switch( width )
 			{
 			case 4:
@@ -301,13 +301,13 @@ void R4000Memory::WriteDoubleWord( int address, int64 value )
 		int64* p = ( int64* )ptr;
 		*p = value;
 	}
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 	{
 		if( _frameBuffer != nullptr )
 			_frameBuffer->WriteDoubleWord( address, value );
 		else
 		{
-			byte* ptr = FrameBuffer + ( address - FrameBufferBase );
+			byte* ptr = VideoMemory + ( address - VideoMemoryBase );
 			int64* p = ( int64* )ptr;
 			*p = value;
 		}
@@ -335,14 +335,14 @@ void R4000Memory::WriteBytes( int address, array<byte>^ bytes )
 		pin_ptr<byte> ptr = &bytes[ 0 ];
 		memcpy( ScratchPad + ( address - ScratchPadBase ), ptr, bytes->Length );
 	}
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 	{
 		if( _frameBuffer != nullptr )
 			_frameBuffer->WriteBytes( address, bytes );
 		else
 		{
 			pin_ptr<byte> ptr = &bytes[ 0 ];
-			memcpy( FrameBuffer + ( address - FrameBufferBase ), ptr, bytes->Length );
+			memcpy( VideoMemory + ( address - VideoMemoryBase ), ptr, bytes->Length );
 		}
 	}
 	else
@@ -378,48 +378,10 @@ void R4000Memory::WriteStream( int address, Stream^ source, int count )
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 		throw gcnew NotImplementedException();
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 		throw gcnew NotImplementedException();
 	else
 		Debugger::Break();
-}
-
-void R4000Memory::Load( Stream^ stream )
-{
-	throw gcnew NotImplementedException();
-}
-
-void R4000Memory::Load( String^ fileName )
-{
-	Stream^ stream = nullptr;
-	try
-	{
-		stream = File::OpenRead( fileName );
-		this->Load( stream );
-	}
-	finally
-	{
-		stream->Close();
-	}
-}
-
-void R4000Memory::Save( Stream^ stream )
-{
-	throw gcnew NotImplementedException();
-}
-
-void R4000Memory::Save( String^ fileName )
-{
-	Stream^ stream = nullptr;
-	try
-	{
-		stream = File::OpenWrite( fileName );
-		this->Save( stream );
-	}
-	finally
-	{
-		stream->Close();
-	}
 }
 
 uint R4000Memory::GetMemoryHash( int address, int count, uint prime )
@@ -437,7 +399,7 @@ uint R4000Memory::GetMemoryHash( int address, int count, uint prime )
 	}
 	else if( ( address >= ScratchPadBase ) && ( address < ScratchPadBound ) )
 		throw gcnew NotImplementedException();
-	else if( ( address >= FrameBufferBase ) && ( address < FrameBufferBound ) )
+	else if( ( address >= VideoMemoryBase ) && ( address < VideoMemoryBound ) )
 		throw gcnew NotImplementedException();
 	else
 		throw gcnew NotSupportedException();

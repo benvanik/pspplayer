@@ -50,6 +50,7 @@ Kernel::Kernel( FastBios^ bios )
 
 	// Took out MSB because addresses come translated
 	Partitions = gcnew array<KernelPartition^>{
+		gcnew KernelPartition( this, 0, 0x0, 0x0 ), /* dummy */
 		gcnew KernelPartition( this, 1, 0x08000000, 0x00300000 ), /* Kernel 1 0x8*/
 		gcnew KernelPartition( this, 2, 0x08000000, 0x01800000 ), /* User */
 		gcnew KernelPartition( this, 3, 0x08000000, 0x00300000 ), /* Kernel 1 */
@@ -167,6 +168,7 @@ void Kernel::Execute()
 
 		// Have to allocate the stuff taken by the elf
 		Partitions[ 1 ]->Allocate( KernelAllocationType::SpecificAddress, lowerBounds, upperBounds - lowerBounds );
+		_elfUpperBounds = upperBounds;
 
 		int preThreadCount = 0;
 		while( _activeThread == nullptr )

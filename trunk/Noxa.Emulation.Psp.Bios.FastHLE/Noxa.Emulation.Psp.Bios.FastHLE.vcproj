@@ -231,6 +231,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\KernelPool.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\KernelStatistics.cpp"
 				>
 			</File>
@@ -386,6 +390,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Modules\ThreadManForUser_Memory.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Modules\ThreadManForUser_ThreadControl.cpp"
 					>
 				</File>
@@ -470,6 +478,10 @@
 			</File>
 			<File
 				RelativePath=".\KernelPartition.h"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelPool.h"
 				>
 			</File>
 			<File

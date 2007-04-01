@@ -71,7 +71,14 @@ KernelMemoryBlock^ KernelPartition::Allocate( KernelAllocationType type, uint ad
 
 			if( block->IsFree == false )
 				continue;
-			newBlock = this->SplitBlock( block, block->Address, size );
+			
+			// If we specified a lower limit for this block, keep searching
+			if( ( address != 0 ) &&
+				( ( address < block->Address ) ||
+				  ( address > block->UpperBound ) ) )
+				  continue;
+
+			newBlock = this->SplitBlock( block, ( address != 0 ) ? address : block->Address, size );
 			if( block->Size <= 0 )
 			{
 				// Free space dead

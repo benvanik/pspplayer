@@ -102,7 +102,7 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, void* memory, void* regist
 
 	// Push module instance (needed for Call below)
 	// We do this by loading the module instance from the array on the cpu (arg0)
-	int moduleIndex = this->LookupOrAddModule( function->Module );
+	int moduleIndex = this->LookupOrAddModule( function->ModuleInstance );
 	ilgen->Emit( OpCodes::Ldarg_0 );
 	ilgen->Emit( OpCodes::Ldfld, _privateModuleInstancesFieldInfo );
 	ilgen->Emit( OpCodes::Ldc_I4, moduleIndex );
@@ -355,6 +355,7 @@ void* R4000Cpu::EmitShimN( BiosFunction^ function, void* memory, void* registers
 		g->push( ( uint )memory );
 
 	// Invoke method
+#pragma warning( disable: 4395 )
 	g->call( ( uint )function->NativeMethod.ToPointer() );
 
 	g->add( ESP, ( x86regOffset - 1 ) * 4 );

@@ -6,18 +6,36 @@
 
 #pragma once
 
+#include "NativeBios.h"
+
 using namespace System;
+using namespace System::Collections::Generic;
+using namespace System::IO;
 using namespace Noxa::Emulation::Psp;
 
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
-			namespace Cpu {
+			namespace Bios {
 
-				ref class R4000Clock : IClock
+				ref class Loader : public ILoader
 				{
+				internal:
+					NativeBios^				_bios;
+
 				public:
-					R4000Clock(){}
+					Loader( NativeBios^ bios );
+					~Loader();
+
+					property IBios^ Bios
+					{
+						virtual IBios^ get()
+						{
+							return _bios;
+						}
+					}
+
+					virtual LoadResults^ LoadModule( ModuleType type, Stream^ moduleStream, LoadParameters^ parameters );
 				};
 
 			}

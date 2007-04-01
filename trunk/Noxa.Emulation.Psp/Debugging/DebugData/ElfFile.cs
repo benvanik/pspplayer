@@ -6,14 +6,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Diagnostics;
+using System.Text;
+
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Bios;
 
-namespace Noxa.Emulation.Psp.Games
+namespace Noxa.Emulation.Psp.Debugging.DebugData
 {
 	// Unfortunately when it comes to relocating elf files, there is very little info besides the data structures
 	// Had to go to the source to figure things out :(
@@ -884,10 +885,8 @@ namespace Noxa.Emulation.Psp.Games
 			}
 		}
 
-		public ElfLoadResult Load( Stream stream, IEmulationInstance emulator, uint baseAddress )
+		public bool Load( Stream stream, IEmulationInstance emulator, uint baseAddress )
 		{
-			ElfLoadResult result = new ElfLoadResult();
-
 			// Relocate only if we need to
 			if( _needsRelocation == false )
 				baseAddress = 0;
@@ -957,13 +956,12 @@ namespace Noxa.Emulation.Psp.Games
 				}
 			}
 
-			result.Stubs = this.FixupStubs( reader, emulator.Cpu, memory, emulator.Bios, baseAddress );
+			//result.Stubs = this.FixupStubs( reader, emulator.Cpu, memory, emulator.Bios, baseAddress );
 
-			result.Successful = true;
-			return result;
+			return true;
 		}
 
-		protected List<StubReference> FixupStubs( BinaryReader reader, ICpu cpu, IMemory memory, IBios bios, uint baseAddress )
+		/*protected List<StubReference> FixupStubs( BinaryReader reader, ICpu cpu, IMemory memory, IBios bios, uint baseAddress )
 		{
 			List<StubReference> stubs = new List<StubReference>();
 			int nidGoodCount = 0;
@@ -1059,7 +1057,7 @@ namespace Noxa.Emulation.Psp.Games
 			}
 
 			return stubs;
-		}
+		}*/
 
 		protected static string ReadString( BinaryReader reader )
 		{
@@ -1072,66 +1070,6 @@ namespace Noxa.Emulation.Psp.Games
 				sb.Append( c );
 			}
 			return sb.ToString();
-		}
-	}
-
-	public class ElfLoadResult
-	{
-		public bool Successful;
-		public List<StubReference> Stubs;
-	}
-
-	public enum StubReferenceResult
-	{
-		Success,
-		ModuleNotFound,
-		NidNotFound,
-		NidNotImplemented
-	}
-
-	public class StubReference
-	{
-		public StubReferenceResult Result;
-		public string ModuleName;
-		public uint Nid;
-		public BiosFunction Function;
-
-		public static StubReference Success( string moduleName, uint nid, BiosFunction function )
-		{
-			StubReference ret = new StubReference();
-			ret.Result = StubReferenceResult.Success;
-			ret.ModuleName = moduleName;
-			ret.Nid = nid;
-			ret.Function = function;
-			return ret;
-		}
-
-		public static StubReference ModuleNotFound( string moduleName, uint nid )
-		{
-			StubReference ret = new StubReference();
-			ret.Result = StubReferenceResult.ModuleNotFound;
-			ret.ModuleName = moduleName;
-			ret.Nid = nid;
-			return ret;
-		}
-
-		public static StubReference NidNotFound( string moduleName, uint nid )
-		{
-			StubReference ret = new StubReference();
-			ret.Result = StubReferenceResult.NidNotFound;
-			ret.ModuleName = moduleName;
-			ret.Nid = nid;
-			return ret;
-		}
-
-		public static StubReference NidNotImplemented( string moduleName, uint nid, BiosFunction function )
-		{
-			StubReference ret = new StubReference();
-			ret.Result = StubReferenceResult.NidNotImplemented;
-			ret.ModuleName = moduleName;
-			ret.Nid = nid;
-			ret.Function = function;
-			return ret;
 		}
 	}
 }

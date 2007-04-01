@@ -435,7 +435,7 @@ namespace Noxa.Emulation.Psp.Player
 			_xmb.Disable();
 #else
 #endif
-			_bios.Kernel.Game = game;
+			_bios.Game = game;
 		}
 
 		private void RuntimeThread()
@@ -459,7 +459,7 @@ namespace Noxa.Emulation.Psp.Player
 							// TODO: debugging runtime loop code
 							break;
 						case InstanceState.Running:
-							if( _bios.Kernel.Game == null )
+							if( _bios.Game == null )
 							{
 								if( _switchToXmb == true )
 								{
@@ -484,7 +484,7 @@ namespace Noxa.Emulation.Psp.Player
 							else
 							{
 								// Run the kernel
-								_bios.Kernel.Execute();
+								_bios.Execute();
 							}
 							break;
 					}

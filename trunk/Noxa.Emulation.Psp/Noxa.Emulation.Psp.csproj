@@ -27,6 +27,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\Debug\Noxa.Emulation.Psp.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -47,20 +48,21 @@
     <Compile Include="Audio\IAudioDriver.cs" />
     <Compile Include="Bios\BiosFunction.cs" />
     <Compile Include="Bios\BiosFunctionAttribute.cs" />
+    <Compile Include="Bios\BiosModule.cs" />
     <Compile Include="Bios\IBios.cs" />
-    <Compile Include="Bios\IKernel.cs" />
+    <Compile Include="Bios\ILoader.cs" />
     <Compile Include="Bios\IModule.cs" />
+    <Compile Include="Bios\LoadParameters.cs" />
+    <Compile Include="Bios\LoadResults.cs" />
     <Compile Include="ComponentIssue.cs" />
     <Compile Include="ComponentParameters.cs" />
     <Compile Include="Debugging\DebugModel\CoreState.cs" />
     <Compile Include="Cpu\IAvcDecoder.cs" />
-    <Compile Include="Cpu\IClock.cs" />
     <Compile Include="Cpu\ICpu.cs" />
     <Compile Include="Cpu\ICpuCapabilities.cs" />
     <Compile Include="Cpu\ICpuCore.cs" />
     <Compile Include="Cpu\ICpuCoreProfiler.cs" />
     <Compile Include="Cpu\ICpuStatistics.cs" />
-    <Compile Include="Cpu\IDmaController.cs" />
     <Compile Include="Cpu\IMemory.cs" />
     <Compile Include="Cpu\IMemorySegment.cs" />
     <Compile Include="Debugging\DebugModel\Breakpoint.cs" />
@@ -72,15 +74,13 @@
     <Compile Include="Debugging\IDebugger.cs" />
     <Compile Include="Debugging\ICpuHook.cs" />
     <Compile Include="Debugging\IDebugInspector.cs" />
-    <Compile Include="Debugging\DebugModel\Instruction.cs" />
     <Compile Include="Debugging\DebugData\IProgramDebugData.cs" />
     <Compile Include="Debugging\DebugModel\Method.cs" />
     <Compile Include="Debugging\NullDebugger.cs" />
-    <Compile Include="Debugging\DebugData\ObjdumpDebugData.cs" />
     <Compile Include="Debugging\DebugData\ProgramDebugData.cs" />
     <Compile Include="Debugging\DebugData\SimpleElfDebugData.cs" />
     <Compile Include="EmulationParameters.cs" />
-    <Compile Include="Games\ElfFile.cs" />
+    <Compile Include="Debugging\DebugData\ElfFile.cs" />
     <Compile Include="Games\GameInformation.cs" />
     <Compile Include="Games\PbpReader.cs" />
     <Compile Include="Games\SfoReader.cs" />
@@ -100,7 +100,6 @@
     <Compile Include="Games\GameLoader.cs" />
     <Compile Include="NullComponent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PspDebug.cs" />
     <Compile Include="Utilities\PerformanceTimer.cs" />
     <Compile Include="Video\DisplayProperties.cs" />
     <Compile Include="Video\IVideoCapabilities.cs" />

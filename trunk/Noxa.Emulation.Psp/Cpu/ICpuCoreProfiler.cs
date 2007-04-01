@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
+	/// <summary>
+	/// <see cref="ICpuCore"/> profiler.
+	/// </summary>
 	public interface ICpuCoreProfiler
 	{
 	}

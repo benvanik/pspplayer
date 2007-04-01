@@ -60,14 +60,14 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	// case to handle read call
 	g->MarkLabel( l1 );
 
-	// if < 0x0400000 && > FrameBufferBound, skip and do a read from method
-	g->cmp( EAX, FrameBufferBase );
+	// if < 0x0400000 && > VideoMemoryBound, skip and do a read from method
+	g->cmp( EAX, VideoMemoryBase );
 	g->jb( l2 );
-	g->cmp( EAX, FrameBufferBound );
+	g->cmp( EAX, VideoMemoryBound );
 	g->ja( l2 );
 
 	// else, do a direct fb read
-	g->sub( EAX, FrameBufferBase );
+	g->sub( EAX, VideoMemoryBase );
 	g->mov( EAX, g->dword_ptr[ EAX + (int)context->FrameBuffer ] );
 	g->jmp( l3 );
 
@@ -126,14 +126,14 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 	// case to handle read call
 	g->MarkLabel( l1 );
 
-	// if < 0x0400000 && > FrameBufferBound, skip and do a read from method
-	g->cmp( EAX, FrameBufferBase );
+	// if < 0x0400000 && > VideoMemoryBound, skip and do a read from method
+	g->cmp( EAX, VideoMemoryBase );
 	g->jb( l2 );
-	g->cmp( EAX, FrameBufferBound );
+	g->cmp( EAX, VideoMemoryBound );
 	g->ja( l2 );
 	
 	// else, do a direct fb read
-	g->sub( EAX, FrameBufferBase ); // get to offset in fb
+	g->sub( EAX, VideoMemoryBase ); // get to offset in fb
 	switch( width )
 	{
 	case 1:

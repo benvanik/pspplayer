@@ -50,8 +50,8 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 			bool relocate = ( elf.EntryAddress < 0x08900000 );
 			
 			// Get functions
-			List<Noxa.Emulation.Psp.Games.ElfFile.ElfSymbol> symbols = elf.Symbols;
-			foreach( Noxa.Emulation.Psp.Games.ElfFile.ElfSymbol symbol in symbols )
+			List<ElfFile.ElfSymbol> symbols = elf.Symbols;
+			foreach( ElfFile.ElfSymbol symbol in symbols )
 			{
 				// Some NOTYPES are valid, like ctor/dtor aux, frame_dummy, etc.
 				// Unfortunately, so many are bad that I can't just include them :(

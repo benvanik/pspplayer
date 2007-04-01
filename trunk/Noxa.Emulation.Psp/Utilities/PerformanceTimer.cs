@@ -6,13 +6,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 
 namespace Noxa.Emulation.Psp.Utilities
 {
+	/// <summary>
+	/// A high-performance timer.
+	/// </summary>
 	public class PerformanceTimer
 	{
 		#region Interop
@@ -33,6 +36,9 @@ namespace Noxa.Emulation.Psp.Utilities
 		/// </summary>
 		private double _rate = 0.0;
 
+		/// <summary>
+		/// Initializes a new <see cref="PerformanceTimer"/> instance.
+		/// </summary>
 		public PerformanceTimer()
 		{
 			long temp = 0;
@@ -48,6 +54,9 @@ namespace Noxa.Emulation.Psp.Utilities
 			this.Reset();
 		}
 
+		/// <summary>
+		/// Reset the timer to 0.
+		/// </summary>
 		public void Reset()
 		{
 			long temp = 0;
@@ -56,6 +65,9 @@ namespace Noxa.Emulation.Psp.Utilities
 			_startTime = ( double )temp;
 		}
 
+		/// <summary>
+		/// Get the amount of time elapsed since the timer was last reset.
+		/// </summary>
 		public double Elapsed
 		{
 			get

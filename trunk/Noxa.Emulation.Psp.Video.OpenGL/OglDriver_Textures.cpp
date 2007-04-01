@@ -53,7 +53,7 @@ void TextureTransfer( OglContext* context )
 	if( sourceAddress & MainMemoryBase )
 		buffer = context->MainMemoryPointer + ( sourceAddress - MainMemoryBase );
 	else
-		buffer = context->VideoMemoryPointer + ( sourceAddress - FrameBufferBase );
+		buffer = context->VideoMemoryPointer + ( sourceAddress - VideoMemoryBase );
 
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );

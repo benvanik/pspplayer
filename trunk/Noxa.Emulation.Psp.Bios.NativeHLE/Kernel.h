@@ -4,29 +4,25 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+#pragma once
 
-using Noxa.Emulation.Psp.Games;
+#include "NoxaShared.h"
 
-namespace Noxa.Emulation.Psp.Bios
-{
-	public interface IKernel
-	{
-		GameInformation Game
-		{
-			get;
-			set;
+using namespace System;
+using namespace System::Diagnostics;
+using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::Bios;
+
+namespace Noxa {
+	namespace Emulation {
+		namespace Psp {
+			namespace Bios {
+
+				class Kernel
+				{
+				};
+
+			}
 		}
-
-		Stream BootStream
-		{
-			get;
-			set;
-		}
-
-		void Execute();
 	}
 }

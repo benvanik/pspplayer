@@ -38,7 +38,6 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_emu = emulator;
 	_params = parameters;
 	_caps = gcnew R4000Capabilities();
-	_clock = gcnew R4000Clock();
 	_memory = gcnew R4000Memory();
 	_core0 = gcnew R4000Core( this, ( R4000Ctx* )_ctx );
 	_codeCache = new R4000Cache();
@@ -61,7 +60,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_hasExecuted = false;
 
 	R4000Generator* gen = new R4000Generator();
-	_context = gcnew R4000GenContext( gen, _memory->MainMemory, _memory->FrameBuffer );
+	_context = gcnew R4000GenContext( gen, _memory->MainMemory, _memory->VideoMemory );
 	_builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	_biosStubs = gcnew R4000BiosStubs();
 	_videoInterface = gcnew R4000VideoInterface( this );

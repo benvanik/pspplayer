@@ -4,13 +4,4 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Noxa.Emulation.Psp.Cpu
-{
-	public interface IDmaController
-	{
-	}
-}
+Yet another BIOS. This time not a copy/paste of the C# one.

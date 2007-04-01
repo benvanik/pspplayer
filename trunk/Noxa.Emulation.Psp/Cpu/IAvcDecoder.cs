@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
+	/// <summary>
+	/// CPU audio/video decoder functionality.
+	/// </summary>
 	public interface IAvcDecoder
 	{
 	}

@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.IO
 {
+	/// <summary>
+	/// A generic IO driver.
+	/// </summary>
 	public interface IIODriver : IComponentInstance
 	{
 	}

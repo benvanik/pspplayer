@@ -415,7 +415,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 				if( ( vertexBufferAddress & MainMemoryBase ) != 0 )
 					ptr = context->MainMemoryPointer + ( vertexBufferAddress - MainMemoryBase );
 				else
-					ptr = context->VideoMemoryPointer + ( vertexBufferAddress - FrameBufferBase );
+					ptr = context->VideoMemoryPointer + ( vertexBufferAddress - VideoMemoryBase );
 
 				if( areSprites == false )
 				{
@@ -428,7 +428,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 						if( ( indexBufferAddress & MainMemoryBase ) != 0 )
 							iptr = context->MainMemoryPointer + ( indexBufferAddress - MainMemoryBase );
 						else
-							iptr = context->VideoMemoryPointer + ( indexBufferAddress - FrameBufferBase );
+							iptr = context->VideoMemoryPointer + ( indexBufferAddress - VideoMemoryBase );
 					}
 
 					SetupVertexBuffers( context, vertexType, vertexCount, vertexSize, ptr );

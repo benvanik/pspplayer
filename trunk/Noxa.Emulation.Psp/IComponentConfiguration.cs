@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp
 {
+	/// <summary>
+	/// Component configuration services.
+	/// </summary>
 	public interface IComponentConfiguration
 	{
 	}

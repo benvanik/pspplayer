@@ -11,62 +11,82 @@ using System.Diagnostics;
 
 namespace Noxa.Emulation.Psp
 {
+	/// <summary>
+	/// Defines the severity level of a <see cref="ComponentIssue"/>.
+	/// </summary>
 	public enum IssueLevel
 	{
+		/// <summary>
+		/// User can proceed, but things may not function properly.
+		/// </summary>
 		Warning,
+
+		/// <summary>
+		/// User cannot proceed.
+		/// </summary>
 		Error,
 	}
 
+	/// <summary>
+	/// Represents an issue that occured during emulation setup.
+	/// </summary>
 	public class ComponentIssue
 	{
-		private IComponent _component;
-		private IssueLevel _level;
-		private string _message;
-		private string _supportUrl;
+		/// <summary>
+		/// The <see cref="IComponent"/> instance the issue relates to.
+		/// </summary>
+		public readonly IComponent Component;
 
+		/// <summary>
+		/// The severity level of the issue.
+		/// </summary>
+		public readonly IssueLevel Level;
+
+		/// <summary>
+		/// The human-friendly message describing the issue.
+		/// </summary>
+		public readonly string Message;
+
+		/// <summary>
+		/// A URL containing support information.
+		/// </summary>
+		public readonly string SupportUrl;
+
+		/// <summary>
+		/// Initializes a new <see cref="ComponentIssue"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="component">The <see cref="IComponent"/> instance the issue relates to.</param>
+		/// <param name="level">The severity level of the issue.</param>
+		/// <param name="message">A message describing the issue.</param>
 		public ComponentIssue( IComponent component, IssueLevel level, string message )
 			: this( component, level, message, null )
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new <see cref="ComponentIssue"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="component">The <see cref="IComponent"/> instance the issue relates to.</param>
+		/// <param name="level">The severity level of the issue.</param>
+		/// <param name="message">A message describing the issue.</param>
+		/// <param name="supportUrl">A URL containing support information.</param>
 		public ComponentIssue( IComponent component, IssueLevel level, string message, string supportUrl )
 		{
 			Debug.Assert( message != null );
 
-			_component = component;
-			_level = level;
-			_message = message;
-			_supportUrl = supportUrl;
+			this.Component = component;
+			this.Level = level;
+			this.Message = message;
+			this.SupportUrl = supportUrl;
 		}
 
-		public IssueLevel Level
-		{
-			get
-			{
-				return _level;
-			}
-		}
-
-		public string Message
-		{
-			get
-			{
-				return _message;
-			}
-		}
-
-		public string SupportUrl
-		{
-			get
-			{
-				return _supportUrl;
-			}
-		}
-
+		/// <summary>
+		/// Returns a <see cref="String"/> that represents the current <see cref="ComponentIssue"/>.
+		/// </summary>
 		public override string ToString()
 		{
 			string level;
-			switch( _level )
+			switch( this.Level )
 			{
 				case IssueLevel.Error:
 					level = "Error";
@@ -79,7 +99,7 @@ namespace Noxa.Emulation.Psp
 					Debug.Assert( false );
 					break;
 			}
-			return string.Format( "[{0}] {1}", level, _message );
+			return string.Format( "[{0}] {1}", level, this.Message );
 		}
 	}
 }

@@ -35,6 +35,8 @@ namespace Noxa.Emulation.Psp.Player.Development
 		public Studio()
 		{
 			InitializeComponent();
+
+			_steppingStatement = null;
 		}
 
 		public Studio( Debugger debugger )
@@ -112,7 +114,7 @@ namespace Noxa.Emulation.Psp.Player.Development
 		private void stepIntoToolStripButton_Click( object sender, EventArgs e )
 		{
 			this.CleanupBreakpoint();
-			_debugger.Control.StepInto();
+			_debugger.Control.Step();
 		}
 
 		private void stepOverToolStripButton_Click( object sender, EventArgs e )

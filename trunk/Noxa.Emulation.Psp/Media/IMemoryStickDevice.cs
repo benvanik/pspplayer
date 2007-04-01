@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Media
 {
+	/// <summary>
+	/// A Memory Stick device.
+	/// </summary>
 	public interface IMemoryStickDevice : IMediaDevice
 	{
 	}

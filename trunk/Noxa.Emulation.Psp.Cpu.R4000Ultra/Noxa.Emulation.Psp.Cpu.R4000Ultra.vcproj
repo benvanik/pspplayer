@@ -359,10 +359,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\R4000Clock.h"
-				>
-			</File>
-			<File
 				RelativePath=".\R4000Core.h"
 				>
 			</File>

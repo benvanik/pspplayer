@@ -10,6 +10,8 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
+	#pragma warning disable 1591
+
 	/// <summary>
 	/// CPU core state.
 	/// </summary>
@@ -33,4 +35,6 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		//bool DelayNop;
 		//int InterruptState;
 	}
+
+	#pragma warning restore
 }

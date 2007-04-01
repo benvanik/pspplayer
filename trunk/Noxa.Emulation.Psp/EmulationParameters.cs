@@ -6,27 +6,33 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics;
+using System.Text;
 
 namespace Noxa.Emulation.Psp
 {
+	/// <summary>
+	/// A set of selected components and their parameters.
+	/// </summary>
 	public class EmulationParameters
 	{
-		protected bool _isLocked = false;
+		private bool _isLocked = false;
 
-		protected IComponent _audio;
-		protected IComponent _bios;
-		protected IComponent _cpu;
-		protected List<IComponent> _io = new List<IComponent>();
-		protected IComponent _input;
-		protected IComponent _umd;
-		protected IComponent _memoryStick;
-		protected IComponent _video;
+		private IComponent _audio;
+		private IComponent _bios;
+		private IComponent _cpu;
+		private List<IComponent> _io = new List<IComponent>();
+		private IComponent _input;
+		private IComponent _umd;
+		private IComponent _memoryStick;
+		private IComponent _video;
 
-		protected Dictionary<IComponent, ComponentParameters> _params = new Dictionary<IComponent, ComponentParameters>();
-		protected ReadOnlyDictionary<IComponent, ComponentParameters> _readOnlyParams;
+		private Dictionary<IComponent, ComponentParameters> _params = new Dictionary<IComponent, ComponentParameters>();
+		private ReadOnlyDictionary<IComponent, ComponentParameters> _readOnlyParams;
 
+		/// <summary>
+		/// The selected audio component.
+		/// </summary>
 		public IComponent AudioComponent
 		{
 			get
@@ -42,6 +48,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// The selected BIOS component.
+		/// </summary>
 		public IComponent BiosComponent
 		{
 			get
@@ -57,6 +66,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// The selected CPU component.
+		/// </summary>
 		public IComponent CpuComponent
 		{
 			get
@@ -72,6 +84,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// A list of selected IO components.
+		/// </summary>
 		public IList<IComponent> IOComponents
 		{
 			get
@@ -83,6 +98,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// The selected input component.
+		/// </summary>
 		public IComponent InputComponent
 		{
 			get
@@ -98,6 +116,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// The selected UMD device component.
+		/// </summary>
 		public IComponent UmdComponent
 		{
 			get
@@ -113,6 +134,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// The selected Memory Stick device component.
+		/// </summary>
 		public IComponent MemoryStickComponent
 		{
 			get
@@ -128,6 +152,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// The selected video component.
+		/// </summary>
 		public IComponent VideoComponent
 		{
 			get
@@ -143,6 +170,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// The parameter collection indexed by component.
+		/// </summary>
 		public IDictionary<IComponent, ComponentParameters> Parameters
 		{
 			get
@@ -158,6 +188,11 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// Get the parameters for the given component.
+		/// </summary>
+		/// <param name="component">Component type whose parameters are to be retrieved.</param>
+		/// <returns>The parameters for the component or <c>null</c> if they were not found.</returns>
 		public ComponentParameters this[ IComponent component ]
 		{
 			get
@@ -173,6 +208,9 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// Make the parameter collection read-only.
+		/// </summary>
 		public void Lock()
 		{
 			_isLocked = true;
