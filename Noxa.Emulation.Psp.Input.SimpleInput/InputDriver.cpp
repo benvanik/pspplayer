@@ -8,6 +8,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include "XInput.h"
+#define DIRECTINPUT_VERSION  0x0800
 #include <dinput.h>
 
 #include "InputDriver.h"

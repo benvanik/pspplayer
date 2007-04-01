@@ -259,10 +259,10 @@ namespace Noxa.Emulation.Psp.Player
 					return "Paused - press play to resume";
 				case InstanceState.Running:
 					{
-						if( _host.CurrentInstance.Bios.Kernel.Game != null )
+						if( _host.CurrentInstance.Bios.Game != null )
 						{
 							string status = string.Format( "Running {0}",
-								_host.CurrentInstance.Bios.Kernel.Game.Parameters.Title );
+								_host.CurrentInstance.Bios.Game.Parameters.Title );
 							if( ( _host.CurrentInstance.Cpu.Capabilities.SupportedStatistics & Noxa.Emulation.Psp.Cpu.CpuStatisticsCapabilities.InstructionsPerSecond ) != 0 )
 							{
 								string ips = string.Format( "IPS: {0:###.##}M",

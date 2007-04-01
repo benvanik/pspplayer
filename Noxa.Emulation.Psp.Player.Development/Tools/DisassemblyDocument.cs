@@ -93,7 +93,8 @@ namespace Noxa.Emulation.Psp.Player.Development.Tools
 				return;
 
 			_currentMethod = method;
-			_rowMapping = new Dictionary<int, Row>( method.Instructions.Count );
+			//_rowMapping = new Dictionary<int, Row>( method.Instructions.Count );
+			_rowMapping = new Dictionary<int, Row>();
 
 			if( methodsToolStripComboBox.Items.Contains( method ) == true )
 				methodsToolStripComboBox.SelectedItem = method;
@@ -102,11 +103,11 @@ namespace Noxa.Emulation.Psp.Player.Development.Tools
 
 			syntaxDocument.Text = string.Format( "{0:X8} <{1}>:", method.EntryAddress, method.Name );
 
-			foreach( Instruction instr in method.Instructions.Values )
-			{
-				Row row = syntaxDocument.Add( string.Format( " {0:X8}:  {1:X8}    {2} {3}", instr.Address, instr.Code, instr.Opcode, instr.Operands ), false );
-				_rowMapping.Add( instr.Address, row );
-			}
+			//foreach( Instruction instr in method.Instructions.Values )
+			//{
+			//    Row row = syntaxDocument.Add( string.Format( " {0:X8}:  {1:X8}    {2} {3}", instr.Address, instr.Code, instr.Opcode, instr.Operands ), false );
+			//    _rowMapping.Add( instr.Address, row );
+			//}
 
 			syntaxDocument.UndoBuffer.Clear();
 

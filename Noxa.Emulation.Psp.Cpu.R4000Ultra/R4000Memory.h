@@ -23,7 +23,7 @@ namespace Noxa {
 				public:
 					byte*			ScratchPad;
 					byte*			MainMemory;
-					byte*			FrameBuffer;
+					byte*			VideoMemory;
 				protected:
 					IMemorySegment^	_frameBuffer;
 
@@ -50,11 +50,11 @@ namespace Noxa {
 						}
 					}
 
-					property void* FrameBufferPointer
+					property void* VideoMemoryPointer
 					{
 						virtual void* get()
 						{
-							return FrameBuffer;
+							return VideoMemory;
 						}
 					}
 
@@ -67,11 +67,6 @@ namespace Noxa {
 					virtual void WriteBytes( int address, array<unsigned char>^ bytes );
 					virtual void WriteBytes( int address, array<unsigned char>^ bytes, int index, int count );
 					virtual void WriteStream( int address, Stream^ source, int count );
-
-					virtual void Load( Stream^ stream );
-					virtual void Load( String^ fileName );
-					virtual void Save( Stream^ stream );
-					virtual void Save( String^ fileName );
 
 					virtual unsigned int GetMemoryHash( int address, int count, unsigned int prime );
 

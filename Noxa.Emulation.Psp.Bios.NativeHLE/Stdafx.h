@@ -4,13 +4,12 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+// stdafx.h : include file for standard system include files,
+// or project specific include files that are used frequently,
+// but are changed infrequently
 
-namespace Noxa.Emulation.Psp.Cpu
-{
-	public interface IClock
-	{
-	}
-}
+#pragma once
+
+#include "Options.h"
+
+#include "NoxaShared.h"

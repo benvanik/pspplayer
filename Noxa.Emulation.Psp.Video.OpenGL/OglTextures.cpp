@@ -157,8 +157,8 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	}*/
 
 	byte* address;
-	if( ( texture->Address & FrameBufferBase ) != 0 )
-		address = context->VideoMemoryPointer + ( texture->Address - FrameBufferBase );
+	if( ( texture->Address & VideoMemoryBase ) != 0 )
+		address = context->VideoMemoryPointer + ( texture->Address - VideoMemoryBase );
 	else
 		address = context->MainMemoryPointer + ( texture->Address - MainMemoryBase );
 

@@ -52,6 +52,6 @@ __inline int power( int base, int exponent )
 #define ScratchPadBase			0x00010000
 #define ScratchPadSize			0x00003FFF
 #define ScratchPadBound			( ScratchPadBase + ScratchPadSize )
-#define FrameBufferBase			0x04000000
-#define FrameBufferSize			0x001FFFFF
-#define FrameBufferBound		( FrameBufferBase + FrameBufferSize )
+#define VideoMemoryBase			0x04000000
+#define VideoMemorySize			0x001FFFFF
+#define VideoMemoryBound		( VideoMemoryBase + VideoMemorySize )

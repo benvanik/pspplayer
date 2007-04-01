@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Video
 {
+	/// <summary>
+	/// Describes the pixel format of a display.
+	/// </summary>
 	public enum PixelFormat
 	{
 		/// <summary>
@@ -30,29 +33,38 @@ namespace Noxa.Emulation.Psp.Video
 		Rgba8888
 	}
 
+	/// <summary>
+	/// Describes the buffer sync mode of a display.
+	/// </summary>
 	public enum BufferSyncMode
 	{
 		/// <summary>
-		/// Buffer change effective immediately
+		/// Buffer change effective immediately.
 		/// </summary>
 		Immediate = 0,
 		/// <summary>
-		/// Buffer change effective next frame
+		/// Buffer change effective next frame.
 		/// </summary>
 		NextFrame = 1
 	}
 
+	/// <summary>
+	/// <see cref="IVideoDriver"/> display properties.
+	/// </summary>
 	public class DisplayProperties : ICloneable
 	{
-		protected bool _hasChanged;
-		protected int _mode;
-		protected int _width;
-		protected int _height;
-		protected PixelFormat _pixelFormat;
-		protected BufferSyncMode _syncMode;
-		protected uint _bufferAddress;
-		protected uint _bufferSize;
+		private bool _hasChanged;
+		private int _mode;
+		private int _width;
+		private int _height;
+		private PixelFormat _pixelFormat;
+		private BufferSyncMode _syncMode;
+		private uint _bufferAddress;
+		private uint _bufferSize;
 
+		/// <summary>
+		/// <c>true</c> if the display properties have been changed.
+		/// </summary>
 		public bool HasChanged
 		{
 			get
@@ -65,6 +77,9 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
+		/// <summary>
+		/// The display mode.
+		/// </summary>
 		public int Mode
 		{
 			get
@@ -79,6 +94,9 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
+		/// <summary>
+		/// The width of the display, in pixels.
+		/// </summary>
 		public int Width
 		{
 			get
@@ -93,6 +111,9 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
+		/// <summary>
+		/// The height of the display, in pixels.
+		/// </summary>
 		public int Height
 		{
 			get
@@ -107,6 +128,9 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
+		/// <summary>
+		/// The pixel format used by the display.
+		/// </summary>
 		public PixelFormat PixelFormat
 		{
 			get
@@ -121,6 +145,9 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
+		/// <summary>
+		/// The sync mode of the display.
+		/// </summary>
 		public BufferSyncMode SyncMode
 		{
 			get
@@ -135,6 +162,9 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
+		/// <summary>
+		/// The address of the frame buffer.
+		/// </summary>
 		public uint BufferAddress
 		{
 			get
@@ -147,6 +177,9 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
+		/// <summary>
+		/// The size of the frame buffer.
+		/// </summary>
 		public uint BufferSize
 		{
 			get
@@ -161,6 +194,10 @@ namespace Noxa.Emulation.Psp.Video
 			}
 		}
 
+		/// <summary>
+		/// Clone the current <see cref="DisplayProperties"/> instance.
+		/// </summary>
+		/// <returns>A clone of the current <see cref="DisplayProperties"/> instance.</returns>
 		public object Clone()
 		{
 			DisplayProperties clone = new DisplayProperties();

@@ -44,6 +44,7 @@ namespace Noxa {
 					GameInformation^					_game;
 					AutoResetEvent^						_gameEvent;
 					Stream^								_bootStream;
+					uint								_elfUpperBounds;
 
 					int									_lastId;
 					Dictionary<int, KernelHandle^>^		_handles;

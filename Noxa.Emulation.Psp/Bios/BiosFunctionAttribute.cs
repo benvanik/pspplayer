@@ -10,32 +10,32 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Bios
 {
+	/// <summary>
+	/// Marks a function as being an exported BIOS routine and defines the unique ID and
+	/// name of a BIOS function.
+	/// </summary>
 	[global::System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
 	public sealed class BiosFunctionAttribute : Attribute
 	{
-		private readonly uint _nid;
-		private readonly string _name;
+		/// <summary>
+		/// The NID (unique ID) of the function.
+		/// </summary>
+		public readonly uint NID;
 
+		/// <summary>
+		/// The name of the function.
+		/// </summary>
+		public readonly string Name;
+
+		/// <summary>
+		/// Marks a method as a BIOS function.
+		/// </summary>
+		/// <param name="nid">The NID (unique ID) of the function.</param>
+		/// <param name="name">The name of the function.</param>
 		public BiosFunctionAttribute( uint nid, string name )
 		{
-			_nid = nid;
-			_name = name;
-		}
-
-		public uint NID
-		{
-			get
-			{
-				return _nid;
-			}
-		}
-
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
+			this.NID = nid;
+			this.Name = name;
 		}
 	}
 }

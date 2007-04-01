@@ -10,6 +10,8 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp
 {
+	#pragma warning disable 1591
+
 	public class NullComponent : IComponent
 	{
 		public ComponentType Type
@@ -104,4 +106,6 @@ namespace Noxa.Emulation.Psp
 			return null;
 		}
 	}
+
+	#pragma warning restore
 }

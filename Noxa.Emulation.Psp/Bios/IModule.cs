@@ -10,15 +10,10 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Bios
 {
+	/// <summary>
+	/// Module instance.
+	/// </summary>
 	public interface IModule
 	{
-		string Name
-		{
-			get;
-		}
-
-		void Start();
-		void Stop();
-		void Clear();
 	}
 }

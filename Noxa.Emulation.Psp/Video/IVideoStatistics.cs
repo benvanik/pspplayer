@@ -10,8 +10,14 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Video
 {
+	/// <summary>
+	/// <see cref="IVideoDriver"/> statistics.
+	/// </summary>
 	public interface IVideoStatistics
 	{
+		/// <summary>
+		/// The number of frames per second, on average.
+		/// </summary>
 		int FramesPerSecond
 		{
 			get;

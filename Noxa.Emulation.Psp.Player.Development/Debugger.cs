@@ -156,9 +156,7 @@ namespace Noxa.Emulation.Psp.Player.Development
 				}
 				else
 				{
-					string filename = setup.ObjdumpFilename;
-					using( Stream stream = File.OpenRead( filename ) )
-						result = this.LoadDebugData( DebugDataType.Objdump, stream );
+					Debug.Assert( false );
 				}
 				Debug.Assert( result == true );
 				if( result == false )

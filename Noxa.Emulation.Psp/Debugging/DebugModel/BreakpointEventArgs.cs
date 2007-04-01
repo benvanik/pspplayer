@@ -11,24 +11,26 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
+	/// <summary>
+	/// Event arguments for <see cref="Breakpoint"/> events.
+	/// </summary>
 	public class BreakpointEventArgs : EventArgs
 	{
-		protected Breakpoint _breakpoint;
+		/// <summary>
+		/// The <see cref="Breakpoint"/> the event is about.
+		/// </summary>
+		public readonly Breakpoint Breakpoint;
 
+		/// <summary>
+		/// Initializes a new <see cref="BreakpointEventArgs"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="breakpoint">The <see cref="Breakpoint"/> the event is about.</param>
 		public BreakpointEventArgs( Breakpoint breakpoint )
 		{
 			Debug.Assert( breakpoint != null );
 			if( breakpoint == null )
 				throw new ArgumentNullException( "breakpoint" );
-			_breakpoint = breakpoint;
-		}
-
-		public Breakpoint Breakpoint
-		{
-			get
-			{
-				return _breakpoint;
-			}
+			this.Breakpoint = breakpoint;
 		}
 	}
 }

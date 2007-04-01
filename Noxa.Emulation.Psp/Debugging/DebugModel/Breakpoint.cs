@@ -10,38 +10,72 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
+	/// <summary>
+	/// Describes the type of <see cref="Breakpoint"/>.
+	/// </summary>
 	public enum BreakpointType
 	{
+		/// <summary>
+		/// Defined by the user.
+		/// </summary>
 		UserSet,
+
+		/// <summary>
+		/// Set by the debugger for stepping.
+		/// </summary>
 		Stepping,
 	}
 
+	/// <summary>
+	/// A breakpoint.
+	/// </summary>
 	public abstract class Breakpoint
 	{
-		protected BreakpointType _type;
-		protected bool _enabled;
-		protected int _address;
+		/// <summary>
+		/// The type of the breakpoint.
+		/// </summary>
+		public readonly BreakpointType Type;
 
+		/// <summary>
+		/// The address of the breakpoint.
+		/// </summary>
+		public readonly int Address;
+
+		/// <summary>
+		/// The enabled state of the breakpoint.
+		/// </summary>
+		protected bool _enabled;
+
+		/// <summary>
+		/// The optional user-defined name of the breakpoint.
+		/// </summary>
+		protected string _name;
+
+		/// <summary>
+		/// Initializes a new user-set <see cref="Breakpoint"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="address">The address of the breakpoint.</param>
 		public Breakpoint( int address )
 			: this( BreakpointType.UserSet, address )
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new <see cref="Breakpoint"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="type">The breakpoint type.</param>
+		/// <param name="address">The address of the breakpoint.</param>
 		public Breakpoint( BreakpointType type, int address )
 		{
-			_type = type;
+			this.Type = type;
+			this.Address = address;
+
 			_enabled = true;
-			_address = address;
 		}
 
-		public BreakpointType Type
-		{
-			get
-			{
-				return _type;
-			}
-		}
-
+		/// <summary>
+		/// The current enabled state of the breakpoint.
+		/// </summary>
 		public bool Enabled
 		{
 			get
@@ -58,15 +92,35 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 			}
 		}
 
-		public int Address
+		/// <summary>
+		/// The optional user-defined name for the breakpoint.
+		/// </summary>
+		public string Name
 		{
 			get
 			{
-				return _address;
+				return _name;
+			}
+			set
+			{
+				bool changed = ( _name != value );
+				_name = value;
+				if( changed == true )
+					this.OnNameChanged();
 			}
 		}
 
+		/// <summary>
+		/// Called when the enabled state of the breakpoint changes.
+		/// </summary>
 		protected virtual void OnEnabledChanged()
+		{
+		}
+
+		/// <summary>
+		/// Called when the name of the breakpoint changes.
+		/// </summary>
+		protected virtual void OnNameChanged()
 		{
 		}
 	}

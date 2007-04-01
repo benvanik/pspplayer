@@ -71,10 +71,25 @@ namespace Noxa.Emulation.Psp.Debugging
 		/// </summary>
 		void Break();
 
+		/// <summary>
+		/// Run until the given address is reached.
+		/// </summary>
+		/// <param name="address">Address to break at.</param>
 		void RunUntil( int address );
+
+		/// <summary>
+		/// Step one instruction.
+		/// </summary>
 		void Step();
-		void StepInto();
+
+		/// <summary>
+		/// Step over the given jump and break on the other side.
+		/// </summary>
 		void StepOver();
+
+		/// <summary>
+		/// Run until control returns to the caller.
+		/// </summary>
 		void StepOut();
 	}
 }

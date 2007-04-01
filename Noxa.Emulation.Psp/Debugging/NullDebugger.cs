@@ -12,6 +12,8 @@ using Noxa.Emulation.Psp.Debugging.DebugData;
 
 namespace Noxa.Emulation.Psp.Debugging
 {
+	#pragma warning disable 1591
+
 	public class NullDebugger : IDebugger
 	{
 		private IEmulationHost _host;
@@ -109,4 +111,6 @@ namespace Noxa.Emulation.Psp.Debugging
 		{
 		}
 	}
+
+	#pragma warning restore
 }

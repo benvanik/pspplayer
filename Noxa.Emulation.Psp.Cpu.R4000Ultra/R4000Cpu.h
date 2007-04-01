@@ -19,7 +19,6 @@ using namespace Noxa::Emulation::Psp::Utilities;
 
 #include "R4000Cache.h"
 #include "R4000Capabilities.h"
-#include "R4000Clock.h"
 #include "R4000Core.h"
 #include "R4000GenContext.h"
 #include "R4000Memory.h"
@@ -46,7 +45,6 @@ namespace Noxa {
 					IEmulationInstance^			_emu;
 					ComponentParameters^		_params;
 					R4000Capabilities^			_caps;
-					R4000Clock^					_clock;
 
 					bool						_hasExecuted;
 
@@ -131,14 +129,6 @@ namespace Noxa {
 						}
 					}
 
-					property IClock^ Clock
-					{
-						virtual IClock^ get()
-						{
-							return _clock;
-						}
-					}
-
 					property array<ICpuCore^>^ Cores
 					{
 						virtual array<ICpuCore^>^ get()
@@ -160,14 +150,6 @@ namespace Noxa {
 							default:
 								return nullptr;
 							}
-						}
-					}
-
-					property IDmaController^ Dma
-					{
-						virtual IDmaController^ get()
-						{
-							return nullptr;
 						}
 					}
 

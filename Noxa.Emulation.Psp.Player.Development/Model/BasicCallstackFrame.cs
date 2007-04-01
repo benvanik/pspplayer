@@ -15,8 +15,8 @@ namespace Noxa.Emulation.Psp.Player.Development.Model
 {
 	class BasicCallstackFrame : Frame
 	{
-		public BasicCallstackFrame( int address, string name )
-			: base( address, name )
+		public BasicCallstackFrame( int address )
+			: base( address )
 		{
 		}
 	}

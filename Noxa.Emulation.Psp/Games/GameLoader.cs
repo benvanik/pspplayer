@@ -6,26 +6,37 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Drawing;
 using System.Diagnostics;
-using System.Xml;
+using System.Drawing;
+using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
-using Noxa.Emulation.Psp.Cpu;
+using System.Xml;
+
 using Noxa.Emulation.Psp.Bios;
+using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.IO;
 using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Games
 {
+	/// <summary>
+	/// Utility class for finding and loading games.
+	/// </summary>
 	public class GameLoader
 	{
-		public bool LoadBoot( GameInformation game, IEmulationInstance instance, out uint lowerBounds, out uint upperBounds, out uint entryAddress )
+		#region Load Helpers
+
+		/// <summary>
+		/// Find and retrieve the boot stream for the given game.
+		/// </summary>
+		/// <param name="game">Game to look for.</param>
+		/// <returns>The games boot stream (from BOOT.BIN, etc) or <c>null</c> if it could not be found.</returns>
+		public Stream FindBootStream( GameInformation game )
 		{
-			lowerBounds = 0;
-			upperBounds = 0;
-			entryAddress = 0;
+			Debug.Assert( game != null );
+			if( game == null )
+				return null;
 
 			IMediaFolder folder = game.Folder;
 			if( folder[ "PSP_GAME" ] != null )
@@ -68,145 +79,101 @@ namespace Noxa.Emulation.Psp.Games
 				bootStream = bootBin.OpenRead();
 			}
 
-			if( bootStream == null )
+			return bootStream;
+		}
+
+		/// <summary>
+		/// Generate a load report XML file and write it to the disk.
+		/// </summary>
+		/// <param name="instance">The current emulation instance.</param>
+		/// <param name="game">The game being loaded.</param>
+		/// <param name="results">The results of the load.</param>
+		public void GenerateReport( IEmulationInstance instance, GameInformation game, LoadResults results )
+		{
+			Debug.Assert( game != null );
+			if( game == null )
+				return;
+			Debug.Assert( results != null );
+			if( results == null )
+				return;
+
+			XmlDocument doc = new XmlDocument();
+			doc.AppendChild( doc.CreateXmlDeclaration( "1.0", null, "yes" ) );
+			XmlElement root = doc.CreateElement( "loadResults" );
+			root.SetAttribute( "successful", results.Successful.ToString() );
+
+			XmlElement gameRoot = doc.CreateElement( "game" );
+			gameRoot.SetAttribute( "type", game.GameType.ToString() );
+			//gameRoot.SetAttribute( "path", EscapeFilePath( game.Folder.AbsolutePath ) );
 			{
-				// Whoa!
-				Debug.WriteLine( "LoadBoot: game had no boot.bin/eboot.bin, aborting" );
-				return false;
+				XmlElement sfoRoot = doc.CreateElement( "parameters" );
+				if( game.Parameters.Title != null )
+					sfoRoot.SetAttribute( "title", game.Parameters.Title );
+				if( game.Parameters.SystemVersion != new Version() )
+					sfoRoot.SetAttribute( "systemVersion", game.Parameters.SystemVersion.ToString() );
+				if( game.Parameters.GameVersion != new Version() )
+					sfoRoot.SetAttribute( "gameVersion", game.Parameters.GameVersion.ToString() );
+				if( game.Parameters.DiscID != null )
+					sfoRoot.SetAttribute( "discId", game.Parameters.DiscID );
+				if( game.Parameters.Region >= 0 )
+					sfoRoot.SetAttribute( "region", game.Parameters.Region.ToString( "X" ) );
+				if( game.Parameters.Language != null )
+					sfoRoot.SetAttribute( "language", game.Parameters.Language );
+				sfoRoot.SetAttribute( "category", game.Parameters.Category.ToString() );
+				gameRoot.AppendChild( sfoRoot );
 			}
+			root.AppendChild( gameRoot );
 
-			ElfFile elf;
-			// TODO: enable exception handling to gracefully handle bad elfs
-			//try
-			//{
-				elf = new ElfFile( bootStream );
-			//}
-			//catch
-			//{
-			//	Debug.WriteLine( "LoadBoot: elf load failed, possibly encrypted, aborting" );
-			//	return false;
-			//}
-
-			uint baseAddress = 0x08900000;
-
-			ElfLoadResult result = elf.Load( bootStream, instance, baseAddress );
-//#if DEBUG
-			if( result.Stubs.Count > 0 )
+			XmlElement biosRoot = doc.CreateElement( "bios" );
 			{
-				XmlDocument doc = new XmlDocument();
-				doc.AppendChild( doc.CreateXmlDeclaration( "1.0", null, "yes" ) );
-				XmlElement root = doc.CreateElement( "loadResult" );
-				XmlElement gameRoot = doc.CreateElement( "game" );
-				gameRoot.SetAttribute( "type", game.GameType.ToString() );
-				if( game.UniqueID != null )
-					gameRoot.SetAttribute( "uniqueId", game.UniqueID );
-				gameRoot.SetAttribute( "path", EscapeFilePath( game.Folder.AbsolutePath ) );
+				IComponent factory = Activator.CreateInstance( instance.Bios.Factory ) as IComponent;
+				if( factory != null )
 				{
-					XmlElement sfoRoot = doc.CreateElement( "parameters" );
-					if( game.Parameters.Title != null )
-						sfoRoot.SetAttribute( "title", game.Parameters.Title );
-					if( game.Parameters.SystemVersion != new Version() )
-						sfoRoot.SetAttribute( "systemVersion", game.Parameters.SystemVersion.ToString() );
-					if( game.Parameters.GameVersion != new Version() )
-						sfoRoot.SetAttribute( "gameVersion", game.Parameters.GameVersion.ToString() );
-					if( game.Parameters.DiscID != null )
-						sfoRoot.SetAttribute( "discId", game.Parameters.DiscID );
-					if( game.Parameters.Region >= 0 )
-						sfoRoot.SetAttribute( "region", game.Parameters.Region.ToString( "X" ) );
-					if( game.Parameters.Language != null )
-						sfoRoot.SetAttribute( "language", game.Parameters.Language );
-					sfoRoot.SetAttribute( "category", game.Parameters.Category.ToString() );
-					gameRoot.AppendChild( sfoRoot );
+					biosRoot.SetAttribute( "name", factory.Name );
+					biosRoot.SetAttribute( "version", factory.Version.ToString() );
+					biosRoot.SetAttribute( "build", factory.Build.ToString() );
+					if( factory.Author != null )
+						biosRoot.SetAttribute( "author", factory.Author );
+					if( factory.Website != null )
+						biosRoot.SetAttribute( "website", factory.Website );
 				}
-				root.AppendChild( gameRoot );
-				XmlElement biosRoot = doc.CreateElement( "bios" );
-				{
-					IComponent factory = Activator.CreateInstance( instance.Bios.Factory ) as IComponent;
-					if( factory != null )
-					{
-						biosRoot.SetAttribute( "name", factory.Name );
-						biosRoot.SetAttribute( "version", factory.Version.ToString() );
-						biosRoot.SetAttribute( "build", factory.Build.ToString() );
-						if( factory.Author != null )
-							biosRoot.SetAttribute( "author", factory.Author );
-						if( factory.Website != null )
-							biosRoot.SetAttribute( "website", factory.Website );
-					}
-					else
-					{
-						biosRoot.SetAttribute( "status", "Unknown" );
-					}
-				}
-				root.AppendChild( biosRoot );
-				XmlElement referencesRoot = doc.CreateElement( "references" );
-				foreach( StubReference reference in result.Stubs )
-				{
-					XmlElement referenceRoot = doc.CreateElement( "reference" );
-					referenceRoot.SetAttribute( "type", reference.Result.ToString() );
-					referenceRoot.SetAttribute( "module", reference.ModuleName );
-					referenceRoot.SetAttribute( "nid", string.Format( "{0:X8}", reference.Nid ) );
-
-					if( reference.Function != null )
-					{
-						XmlElement functionRoot = doc.CreateElement( "function" );
-						functionRoot.SetAttribute( "name", reference.Function.Name );
-						functionRoot.SetAttribute( "isImplemented", reference.Function.IsImplemented.ToString() );
-						referenceRoot.AppendChild( functionRoot );
-					}
-
-					referencesRoot.AppendChild( referenceRoot );
-				}
-				root.AppendChild( referencesRoot );
-				doc.AppendChild( root );
-
-				string fileName;
-				if( game.GameType == GameType.Eboot )
-				{
-					string title = game.Parameters.Title;
-					title = title.Replace( "\n", "" ); // All it takes is one moron
-					fileName = string.Format( "LoadResult-Eboot-{0}.xml", title );
-				}
-				else
-					fileName = string.Format( "LoadResult-{0}.xml", game.Parameters.DiscID );
-				using( FileStream stream = File.Open( fileName, FileMode.Create ) )
-					doc.Save( stream );
 			}
-//#endif
+			root.AppendChild( biosRoot );
 
-			// Setup the CPU
-			instance.Bios.Kernel.BootStream = bootStream;
-			instance.Cpu.SetupGame( game, bootStream );
-			if( instance.Host.Debugger != null )
-				instance.Host.Debugger.SetupGame( game, bootStream );
+			XmlElement importsRoot = doc.CreateElement( "imports" );
+			foreach( StubImport import in results.Imports )
+			{
+				XmlElement importRoot = doc.CreateElement( "import" );
+				importRoot.SetAttribute( "type", import.Result.ToString() );
+				importRoot.SetAttribute( "module", import.ModuleName );
+				importRoot.SetAttribute( "nid", string.Format( "{0:X8}", import.NID ) );
 
-			// Set arguments - we put these right below user space, and right above the stack
-			int args = 0;
-			int argp = 0x087FFFFF;
-			string arg0 = game.Folder.AbsolutePath.Replace( '\\', '/' ) + '/';
-			args += arg0.Length + 1;
-			argp -= args;
-			instance.Cpu.Memory.WriteBytes( argp, Encoding.ASCII.GetBytes( arg0 ) );
-			int envp = argp;
-			// write envp??
+				if( import.Function != null )
+				{
+					XmlElement functionRoot = doc.CreateElement( "function" );
+					functionRoot.SetAttribute( "name", import.Function.Name );
+					functionRoot.SetAttribute( "isImplemented", import.Function.IsImplemented.ToString() );
+					functionRoot.SetAttribute( "hasNative", ( import.Function.NativeMethod != IntPtr.Zero ) ? true.ToString() : false.ToString() );
+					importRoot.AppendChild( functionRoot );
+				}
 
-			// dword align the stack (just truncate, we don't care if we waste a byte or two)
-			int sp = envp & unchecked( ( int )0xFFFFFFF0 );
+				importsRoot.AppendChild( importRoot );
+			}
+			root.AppendChild( importsRoot );
 
-			// TODO: Move this elsewhere?
-			instance.Cpu[ 0 ].ProgramCounter = ( int )elf.EntryAddress;
-			instance.Cpu[ 0 ].SetGeneralRegister( 4, args );
-			instance.Cpu[ 0 ].SetGeneralRegister( 5, argp );
-			instance.Cpu[ 0 ].SetGeneralRegister( 6, envp );
-			instance.Cpu[ 0 ].SetGeneralRegister( 26, 0x09FBFF00 ); //0x08380000;
-			instance.Cpu[ 0 ].SetGeneralRegister( 28, ( int )elf.GlobalPointer );
-			instance.Cpu[ 0 ].SetGeneralRegister( 29, sp ); // start below argv & envp data - not 0x087FFFFF
-			//instance.Cpu[ 0 ].SetGeneralRegister( 31, ( int )elf.EntryAddress );
+			doc.AppendChild( root );
 
-			entryAddress = elf.EntryAddress;
-			lowerBounds = baseAddress;
-			upperBounds = elf.UpperAddress;
-
-			return true;
+			string fileName;
+			if( game.GameType == GameType.Eboot )
+			{
+				string title = game.Parameters.Title;
+				title = title.Replace( "\n", "" ); // All it takes is one moron
+				fileName = string.Format( "LoadResult-Eboot-{0}.xml", title );
+			}
+			else
+				fileName = string.Format( "LoadResult-{0}.xml", game.Parameters.DiscID );
+			using( FileStream stream = File.Open( fileName, FileMode.Create ) )
+				doc.Save( stream );
 		}
 
 		private static string EscapeFilePath( string path )
@@ -214,23 +181,25 @@ namespace Noxa.Emulation.Psp.Games
 			return path.Replace( "&", "&amp;" ).Replace( "'", "&apos;" );
 		}
 
-		public GameInformation[] FindGames( IEmulationInstance instance )
+		#endregion
+
+		#region Game Searching
+
+		/// <summary>
+		/// Find all games on the current Memory Stick.
+		/// </summary>
+		/// <param name="device">The Memory Stick to search.</param>
+		/// <returns>A list of games found.</returns>
+		public GameInformation[] FindGames( IMemoryStickDevice device )
 		{
 			List<GameInformation> infos = new List<GameInformation>();
 
-			if( ( instance.Umd != null ) &&
-				( instance.Umd.State == MediaState.Present ) )
-			{
-				GameInformation info = this.GetUmdGameInformation( instance.Umd );
-				if( infos != null )
-					infos.Add( info );
-			}
-
-			if( ( instance.MemoryStick != null ) &&
-				( instance.MemoryStick.State == MediaState.Present ) )
+			Debug.Assert( device != null );
+			if( ( device != null ) &&
+				( device.State == MediaState.Present ) )
 			{
 				// Eboots in PSP\GAME\*
-				IMediaFolder rootFolder = instance.MemoryStick.Root.FindFolder( @"PSP\GAME\" );
+				IMediaFolder rootFolder = device.Root.FindFolder( @"PSP\GAME\" );
 				foreach( IMediaFolder folder in rootFolder )
 				{
 					// kxploit check
@@ -256,16 +225,38 @@ namespace Noxa.Emulation.Psp.Games
 			return infos.ToArray();
 		}
 
+		/// <summary>
+		/// Find the game on the given UMD device.
+		/// </summary>
+		/// <param name="device">The UMD to search.</param>
+		/// <returns>The game found on the device, or <c>null</c> if none was found.</returns>
 		public GameInformation FindGame( IUmdDevice device )
 		{
+			Debug.Assert( device != null );
+			if( device == null )
+				return null;
+
 			GameInformation info = this.GetUmdGameInformation( device );
+			Debug.Assert( info != null );
+
 			return info;
 		}
 
+		#endregion
+
 		#region Information
 
+		/// <summary>
+		/// Get <see cref="GameInformation"/> from the given EBOOT folder.
+		/// </summary>
+		/// <param name="folder">The folder containing the EBOOT.</param>
+		/// <returns>A <see cref="GameInformation"/> instance representing the game, or <c>null</c> if an error occurred.</returns>
 		public GameInformation GetEbootGameInformation( IMediaFolder folder )
 		{
+			Debug.Assert( folder != null );
+			if( folder == null )
+				return null;
+
 			IMediaFile file = folder[ "EBOOT.PBP" ] as IMediaFile;
 			if( file == null )
 				return null;
@@ -294,6 +285,11 @@ namespace Noxa.Emulation.Psp.Games
 			}
 		}
 
+		/// <summary>
+		/// Get <see cref="GameInformation"/> from the given UMD device.
+		/// </summary>
+		/// <param name="device">The device containing the game.</param>
+		/// <returns>A <see cref="GameInformation"/> instance representing the game, or <c>null</c> if an error occurred.</returns>
 		public GameInformation GetUmdGameInformation( IMediaDevice device )
 		{
 			IMediaFolder folder = device.Root;

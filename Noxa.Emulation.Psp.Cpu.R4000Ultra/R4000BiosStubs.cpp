@@ -143,10 +143,10 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 
 		// sceGeUser -------------------------------------------
 		case 0x1f6752ad:		// sceGeEdramGetSize
-			g->mov( EAX, FrameBufferSize );
+			g->mov( EAX, VideoMemorySize );
 			return true;
 		case 0xe47e40e4:		// sceGeEdramGetAddr
-			g-> mov( EAX, FrameBufferBase );
+			g-> mov( EAX, VideoMemoryBase );
 			return true;
 		case 0xab49e76a:		// sceGeListEnQueue
 			g->push( ( uint )0 ); // head = false

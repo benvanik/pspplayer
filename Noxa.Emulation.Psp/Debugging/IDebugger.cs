@@ -14,17 +14,40 @@ using Noxa.Emulation.Psp.Games;
 
 namespace Noxa.Emulation.Psp.Debugging
 {
+	/// <summary>
+	/// Describes the type of debug database.
+	/// </summary>
 	public enum DebugDataType
 	{
-		Objdump,
+		/// <summary>
+		/// Full ELF debug information.
+		/// </summary>
 		Elf,
+
+		/// <summary>
+		/// Minimal ELF debug information, consisting only of symbols.
+		/// </summary>
 		Symbols,
 	}
 
+	/// <summary>
+	/// Describes the state of the debugger.
+	/// </summary>
 	public enum DebuggerState
 	{
+		/// <summary>
+		/// The debugger is running code.
+		/// </summary>
 		Running,
+
+		/// <summary>
+		/// The debugger is paused at a breakpoint or on an error.
+		/// </summary>
 		Paused,
+
+		/// <summary>
+		/// The debugger has handled a crash in the executable.
+		/// </summary>
 		Crashed,
 	}
 

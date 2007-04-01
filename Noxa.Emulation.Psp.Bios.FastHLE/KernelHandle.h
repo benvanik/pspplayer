@@ -23,6 +23,7 @@ namespace Noxa {
 					Stdio,
 					File,
 					MemoryBlock,
+					Pool,
 					Callback,
 					GeCallback,
 					Semaphore,

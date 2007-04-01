@@ -10,31 +10,23 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
+	/// <summary>
+	/// A single frame in a callstack.
+	/// </summary>
 	public abstract class Frame
 	{
-		protected int _address;
-		protected string _name;
+		/// <summary>
+		/// The entry address.
+		/// </summary>
+		public readonly int Address;
 
-		public Frame( int address, string name )
+		/// <summary>
+		/// Initializes a new <see cref="Frame"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="address">The entry address of the method.</param>
+		protected Frame( int address )
 		{
-			_address = address;
-			_name = name;
-		}
-
-		public int Address
-		{
-			get
-			{
-				return _address;
-			}
-		}
-
-		public string Name
-		{
-			get
-			{
-				return _name;
-			}
+			this.Address = address;
 		}
 	}
 }

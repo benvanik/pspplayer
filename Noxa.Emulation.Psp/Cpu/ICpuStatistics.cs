@@ -10,8 +10,14 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
+	/// <summary>
+	/// <see cref="ICpu"/> statistics.
+	/// </summary>
 	public interface ICpuStatistics
 	{
+		/// <summary>
+		/// The number of instructions per second.
+		/// </summary>
 		int InstructionsPerSecond
 		{
 			get;

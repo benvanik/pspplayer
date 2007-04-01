@@ -28,6 +28,13 @@ int CallbackThread( SceSize args, void *argp )
 	return 0;
 }
 
+int DummyCallback( int arg1, int arg2, void* arg )
+{
+	pspDebugScreenPrintf( "callback: arg1: %X, arg2: %X, arg3: %X", arg1, arg2, (int)arg );
+
+	return 0;
+}
+
 int main( int argc, char *argv[] )
 {
 	pspDebugScreenInit();
@@ -36,50 +43,29 @@ int main( int argc, char *argv[] )
 	if( thid >= 0 )
 		sceKernelStartThread( thid, 0, 0 );
 
-	while( 1 )
+	//int cbid = sceKernelCreateCallback( "Dummy Callback", DummyCallback, NULL );
+
+	//int  sceKernelCreateFpl (const char *name, int part, int attr, unsigned int size, unsigned int blocks, struct SceKernelFplOptParam *opt) 
+	//SceKernelFplOptParam opts;
+	//opts.size = sizeof( SceKernelFplOptParam );
+	int id = sceKernelCreateFpl( "Fpl1", 2, 0, 0x0145D000, 1, NULL );
+
+	// 0x00900010 -> 0890E400
+	// 0x0145D000 -> 0890E400
+	// = next aligned address after program memory
+
+	void* ptr;
+	int ret = sceKernelAllocateFpl( id, &ptr, 0 );
+	if( ret >= 0 )
 	{
-		SceKernelSysClock t;
-
-		unsigned us = 1;
-		sceKernelUSec2SysClock( us, &t );
-		pspDebugScreenPrintf( "%d -> lo: %08X hi: %08X\n", us, t.low, t.hi );
-
-		us = 1000;
-		sceKernelUSec2SysClock( us, &t );
-		pspDebugScreenPrintf( "%d -> lo: %08X hi: %08X\n", us, t.low, t.hi );
-
-		us = 1000000;
-		sceKernelUSec2SysClock( us, &t );
-		pspDebugScreenPrintf( "%d -> lo: %08X hi: %08X\n", us, t.low, t.hi );
-
-		us = 1000000000;
-		sceKernelUSec2SysClock( us, &t );
-		pspDebugScreenPrintf( "%d -> lo: %08X hi: %08X\n", us, t.low, t.hi );
-
-		//sceKernelGetSystemTime( &t );
-
-		//pspDebugScreenPrintf( "sceKernelGetSystemTime lo=%08X hi=%08X\n", t.low, t.hi );
-
-		/*t.low = 0xDEADBEEF;
-		t.hi = 0xCAFEBABE;
-
-		unsigned int lo;
-		unsigned int hi;
-		sceKernelSysClock2USec( &t, &lo, &hi );
-
-		pspDebugScreenPrintf( "sceKernelSysClock2USec lo=%08X hi=%08X\n", lo, hi );
-
-		SceKernelSysClock tt;
-		unsigned us = 5538892;
-		sceKernelUSec2SysClock( us, &tt );
-
-		pspDebugScreenPrintf( "sceKernelUSec2SysClock %d -> lo=%08X hi=%08X\n", tt.low, tt.hi );*/
-
-		//sceKernelDelayThread( 1000000 );
-		while( 1 );
+		pspDebugScreenPrintf( "allocated ok - got ptr %X (ret=%X)", (int)ptr, ret );
+	}
+	else
+	{
+		pspDebugScreenPrintf( "failed alloc - got ret=%X", ret );
 	}
 
-	while( 1 );
+	sceKernelSleepThreadCB();
 
 	return 0;
 }

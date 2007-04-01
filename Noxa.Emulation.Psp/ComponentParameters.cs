@@ -12,17 +12,33 @@ using System.Xml;
 
 namespace Noxa.Emulation.Psp
 {
+	/// <summary>
+	/// <see cref="IComponentInstance"/> configuration.
+	/// </summary>
 	public class ComponentParameters : Settings
 	{
+		/// <summary>
+		/// Initializes a new <see cref="ComponentParameters"/> instance.
+		/// </summary>
 		public ComponentParameters()
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new <see cref="ComponentParameters"/> instance.
+		/// </summary>
+		/// <param name="source">Internal.</param>
+		/// <param name="depth">Internal.</param>
+		/// <param name="b">Internal.</param>
 		public ComponentParameters( string source, int depth, bool b )
 			: base( source, depth, b )
 		{
 		}
 
+		/// <summary>
+		/// Clones a new <see cref="ComponentParameters"/> instance from the given <see cref="ComponentParameters"/> instance.
+		/// </summary>
+		/// <param name="source">Source instance to clone.</param>
 		public ComponentParameters( ComponentParameters source )
 			: base()
 		{
@@ -39,13 +55,13 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
+		/// <summary>
+		/// Clones the <see cref="ComponentParameters"/> instance.
+		/// </summary>
+		/// <returns>A clone of the current <see cref="ComponentParameters"/> instance.</returns>
 		public ComponentParameters Clone()
 		{
 			return new ComponentParameters( this );
-		}
-
-		public void Merge( ComponentParameters source )
-		{
 		}
 	}
 }

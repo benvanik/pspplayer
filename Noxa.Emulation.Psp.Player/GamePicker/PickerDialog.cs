@@ -83,7 +83,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			// Load the memory stick listing
 			GameLoader loader = new GameLoader();
 			List<GameInformation> eboots = new List<GameInformation>();
-			GameInformation[] ebootList = loader.FindGames( _emulator );
+			GameInformation[] ebootList = loader.FindGames( _emulator.MemoryStick );
 			foreach( GameInformation game in ebootList )
 			{
 				if( game.GameType == GameType.Eboot )
