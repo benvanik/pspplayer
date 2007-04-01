@@ -30,7 +30,7 @@ OglDriver::OglDriver( IEmulationInstance^ emulator, ComponentParameters^ paramet
 	_caps = gcnew OglCapabilities();
 	_stats = gcnew OglStatistics();
 
-	_nativeInterface = malloc( sizeof( VideoApi ) );
+	_nativeInterface = ( VideoApi* )malloc( sizeof( VideoApi ) );
 	memset( _nativeInterface, 0, sizeof( VideoApi ) );
 	this->SetupNativeInterface();
 

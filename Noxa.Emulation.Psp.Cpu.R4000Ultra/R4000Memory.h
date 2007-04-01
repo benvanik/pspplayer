@@ -24,6 +24,9 @@ namespace Noxa {
 					byte*			ScratchPad;
 					byte*			MainMemory;
 					byte*			VideoMemory;
+
+					MemorySystem*	SystemInstance;
+
 				protected:
 					IMemorySegment^	_frameBuffer;
 
@@ -55,6 +58,14 @@ namespace Noxa {
 						virtual void* get()
 						{
 							return VideoMemory;
+						}
+					}
+
+					property void* MemorySystemInstance
+					{
+						virtual void* get()
+						{
+							return SystemInstance;
 						}
 					}
 

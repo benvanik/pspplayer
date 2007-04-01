@@ -193,8 +193,7 @@ void OglDriver::WorkerThread()
 	// Setup the context
 	bool supportInternalMemory = ( _emu->Cpu->Memory->MainMemoryPointer != NULL );
 	Debug::Assert( supportInternalMemory == true );
-	_context->MainMemoryPointer = ( byte* )_emu->Cpu->Memory->MainMemoryPointer;
-	_context->VideoMemoryPointer = ( byte* )_emu->Cpu->Memory->VideoMemoryPointer;
+	_context->Memory = ( MemorySystem* )_emu->Cpu->Memory->MemorySystemInstance;
 
 	_startTime = DateTime::Now;
 

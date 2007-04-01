@@ -26,6 +26,11 @@ R4000Memory::R4000Memory()
 	memset( MainMemory, 0x0, MainMemorySize );
 	memset( ScratchPad, 0x0, ScratchPadSize );
 	memset( VideoMemory, 0x0, VideoMemorySize );
+
+	SystemInstance = new MemorySystem();
+	SystemInstance->MainMemory = MainMemory;
+	SystemInstance->ScratchPad = ScratchPad;
+	SystemInstance->VideoMemory = VideoMemory;
 }
 
 R4000Memory::~R4000Memory()
@@ -49,6 +54,7 @@ void R4000Memory::Clear()
 	if( VideoMemory != NULL )
 		_aligned_free( VideoMemory );
 	VideoMemory = NULL;
+	SAFEDELETE( SystemInstance );
 }
 
 IMemorySegment^ R4000Memory::DefineSegment( MemoryType type, String^ name, int baseAddress, int length )

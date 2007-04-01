@@ -53,6 +53,7 @@ VdlRef* _pendingBatch;
 int _pendingCount;
 
 MemoryPool* _pool;
+MemorySystem* _memory;
 
 int64 _lastVsync;
 
@@ -187,8 +188,9 @@ void MigrateBatch( bool waitIfPending )
 	_pendingBatch = batch;
 }
 
-void niSetup( MemoryPool* pool )
+void niSetup( MemorySystem* memory, MemoryPool* pool )
 {
+	_memory = memory;
 	_pool = pool;
 	_lists = NULL;
 	_listsTail = NULL;
@@ -229,6 +231,7 @@ void niCleanup()
 	_pendingCount = 0;
 
 	_pool = NULL;
+	_memory = NULL;
 
 	UNLOCK;
 }

@@ -221,8 +221,8 @@ namespace Noxa {
 
 				protected:
 					int LookupOrAddModule( IModule^ module );
-					BiosShim^ EmitShim( BiosFunction^ function, void* memory, void* registers );
-					void* EmitShimN( BiosFunction^ function, void* memory, void* registers );
+					BiosShim^ EmitShim( BiosFunction^ function, MemorySystem* memory, void* registers );
+					void* EmitShimN( BiosFunction^ function, MemorySystem* memory, void* registers );
 
 				public:
 					virtual CoreState^ GetCoreState( int core );

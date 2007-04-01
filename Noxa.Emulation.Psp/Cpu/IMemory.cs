@@ -63,6 +63,14 @@ namespace Noxa.Emulation.Psp.Cpu
 		}
 
 		/// <summary>
+		/// An instance of <c>MemorySystem</c>.
+		/// </summary>
+		unsafe void* MemorySystemInstance
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Read a 32-bit word from the given address.
 		/// </summary>
 		/// <param name="address">Address to read from.</param>

@@ -267,6 +267,10 @@ bool Vector<T>::Expand( int newLength )
 template <typename T>
 void Vector<T>::Compress()
 {
+	// Uh oh - compression is totally wrong - it fucks up all the indicies.... need to do something else
+	assert( false );
+	return;
+
 	// Walk the linked list and place in that order
 	VectorEntry<T>* entry = this->FindNext( -1 );
 	if( entry == NULL )
