@@ -109,7 +109,7 @@ namespace Noxa.Emulation.Psp.Games
 	/// <summary>
 	/// Game information.
 	/// </summary>
-	public class GameInformation
+	public class GameInformation : IDisposable
 	{
 		/// <summary>
 		/// The game type.
@@ -161,5 +161,37 @@ namespace Noxa.Emulation.Psp.Games
 
 			this.Folder = folder;
 		}
+
+		/// <summary>
+		/// Release the resources used by the current <see cref="GameInformation"/> instance.
+		/// </summary>
+		~GameInformation()
+		{
+			GC.SuppressFinalize( this );
+			this.Dispose();
+		}
+
+		#region IDisposable Members
+
+		/// <summary>
+		/// Release the resources used by the current <see cref="GameInformation"/> instance.
+		/// </summary>
+		public void Dispose()
+		{
+			if( this.DataPsp != null )
+				this.DataPsp.Dispose();
+			this.DataPsp = null;
+
+			if( this.Icon != null )
+				this.Icon.Dispose();
+
+			if( this.Background != null )
+				this.Background.Dispose();
+
+			this.Folder = null;
+			this.Tag = null;
+		}
+
+		#endregion
 	}
 }
