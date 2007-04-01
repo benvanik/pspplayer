@@ -137,6 +137,11 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		public void ClearGames()
 		{
 			this.SuspendLayout();
+			foreach( Control control in this.Controls )
+			{
+				if( control is GameEntry )
+					( ( GameEntry )control ).Game.Dispose();
+			}
 			this.Controls.Clear();
 			this.SelectedEntry = null;
 			this.ResumeLayout( true );

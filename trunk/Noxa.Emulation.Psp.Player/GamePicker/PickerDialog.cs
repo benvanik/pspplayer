@@ -51,6 +51,14 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			whidbeyTabControl1.SelectedIndex = 0;
 		}
 
+		protected override void OnClosed( EventArgs e )
+		{
+			recentGamesListing.ClearGames();
+			memoryStickListing.ClearGames();
+
+			base.OnClosed( e );
+		}
+
 		public void LaunchGame( GameInformation game )
 		{
 			if( game.Tag != null )

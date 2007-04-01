@@ -178,6 +178,14 @@
 			RelativePath="System.XML.dll"
 			AssemblyName="System.Xml, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
 		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{7609D1BE-23AC-4E67-AD44-9D1E637FB202}"
+			RelativePathToProject=".\Noxa.Utilities\Noxa.Utilities.csproj"
+		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}"
+			RelativePathToProject=".\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -234,6 +242,10 @@
 				</File>
 				<File
 					RelativePath="..\Shared\Source\Tracer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Source\Vector.cpp"
 					>
 				</File>
 			</Filter>
@@ -360,6 +372,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\HandleTable.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Kernel.h"
 				>
 			</File>
@@ -420,6 +436,10 @@
 				</File>
 				<File
 					RelativePath="..\Shared\Include\Tracer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\Vector.h"
 					>
 				</File>
 			</Filter>

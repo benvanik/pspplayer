@@ -278,8 +278,8 @@ namespace Noxa.Emulation.Psp.Games
 				Stream background = null;
 				if( reader.ContainsEntry( PbpReader.PbpEntryType.Icon0 ) == true )
 					icon = reader.Read( stream, PbpReader.PbpEntryType.Icon0 );
-				if( reader.ContainsEntry( PbpReader.PbpEntryType.Pic1 ) == true )
-					background = reader.Read( stream, PbpReader.PbpEntryType.Pic1 );
+				//if( reader.ContainsEntry( PbpReader.PbpEntryType.Pic1 ) == true )
+				//	background = reader.Read( stream, PbpReader.PbpEntryType.Pic1 );
 
 				return new GameInformation( GameType.Eboot, folder, gameParams, icon, background, null );
 			}
