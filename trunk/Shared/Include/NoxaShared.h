@@ -30,6 +30,7 @@ typedef union SysClock_u
 
 #define SAFEFREE( x ) { if( x != NULL ) free( ( void* )x ); x = NULL; }
 #define SAFEDELETE( x ) { if( x != NULL ) delete x; x = NULL; }
+#define SAFEDELETEA( x ) { if ( x != NULL ) delete[] x; x = NULL; }
 
 #define MIN2( a, b ) ( a < b ) ? a : b
 
