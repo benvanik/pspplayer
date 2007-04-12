@@ -38,7 +38,8 @@ enum UmdMode
 // int sceUmdCheckMedium(); (/umd/pspumd.h:42)
 int sceUmdUser::sceUmdCheckMedium()
 {
-	IUmdDevice^ umd = _kernel->_emu->Umd;
+	IEmulationInstance^ emu = _kernel->Emu;
+	IUmdDevice^ umd = emu->Umd;
 	if( umd == nullptr )
 		return 0;
 	else
@@ -101,14 +102,12 @@ int sceUmdUser::sceUmdWaitDriveStatCB( int stat )
 // int sceUmdRegisterUMDCallBack(int cbid); (/umd/pspumd.h:89)
 int sceUmdUser::sceUmdRegisterUMDCallBack( int cbid )
 {
-	KernelCallback^ cb = ( KernelCallback^ )_kernel->FindHandle( cbid );
-	if( cb == nullptr )
+	KCallback* cb = ( KCallback* )_kernel->Handles->Lookup( cbid );
+	if( cb == NULL )
 		return -1;
 
-	// Don't support more than one callback
-	Debug::Assert( _kernel->Callbacks->ContainsKey( KernelCallbackType::Umd ) == false );
-
-	_kernel->Callbacks->Add( KernelCallbackType::Umd, cb );
+	LL<KCallback*>* list = _kernel->Callbacks->GetValue( _kernel->CallbackTypes.Umd );
+	list->Enqueue( cb );
 
 	return 0;
 }
@@ -116,7 +115,12 @@ int sceUmdUser::sceUmdRegisterUMDCallBack( int cbid )
 // manual add
 int sceUmdUser::sceUmdUnRegisterUMDCallBack( int cbid )
 {
-	_kernel->Callbacks->Remove( KernelCallbackType::Umd );
+	KCallback* cb = ( KCallback* )_kernel->Handles->Lookup( cbid );
+	if( cb == NULL )
+		return -1;
+
+	LL<KCallback*>* list = _kernel->Callbacks->GetValue( _kernel->CallbackTypes.Umd );
+	list->Remove( cb );
 
 	return 0;
 }
@@ -124,7 +128,8 @@ int sceUmdUser::sceUmdUnRegisterUMDCallBack( int cbid )
 // manual add
 int sceUmdUser::sceUmdGetDiscInfo( IMemory^ memory, int discInfo )
 {
-	IUmdDevice^ umd = _kernel->_emu->Umd;
+	IEmulationInstance^ emu = _kernel->Emu;
+	IUmdDevice^ umd = emu->Umd;
 	if( umd == nullptr )
 		return -1;
 

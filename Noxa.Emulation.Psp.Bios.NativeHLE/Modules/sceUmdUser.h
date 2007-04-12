@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceUmdUser : public Module
 					{
 					public:
-						sceUmdUser( Kernel^ kernel ) : Module( kernel ) {}
+						sceUmdUser( IntPtr kernel ) : Module( kernel ) {}
 						~sceUmdUser(){}
 
 					public:

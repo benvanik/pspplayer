@@ -9,7 +9,7 @@
 #include "NoxaShared.h"
 #include "ModulesShared.h"
 #include "Module.h"
-#include "KernelFileHandle.h"
+#include "KFile.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -25,7 +25,7 @@ namespace Noxa {
 					public ref class StdioForUser : public Module
 					{
 					public:
-						StdioForUser( Kernel^ kernel ) : Module( kernel ) {}
+						StdioForUser( IntPtr kernel ) : Module( kernel ) {}
 						~StdioForUser(){}
 
 					public:
@@ -42,15 +42,15 @@ namespace Noxa {
 
 						[BiosFunction( 0x172D316E, "sceKernelStdin" )] [Stateless]
 						// SceUID sceKernelStdin(); (/user/pspstdio.h:35)
-						int sceKernelStdin(){ return _kernel->StdIn->ID; }
+						int sceKernelStdin(){ return _kernel->StdIn->UID; }
 
 						[BiosFunction( 0xA6BAB2E9, "sceKernelStdout" )] [Stateless]
 						// SceUID sceKernelStdout(); (/user/pspstdio.h:42)
-						int sceKernelStdout(){ return _kernel->StdOut->ID; }
+						int sceKernelStdout(){ return _kernel->StdOut->UID; }
 
 						[BiosFunction( 0xF78BA90A, "sceKernelStderr" )] [Stateless]
 						// SceUID sceKernelStderr(); (/user/pspstdio.h:49)
-						int sceKernelStderr(){ return _kernel->StdErr->ID; }
+						int sceKernelStderr(){ return _kernel->StdErr->UID; }
 
 					public: // ------ Stubbed calls ------
 

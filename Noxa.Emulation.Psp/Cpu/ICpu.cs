@@ -11,6 +11,7 @@ using System.Text;
 
 using Noxa.Emulation.Psp.Debugging;
 using Noxa.Emulation.Psp.Games;
+using Noxa.Emulation.Psp.Bios;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
@@ -70,6 +71,14 @@ namespace Noxa.Emulation.Psp.Cpu
 		}
 
 		/// <summary>
+		/// A pointer to the native CPU interface.
+		/// </summary>
+		IntPtr NativeInterface
+		{
+			get;
+		}
+
+		/// <summary>
 		/// <c>true</c> if debugging is enabled.
 		/// </summary>
 		bool DebuggingEnabled
@@ -105,6 +114,19 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// <param name="nid">The NID of the syscall to register.</param>
 		/// <returns>The syscall ID used to call the given <paramref name="nid"/>.</returns>
 		int RegisterSyscall( uint nid );
+
+		/// <summary>
+		/// Register user module exports.
+		/// </summary>
+		/// <param name="module">The user module containing the exports to register.</param>
+		void RegisterUserExports( BiosModule module );
+
+		/// <summary>
+		/// Lookup the address of a user export by NID.
+		/// </summary>
+		/// <param name="nid">The NID to look up.</param>
+		/// <returns>The address of the export with the given NID or <c>0</c> if it was not found.</returns>
+		uint LookupUserExport( uint nid );
 
 		/// <summary>
 		/// Resume execution.

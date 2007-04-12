@@ -202,7 +202,6 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		hasReturn = true;
 		wideReturn = false;
 
-
 		if( pass == 0 )
 			Debug::WriteLine( String::Format( "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address ) );
 	}
@@ -227,9 +226,10 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		// Emit stop flag check - if the flag is set we return
 		Label* skipStopLabel = g->DefineLabel();
 		g->mov( EAX, MSTOPFLAG( CTX ) );
-		g->cmp( EAX, 1 );
-		g->jne( skipStopLabel );
+		g->test( EAX, EAX );
+		g->je( skipStopLabel );
 		//g->int3();
+		g->mov( EAX, 0 );
 		g->ret();
 		g->MarkLabel( skipStopLabel );
 
@@ -387,10 +387,10 @@ GenerationResult HALT( R4000GenContext^ context, int pass, int address, uint cod
 	return GenerationResult::Success;
 }
 
-int __mfic()
-{
-	return R4000Cpu::GlobalCpu->_core0->InterruptState;
-}
+//int __mfic()
+//{
+//	return R4000Cpu::GlobalCpu->_core0->InterruptState;
+//}
 
 GenerationResult MFIC( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
@@ -399,16 +399,18 @@ GenerationResult MFIC( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->call( ( uint )&__mfic );
+		//g->call( ( uint )&__mfic );
+		//g->mov( MREG( CTX, rt ), EAX );
+		g->mov( EAX, MINTMASK( CTX ) );
 		g->mov( MREG( CTX, rt ), EAX );
 	}
 	return GenerationResult::Success;
 }
 
-void __mtic( int value )
-{
-	R4000Cpu::GlobalCpu->_core0->InterruptState = value;
-}
+//void __mtic( int value )
+//{
+//	R4000Cpu::GlobalCpu->_core0->InterruptState = value;
+//}
 
 GenerationResult MTIC( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
@@ -417,12 +419,15 @@ GenerationResult MTIC( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		if( rt == 0 )
+		/*if( rt == 0 )
 			g->push( ( uint )0 );
 		else
 			g->push( MREG( CTX, rt ) );
 		g->call( ( uint )&__mtic );
-		g->add( ESP, 4 );
+		g->add( ESP, 4 );*/
+		g->mov( EAX, MREG( CTX, rt ) );
+		g->mov( MINTMASK( CTX ), EAX );
+		// Fire pending interrupts?
 	}
 	return GenerationResult::Success;
 }

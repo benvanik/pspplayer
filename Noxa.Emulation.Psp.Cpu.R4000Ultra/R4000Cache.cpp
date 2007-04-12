@@ -41,6 +41,7 @@ using namespace Noxa::Emulation::Psp::Cpu;
 static int*** CCLookupTable;
 
 #pragma unmanaged
+
 int Noxa::Emulation::Psp::Cpu::QuickPointerLookup( int address )
 {
 	uint addr = ( address & 0x0FFFFFFF ) >> 2;
@@ -60,7 +61,6 @@ int Noxa::Emulation::Psp::Cpu::QuickPointerLookup( int address )
 		return 0;
 	return ret;
 }
-#pragma managed
 
 R4000Cache::R4000Cache()
 {
@@ -89,10 +89,10 @@ CodeBlock* R4000Cache::Add( int address )
 		CodeBlock** block0 = _lookup[ b0 ];
 		if( block0 == NULL )
 		{
-#ifdef STATISTICS
-			R4000Cpu::GlobalCpu->_stats->CodeCacheLevel2Count++;
-			R4000Cpu::GlobalCpu->_stats->CodeCacheTableSize += L2SIZE * sizeof( CodeBlock* );
-#endif
+//#ifdef STATISTICS
+//			R4000Cpu::GlobalCpu->_stats->CodeCacheLevel2Count++;
+//			R4000Cpu::GlobalCpu->_stats->CodeCacheTableSize += L2SIZE * sizeof( CodeBlock* );
+//#endif
 			block0 = ( CodeBlock** )calloc( L2SIZE, sizeof( CodeBlock* ) );
 			_lookup[ b0 ] = block0;
 		}
@@ -100,17 +100,17 @@ CodeBlock* R4000Cache::Add( int address )
 		CodeBlock* block1 = block0[ b1 ];
 		if( block1 == NULL )
 		{
-#ifdef STATISTICS
-			R4000Cpu::GlobalCpu->_stats->CodeCacheLevel3Count++;
-			R4000Cpu::GlobalCpu->_stats->CodeCacheTableSize += L3SIZE * sizeof( CodeBlock );
-#endif
+//#ifdef STATISTICS
+//			R4000Cpu::GlobalCpu->_stats->CodeCacheLevel3Count++;
+//			R4000Cpu::GlobalCpu->_stats->CodeCacheTableSize += L3SIZE * sizeof( CodeBlock );
+//#endif
 			block1 = ( CodeBlock* )calloc( L3SIZE, sizeof( CodeBlock ) );
 			block0[ b1 ] = block1;
 		}
 
-#ifdef STATISTICS
-		R4000Cpu::GlobalCpu->_stats->CodeCacheBlockCount++;
-#endif
+//#ifdef STATISTICS
+//		R4000Cpu::GlobalCpu->_stats->CodeCacheBlockCount++;
+//#endif
 
 		block = &block1[ b2 ];
 		block->Address = address;
@@ -284,3 +284,5 @@ void R4000Cache::Clear( bool realloc )
 	}
 	UNLOCK;
 }
+
+#pragma managed

@@ -18,47 +18,54 @@ using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 using namespace Noxa::Emulation::Psp::Video;
 
+sceGe_user::sceGe_user( IntPtr kernel ) : Module( kernel )
+{
+}
+
+sceGe_user::~sceGe_user()
+{
+}
+
 void sceGe_user::Start()
 {
-	_callbacks = gcnew List<GeCallbackHandle^>();
+	_callbacks = new LL<GeCallback*>();
 }
 
 void sceGe_user::Stop()
 {
-	_callbacks = nullptr;
+	SAFEDELETE( _callbacks );
 }
 
 void sceGe_user::Clear()
 {
-	_callbacks = nullptr;
+	SAFEDELETE( _callbacks );
 }
 
 // int sceGeSetCallback(PspGeCallbackData *cb); (/ge/pspge.h:193)
 int sceGe_user::sceGeSetCallback( IMemory^ memory, int pcb )
 {
-	GeCallbackHandle^ cb = gcnew GeCallbackHandle( _kernel->AllocateID() );
+	GeCallback* cb = new GeCallback();
 	cb->SignalFunction = memory->ReadWord( pcb );
 	cb->SignalArgument = memory->ReadWord( pcb + 4 );
 	cb->FinishFunction = memory->ReadWord( pcb + 8 );
 	cb->FinishArgument = memory->ReadWord( pcb + 16 );
-	_kernel->AddHandle( cb );
+	KHandle* handle = _kernel->Handles->Add( cb );
 
-	_callbacks->Add( cb );
+	_callbacks->Enqueue( cb );
 
 	Debug::WriteLine( "sceGeSetCallback: callback set - not good!" );
 	
-	return cb->ID;
+	return cb->UID;
 }
 
 // int sceGeUnsetCallback(int cbid); (/ge/pspge.h:201)
 int sceGe_user::sceGeUnsetCallback( int cbid )
 {
-	GeCallbackHandle^ cb = ( GeCallbackHandle^ )_kernel->FindHandle( cbid );
-	if( cb == nullptr )
+	GeCallback* cb = ( GeCallback* )_kernel->Handles->Lookup( cbid );
+	if( cb == NULL )
 		return -1;
 
-	_kernel->RemoveHandle( cb );
-
+	_kernel->Handles->Remove( cb );
 	_callbacks->Remove( cb );
 
 	return 0;

@@ -7,7 +7,8 @@
 #include "Stdafx.h"
 #include "IoFileMgrForUser.h"
 #include "Kernel.h"
-#include "KernelFileHandle.h"
+#include "KFile.h"
+#include "KDevice.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -29,27 +30,38 @@ int IoFileMgrForUser::sceIoDopen( IMemory^ memory, int dirname )
 		return -1;
 	}
 
-	KernelFileHandle^ handle = gcnew KernelFileHandle( _kernel->AllocateID() );
-	handle->Device = ( KernelFileDevice^ )_kernel->FindDevice( path );
-	handle->CanWrite = !handle->Device->ReadOnly;
-	handle->CanSeek = handle->Device->IsSeekable;
+	IMediaDevice^ device = folder->Device;
+	KDevice* dev = NULL;
+	for( int n = 0; n < DEVICECOUNT; n++ )
+	{
+		IMediaDevice^ rdev = _kernel->Devices[ n ]->Device;
+		if( rdev == device )
+		{
+			dev = _kernel->Devices[ n ];
+			break;
+		}
+	}
+	assert( dev != NULL );
+
+	KFile* handle = new KFile( dev, folder );
+	handle->CanWrite = !dev->ReadOnly;
+	handle->CanSeek = false;
 	handle->IsOpen = true;
-	handle->MediaItem = folder;
 	handle->FolderOffset = -2;
-	_kernel->AddHandle( handle );
+	_kernel->Handles->Add( handle );
 
 #ifdef VERBOSEIO
-	Debug::WriteLine( String::Format( "sceIoDopen: opened {0} with ID {1}", path, handle->ID ) );
+	Debug::WriteLine( String::Format( "sceIoDopen: opened {0} with ID {1}", path, handle->UID ) );
 #endif
 
-	return handle->ID;
+	return handle->UID;
 }
 
 // int sceIoDread(SceUID fd, SceIoDirent *dir); (/user/pspiofilemgr.h:280)
 int IoFileMgrForUser::sceIoDread( IMemory^ memory, int fd, int dir )
 {
-	KernelFileHandle^ handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
-	if( handle == nullptr )
+	KFile* handle = ( KFile* )_kernel->Handles->Lookup( fd );
+	if( handle == NULL )
 	{
 		Debug::WriteLine( String::Format( "sceIoDread: kernel file handle {0} not found", fd ) );
 		return -1;
@@ -58,7 +70,7 @@ int IoFileMgrForUser::sceIoDread( IMemory^ memory, int fd, int dir )
 	int offset = handle->FolderOffset;
 	handle->FolderOffset++;
 
-	IMediaFolder^ folder = ( IMediaFolder^ )handle->MediaItem;
+	IMediaFolder^ folder = ( IMediaFolder^ )( IMediaItem^ )handle->Item;
 	if( offset == folder->Items->Length )
 		return 0;
 
@@ -158,20 +170,22 @@ int IoFileMgrForUser::sceIoDread( IMemory^ memory, int fd, int dir )
 
 	// 0 to stop, 1 to keep going
 	return 1;
-	}
+}
 
 // int sceIoDclose(SceUID fd); (/user/pspiofilemgr.h:288)
 int IoFileMgrForUser::sceIoDclose( int fd )
 {
-	KernelFileHandle^ handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
-	if( handle == nullptr )
+	KFile* handle = ( KFile* )_kernel->Handles->Lookup( fd );
+	if( handle == NULL )
 	{
 		Debug::WriteLine( String::Format( "sceIoDclose: kernel file handle {0} not found", fd ) );
 		return -1;
 	}
 
 	handle->IsOpen = false;
-	_kernel->RemoveHandle( handle );
+	_kernel->Handles->Remove( handle );
+
+	delete handle;
 
 	return 0;
 }

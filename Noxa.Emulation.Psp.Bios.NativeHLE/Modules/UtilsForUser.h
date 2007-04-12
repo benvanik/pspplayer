@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class UtilsForUser : public Module
 					{
 					public:
-						UtilsForUser( Kernel^ kernel ) : Module( kernel ) {}
+						UtilsForUser( IntPtr kernel ) : Module( kernel ) {}
 						~UtilsForUser(){}
 
 					public:

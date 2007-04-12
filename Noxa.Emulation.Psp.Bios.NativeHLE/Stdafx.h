@@ -13,3 +13,4 @@
 #include "Options.h"
 
 #include "NoxaShared.h"
+#include "ManagedLookup.h"

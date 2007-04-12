@@ -8,9 +8,11 @@
 
 using namespace System;
 using namespace System::Collections::Generic;
+using namespace System::IO;
 
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Debugging;
+using namespace Noxa::Emulation::Psp::Games;
 
 namespace Noxa {
 	namespace Emulation {
@@ -18,6 +20,8 @@ namespace Noxa {
 			namespace Bios {
 
 				ref class NativeHLE;
+				ref class Module;
+				ref class Loader;
 				class Kernel;
 
 				ref class NativeBios : public IBios
@@ -29,15 +33,20 @@ namespace Noxa {
 
 					List<BiosModule^>^					_metaModuleList;
 					Dictionary<String^, BiosModule^>^	_metaModules;
-					List<Module^>						_moduleList;
+					List<Module^>^						_moduleList;
 					List<BiosFunction^>^				_functionList;
 					Dictionary<uint, BiosFunction^>^	_functions;
 
-					List<Module^>						_modules;
+					List<Module^>^						_modules;
+
+					GameInformation^					_game;
+					Stream^								_bootStream;
+
+					Threading::AutoResetEvent^			_gameSetEvent;
 
 				internal:
-					Loader^								Loader;
-					Kernel*								Kernel;
+					Loader^								_loader;
+					Kernel*								_kernel;
 
 				public:
 					NativeBios( IEmulationInstance^ emulator, ComponentParameters^ parameters );
@@ -83,7 +92,50 @@ namespace Noxa {
 						}
 					}
 
-					property bool DebuggingEnabled
+					property ILoader^ Loader
+					{
+						virtual ILoader^ get()
+						{
+							return ( ILoader^ )_loader;
+						}
+					}
+
+					property GameInformation^ Game
+					{
+						virtual GameInformation^ get();
+						virtual void set( GameInformation^ value );
+					}
+
+					property Stream^ BootStream
+					{
+						virtual Stream^ get()
+						{
+							return _bootStream;
+						}
+						virtual void set( Stream^ value )
+						{
+							_bootStream = value;
+						}
+					}
+
+					virtual void Execute();
+
+					virtual void Cleanup();
+
+					virtual BiosModule^ FindModule( String^ name );
+					virtual BiosFunction^ FindFunction( uint nid );
+
+				internal:
+					void ClearModules();
+					void StartModules();
+					void StopModules();
+
+				private:
+					void GatherFunctions();
+					void RegisterFunction( BiosFunction^ function );
+
+					public:
+						property bool DebuggingEnabled
 					{
 						virtual bool get()
 						{
@@ -108,20 +160,6 @@ namespace Noxa {
 					}
 
 					virtual void EnableDebugging( IDebugger^ debugger );
-
-					virtual void Cleanup();
-
-					virtual BiosModule^ FindModule( String^ name );
-					virtual BiosFunction^ FindFunction( uint nid );
-
-				internal:
-					void ClearModules();
-					void StartModules();
-					void StopModules();
-
-				private:
-					void GatherFunctions();
-					void RegisterFunction( BiosFunction^ function );
 
 				};
 

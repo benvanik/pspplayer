@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceUtility : public Module
 					{
 					public:
-						sceUtility( Kernel^ kernel ) : Module( kernel ) {}
+						sceUtility( IntPtr kernel ) : Module( kernel ) {}
 						~sceUtility(){}
 
 					public:

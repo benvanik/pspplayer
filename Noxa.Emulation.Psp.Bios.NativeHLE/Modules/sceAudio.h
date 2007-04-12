@@ -28,7 +28,7 @@ namespace Noxa {
 						IAudioDriver^		_driver;
 
 					public:
-						sceAudio( Kernel^ kernel ) : Module( kernel ) {}
+						sceAudio( IntPtr kernel ) : Module( kernel ) {}
 						~sceAudio(){}
 
 					public:

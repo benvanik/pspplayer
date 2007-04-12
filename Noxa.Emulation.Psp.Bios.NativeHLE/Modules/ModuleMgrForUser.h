@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class ModuleMgrForUser : public Module
 					{
 					public:
-						ModuleMgrForUser( Kernel^ kernel ) : Module( kernel ) {}
+						ModuleMgrForUser( IntPtr kernel ) : Module( kernel ) {}
 						~ModuleMgrForUser(){}
 
 					public:

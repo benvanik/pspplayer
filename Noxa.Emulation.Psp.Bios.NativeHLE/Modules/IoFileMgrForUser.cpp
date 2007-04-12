@@ -7,7 +7,7 @@
 #include "Stdafx.h"
 #include "IoFileMgrForUser.h"
 #include "Kernel.h"
-#include "KernelDevice.h"
+#include "KDevice.h"
 
 using namespace System;
 using namespace System::Collections::Generic;

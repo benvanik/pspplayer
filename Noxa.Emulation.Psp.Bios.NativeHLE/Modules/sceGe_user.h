@@ -21,25 +21,23 @@ namespace Noxa {
 			namespace Bios {
 				namespace Modules {
 
-					ref class GeCallbackHandle : public KernelHandle
+					class GeCallback : public KHandle
 					{
 					public:
 						int		SignalFunction;
 						int		SignalArgument;
 						int		FinishFunction;
 						int		FinishArgument;
-
-						GeCallbackHandle( int id ) : KernelHandle( KernelHandleType::GeCallback, id ) {}
 					};
 
 					public ref class sceGe_user : public Module
 					{
 					internal:
-						List<GeCallbackHandle^>^	_callbacks;
+						LL<GeCallback*>*			_callbacks;
 
 					public:
-						sceGe_user( Kernel^ kernel ) : Module( kernel ) {}
-						~sceGe_user(){}
+						sceGe_user( IntPtr kernel );
+						~sceGe_user();
 
 					public:
 						property String^ Name { virtual String^ get() override { return "sceGe_user"; } }

@@ -18,6 +18,10 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 #pragma unmanaged
 
+// Kernel_Library --------------------------------------
+int sceKernelCpuSuspendIntr();
+void sceKernelCpuResumeIntr( int flags );
+
 // sceRtc ----------------------------------------------
 int sceRtcGetTickResolution();
 void sceRtcGetCurrentTick( LARGE_INTEGER* address );
@@ -57,6 +61,17 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 
 	switch( nid )
 	{
+	// Kernel_Library --------------------------------------
+	case 0x092968F4:
+		g->call( ( int )sceKernelCpuSuspendIntr );
+		return true;
+	case 0x5F10D406:
+		g->push( MREG( CTX, 4 ) );
+		g->call( ( int )sceKernelCpuResumeIntr );
+		g->add( ESP, 4 );
+		g->xor( EAX, EAX );
+		break;
+
 	// sceRtc ----------------------------------------------
 	case 0xc41c2853:		// sceRtcGetTickResolution
 		g->call( ( uint )&sceRtcGetTickResolution );
@@ -196,6 +211,20 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 }
 
 #pragma unmanaged
+
+// Kernel_Library --------------------------------------
+
+extern int niSetInterruptState( int newState );
+
+int sceKernelCpuSuspendIntr()
+{
+	return niSetInterruptState( 0 );
+}
+
+void sceKernelCpuResumeIntr( int flags )
+{
+	niSetInterruptState( flags );
+}
 
 // sceRtc ----------------------------------------------
 

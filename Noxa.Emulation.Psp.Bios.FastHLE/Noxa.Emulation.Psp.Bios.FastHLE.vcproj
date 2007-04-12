@@ -532,6 +532,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Shared\Include\CpuApi.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Shared\Include\MemoryPool.h"
 					>
 				</File>

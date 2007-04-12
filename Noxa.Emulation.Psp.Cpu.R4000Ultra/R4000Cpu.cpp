@@ -23,7 +23,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace Noxa::Emulation::Psp::Debugging::DebugData;
 
-//#define DEBUGBOUNCE
+extern int niExecute( int* breakFlags );
+extern void niBreakExecute( int flags );
 
 extern uint _instructionsExecuted;
 
@@ -56,6 +57,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_syscallCounts = gcnew array<int>( 1024 );
 #endif
 	_moduleInstances = gcnew array<IModule^>( 64 );
+	_userExports = gcnew Dictionary<uint, uint>( 1024 );
 
 	_hasExecuted = false;
 
@@ -65,14 +67,20 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_biosStubs = gcnew R4000BiosStubs();
 	_videoInterface = gcnew R4000VideoInterface( this );
 
-	_bounce = _builder->BuildBounce();
+	_bounce = ( bouncefn )_builder->BuildBounce();
 
 	_privateMemoryFieldInfo = ( R4000Cpu::typeid )->GetField( "_memory", BindingFlags::Instance | BindingFlags::NonPublic );
 	_privateModuleInstancesFieldInfo = ( R4000Cpu::typeid )->GetField( "_moduleInstances", BindingFlags::Instance | BindingFlags::NonPublic );
+
+	_nativeInterface = ( CpuApi* )calloc( 1, sizeof( CpuApi ) );
+	this->SetupNativeInterface();
 }
 
 R4000Cpu::~R4000Cpu()
 {
+	this->DestroyNativeInterface();
+	SAFEFREE( _nativeInterface );
+
 	if( _ctx != NULL )
 		_aligned_free( _ctx );
 	_ctx = NULL;
@@ -94,6 +102,28 @@ int R4000Cpu::RegisterSyscall( unsigned int nid )
 	_syscallShimsN[ sid ] = IntPtr( EmitShimN( function, _memory->SystemInstance, registers ) );
 
 	return sid;
+}
+
+void R4000Cpu::RegisterUserExports( BiosModule^ module )
+{
+	Debug::Assert( module != nullptr );
+
+	for each( StubExport^ ex in module->Exports )
+	{
+		// Ignore system exports
+		if( ex->IsSystem == true )
+			continue;
+		_userExports->Add( ex->NID, ex->Address );
+	}
+}
+
+uint R4000Cpu::LookupUserExport( uint nid )
+{
+	uint address;
+	if( _userExports->TryGetValue( nid, address ) == true )
+		return address;
+	else
+		return 0;
 }
 
 void R4000Cpu::Cleanup()
@@ -124,99 +154,15 @@ void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 	}
 }
 
-#ifdef DEBUGBOUNCE
-#pragma unmanaged
-int __debugBounce( bouncefn f, int pointer )
-{
-	return f( pointer );
-}
-#pragma managed
-#endif
-
 int R4000Cpu::ExecuteBlock()
 {
-#ifdef STATISTICS
-	double blockStart = _timer->Elapsed;
-	if( _stats->RunTime == 0.0 )
-		_stats->RunTime = _timer->Elapsed;
-#endif
-
-	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
-	//if( ctx->PC == 0 )
-	//	ctx->PC = _core0->PC;
-
-	// Get/build block
-	int pc = ctx->PC & 0x3FFFFFFF;
-	CodeBlock* block = _codeCache->Find( pc );
-	if( block == NULL )
-	{
-		block = _builder->Build( pc );
-#ifdef STATISTICS
-		_stats->CodeCacheMisses++;
-#endif
-	}
-	else
-	{
-#ifdef STATISTICS
-		_stats->CodeCacheHits++;
-#endif
-	}
-	Debug::Assert( block != nullptr );
-
-#ifdef STATISTICS
-	_stats->ExecutionLoops++;
-
-	block->ExecutionCount++;
-#endif
-
-	//Debug::WriteLine( String::Format( "Executing block 0x{0:X8} (codegen at 0x{1:X8})", pc, (uint)block->Pointer ) );
-
-	// Populate ctx
-	//ctx->PCValid = false;
-	//ctx->NullifyDelay = false;
-
-#ifdef STATISTICS
-	uint startInstrExec = _instructionsExecuted;
-#endif
-
-	// Bounce in to it
-	bouncefn bounce = ( bouncefn )_bounce;
-#ifdef DEBUGBOUNCE
-	int x = __debugBounce( bounce, ( int )block->Pointer );
-#else
-	int x = bounce( ( int )block->Pointer );
-#endif
-
-	// PC updated via __updateCorePC
-	_core0->DelayNop = ( ctx->NullifyDelay == 1 ) ? true : false;
-
-#ifdef STATISTICS
-
-	double blockTime = _timer->Elapsed - blockStart;
-	if( blockTime <= 0.0 )
-		blockTime = 0.000001;
-
-	uint instructionsExecuted = _instructionsExecuted - startInstrExec;
-	_stats->IPS = ( _stats->IPS * .8 ) + ( ( ( double )instructionsExecuted / blockTime ) * .2 );
-	
-	//_timeSinceLastIpsPrint += blockTime;
-	//if( _timeSinceLastIpsPrint > 1.0 )
-	//{
-	//	double ips = ( ( double )instructionsExecuted / blockTime );
-	//	Debug::WriteLine( String::Format( "IPS: {0}", ( long )ips ) );
-	//	_timeSinceLastIpsPrint = 0.0;
-	//}
-
-	return instructionsExecuted;
-#else
-	return 1;
-#endif
+	int breakFlags;
+	return niExecute( &breakFlags );
 }
 
 void R4000Cpu::Stop()
 {
-	R4000Ctx* ctx = ( R4000Ctx* )_ctx;
-	ctx->StopFlag = 1;
+	niBreakExecute( 1 );
 }
 
 void R4000Cpu::PrintStatistics()

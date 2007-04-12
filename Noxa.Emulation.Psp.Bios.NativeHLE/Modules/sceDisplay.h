@@ -24,13 +24,16 @@ namespace Noxa {
 					public ref class sceDisplay : public Module
 					{
 					public:
-						sceDisplay( Kernel^ kernel ) : Module( kernel ) {}
+						void*			_videoApi;
+
+					public:
+						sceDisplay( IntPtr kernel ) : Module( kernel ) {}
 						~sceDisplay(){}
 
 					public:
 						property String^ Name { virtual String^ get() override { return "sceDisplay"; } }
 
-						//virtual void Start() override;
+						virtual void Start() override;
 						//virtual void Stop() override;
 						//virtual void Clear() override;
 
@@ -88,7 +91,6 @@ namespace Noxa {
 						// int sceDisplayWaitVblankStart(); (/display/pspdisplay.h:94)
 						int sceDisplayWaitVblankStart();
 
-						[NotImplemented]
 						[BiosFunction( 0x46F186C3, "sceDisplayWaitVblankStartCB" )]
 						// int sceDisplayWaitVblankStartCB(); (/display/pspdisplay.h:99)
 						int sceDisplayWaitVblankStartCB();

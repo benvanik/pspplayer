@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceDmac : public Module
 					{
 					public:
-						sceDmac( Kernel^ kernel ) : Module( kernel ) {}
+						sceDmac( IntPtr kernel ) : Module( kernel ) {}
 						~sceDmac(){}
 
 					public:

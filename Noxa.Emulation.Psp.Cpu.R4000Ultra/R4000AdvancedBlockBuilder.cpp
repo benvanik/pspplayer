@@ -38,8 +38,8 @@ using namespace Noxa::Emulation::Psp::Cpu;
 #define MAXCODELENGTH 200
 
 // Debugging addresses
-//#define BREAKADDRESS1		0x089534E8
-//#define BREAKADDRESS2		0x0896BF30
+//#define BREAKADDRESS1		0x0892D71C
+//#define BREAKADDRESS2		0x0895c9b8
 //#define GENBREAKADDRESS		0x089534E4
 
 extern uint _instructionsExecuted;
@@ -107,8 +107,6 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 
 			bool inDelay = _ctx->InDelay;
 			uint code = *( ( uint* )( mainMemory + ( address - MainMemoryBase ) ) );
-
-			//this->EmitDebug( address, code );
 
 #if _DEBUG
 			// Debug breakpoint on instruction

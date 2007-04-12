@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceAudiocodec : public Module
 					{
 					public:
-						sceAudiocodec( Kernel^ kernel ) : Module( kernel ) {}
+						sceAudiocodec( IntPtr kernel ) : Module( kernel ) {}
 						~sceAudiocodec(){}
 
 					public:

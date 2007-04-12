@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceReg : public Module
 					{
 					public:
-						sceReg( Kernel^ kernel ) : Module( kernel ) {}
+						sceReg( IntPtr kernel ) : Module( kernel ) {}
 						~sceReg(){}
 
 					public:

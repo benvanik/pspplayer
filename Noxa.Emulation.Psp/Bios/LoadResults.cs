@@ -36,6 +36,11 @@ namespace Noxa.Emulation.Psp.Bios
 		public uint EntryAddress;
 
 		/// <summary>
+		/// The name of the module.
+		/// </summary>
+		public string Name;
+
+		/// <summary>
 		/// The $GP, as defined by the module.
 		/// </summary>
 		public uint GlobalPointer;
@@ -54,6 +59,22 @@ namespace Noxa.Emulation.Psp.Bios
 		/// Used internally to preserve important information. Only present if requested in <see cref="LoadParameters"/>.
 		/// </summary>
 		public IntPtr PreservedData;
+	}
+
+	/// <summary>
+	/// Defines the type of the <see cref="StubExport"/> or <see cref="StubImport"/>.
+	/// </summary>
+	public enum StubType
+	{
+		/// <summary>
+		/// Exported or imported as a function pointer.
+		/// </summary>
+		Function,
+
+		/// <summary>
+		/// Exported or imported as a variable.
+		/// </summary>
+		Variable,
 	}
 
 	/// <summary>
@@ -103,85 +124,19 @@ namespace Noxa.Emulation.Psp.Bios
 		public uint NID;
 
 		/// <summary>
+		/// The type of the import.
+		/// </summary>
+		public StubType Type;
+
+		/// <summary>
+		/// The address of the stub.
+		/// </summary>
+		public uint Address;
+
+		/// <summary>
 		/// The <see cref="BiosFunction"/>, if found, of the reference.
 		/// </summary>
 		public BiosFunction Function;
-
-		/// <summary>
-		/// Creates a new successful stub reference.
-		/// </summary>
-		/// <param name="function">The <see cref="BiosFunction"/> found for the reference.</param>
-		/// <returns>A <see cref="StubImport"/>.</returns>
-		public static StubImport Success(  BiosFunction function )
-		{
-			StubImport ret = new StubImport();
-			ret.Result = StubReferenceResult.Success;
-			ret.ModuleName = function.Module.Name;
-			ret.NID = function.NID;
-			ret.Function = function;
-			return ret;
-		}
-
-		/// <summary>
-		/// Creates a new stub reference for when the module is not found.
-		/// </summary>
-		/// <param name="moduleName">The name of the module containing the reference.</param>
-		/// <param name="nid">The NID of the reference.</param>
-		/// <returns>A <see cref="StubImport"/>.</returns>
-		public static StubImport ModuleNotFound( string moduleName, uint nid )
-		{
-			StubImport ret = new StubImport();
-			ret.Result = StubReferenceResult.ModuleNotFound;
-			ret.ModuleName = moduleName;
-			ret.NID = nid;
-			return ret;
-		}
-
-		/// <summary>
-		/// Creates a new stub reference for when the NID is not found in the module.
-		/// </summary>
-		/// <param name="moduleName">The name of the module containing the reference.</param>
-		/// <param name="nid">The NID of the reference.</param>
-		/// <returns>A <see cref="StubImport"/>.</returns>
-		public static StubImport NidNotFound( string moduleName, uint nid )
-		{
-			StubImport ret = new StubImport();
-			ret.Result = StubReferenceResult.NidNotFound;
-			ret.ModuleName = moduleName;
-			ret.NID = nid;
-			return ret;
-		}
-
-		/// <summary>
-		/// Creates a new stub reference for when the NID is not implemented.
-		/// </summary>
-		/// <param name="function">The <see cref="BiosFunction"/> found for the reference.</param>
-		/// <returns>A <see cref="StubImport"/>.</returns>
-		public static StubImport NidNotImplemented( BiosFunction function )
-		{
-			StubImport ret = new StubImport();
-			ret.Result = StubReferenceResult.NidNotImplemented;
-			ret.ModuleName = function.Module.Name;
-			ret.NID = function.NID;
-			ret.Function = function;
-			return ret;
-		}
-	}
-
-	/// <summary>
-	/// Defines the type of the <see cref="StubExport"/>.
-	/// </summary>
-	public enum StubExportType
-	{
-		/// <summary>
-		/// Exported as a function pointer.
-		/// </summary>
-		Function,
-
-		/// <summary>
-		/// Exported as a variable.
-		/// </summary>
-		Variable,
 	}
 
 	/// <summary>
@@ -190,6 +145,11 @@ namespace Noxa.Emulation.Psp.Bios
 	public class StubExport
 	{
 		/// <summary>
+		/// The name of the module that the reference is exported from.
+		/// </summary>
+		public string ModuleName;
+
+		/// <summary>
 		/// The NID (unique ID) of the export.
 		/// </summary>
 		public uint NID;
@@ -197,11 +157,28 @@ namespace Noxa.Emulation.Psp.Bios
 		/// <summary>
 		/// The type of the export.
 		/// </summary>
-		public StubExportType Type;
+		public StubType Type;
 
 		/// <summary>
 		/// The address of the NID.
 		/// </summary>
 		public uint Address;
+
+		/// <summary>
+		/// <c>true</c> if this export is used by the loader.
+		/// </summary>
+		public bool IsSystem
+		{
+			get
+			{
+				return
+					( NID == 0xF01D73A7 ) ||
+					( NID == 0xD3744BE0 ) ||
+					( NID == 0xD632ACDB ) ||
+					( NID == 0x0F7C276C ) ||
+					( NID == 0xCEE8593C ) ||
+					( NID == 0xCF0CC697 );
+			}
+		}
 	}
 }

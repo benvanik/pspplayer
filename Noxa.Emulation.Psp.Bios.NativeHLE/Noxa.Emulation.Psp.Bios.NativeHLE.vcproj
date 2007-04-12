@@ -41,9 +41,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)Shared\Include&quot;; $(ProjectDir)\"
-				PreprocessorDefinitions="WIN32;_DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WIN32_WINNT=0x0502;WINVER=0x0502"
 				RuntimeLibrary="3"
+				BufferSecurityCheck="false"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -116,9 +120,15 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)Shared\Include&quot;; $(ProjectDir)\"
 				PreprocessorDefinitions="WIN32;NDEBUG"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="2"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -198,7 +208,31 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HandleTable.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Kernel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Kernel_Scheduling.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Kernel_Timers.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\KernelHelpers.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Loader.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ManagedLookup.cpp"
 				>
 			</File>
 			<File
@@ -242,10 +276,6 @@
 				</File>
 				<File
 					RelativePath="..\Shared\Source\Tracer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Shared\Source\Vector.cpp"
 					>
 				</File>
 			</Filter>
@@ -365,6 +395,46 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Kernel Types"
+				>
+				<File
+					RelativePath=".\KCallback.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\KEvent.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\KFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\KIntHandler.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\KMemoryBlock.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\KModule.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\KPartition.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\KPool.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\KThread.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -380,7 +450,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\KernelHelpers.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Loader.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ManagedLookup.h"
 				>
 			</File>
 			<File
@@ -423,7 +501,19 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Shared\Include\CpuApi.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\gcref.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Shared\Include\HashTable.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\LL.h"
 					>
 				</File>
 				<File
@@ -568,6 +658,74 @@
 				</File>
 				<File
 					RelativePath=".\Modules\UtilsForUser.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Kernel Types"
+				>
+				<File
+					RelativePath=".\KCallback.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KDevice.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KEvent.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KFile.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KHandle.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KIntHandler.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KMemoryBlock.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KModule.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KPartition.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KSemaphore.h"
+					>
+				</File>
+				<File
+					RelativePath=".\KThread.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="SDK"
+				>
+				<File
+					RelativePath=".\SDK\elftypes.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SDK\prxtypes.h"
+					>
+				</File>
+				<File
+					RelativePath=".\SDK\types.h"
 					>
 				</File>
 			</Filter>

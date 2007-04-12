@@ -38,13 +38,7 @@ namespace Noxa {
 					int*		LO;
 					int*		LL;
 
-					bool		InDelaySlot;
-					int			DelayPC;
-					bool		DelayNop;
-					int			InterruptState;
-
-					// Used for tracking instruction counts inside of blocks
-					int			BlockCounter;
+					int*		InterruptState;
 
 				public:
 					R4000Core( R4000Cpu^ cpu, R4000Ctx* ctx )
@@ -60,6 +54,7 @@ namespace Noxa {
 						HI = &ctx->HI;
 						LO = &ctx->LO;
 						LL = &ctx->LL;
+						InterruptState = &ctx->InterruptMask;
 
 						this->Clear();
 					}
@@ -80,12 +75,7 @@ namespace Noxa {
 						*HI = 0;
 						*LO = 0;
 						*LL = 0;
-						InDelaySlot = false;
-						DelayPC = 0;
-						DelayNop = false;
 						InterruptState = 0;
-
-						BlockCounter = 0;
 
 						Cp0->Clear();
 						Cp1->Clear();
@@ -109,9 +99,6 @@ namespace Noxa {
 						virtual void set( int value )
 						{
 							*PC = value;
-							InDelaySlot = false;
-							DelayPC = 0;
-							DelayNop = false;
 						}
 					}
 
@@ -140,9 +127,6 @@ namespace Noxa {
 						int HI;
 						int LO;
 						bool LL;
-						bool InDelaySlot;
-						int DelayPC;
-						bool DelayNop;
 						int InterruptState;
 
 						Object^ Cp0;
@@ -164,10 +148,7 @@ namespace Noxa {
 							context->HI = *HI;
 							context->LO = *LO;
 							context->LL = ( *LL == 1 ) ? true : false;
-							context->InDelaySlot = InDelaySlot;
-							context->DelayPC = DelayPC;
-							context->DelayNop = DelayNop;
-							context->InterruptState = InterruptState;
+							context->InterruptState = *InterruptState;
 
 							context->Cp0 = Cp0->Context;
 							context->Cp1 = Cp1->Context;
@@ -184,30 +165,19 @@ namespace Noxa {
 							*HI = context->HI;
 							*LO = context->LO;
 							*LL = context->LL;
-							InDelaySlot = context->InDelaySlot;
-							DelayPC = context->DelayPC;
-							DelayNop = context->DelayNop;
-							InterruptState = context->InterruptState;
+							*InterruptState = context->InterruptState;
 
 							Cp0->Context = context->Cp0;
 							Cp1->Context = context->Cp1;
 
 							// HACK: clear delay slot
-							if( InDelaySlot == true )
+							/*if( InDelaySlot == true )
 							{
 								InDelaySlot = false;
 								*PC = DelayPC - 4;
 								DelayPC = 0;
 								DelayNop = false;
-							}
-						}
-					}
-
-					property bool InterruptsEnabled
-					{
-						virtual bool get()
-						{
-							return ( InterruptState != 0x0 );
+							}*/
 						}
 					}
 
@@ -215,11 +185,11 @@ namespace Noxa {
 					{
 						virtual uint get()
 						{
-							return InterruptState;
+							return *InterruptState;
 						}
 						virtual void set( uint value )
 						{
-							InterruptState = value;
+							*InterruptState = value;
 						}
 					}
 				};

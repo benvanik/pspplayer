@@ -34,20 +34,19 @@ typedef struct _SceKernelUtilsMt19937Context {
 #define UPPER_MASK	0x80000000UL	// most significant w-r bits
 #define LOWER_MASK	0x7fffffffUL	// least significant r bits
 
-int sceKernelUtilsMt19937InitN( byte* memory, int pctx, uint seed );
-uint sceKernelUtilsMt19937UIntN( byte* memory, int pctx );
+int sceKernelUtilsMt19937InitN( MemorySystem* memory, int pctx, uint seed );
+uint sceKernelUtilsMt19937UIntN( MemorySystem* memory, int pctx );
 
-[BiosFunction( 0xE860E75E, "sceKernelUtilsMt19937Init" )] [Stateless]
 // int sceKernelUtilsMt19937Init(SceKernelUtilsMt19937Context *ctx, u32 seed); (/user/psputils.h:96)
 int UtilsForUser::sceKernelUtilsMt19937Init( IMemory^ memory, int ctx, int seed )
 {
-	return sceKernelUtilsMt19937InitN( ( byte* )memory->MainMemoryPointer, ctx, seed );
+	return sceKernelUtilsMt19937InitN( MSI( memory ), ctx, seed );
 }
 
 #pragma unmanaged
-int sceKernelUtilsMt19937InitN( byte* memory, int ctx, uint seed )
+int sceKernelUtilsMt19937InitN( MemorySystem* memory, int ctx, uint seed )
 {
-	SceKernelUtilsMt19937Context* pctx = ( SceKernelUtilsMt19937Context* )( memory + ( ctx - MainMemoryBase ) );
+	SceKernelUtilsMt19937Context* pctx = ( SceKernelUtilsMt19937Context* )memory->Translate( ctx );
 	uint* mt = pctx->state;
 	int mti = pctx->count;
 
@@ -73,13 +72,13 @@ int sceKernelUtilsMt19937InitN( byte* memory, int ctx, uint seed )
 // u32 sceKernelUtilsMt19937UInt(SceKernelUtilsMt19937Context *ctx); (/user/psputils.h:104)
 int UtilsForUser::sceKernelUtilsMt19937UInt( IMemory^ memory, int ctx )
 {
-	return sceKernelUtilsMt19937UIntN( ( byte* )memory->MainMemoryPointer, ctx );
+	return sceKernelUtilsMt19937UIntN( MSI( memory ), ctx );
 }
 
 #pragma unmanaged
-uint sceKernelUtilsMt19937UIntN( byte* memory, int ctx )
+uint sceKernelUtilsMt19937UIntN( MemorySystem* memory, int ctx )
 {
-	SceKernelUtilsMt19937Context* pctx = ( SceKernelUtilsMt19937Context* )( memory + ( ctx - MainMemoryBase ) );
+	SceKernelUtilsMt19937Context* pctx = ( SceKernelUtilsMt19937Context* )memory->Translate( ctx );
 	uint* mt = pctx->state;
 	int mti = pctx->count;
 

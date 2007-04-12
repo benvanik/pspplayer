@@ -6,6 +6,10 @@
 
 #include "Stdafx.h"
 #include "NativeBios.h"
+#include "Loader.h"
+#include "Kernel.h"
+#include "Module.h"
+#include "ModuleListing.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -27,15 +31,42 @@ NativeBios::NativeBios( IEmulationInstance^ emulator, ComponentParameters^ param
 	_functionList = gcnew List<BiosFunction^>();
 	_functions = gcnew Dictionary<uint, BiosFunction^>();
 
-	Loader = gcnew Loader( this );
-	Kernel = new Kernel();
+	_loader = gcnew Bios::Loader( this );
+	_kernel = new Bios::Kernel( this );
+
+	_gameSetEvent = gcnew Threading::AutoResetEvent( false );
 
 	this->GatherFunctions();
 }
 
 NativeBios::~NativeBios()
 {
-	SAFEDELETE( Kernel );
+	SAFEDELETE( _kernel );
+}
+
+GameInformation^ NativeBios::Game::get()
+{
+	return _game;
+}
+
+void NativeBios::Game::set( GameInformation^ value )
+{
+	if( _game != nullptr )
+	{
+		Debug::Assert( value == nullptr );
+		_game = nullptr;
+		return;
+	}
+	_game = value;
+	_kernel->StartGame();
+	_gameSetEvent->Set();
+}
+
+void NativeBios::Execute()
+{
+	if( _game == nullptr )
+		_gameSetEvent->WaitOne();
+	_kernel->Execute();
 }
 
 void NativeBios::Cleanup()
@@ -87,12 +118,14 @@ void NativeBios::GatherFunctions()
 
 	for each( Type^ type in Reflection::Assembly::GetCallingAssembly()->GetTypes() )
 	{
-		if( type->GetInterface( "Noxa.Emulation.Psp.Bios.IModule" ) == nullptr )
+		if( type->BaseType->Equals( Module::typeid ) == false )
 			continue;
 		if( type->IsAbstract == true )
 			continue;
+		
+		// Kernel* ptr
 
-		Module^ module = ( Module^ )Activator::CreateInstance( type, _kernel );
+		Module^ module = ( Module^ )Activator::CreateInstance( type, IntPtr( _kernel ) );
 		Debug::Assert( module != nullptr );
 		if( module == nullptr )
 			continue;
@@ -128,7 +161,7 @@ void NativeBios::GatherFunctions()
 			}
 
 			BiosFunction^ function = gcnew BiosFunction(
-				metaModule,
+				metaModule, ( IModule^ )module,
 				attr->NID, attr->Name,
 				isImplemented, isStateless,
 				mi, nativePointer );

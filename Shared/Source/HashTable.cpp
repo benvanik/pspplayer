@@ -288,7 +288,7 @@ PTR htab_find_with_hash( HashTable htab, const PTR key, hashval_t hash )
 	PTR entry = htab->Entries[index];
 	if( ( entry == EMPTY_ENTRY ) ||
 		( ( entry != DELETED_ENTRY ) &&
-		  ( (*htab->CompareFunction)( entry, key ) ) ) )
+		  ( (*htab->CompareFunction)( *( (PTR*)entry ), key ) ) ) )
 		return entry;
 
 	hashval_t hash2 = 1 + hash % ( size - 2 );
@@ -305,7 +305,7 @@ PTR htab_find_with_hash( HashTable htab, const PTR key, hashval_t hash )
 		entry = htab->Entries[index];
 		if( ( entry == EMPTY_ENTRY ) ||
 			( ( entry != DELETED_ENTRY ) &&
-			  ( (*htab->CompareFunction)( entry, key ) ) ) )
+			  ( (*htab->CompareFunction)( *( (PTR*)entry ), key ) ) ) )
 			return entry;
 	}
 }
@@ -364,7 +364,7 @@ PTR* htab_find_slot_with_hash( HashTable htab, const PTR key, hashval_t hash, bo
 			if( first_deleted_slot == NULL )
 				first_deleted_slot = &htab->Entries[index];
 		}
-		else if( (*htab->CompareFunction)( entry, key ) )
+		else if( (*htab->CompareFunction)( *( (PTR*)entry ), key ) )
 			return &htab->Entries[index];
 
 #ifdef _DEBUG

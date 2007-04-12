@@ -178,6 +178,9 @@ namespace Noxa.Emulation.Psp.Games
 		/// </summary>
 		public void Dispose()
 		{
+			if( IgnoreDispose == true )
+				return;
+
 			if( this.DataPsp != null )
 				this.DataPsp.Dispose();
 			this.DataPsp = null;
@@ -193,5 +196,10 @@ namespace Noxa.Emulation.Psp.Games
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Ignore Dispose calls; for internal use only.
+		/// </summary>
+		public bool IgnoreDispose = false;
 	}
 }

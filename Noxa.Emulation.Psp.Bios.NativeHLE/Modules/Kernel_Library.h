@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class Kernel_Library : public Module
 					{
 					public:
-						Kernel_Library( Kernel^ kernel ) : Module( kernel ) {}
+						Kernel_Library( IntPtr kernel ) : Module( kernel ) {}
 						~Kernel_Library(){}
 
 					public:

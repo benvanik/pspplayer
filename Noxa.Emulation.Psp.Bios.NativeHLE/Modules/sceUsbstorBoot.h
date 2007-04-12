@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceUsbstorBoot : public Module
 					{
 					public:
-						sceUsbstorBoot( Kernel^ kernel ) : Module( kernel ) {}
+						sceUsbstorBoot( IntPtr kernel ) : Module( kernel ) {}
 						~sceUsbstorBoot(){}
 
 					public:

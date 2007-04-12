@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceRtc : public Module
 					{
 					public:
-						sceRtc( Kernel^ kernel ) : Module( kernel ) {}
+						sceRtc( IntPtr kernel ) : Module( kernel ) {}
 						~sceRtc(){}
 
 					public:

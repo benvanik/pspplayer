@@ -28,18 +28,18 @@ using namespace Noxa::Emulation::Psp::Bios::Modules;
 #define TICKSPERYEAR	314496000000000		// 52 weeks/year?
 
 int sceRtcGetTickResolutionN();
-int sceRtcGetCurrentTickN( LARGE_INTEGER* tick );
-int sceRtcGetCurrentClockLocalTimeN( byte* memory, int time );
-int sceRtcCompareTickN( byte* memory, int tick1, int tick2 );
-int sceRtcTickAddTicksN( byte* memory, int destTick, int srcTick, int numYears );
-int sceRtcTickAddMicrosecondsN( byte* memory, int destTick, int srcTick, int numYears );
-int sceRtcTickAddSecondsN( byte* memory, int destTick, int srcTick, int numYears );
-int sceRtcTickAddMinutesN( byte* memory, int destTick, int srcTick, int numYears );
-int sceRtcTickAddHoursN( byte* memory, int destTick, int srcTick, int numYears );
-int sceRtcTickAddDaysN( byte* memory, int destTick, int srcTick, int numYears );
-int sceRtcTickAddWeeksN( byte* memory, int destTick, int srcTick, int numYears );
-int sceRtcTickAddMonthsN( byte* memory, int destTick, int srcTick, int numYears );
-int sceRtcTickAddYearsN( byte* memory, int destTick, int srcTick, int numYears );
+int sceRtcGetCurrentTickN( MemorySystem* memory, int tick );
+int sceRtcGetCurrentClockLocalTimeN( MemorySystem* memory, int time );
+int sceRtcCompareTickN( MemorySystem* memory, int tick1, int tick2 );
+int sceRtcTickAddTicksN( MemorySystem* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddMicrosecondsN( MemorySystem* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddSecondsN( MemorySystem* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddMinutesN( MemorySystem* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddHoursN( MemorySystem* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddDaysN( MemorySystem* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddWeeksN( MemorySystem* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddMonthsN( MemorySystem* memory, int destTick, int srcTick, int numYears );
+int sceRtcTickAddYearsN( MemorySystem* memory, int destTick, int srcTick, int numYears );
 
 void* sceRtc::QueryNativePointer( uint nid )
 {
@@ -107,9 +107,10 @@ int sceRtc::sceRtcGetCurrentTick( IMemory^ memory, int tick )
 }
 
 #pragma unmanaged
-int sceRtcGetCurrentTickN( LARGE_INTEGER* tick )
+int sceRtcGetCurrentTickN( MemorySystem* memory, int tick )
 {
-	QueryPerformanceCounter( tick );
+	LARGE_INTEGER* ptick = ( LARGE_INTEGER* )memory->Translate( tick );
+	QueryPerformanceCounter( ptick );
 	return 0;
 }
 #pragma managed
@@ -118,11 +119,11 @@ int sceRtcGetCurrentTickN( LARGE_INTEGER* tick )
 int sceRtc::sceRtcGetCurrentClock( IMemory^ memory, int time, int tz ){ return NISTUBRETURN; }
 
 #pragma unmanaged
-int sceRtcGetCurrentClockLocalTimeN( byte* memory, int time )
+int sceRtcGetCurrentClockLocalTimeN( MemorySystem* memory, int time )
 {
 	SYSTEMTIME t;
 	GetLocalTime( &t );
-	ushort* ptr = ( ushort* )( memory + ( time - MainMemoryBase ) );
+	ushort* ptr = ( ushort* )memory->Translate( time );
 	*ptr = ( ushort )t.wYear;
 	*( ptr + 1 ) = ( ushort )t.wMonth;
 	*( ptr + 2 ) = ( ushort )t.wDay;
@@ -184,10 +185,10 @@ int sceRtc::sceRtcSetTick( IMemory^ memory, int date, int tick ){ return NISTUBR
 int sceRtc::sceRtcGetTick( IMemory^ memory, int date, int tick ){ return NISTUBRETURN; }
 
 #pragma unmanaged
-int sceRtcCompareTickN( byte* memory, int tick1, int tick2 )
+int sceRtcCompareTickN( MemorySystem* memory, int tick1, int tick2 )
 {
-	int64 t1 = *( int64* )( memory + ( tick1 - MainMemoryBase ) );
-	int64 t2 = *( int64* )( memory + ( tick2 - MainMemoryBase ) );
+	int64 t1 = *( int64* )memory->Translate( tick1 );
+	int64 t2 = *( int64* )memory->Translate( tick2 );
 	if( t1 == t2 )
 		return 0;
 	else if( t1 < t2 )
@@ -200,8 +201,8 @@ int sceRtcCompareTickN( byte* memory, int tick1, int tick2 )
 // int sceRtcCompareTick(const u64* tick1, const u64* tick2); (/rtc/psprtc.h:151)
 int sceRtc::sceRtcCompareTick( IMemory^ memory, int tick1, int tick2 )
 {
-	int64 t1 = memory->ReadDoubleWord( tick1 );
-	int64 t2 = memory->ReadDoubleWord( tick2 );
+	int64 t1 = *( int64* )MSI( memory )->Translate( tick1 );
+	int64 t2 = *( int64* )MSI( memory )->Translate( tick2 );
 	if( t1 == t2 )
 		return 0;
 	else if( t1 < t2 )
@@ -211,10 +212,10 @@ int sceRtc::sceRtcCompareTick( IMemory^ memory, int tick1, int tick2 )
 }
 
 #pragma unmanaged
-int sceRtcTickAddTicksN( byte* memory, int destTick, int srcTick, int numTicks )
+int sceRtcTickAddTicksN( MemorySystem* memory, int destTick, int srcTick, int numTicks )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + numTicks;
 	return 0;
 }
@@ -223,18 +224,17 @@ int sceRtcTickAddTicksN( byte* memory, int destTick, int srcTick, int numTicks )
 // int sceRtcTickAddTicks(u64* destTick, const u64* srcTick, u64 numTicks); (/rtc/psprtc.h:161)
 int sceRtc::sceRtcTickAddTicks( IMemory^ memory, int destTick, int srcTick, int numTicks )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numTicks;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + numTicks;
 	return 0;
 }
 
 #pragma unmanaged
-int sceRtcTickAddMicrosecondsN( byte* memory, int destTick, int srcTick, int numMS )
+int sceRtcTickAddMicrosecondsN( MemorySystem* memory, int destTick, int srcTick, int numMS )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + ( numMS * TICKSPERUS );
 	return 0;
 }
@@ -243,18 +243,17 @@ int sceRtcTickAddMicrosecondsN( byte* memory, int destTick, int srcTick, int num
 // int sceRtcTickAddMicroseconds(u64* destTick, const u64* srcTick, u64 numMS); (/rtc/psprtc.h:171)
 int sceRtc::sceRtcTickAddMicroseconds( IMemory^ memory, int destTick, int srcTick, int numMS )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numMS * TICKSPERUS;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + ( numMS * TICKSPERUS );
 	return 0;
 }
 
 #pragma unmanaged
-int sceRtcTickAddSecondsN( byte* memory, int destTick, int srcTick, int numSecs )
+int sceRtcTickAddSecondsN( MemorySystem* memory, int destTick, int srcTick, int numSecs )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + ( numSecs * TICKSPERSEC );
 	return 0;
 }
@@ -263,18 +262,17 @@ int sceRtcTickAddSecondsN( byte* memory, int destTick, int srcTick, int numSecs 
 // int sceRtcTickAddSeconds(u64* destTick, const u64* srcTick, u64 numSecs); (/rtc/psprtc.h:181)
 int sceRtc::sceRtcTickAddSeconds( IMemory^ memory, int destTick, int srcTick, int numSecs )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numSecs * TICKSPERSEC;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + ( numSecs * TICKSPERSEC );
 	return 0;
 }
 
 #pragma unmanaged
-int sceRtcTickAddMinutesN( byte* memory, int destTick, int srcTick, int numMins )
+int sceRtcTickAddMinutesN( MemorySystem* memory, int destTick, int srcTick, int numMins )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + ( numMins * TICKSPERMIN );
 	return 0;
 }
@@ -283,18 +281,17 @@ int sceRtcTickAddMinutesN( byte* memory, int destTick, int srcTick, int numMins 
 // int sceRtcTickAddMinutes(u64* destTick, const u64* srcTick, u64 numMins); (/rtc/psprtc.h:191)
 int sceRtc::sceRtcTickAddMinutes( IMemory^ memory, int destTick, int srcTick, int numMins )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numMins * TICKSPERMIN;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + ( numMins * TICKSPERMIN );
 	return 0;
 }
 
 #pragma unmanaged
-int sceRtcTickAddHoursN( byte* memory, int destTick, int srcTick, int numHours )
+int sceRtcTickAddHoursN( MemorySystem* memory, int destTick, int srcTick, int numHours )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + ( numHours * TICKSPERHOUR );
 	return 0;
 }
@@ -303,18 +300,17 @@ int sceRtcTickAddHoursN( byte* memory, int destTick, int srcTick, int numHours )
 // int sceRtcTickAddHours(u64* destTick, const u64* srcTick, int numHours); (/rtc/psprtc.h:201)
 int sceRtc::sceRtcTickAddHours( IMemory^ memory, int destTick, int srcTick, int numHours )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numHours * TICKSPERHOUR;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + ( numHours * TICKSPERHOUR );
 	return 0;
 }
 
 #pragma unmanaged
-int sceRtcTickAddDaysN( byte* memory, int destTick, int srcTick, int numDays )
+int sceRtcTickAddDaysN( MemorySystem* memory, int destTick, int srcTick, int numDays )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + ( numDays * TICKSPERDAY );
 	return 0;
 }
@@ -323,18 +319,17 @@ int sceRtcTickAddDaysN( byte* memory, int destTick, int srcTick, int numDays )
 // int sceRtcTickAddDays(u64* destTick, const u64* srcTick, int numDays); (/rtc/psprtc.h:211)
 int sceRtc::sceRtcTickAddDays( IMemory^ memory, int destTick, int srcTick, int numDays )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numDays * TICKSPERDAY;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + ( numDays * TICKSPERDAY );
 	return 0;
 }
 
 #pragma unmanaged
-int sceRtcTickAddWeeksN( byte* memory, int destTick, int srcTick, int numWeeks )
+int sceRtcTickAddWeeksN( MemorySystem* memory, int destTick, int srcTick, int numWeeks )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + ( numWeeks * TICKSPERWEEK );
 	return 0;
 }
@@ -343,18 +338,17 @@ int sceRtcTickAddWeeksN( byte* memory, int destTick, int srcTick, int numWeeks )
 // int sceRtcTickAddWeeks(u64* destTick, const u64* srcTick, int numWeeks); (/rtc/psprtc.h:221)
 int sceRtc::sceRtcTickAddWeeks( IMemory^ memory, int destTick, int srcTick, int numWeeks )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numWeeks * TICKSPERWEEK;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + ( numWeeks * TICKSPERWEEK );
 	return 0;
 }
 
 #pragma unmanaged
-int sceRtcTickAddMonthsN( byte* memory, int destTick, int srcTick, int numMonths )
+int sceRtcTickAddMonthsN( MemorySystem* memory, int destTick, int srcTick, int numMonths )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + ( numMonths * TICKSPERMONTH );
 	return 0;
 }
@@ -363,18 +357,17 @@ int sceRtcTickAddMonthsN( byte* memory, int destTick, int srcTick, int numMonths
 // int sceRtcTickAddMonths(u64* destTick, const u64* srcTick, int numMonths); (/rtc/psprtc.h:232)
 int sceRtc::sceRtcTickAddMonths( IMemory^ memory, int destTick, int srcTick, int numMonths )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numMonths * TICKSPERMONTH;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + ( numMonths * TICKSPERMONTH );
 	return 0;
 }
 
 #pragma unmanaged
-int sceRtcTickAddYearsN( byte* memory, int destTick, int srcTick, int numYears )
+int sceRtcTickAddYearsN( MemorySystem* memory, int destTick, int srcTick, int numYears )
 {
-	int64* dp = ( int64* )( memory + ( destTick - MainMemoryBase ) );
-	int64* sp = ( int64* )( memory + ( srcTick - MainMemoryBase ) );
+	int64* dp = ( int64* )memory->Translate( destTick );
+	int64* sp = ( int64* )memory->Translate( srcTick );
 	*dp = *sp + ( numYears * TICKSPERYEAR );
 	return 0;
 }
@@ -383,10 +376,9 @@ int sceRtcTickAddYearsN( byte* memory, int destTick, int srcTick, int numYears )
 // int sceRtcTickAddYears(u64* destTick, const u64* srcTick, int numYears); (/rtc/psprtc.h:242)
 int sceRtc::sceRtcTickAddYears( IMemory^ memory, int destTick, int srcTick, int numYears )
 {
-	int64 st = memory->ReadDoubleWord( srcTick );
-	st += numYears * TICKSPERYEAR;
-	memory->WriteDoubleWord( destTick, st );
-
+	int64* dp = ( int64* )MSI( memory )->Translate( destTick );
+	int64* sp = ( int64* )MSI( memory )->Translate( srcTick );
+	*dp = *sp + ( numYears * TICKSPERYEAR );
 	return 0;
 }
 

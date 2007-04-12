@@ -43,7 +43,7 @@ namespace Noxa {
 						static const int				InputPollInterval = 50;
 
 					public:
-						sceCtrl( Kernel^ kernel ) : Module( kernel ) {}
+						sceCtrl( IntPtr kernel ) : Module( kernel ) {}
 						~sceCtrl(){}
 
 					public:
