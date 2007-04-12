@@ -25,7 +25,7 @@ namespace Noxa {
 					public ref class IoFileMgrForUser : public Module
 					{
 					public:
-						IoFileMgrForUser( Kernel^ kernel ) : Module( kernel ) {}
+						IoFileMgrForUser( IntPtr kernel ) : Module( kernel ) {}
 						~IoFileMgrForUser(){}
 
 					public:

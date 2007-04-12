@@ -8,9 +8,8 @@
 #include "ThreadManForUser.h"
 #include "Kernel.h"
 #include "KernelHelpers.h"
-#include "KernelPartition.h"
-#include "KernelStatistics.h"
-#include "KernelThread.h"
+#include "KPartition.h"
+#include "KThread.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -21,15 +20,14 @@ using namespace Noxa::Emulation::Psp::Bios::Modules;
 // int sceKernelSleepThread(); (/user/pspthreadman.h:244)
 int ThreadManForUser::sceKernelSleepThread()
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Waiting;
-	thread->WaitID = 0;
-	thread->WaitClass = KernelThreadWait::Sleep;
-	thread->CanHandleCallbacks = false;
-	_kernel->ContextSwitch();
+	thread->Sleep( false );
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
@@ -37,15 +35,14 @@ int ThreadManForUser::sceKernelSleepThread()
 // int sceKernelSleepThreadCB(); (/user/pspthreadman.h:255)
 int ThreadManForUser::sceKernelSleepThreadCB()
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Waiting;
-	thread->WaitID = 0;
-	thread->WaitClass = KernelThreadWait::Sleep;
-	thread->CanHandleCallbacks = true;
-	_kernel->ContextSwitch();
+	thread->Sleep( true );
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
@@ -53,14 +50,14 @@ int ThreadManForUser::sceKernelSleepThreadCB()
 // int sceKernelWakeupThread(SceUID thid); (/user/pspthreadman.h:264)
 int ThreadManForUser::sceKernelWakeupThread( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Ready;
-	thread->WakeupCount++;
-
-	_kernel->ContextSwitch();
+	thread->Wake();
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
@@ -68,18 +65,16 @@ int ThreadManForUser::sceKernelWakeupThread( int thid )
 // int sceKernelCancelWakeupThread(SceUID thid); (/user/pspthreadman.h:273)
 int ThreadManForUser::sceKernelCancelWakeupThread( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
 	// cancel wakeup not supported - perhaps we shouldn't cs in sceKernelWakeupThread?
-	Debug::Assert( false );
+	assert( false );
 
-	if( thread->State == KernelThreadState::Ready )
+	if( thread->State == KThreadReady )
 	{
-		thread->State = KernelThreadState::Waiting;
-		thread->WaitID = 0;
-		thread->WaitClass = KernelThreadWait::Sleep;
+		thread->Sleep( thread->CanHandleCallbacks );
 
 		return 0;
 	}
@@ -90,13 +85,14 @@ int ThreadManForUser::sceKernelCancelWakeupThread( int thid )
 // int sceKernelSuspendThread(SceUID thid); (/user/pspthreadman.h:282)
 int ThreadManForUser::sceKernelSuspendThread( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Suspended;
-
-	_kernel->ContextSwitch();
+	thread->Suspend();
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
@@ -104,13 +100,14 @@ int ThreadManForUser::sceKernelSuspendThread( int thid )
 // int sceKernelResumeThread(SceUID thid); (/user/pspthreadman.h:291)
 int ThreadManForUser::sceKernelResumeThread( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Ready;
-
-	_kernel->ContextSwitch();
+	thread->Resume();
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
@@ -118,20 +115,30 @@ int ThreadManForUser::sceKernelResumeThread( int thid )
 // int sceKernelWaitThreadEnd(SceUID thid, SceUInt *timeout); (/user/pspthreadman.h:301)
 int ThreadManForUser::sceKernelWaitThreadEnd( IMemory^ memory, int thid, int timeout )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Waiting;
-	thread->WaitID = thid;
-	thread->WaitClass = KernelThreadWait::ThreadEnd;
-	if( timeout != 0x0 )
-		thread->WaitTimeout = memory->ReadWord( timeout );
-	else
-		thread->WaitTimeout = 0;
-	thread->CanHandleCallbacks = false;
+	KThread* targetThread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( targetThread == NULL )
+		return -1;
 
-	_kernel->ContextSwitch();
+	// If already stopped, return
+	if( ( targetThread->State == KThreadDead ) ||
+		( targetThread->State == KThreadStopped ) )
+		return 0;
+
+	uint timeoutUs;
+	if( timeout != 0 )
+	{
+		uint* ptimeout = ( uint* )MSI( memory )->Translate( timeout );
+		timeoutUs = *ptimeout;
+	}
+
+	thread->Join( targetThread, timeoutUs, false );
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
@@ -139,20 +146,30 @@ int ThreadManForUser::sceKernelWaitThreadEnd( IMemory^ memory, int thid, int tim
 // int sceKernelWaitThreadEndCB(SceUID thid, SceUInt *timeout); (/user/pspthreadman.h:311)
 int ThreadManForUser::sceKernelWaitThreadEndCB( IMemory^ memory, int thid, int timeout )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Waiting;
-	thread->WaitID = thid;
-	thread->WaitClass = KernelThreadWait::ThreadEnd;
-	if( timeout != 0x0 )
-		thread->WaitTimeout = memory->ReadWord( timeout );
-	else
-		thread->WaitTimeout = 0;
-	thread->CanHandleCallbacks = true;
+	KThread* targetThread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( targetThread == NULL )
+		return -1;
 
-	_kernel->ContextSwitch();
+	// If already stopped, return
+	if( ( targetThread->State == KThreadDead ) ||
+		( targetThread->State == KThreadStopped ) )
+		return 0;
+
+	uint timeoutUs;
+	if( timeout != 0 )
+	{
+		uint* ptimeout = ( uint* )MSI( memory )->Translate( timeout );
+		timeoutUs = *ptimeout;
+	}
+
+	thread->Join( targetThread, timeoutUs, true );
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
@@ -160,24 +177,14 @@ int ThreadManForUser::sceKernelWaitThreadEndCB( IMemory^ memory, int thid, int t
 // int sceKernelDelayThread(SceUInt delay); (/user/pspthreadman.h:323)
 int ThreadManForUser::sceKernelDelayThread( int delay )
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Waiting;
-	thread->WaitClass = KernelThreadWait::Delay;
-	thread->WaitID = 0;
-	thread->WaitTimeout = delay * 10; // in us - convert to ticks
-	thread->WaitTimestamp = DateTime::Now.Ticks;
-	thread->CanHandleCallbacks = false;
-
-	_kernel->_delayedThreads->Add( thread );
-	_kernel->_delayedThreads->Sort( gcnew Comparison<KernelThread^>( _kernel, &Kernel::ThreadDelayComparer ) );
-
-	if( _kernel->_delayedThreadTimer->Enabled == false )
-		_kernel->SpawnDelayedThreadTimer( thread->WaitTimeout + thread->WaitTimestamp );
-
-	_kernel->ContextSwitch();
+	thread->Delay( delay, false );
+	if( _kernel->Schedule() == true )
+	{
+	}
 	
 	return 0;
 }
@@ -185,24 +192,14 @@ int ThreadManForUser::sceKernelDelayThread( int delay )
 // int sceKernelDelayThreadCB(SceUInt delay); (/user/pspthreadman.h:335)
 int ThreadManForUser::sceKernelDelayThreadCB( int delay )
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Waiting;
-	thread->WaitClass = KernelThreadWait::Delay;
-	thread->WaitID = 0;
-	thread->WaitTimeout = delay * 10; // us->ticks
-	thread->WaitTimestamp = DateTime::Now.Ticks;
-	thread->CanHandleCallbacks = true;
-
-	_kernel->_delayedThreads->Add( thread );
-	_kernel->_delayedThreads->Sort( gcnew Comparison<KernelThread^>( _kernel, &Kernel::ThreadDelayComparer ) );
-
-	if( _kernel->_delayedThreadTimer->Enabled == false )
-		_kernel->SpawnDelayedThreadTimer( thread->WaitTimeout + thread->WaitTimestamp );
-
-	_kernel->ContextSwitch();
+	thread->Delay( delay, true );
+	if( _kernel->Schedule() == true )
+	{
+	}
 	
 	return 0;
 }
@@ -210,8 +207,8 @@ int ThreadManForUser::sceKernelDelayThreadCB( int delay )
 // int sceKernelDelaySysClockThread(SceKernelSysClock *delay); (/user/pspthreadman.h:344)
 int ThreadManForUser::sceKernelDelaySysClockThread( IMemory^ memory, int delay )
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 	
 	return NISTUBRETURN;
@@ -220,8 +217,8 @@ int ThreadManForUser::sceKernelDelaySysClockThread( IMemory^ memory, int delay )
 // int sceKernelDelaySysClockThreadCB(SceKernelSysClock *delay); (/user/pspthreadman.h:354)
 int ThreadManForUser::sceKernelDelaySysClockThreadCB( IMemory^ memory, int delay )
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 	
 	return NISTUBRETURN;

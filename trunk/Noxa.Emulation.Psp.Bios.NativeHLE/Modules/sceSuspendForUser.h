@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceSuspendForUser : public Module
 					{
 					public:
-						sceSuspendForUser( Kernel^ kernel ) : Module( kernel ) {}
+						sceSuspendForUser( IntPtr kernel ) : Module( kernel ) {}
 						~sceSuspendForUser(){}
 
 					public:

@@ -18,6 +18,6 @@ using namespace Noxa::Emulation::Psp::Debugging::DebugModel;
 void NativeBios::EnableDebugging( IDebugger^ debugger )
 {
 	_debugger = debugger;
-	if( _debugger != nullptr )
-		_debugger->BiosHook = this;
+	//if( _debugger != nullptr )
+	//	_debugger->BiosHook = this;
 }

@@ -6,11 +6,21 @@
 
 #include "Stdafx.h"
 #include <assert.h>
+#include <malloc.h>
 #include "LL.h"
 
 using namespace Noxa::Emulation::Psp;
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 #pragma unmanaged
+
+void dummy()
+{
+	LL<int> x;
+}
 
 template<typename T>
 LL<T>::LL()

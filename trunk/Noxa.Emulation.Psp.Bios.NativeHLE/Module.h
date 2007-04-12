@@ -21,15 +21,13 @@ namespace Noxa {
 		namespace Psp {
 			namespace Bios {
 
-				class Kernel;
-
-				ref class Module abstract
+				public ref class Module abstract : public IModule
 				{
 				internal:
 					Kernel*						_kernel;
 
 				internal:
-					Module( Kernel* kernel ){ _kernel = kernel; }
+					Module( IntPtr kernel ){ _kernel = ( Kernel* )kernel.ToPointer(); }
 					~Module(){ this->Clear(); }
 
 				public:

@@ -61,6 +61,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 		public void LaunchGame( GameInformation game )
 		{
+			game.IgnoreDispose = true;
 			if( game.Tag != null )
 			{
 				// Need to have the UMD instance reload to the game

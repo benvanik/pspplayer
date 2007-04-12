@@ -43,6 +43,7 @@ using namespace Noxa::Emulation::Psp::CodeGen;
 #define MNULLDELAY( xr )		g->dword_ptr[ xr + CTXNULLDELAY ]
 #define MPCVALID( xr )			g->dword_ptr[ xr + CTXPCVALID ]
 #define MPC( xr )				g->dword_ptr[ xr + CTXPC ]
+#define MINTMASK( xr )			g->dword_ptr[ xr + CTXINTMASK ]
 #define MCP1REG( xr, r, fmt )	g->dword_ptr[ xr + CTXCP1REGS + ( r << 4 ) ]
 #define MCP1CONDBIT( xr )		g->dword_ptr[ xr + CTXCP1CONDBIT ]
 #define MSTOPFLAG( xr )			g->dword_ptr[ xr + CTXSTOPFLAG ]

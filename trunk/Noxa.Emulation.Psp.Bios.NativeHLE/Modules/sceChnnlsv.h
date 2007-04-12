@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceChnnlsv : public Module
 					{
 					public:
-						sceChnnlsv( Kernel^ kernel ) : Module( kernel ) {}
+						sceChnnlsv( IntPtr kernel ) : Module( kernel ) {}
 						~sceChnnlsv(){}
 
 					public:

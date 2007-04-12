@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class scePower : public Module
 					{
 					public:
-						scePower( Kernel^ kernel ) : Module( kernel ) {}
+						scePower( IntPtr kernel ) : Module( kernel ) {}
 						~scePower(){}
 
 					public:

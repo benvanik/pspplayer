@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class SysMemUserForUser : public Module
 					{
 					public:
-						SysMemUserForUser( Kernel^ kernel ) : Module( kernel ) {}
+						SysMemUserForUser( IntPtr kernel ) : Module( kernel ) {}
 						~SysMemUserForUser(){}
 
 					public:
@@ -49,13 +49,13 @@ namespace Noxa {
 						// SceSize sceKernelTotalFreeMemSize(); (/user/pspsysmem.h:81)
 						int sceKernelTotalFreeMemSize();
 
-						[BiosFunction( 0xE6581468, "sceKernelPartitionMaxFreeMemSize" )] [Stateless]
+						[BiosFunction( 0xE6581468, "sceKPartitionMaxFreeMemSize" )] [Stateless]
 						// manual add
-						int sceKernelPartitionMaxFreeMemSize( int partitionid );
+						int sceKPartitionMaxFreeMemSize( int partitionid );
 
-						[BiosFunction( 0x9697CD32, "sceKernelPartitionTotalFreeMemSize" )] [Stateless]
+						[BiosFunction( 0x9697CD32, "sceKPartitionTotalFreeMemSize" )] [Stateless]
 						// manual add
-						int sceKernelPartitionTotalFreeMemSize( int partitionid );
+						int sceKPartitionTotalFreeMemSize( int partitionid );
 
 						[BiosFunction( 0x237DBD4F, "sceKernelAllocPartitionMemory" )] [Stateless]
 						// SceUID sceKernelAllocPartitionMemory(SceUID partitionid, const char *name, int type, SceSize size, void *addr); (/user/pspsysmem.h:56)

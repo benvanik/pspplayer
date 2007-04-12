@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceAtrac3plus : public Module
 					{
 					public:
-						sceAtrac3plus( Kernel^ kernel ) : Module( kernel ) {}
+						sceAtrac3plus( IntPtr kernel ) : Module( kernel ) {}
 						~sceAtrac3plus(){}
 
 					public:

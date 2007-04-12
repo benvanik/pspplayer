@@ -16,7 +16,7 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 
-int sceDmacMemcpyN( byte* memory, int dest, int source, int size );
+int sceDmacMemcpyN( MemorySystem* memory, int dest, int source, int size );
 
 void* sceDmac::QueryNativePointer( uint nid )
 {
@@ -30,16 +30,12 @@ void* sceDmac::QueryNativePointer( uint nid )
 }
 
 #pragma unmanaged
-int sceDmacMemcpyN( byte* memory, int dest, int source, int size )
+int sceDmacMemcpyN( MemorySystem* memory, int dest, int source, int size )
 {
-	// Only support main memory copies - anything else can DIAF
-	assert( ( dest >= MainMemoryBase ) && ( dest < MainMemoryBound ) );
-	assert( ( source >= MainMemoryBase ) && ( source < MainMemoryBound ) );
+	byte* pdest = memory->Translate( dest );
+	byte* psrc = memory->Translate( source );
 
-	memcpy(
-		( memory + ( dest - MainMemoryBase ) ),
-		( memory + ( source - MainMemoryBase ) ),
-		size );
+	memcpy( pdest, psrc, size );
 
 	return dest;
 }
@@ -47,12 +43,10 @@ int sceDmacMemcpyN( byte* memory, int dest, int source, int size )
 
 int sceDmac::sceDmacMemcpy( IMemory^ memory, int dest, int source, int size )
 {
-	byte* ptr = ( byte* )memory->MainMemoryPointer;
+	byte* pdest = MSI( memory )->Translate( dest );
+	byte* psrc = MSI( memory )->Translate( source );
 
-	memcpy(
-		( ptr + ( dest - MainMemoryBase ) ),
-		( ptr + ( source - MainMemoryBase ) ),
-		size );
+	memcpy( pdest, psrc, size );
 
 	return dest;
 }

@@ -17,12 +17,15 @@ using namespace Noxa::Emulation::Psp::Debugging::DebugModel;
 using namespace Noxa::Emulation::Psp::Games;
 using namespace Noxa::Emulation::Psp::Utilities;
 
+#include "CpuApi.h"
 #include "R4000Cache.h"
 #include "R4000Capabilities.h"
 #include "R4000Core.h"
 #include "R4000GenContext.h"
 #include "R4000Memory.h"
 #include "R4000Statistics.h"
+
+using namespace Noxa::Emulation::Psp::Cpu::Native;
 
 namespace Noxa {
 	namespace Emulation {
@@ -70,6 +73,8 @@ namespace Noxa {
 					void*						_ctx;
 					void*						_bounce;
 
+					CpuApi*						_nativeInterface;
+
 				internal:
 					int							_lastSyscall;
 					array<BiosFunction^>^		_syscalls;
@@ -79,6 +84,7 @@ namespace Noxa {
 					array<int>^					_syscallCounts;
 #endif
 					array<IModule^>^			_moduleInstances;
+					Dictionary<uint, uint>^		_userExports;		// NID -> address
 
 					FieldInfo^					_privateMemoryFieldInfo;
 					FieldInfo^					_privateModuleInstancesFieldInfo;
@@ -169,6 +175,14 @@ namespace Noxa {
 						}
 					}
 
+					property IntPtr NativeInterface
+					{
+						virtual IntPtr get()
+						{
+							return IntPtr( _nativeInterface );
+						}
+					}
+
 					property bool DebuggingEnabled
 					{
 						virtual bool get()
@@ -209,6 +223,8 @@ namespace Noxa {
 					virtual void Cleanup();
 
 					virtual int RegisterSyscall( unsigned int nid );
+					virtual void RegisterUserExports( BiosModule^ module );
+					virtual uint LookupUserExport( uint nid );
 
 					virtual void Resume();
 					virtual void Break();
@@ -223,6 +239,9 @@ namespace Noxa {
 					int LookupOrAddModule( IModule^ module );
 					BiosShim^ EmitShim( BiosFunction^ function, MemorySystem* memory, void* registers );
 					void* EmitShimN( BiosFunction^ function, MemorySystem* memory, void* registers );
+
+					void SetupNativeInterface();
+					void DestroyNativeInterface();
 
 				public:
 					virtual CoreState^ GetCoreState( int core );

@@ -30,9 +30,9 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 VdlRef* _outstandingLists;
 VdlRef* _outstandingListsTail;
 
-MemorySystem* _memory;
-VideoApi* _videoApi;
-MemoryPool* _memoryPool;
+MemorySystem*	_memory;
+VideoApi*		_videoApi;
+MemoryPool*		_memoryPool;
 
 void ClearOutstandingLists();
 

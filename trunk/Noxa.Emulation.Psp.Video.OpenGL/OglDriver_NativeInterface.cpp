@@ -392,6 +392,8 @@ void niWaitForVsync()
 	duration /= 1000000;
 
 	// If we are under 16ms, wait until 16ms
+	// Sleep is pretty expensive, so if we are <= 1, don't do it - we can take the inaccuracy
+	//if( ( ( duration > 1 ) &&
 	if( duration < 16 )
 		Sleep( 16 - ( int )duration );
 

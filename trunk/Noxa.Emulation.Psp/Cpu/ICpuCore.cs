@@ -49,14 +49,6 @@ namespace Noxa.Emulation.Psp.Cpu
 		}
 
 		/// <summary>
-		/// <c>true</c> if interrupts are enabled.
-		/// </summary>
-		bool InterruptsEnabled
-		{
-			get;
-		}
-
-		/// <summary>
 		/// The current interrupts masking flag.
 		/// </summary>
 		uint InterruptsFlag

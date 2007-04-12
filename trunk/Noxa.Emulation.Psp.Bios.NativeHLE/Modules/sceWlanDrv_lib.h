@@ -24,7 +24,7 @@ namespace Noxa {
 					ref class sceWlanDrv_lib : public Module
 					{
 					public:
-						sceWlanDrv_lib( Kernel^ kernel ) : Module( kernel ) {}
+						sceWlanDrv_lib( IntPtr kernel ) : Module( kernel ) {}
 						~sceWlanDrv_lib(){}
 
 						property String^ Name { virtual String^ get() override { return "sceWlanDrv_lib"; } }

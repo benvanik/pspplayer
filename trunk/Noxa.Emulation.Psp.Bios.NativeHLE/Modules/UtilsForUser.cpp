@@ -17,8 +17,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 
-int sceKernelUtilsMt19937InitN( byte* memory, int pctx, uint seed );
-uint sceKernelUtilsMt19937UIntN( byte* memory, int pctx );
+int sceKernelUtilsMt19937InitN( MemorySystem* memory, int pctx, uint seed );
+uint sceKernelUtilsMt19937UIntN( MemorySystem* memory, int pctx );
 
 void* UtilsForUser::QueryNativePointer( uint nid )
 {

@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceHprm : public Module
 					{
 					public:
-						sceHprm( Kernel^ kernel ) : Module( kernel ) {}
+						sceHprm( IntPtr kernel ) : Module( kernel ) {}
 						~sceHprm(){}
 
 					public:

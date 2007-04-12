@@ -24,7 +24,7 @@ namespace Noxa {
 					ref class sceUtility_netparam_internal : public Module
 					{
 					public:
-						sceUtility_netparam_internal( Kernel^ kernel ) : Module( kernel ) {}
+						sceUtility_netparam_internal( IntPtr kernel ) : Module( kernel ) {}
 						~sceUtility_netparam_internal(){}
 
 						property String^ Name { virtual String^ get() override { return "sceUtility_netparam_internal"; } }

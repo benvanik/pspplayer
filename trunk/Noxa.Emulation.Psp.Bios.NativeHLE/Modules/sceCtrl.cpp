@@ -21,9 +21,10 @@ using namespace Noxa::Emulation::Psp::Input;
 static uint _makedButtons;
 static uint _breakedButtons;
 static uint _pressedButtons;
+static uint _releasedButtons;
 
-int sceCtrlPeekLatchN( byte* memory, int latch_data );
-int sceCtrlReadLatchN( byte* memory, int latch_data );
+int sceCtrlPeekLatchN( MemorySystem* memory, int latch_data );
+int sceCtrlReadLatchN( MemorySystem* memory, int latch_data );
 
 void* sceCtrl::QueryNativePointer( uint nid )
 {
@@ -70,6 +71,7 @@ void sceCtrl::Clear()
 	_makedButtons = 0;
 	_breakedButtons = 0;
 	_pressedButtons = 0;
+	_releasedButtons = 0;
 }
 
 void sceCtrl::UpdateButtons( PadButtons buttons )
@@ -78,6 +80,7 @@ void sceCtrl::UpdateButtons( PadButtons buttons )
 	uint oldPressed = _pressedButtons;
 	_pressedButtons = ( uint )buttons;
 	uint stillPressed = _pressedButtons & oldPressed;
+	_releasedButtons = ~_pressedButtons;
 
 	// Set maked/breaked (pressed/released) buttons this last sample
 	_makedButtons = _pressedButtons & ~stillPressed;
@@ -88,7 +91,8 @@ void sceCtrl::InputThread()
 {
 	try
 	{
-		_device = _kernel->_emu->Input;
+		IEmulationInstance^ emu = _kernel->Emu;
+		_device = emu->Input;
 		Debug::Assert( _device != nullptr );
 		if( _device == nullptr )
 		{
@@ -158,7 +162,7 @@ int sceCtrl::sceCtrlPeekBufferPositive( IMemory^ memory, int pad_data, int count
 
 	if( pad_data != 0x0 )
 	{
-		int addr = pad_data;
+		byte* p = MSI( memory )->Translate( pad_data );
 		for( int n = 0; n < count; n++ )
 		{
 			_device->Poll();
@@ -172,12 +176,12 @@ int sceCtrl::sceCtrlPeekBufferPositive( IMemory^ memory, int pad_data, int count
 			//if( analogY == 0 )
 				analogY = ( int )( ( ( ( float )analogY / max ) + 0.5f ) * 256 );
 
-			memory->WriteWord( addr + 0, 4, ( int )Environment::TickCount );
-			memory->WriteWord( addr + 4, 4, ( int )buttons );
-			memory->WriteWord( addr + 8, 1, ( byte )analogX );
-			memory->WriteWord( addr + 9, 1, ( byte )analogY );
+			*( ( int* )p ) = ( int )Environment::TickCount;
+			*( ( int* )( p + 4 ) ) = ( int )buttons;
+			*( p + 8 ) = ( byte )analogX;
+			*( p + 9 ) = ( byte )analogY;
 			// 6 bytes of junk
-			addr += 16;
+			p += 16;
 		}
 	}
 
@@ -194,7 +198,7 @@ int sceCtrl::sceCtrlPeekBufferNegative( IMemory^ memory, int pad_data, int count
 
 	if( pad_data != 0x0 )
 	{
-		int addr = pad_data;
+		byte* p = MSI( memory )->Translate( pad_data );
 		for( int n = 0; n < count; n++ )
 		{
 			_device->Poll();
@@ -208,12 +212,12 @@ int sceCtrl::sceCtrlPeekBufferNegative( IMemory^ memory, int pad_data, int count
 			if( analogY == 0 )
 				analogY = ( int )( ( ( ( float )analogY / max ) + 0.5f ) * 256 );
 
-			memory->WriteWord( addr + 0, 4, ( int )Environment::TickCount );
-			memory->WriteWord( addr + 4, 4, ~( int )buttons );
-			memory->WriteWord( addr + 8, 1, ( byte )analogX );
-			memory->WriteWord( addr + 9, 1, ( byte )analogY );
+			*( ( int* )p ) = ( int )Environment::TickCount;
+			*( ( int* )( p + 4 ) ) = ~( int )buttons;
+			*( p + 8 ) = ( byte )analogX;
+			*( p + 9 ) = ( byte )analogY;
 			// 6 bytes of junk
-			addr += 16;
+			p += 16;
 		}
 	}
 
@@ -228,7 +232,7 @@ int sceCtrl::sceCtrlReadBufferPositive( IMemory^ memory, int pad_data, int count
 
 	if( pad_data != 0x0 )
 	{
-		int addr = pad_data;
+		byte* p = MSI( memory )->Translate( pad_data );
 		for( int n = 0; n < count; n++ )
 		{
 			_device->Poll();
@@ -242,12 +246,12 @@ int sceCtrl::sceCtrlReadBufferPositive( IMemory^ memory, int pad_data, int count
 			if( analogY == 0 )
 				analogY = ( int )( ( ( ( float )analogY / max ) + 0.5f ) * 256 );
 
-			memory->WriteWord( addr + 0, 4, ( int )Environment::TickCount );
-			memory->WriteWord( addr + 4, 4, ( int )buttons );
-			memory->WriteWord( addr + 8, 1, ( byte )analogX );
-			memory->WriteWord( addr + 9, 1, ( byte )analogY );
+			*( ( int* )p ) = ( int )Environment::TickCount;
+			*( ( int* )( p + 4 ) ) = ( int )buttons;
+			*( p + 8 ) = ( byte )analogX;
+			*( p + 9 ) = ( byte )analogY;
 			// 6 bytes of junk
-			addr += 16;
+			p += 16;
 		}
 	}
 
@@ -262,7 +266,7 @@ int sceCtrl::sceCtrlReadBufferNegative( IMemory^ memory, int pad_data, int count
 
 	if( pad_data != 0x0 )
 	{
-		int addr = pad_data;
+		byte* p = MSI( memory )->Translate( pad_data );
 		for( int n = 0; n < count; n++ )
 		{
 			_device->Poll();
@@ -276,12 +280,12 @@ int sceCtrl::sceCtrlReadBufferNegative( IMemory^ memory, int pad_data, int count
 			if( analogY == 0 )
 				analogY = ( int )( ( ( ( float )analogY / max ) + 0.5f ) * 256 );
 
-			memory->WriteWord( addr + 0, 4, ( int )Environment::TickCount );
-			memory->WriteWord( addr + 4, 4, ~( int )buttons );
-			memory->WriteWord( addr + 8, 1, ( byte )analogX );
-			memory->WriteWord( addr + 9, 1, ( byte )analogY );
+			*( ( int* )p ) = ( int )Environment::TickCount;
+			*( ( int* )( p + 4 ) ) = ~( int )buttons;
+			*( p + 8 ) = ( byte )analogX;
+			*( p + 9 ) = ( byte )analogY;
 			// 6 bytes of junk
-			addr += 16;
+			p += 16;
 		}
 	}
 
@@ -296,13 +300,13 @@ int sceCtrl::sceCtrlReadBufferNegative( IMemory^ memory, int pad_data, int count
 //} SceCtrlLatch;
 
 #pragma unmanaged
-int sceCtrlPeekLatchN( byte* memory, int latch_data )
+int sceCtrlPeekLatchN( MemorySystem* memory, int latch_data )
 {
-	int* ptr = ( int* )( memory + ( latch_data - MainMemoryBase ) );
+	int* ptr = ( int* )memory->Translate( latch_data );
 	*ptr			= _makedButtons;
 	*( ptr + 1 )	= _breakedButtons;
 	*( ptr + 2 )	= _pressedButtons;
-	*( ptr + 3 )	= ~_pressedButtons;
+	*( ptr + 3 )	= _releasedButtons;
 	return 0;
 }
 #pragma managed
@@ -310,22 +314,23 @@ int sceCtrlPeekLatchN( byte* memory, int latch_data )
 // int sceCtrlPeekLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:172)
 int sceCtrl::sceCtrlPeekLatch( IMemory^ memory, int latch_data )
 {
-	memory->WriteWord( latch_data + 0, 4, _makedButtons );
-	memory->WriteWord( latch_data + 4, 4, _breakedButtons );
-	memory->WriteWord( latch_data + 8, 4, _pressedButtons );
-	memory->WriteWord( latch_data + 12, 4, ~_pressedButtons );
+	int* ptr = ( int* )MSI( memory )->Translate( latch_data );
+	*ptr			= _makedButtons;
+	*( ptr + 1 )	= _breakedButtons;
+	*( ptr + 2 )	= _pressedButtons;
+	*( ptr + 3 )	= _releasedButtons;
 
 	return 0;
 }
 
 #pragma unmanaged
-int sceCtrlReadLatchN( byte* memory, int latch_data )
+int sceCtrlReadLatchN( MemorySystem* memory, int latch_data )
 {
-	int* ptr = ( int* )( memory + ( latch_data - MainMemoryBase ) );
+	int* ptr = ( int* )memory->Translate( latch_data );
 	*ptr			= _makedButtons;
 	*( ptr + 1 )	= _breakedButtons;
 	*( ptr + 2 )	= _pressedButtons;
-	*( ptr + 3 )	= ~_pressedButtons;
+	*( ptr + 3 )	= _releasedButtons;
 
 	_makedButtons = 0;
 	_breakedButtons = 0;
@@ -337,10 +342,11 @@ int sceCtrlReadLatchN( byte* memory, int latch_data )
 // int sceCtrlReadLatch(SceCtrlLatch *latch_data); (/ctrl/pspctrl.h:174)
 int sceCtrl::sceCtrlReadLatch( IMemory^ memory, int latch_data )
 {
-	memory->WriteWord( latch_data + 0, 4, _makedButtons );
-	memory->WriteWord( latch_data + 4, 4, _breakedButtons );
-	memory->WriteWord( latch_data + 8, 4, _pressedButtons );
-	memory->WriteWord( latch_data + 12, 4, ~_pressedButtons );
+	int* ptr = ( int* )MSI( memory )->Translate( latch_data );
+	*ptr			= _makedButtons;
+	*( ptr + 1 )	= _breakedButtons;
+	*( ptr + 2 )	= _pressedButtons;
+	*( ptr + 3 )	= _releasedButtons;
 
 	_makedButtons = 0;
 	_breakedButtons = 0;

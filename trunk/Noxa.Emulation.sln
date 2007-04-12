@@ -10,7 +10,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Player",
 		{F8A92180-DC91-4FCB-8F69-9B3594C75A7D} = {F8A92180-DC91-4FCB-8F69-9B3594C75A7D}
 		{30EA9C83-286D-4560-8B12-6E4530A5ECAD} = {30EA9C83-286D-4560-8B12-6E4530A5ECAD}
 		{C4A3CB92-6CCA-41CA-B3AA-47754B6382E1} = {C4A3CB92-6CCA-41CA-B3AA-47754B6382E1}
-		{1448FED7-FABB-4197-A0AA-CBC48656546B} = {1448FED7-FABB-4197-A0AA-CBC48656546B}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Configuration", "Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj", "{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}"
@@ -31,8 +30,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{102BC2E8-2DED-489C-851C-333302D03BFF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Video.OpenGL", "Noxa.Emulation.Psp.Video.OpenGL\Noxa.Emulation.Psp.Video.OpenGL.vcproj", "{78980526-7FCC-4DB8-BDDA-BEDBBE8C8705}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Bios.FastHLE", "Noxa.Emulation.Psp.Bios.FastHLE\Noxa.Emulation.Psp.Bios.FastHLE.vcproj", "{1448FED7-FABB-4197-A0AA-CBC48656546B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.CodeGen", "Noxa.Emulation.Psp.CodeGen\Noxa.Emulation.Psp.CodeGen.vcproj", "{3BA8A34E-E779-4282-9566-2E0FE1D507FC}"
 EndProject
@@ -142,15 +139,6 @@ Global
 		{78980526-7FCC-4DB8-BDDA-BEDBBE8C8705}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{78980526-7FCC-4DB8-BDDA-BEDBBE8C8705}.Release|Win32.ActiveCfg = Release|Win32
 		{78980526-7FCC-4DB8-BDDA-BEDBBE8C8705}.Release|Win32.Build.0 = Release|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Debug|Win32.Build.0 = Debug|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Release|Any CPU.ActiveCfg = Release|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Release|Win32.ActiveCfg = Release|Win32
-		{1448FED7-FABB-4197-A0AA-CBC48656546B}.Release|Win32.Build.0 = Release|Win32
 		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{3BA8A34E-E779-4282-9566-2E0FE1D507FC}.Debug|Mixed Platforms.Build.0 = Debug|Win32

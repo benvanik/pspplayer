@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class InterruptManager : public Module
 					{
 					public:
-						InterruptManager( Kernel^ kernel ) : Module( kernel ) {}
+						InterruptManager( IntPtr kernel ) : Module( kernel ) {}
 						~InterruptManager(){}
 
 					public:

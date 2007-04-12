@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceSircs : public Module
 					{
 					public:
-						sceSircs( Kernel^ kernel ) : Module( kernel ) {}
+						sceSircs( IntPtr kernel ) : Module( kernel ) {}
 						~sceSircs(){}
 
 					public:

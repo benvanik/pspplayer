@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceImpose : public Module
 					{
 					public:
-						sceImpose( Kernel^ kernel ) : Module( kernel ) {}
+						sceImpose( IntPtr kernel ) : Module( kernel ) {}
 						~sceImpose(){}
 
 					public:

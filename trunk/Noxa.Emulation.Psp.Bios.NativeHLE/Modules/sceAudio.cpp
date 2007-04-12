@@ -10,6 +10,7 @@
 
 #include "sceAudio.h"
 #include "Kernel.h"
+#include "KThread.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -20,7 +21,8 @@ using namespace Noxa::Emulation::Psp::Audio;
 
 void sceAudio::Start()
 {
-	_driver = _kernel->_emu->Audio;
+	IEmulationInstance^ emu = _kernel->Emu;
+	_driver = emu->Audio;
 }
 
 void sceAudio::Stop()
@@ -41,8 +43,8 @@ int sceAudio::sceAudioOutput( IMemory^ memory, int channel, int vol, int buf )
 	if( _driver == nullptr )
 		return 0;
 
-	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->MainMemoryPointer + ( MainMemoryBase - buf ) ) );
-	_driver->Output( buffer, false, vol );
+	IntPtr buffer = IntPtr( ( void* )MSI( memory )->Translate( buf ) );
+	_driver->Output( channel, buffer, false, vol );
 
 	return 0;
 }
@@ -50,15 +52,18 @@ int sceAudio::sceAudioOutput( IMemory^ memory, int channel, int vol, int buf )
 // int sceAudioOutputBlocking(int channel, int vol, void *buf); (/audio/pspaudio.h:79)
 int sceAudio::sceAudioOutputBlocking( IMemory^ memory, int channel, int vol, int buf )
 {
-	// Context switch
-	_kernel->ActiveThread->State = KernelThreadState::Suspended;
-	_kernel->ContextSwitch();
+	// TODO: proper blocking
+	KThread* thread = _kernel->ActiveThread;
+	thread->Suspend();
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	if( _driver == nullptr )
 		return 0;
 
-	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->MainMemoryPointer + ( MainMemoryBase - buf ) ) );
-	_driver->Output( buffer, true, vol );
+	IntPtr buffer = IntPtr( ( void* )MSI( memory )->Translate( buf ) );
+	_driver->Output( channel, buffer, true, vol );
 
 	return 0;
 }
@@ -69,8 +74,8 @@ int sceAudio::sceAudioOutputPanned( IMemory^ memory, int channel, int leftvol, i
 	if( _driver == nullptr )
 		return 0;
 
-	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->MainMemoryPointer + ( MainMemoryBase - buf ) ) );
-	_driver->Output( buffer, false, leftvol, rightvol );
+	IntPtr buffer = IntPtr( ( void* )MSI( memory )->Translate( buf ) );
+	_driver->Output( channel, buffer, false, leftvol, rightvol );
 
 	return 0;
 }
@@ -78,15 +83,18 @@ int sceAudio::sceAudioOutputPanned( IMemory^ memory, int channel, int leftvol, i
 // int sceAudioOutputPannedBlocking(int channel, int leftvol, int rightvol, void *buffer); (/audio/pspaudio.h:91)
 int sceAudio::sceAudioOutputPannedBlocking( IMemory^ memory, int channel, int leftvol, int rightvol, int buf )
 {
-	// Context switch
-	_kernel->ActiveThread->State = KernelThreadState::Suspended;
-	_kernel->ContextSwitch();
+	// TODO: proper blocking
+	KThread* thread = _kernel->ActiveThread;
+	thread->Suspend();
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	if( _driver == nullptr )
 		return 0;
 
-	IntPtr buffer = IntPtr( ( void* )( ( byte* )memory->MainMemoryPointer + ( MainMemoryBase - buf ) ) );
-	_driver->Output( buffer, true, leftvol, rightvol );
+	IntPtr buffer = IntPtr( ( void* )MSI( memory )->Translate( buf ) );
+	_driver->Output( channel, buffer, true, leftvol, rightvol );
 
 	return 0;
 }

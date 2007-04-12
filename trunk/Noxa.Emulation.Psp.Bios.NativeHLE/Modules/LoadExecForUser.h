@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class LoadExecForUser : public Module
 					{
 					public:
-						LoadExecForUser( Kernel^ kernel ) : Module( kernel ) {}
+						LoadExecForUser( IntPtr kernel ) : Module( kernel ) {}
 						~LoadExecForUser(){}
 
 					public:

@@ -37,11 +37,11 @@ namespace Noxa {
 					{
 						virtual Cpu::CpuStatisticsCapabilities get()
 						{
-#ifdef STATISTICS
-							return Cpu::CpuStatisticsCapabilities::InstructionsPerSecond;
-#else
+//#ifdef STATISTICS
+//							return Cpu::CpuStatisticsCapabilities::InstructionsPerSecond;
+//#else
 							return Cpu::CpuStatisticsCapabilities::None;
-#endif
+//#endif
 						}
 					}
 

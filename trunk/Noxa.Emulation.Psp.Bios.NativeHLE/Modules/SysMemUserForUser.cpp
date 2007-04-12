@@ -8,6 +8,7 @@
 #include "SysMemUserForUser.h"
 #include "Kernel.h"
 #include "KernelHelpers.h"
+#include "KPartition.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -19,7 +20,7 @@ using namespace Noxa::Emulation::Psp::Bios::Modules;
 int SysMemUserForUser::sceKernelMaxFreeMemSize()
 {
 	uint size = 0;
-	for( int n = 0; n < _kernel->Partitions->Length; n++ )
+	for( int n = 0; n < PARTITIONCOUNT; n++ )
 		size += _kernel->Partitions[ n ]->Size;
 	return ( int )size;
 }
@@ -28,48 +29,50 @@ int SysMemUserForUser::sceKernelMaxFreeMemSize()
 int SysMemUserForUser::sceKernelTotalFreeMemSize()
 {
 	uint size = 0;
-	for( int n = 0; n < _kernel->Partitions->Length; n++ )
+	for( int n = 0; n < PARTITIONCOUNT; n++ )
 		size += _kernel->Partitions[ n ]->FreeSize;
 	return ( int )size;
 }
 
 // manual add
-int SysMemUserForUser::sceKernelPartitionMaxFreeMemSize( int partitionid )
+int SysMemUserForUser::sceKPartitionMaxFreeMemSize( int partitionid )
 {
-	KernelPartition^ partition = _kernel->Partitions[ partitionid ];
+	KPartition* partition = _kernel->Partitions[ partitionid ];
 	return ( int )partition->Size;
 }
 
 // manual add
-int SysMemUserForUser::sceKernelPartitionTotalFreeMemSize( int partitionid )
+int SysMemUserForUser::sceKPartitionTotalFreeMemSize( int partitionid )
 {
-	KernelPartition^ partition = _kernel->Partitions[ partitionid ];
+	KPartition* partition = _kernel->Partitions[ partitionid ];
 	return ( int )partition->FreeSize;
 }
 
 // SceUID sceKernelAllocPartitionMemory(SceUID partitionid, const char *name, int type, SceSize size, void *addr); (/user/pspsysmem.h:56)
 int SysMemUserForUser::sceKernelAllocPartitionMemory( IMemory^ memory, int partitionid, int name, int type, int size, int addr )
 {
-	KernelAllocationType allocType = ( KernelAllocationType )type;
-
-	KernelPartition^ partition = _kernel->Partitions[ partitionid ];
-	KernelMemoryBlock^ block = partition->Allocate( allocType, addr, size );
-	block->Name = KernelHelpers::ReadString( memory, name );
-
-	_kernel->AddHandle( block );
+	KPartition* partition = _kernel->Partitions[ partitionid ];
+	KMemoryBlock* block = partition->Allocate( ( KAllocType )type, addr, size );
+	assert( block != NULL );
 	
-	return block->ID;
+	char buffer[ 32 ];
+	if( KernelHelpers::ReadString( MSI( memory ), ( const int )name, ( byte* )buffer, ( const int )32 ) > 0 )
+		block->Name = _strdup( buffer );
+
+	_kernel->Handles->Add( block );
+	
+	return block->UID;
 }
 
 // int sceKernelFreePartitionMemory(SceUID blockid); (/user/pspsysmem.h:65)
 int SysMemUserForUser::sceKernelFreePartitionMemory( int blockid )
 {
-	KernelMemoryBlock^ block = ( KernelMemoryBlock^ )_kernel->FindHandle( blockid );
-	if( block == nullptr )
+	KMemoryBlock* block = ( KMemoryBlock* )_kernel->Handles->Lookup( blockid );
+	if( block == NULL )
 		return -1;
 
 	block->Partition->Free( block );
-	_kernel->RemoveHandle( block );
+	_kernel->Handles->Remove( block );
 	
 	return 0;
 }
@@ -77,8 +80,8 @@ int SysMemUserForUser::sceKernelFreePartitionMemory( int blockid )
 // void * sceKernelGetBlockHeadAddr(SceUID blockid); (/user/pspsysmem.h:74)
 int SysMemUserForUser::sceKernelGetBlockHeadAddr( int blockid )
 {
-	KernelMemoryBlock^ block = ( KernelMemoryBlock^ )_kernel->FindHandle( blockid );
-	if( block == nullptr )
+	KMemoryBlock* block = ( KMemoryBlock* )_kernel->Handles->Lookup( blockid );
+	if( block == NULL )
 		return -1;
 	
 	return ( int )block->Address;

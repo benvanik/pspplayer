@@ -8,9 +8,9 @@
 #include "ThreadManForUser.h"
 #include "Kernel.h"
 #include "KernelHelpers.h"
-#include "KernelPartition.h"
-#include "KernelStatistics.h"
-#include "KernelThread.h"
+#include "KPartition.h"
+#include "KThread.h"
+#include "KEvent.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -21,30 +21,31 @@ using namespace Noxa::Emulation::Psp::Bios::Modules;
 // SceUID sceKernelCreateEventFlag(const char *name, int attr, int bits, SceKernelEventFlagOptParam *opt); (/user/pspthreadman.h:645)
 int ThreadManForUser::sceKernelCreateEventFlag( IMemory^ memory, int name, int attr, int bits, int opt )
 {
-	KernelEvent^ ev = gcnew KernelEvent( _kernel->AllocateID() );
-	ev->Name = KernelHelpers::ReadString( memory, name );
-	ev->Attributes = ( KernelEventAttributes )attr;
-	ev->InitialBitMask = bits;
-	ev->BitMask = bits;
+	byte buffer[ 32 ];
+	KernelHelpers::ReadString( MSI( memory ), ( const int )name, ( byte* )buffer, ( const int )32 );
+
+	KEvent* ev = new KEvent( ( char* )buffer, attr, bits );
 
 	// options unused
 
-	_kernel->AddHandle( ev );
+	_kernel->Handles->Add( ev );
 
-	return ev->ID;
+	return ev->UID;
 }
 
 // int sceKernelDeleteEventFlag(int evid); (/user/pspthreadman.h:709)
 int ThreadManForUser::sceKernelDeleteEventFlag( int evid )
 {
-	KernelEvent^ ev = ( KernelEvent^ )_kernel->FindHandle( evid );
-	if( ev == nullptr )
+	KEvent* ev = ( KEvent* )_kernel->Handles->Lookup( evid );
+	if( ev == NULL )
 		return -1;
 
 	// What if someone is waiting on this?
-	Debug::Assert( ev->WaitingThreads == 0 );
+	assert( ev->WaitingThreads->GetCount() == 0 );
 
-	_kernel->RemoveHandle( ev );
+	_kernel->Handles->Remove( ev );
+
+	SAFEDELETE( ev );
 
 	return 0;
 }
@@ -52,12 +53,16 @@ int ThreadManForUser::sceKernelDeleteEventFlag( int evid )
 // int sceKernelSetEventFlag(SceUID evid, u32 bits); (/user/pspthreadman.h:655)
 int ThreadManForUser::sceKernelSetEventFlag( int evid, int bits )
 {
-	KernelEvent^ ev = ( KernelEvent^ )_kernel->FindHandle( evid );
-	if( ev == nullptr )
+	KEvent* ev = ( KEvent* )_kernel->Handles->Lookup( evid );
+	if( ev == NULL )
 		return -1;
 
-	ev->BitMask = bits;
-	_kernel->SignalEvent( ev );
+	ev->Value = bits;
+	if( ev->Signal( _kernel ) == true )
+	{
+		// Our event woke something!
+		_kernel->Schedule();
+	}
 
 	return 0;
 }
@@ -65,11 +70,11 @@ int ThreadManForUser::sceKernelSetEventFlag( int evid, int bits )
 // int sceKernelClearEventFlag(SceUID evid, u32 bits); (/user/pspthreadman.h:665)
 int ThreadManForUser::sceKernelClearEventFlag( int evid, int bits )
 {
-	KernelEvent^ ev = ( KernelEvent^ )_kernel->FindHandle( evid );
-	if( ev == nullptr )
+	KEvent* ev = ( KEvent* )_kernel->Handles->Lookup( evid );
+	if( ev == NULL )
 		return -1;
 
-	ev->BitMask = ev->BitMask & ~bits;
+	ev->Value = ev->Value & ~bits;
 
 	return 0;
 }
@@ -77,31 +82,35 @@ int ThreadManForUser::sceKernelClearEventFlag( int evid, int bits )
 // int sceKernelWaitEventFlag(int evid, u32 bits, u32 wait, u32 *outBits, SceUInt *timeout); (/user/pspthreadman.h:688)
 int ThreadManForUser::sceKernelWaitEventFlag( IMemory^ memory, int evid, int bits, int wait, int outBits, int timeout )
 {
-	KernelEvent^ ev = ( KernelEvent^ )_kernel->FindHandle( evid );
-	if( ev == nullptr )
+	KEvent* ev = ( KEvent* )_kernel->Handles->Lookup( evid );
+	if( ev == NULL )
 		return -1;
 
-	// Timeout not handled
-	Debug::Assert( timeout == 0 );
+	// TODO: event timeouts
+	assert( timeout == 0 );
 
 	// We may already be set!
-	bool matches = ev->Matches( bits, ( KernelThreadWaitTypes )wait );
+	bool matches = ev->Matches( bits, wait );
 	if( matches == true )
 	{
 		if( outBits != 0x0 )
-			memory->WriteWord( outBits, 4, ev->BitMask );
+		{
+			int* poutBits = ( int* )MSI( memory )->Translate( outBits );
+			*poutBits = ev->Value;
+		}
 
-		if( ( wait & ( int )KernelThreadWaitTypes::ClearAll ) != 0 )
-			ev->BitMask = 0;
-		else if( ( wait & ( int )KernelThreadWaitTypes::ClearPattern ) != 0 )
-			ev->BitMask = ev->BitMask & ~bits;
+		if( ( wait & KThreadWaitClearAll ) != 0 )
+			ev->Value = 0;
+		else if( ( wait & KThreadWaitClearPattern ) != 0 )
+			ev->Value = ev->Value & ~bits;
 
 		return 0;
 	}
 	else
 	{
-		KernelThread^ thread = _kernel->ActiveThread;
-		_kernel->WaitThreadOnEvent( thread, ev, ( KernelThreadWaitTypes )wait, bits, outBits );
+		KThread* thread = _kernel->ActiveThread;
+		assert( thread != NULL );
+		thread->Wait( ev, wait, bits, outBits, timeout, false );
 	}
 
 	return 0;
@@ -110,32 +119,35 @@ int ThreadManForUser::sceKernelWaitEventFlag( IMemory^ memory, int evid, int bit
 // int sceKernelWaitEventFlagCB(int evid, u32 bits, u32 wait, u32 *outBits, SceUInt *timeout); (/user/pspthreadman.h:700)
 int ThreadManForUser::sceKernelWaitEventFlagCB( IMemory^ memory, int evid, int bits, int wait, int outBits, int timeout )
 {
-	KernelEvent^ ev = ( KernelEvent^ )_kernel->FindHandle( evid );
-	if( ev == nullptr )
+	KEvent* ev = ( KEvent* )_kernel->Handles->Lookup( evid );
+	if( ev == NULL )
 		return -1;
 
-	// Timeout not handled
-	Debug::Assert( timeout == 0 );
+	// TODO: event timeouts
+	assert( timeout == 0 );
 
 	// We may already be set!
-	bool matches = ev->Matches( bits, ( KernelThreadWaitTypes )wait );
+	bool matches = ev->Matches( bits, wait );
 	if( matches == true )
 	{
 		if( outBits != 0x0 )
-			memory->WriteWord( outBits, 4, ev->BitMask );
+		{
+			int* poutBits = ( int* )MSI( memory )->Translate( outBits );
+			*poutBits = ev->Value;
+		}
 
-		if( ( wait & ( int )KernelThreadWaitTypes::ClearAll ) != 0 )
-			ev->BitMask = 0;
-		else if( ( wait & ( int )KernelThreadWaitTypes::ClearPattern ) != 0 )
-			ev->BitMask = ev->BitMask & ~bits;
+		if( ( wait & KThreadWaitClearAll ) != 0 )
+			ev->Value = 0;
+		else if( ( wait & KThreadWaitClearPattern ) != 0 )
+			ev->Value = ev->Value & ~bits;
 
 		return 0;
 	}
 	else
 	{
-		KernelThread^ thread = _kernel->ActiveThread;
-		thread->CanHandleCallbacks = true;
-		_kernel->WaitThreadOnEvent( thread, ev, ( KernelThreadWaitTypes )wait, bits, outBits );
+		KThread* thread = _kernel->ActiveThread;
+		assert( thread != NULL );
+		thread->Wait( ev, wait, bits, outBits, timeout, true );
 	}
 
 	return 0;
@@ -144,20 +156,24 @@ int ThreadManForUser::sceKernelWaitEventFlagCB( IMemory^ memory, int evid, int b
 // int sceKernelPollEventFlag(int evid, u32 bits, u32 wait, u32 *outBits); (/user/pspthreadman.h:676)
 int ThreadManForUser::sceKernelPollEventFlag( IMemory^ memory, int evid, int bits, int wait, int outBits )
 {
-	KernelEvent^ ev = ( KernelEvent^ )_kernel->FindHandle( evid );
-	if( ev == nullptr )
+	KEvent* ev = ( KEvent* )_kernel->Handles->Lookup( evid );
+	if( ev == NULL )
 		return -1;
 
-	bool matches = ev->Matches( bits, ( KernelThreadWaitTypes )wait );
+	bool matches = ev->Matches( bits, wait );
 	if( matches == true )
 	{
 		if( outBits != 0x0 )
-			memory->WriteWord( outBits, 4, ev->BitMask );
+		{
+			int* poutBits = ( int* )MSI( memory )->Translate( outBits );
+			*poutBits = ev->Value;
+		}
 
-		if( ( wait & ( int )KernelThreadWaitTypes::ClearAll ) != 0 )
-			ev->BitMask = 0;
-		else if( ( wait & ( int )KernelThreadWaitTypes::ClearPattern ) != 0 )
-			ev->BitMask = ev->BitMask & ~bits;
+		// Don't clear? just Polling
+		if( ( wait & KThreadWaitClearAll ) != 0 )
+			ev->Value = 0;
+		else if( ( wait & KThreadWaitClearPattern ) != 0 )
+			ev->Value = ev->Value & ~bits;
 	}
 
 	// What is the proper return here?
@@ -174,21 +190,24 @@ int ThreadManForUser::sceKernelReferEventFlagStatus( IMemory^ memory, int evid, 
 	// SceUInt  currentPattern 
 	// int		numWaitThreads 
 
-	KernelEvent^ ev = ( KernelEvent^ )_kernel->FindHandle( evid );
-	if( ev == nullptr )
+	KEvent* ev = ( KEvent* )_kernel->Handles->Lookup( evid );
+	if( ev == NULL )
 		return -1;
 
-	if( memory->ReadWord( status ) == 52 )
+	byte* p = ( byte* )MSI( memory )->Translate( status );
+
+	int size = *( ( int* )p );
+	if( size == 52 )
 	{
-		KernelHelpers::WriteString( memory, status + 4, ev->Name );
-		memory->WriteWord( status + 36, 4, ( int )ev->Attributes );
-		memory->WriteWord( status + 40, 4, ev->InitialBitMask );
-		memory->WriteWord( status + 44, 4, ev->BitMask );
-		memory->WriteWord( status + 48, 4, ev->WaitingThreads );
+		KernelHelpers::WriteString( MSI( memory ), status + 4, ev->Name );
+		*( ( int* )( p + 36 ) ) = ( int )ev->Attributes;
+		*( ( int* )( p + 40 ) ) = ev->InitialValue;
+		*( ( int* )( p + 44 ) ) = ev->Value;
+		*( ( int* )( p + 48 ) ) = ev->WaitingThreads->GetCount();
 	}
 	else
 	{
-		Debug::WriteLine( String::Format( "sceKernelReferEventFlagStatus: app passed in SceKernelEventFlagInfo of size {0}; expected size 52.", memory->ReadWord( status ) ) );
+		Debug::WriteLine( String::Format( "sceKernelReferEventFlagStatus: app passed in SceKernelEventFlagInfo of size {0}; expected size 52.", size ) );
 		return -1;
 	}
 

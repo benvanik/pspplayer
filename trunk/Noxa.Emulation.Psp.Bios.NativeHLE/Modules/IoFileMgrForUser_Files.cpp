@@ -7,7 +7,8 @@
 #include "Stdafx.h"
 #include "IoFileMgrForUser.h"
 #include "Kernel.h"
-#include "KernelFileHandle.h"
+#include "KFile.h"
+#include "KDevice.h"
 
 using namespace System;
 using namespace System::Collections::Generic;
@@ -16,6 +17,9 @@ using namespace System::IO;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
+
+// Conflict with windows.h
+#undef CreateFile
 
 // SceUID sceIoOpen(const char *file, int flags, SceMode mode); (/user/pspiofilemgr.h:63)
 int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int mode )
@@ -90,20 +94,29 @@ int IoFileMgrForUser::sceIoOpen( IMemory^ memory, int fileName, int flags, int m
 		return -1;
 	}
 
-	KernelFileHandle^ handle = gcnew KernelFileHandle( _kernel->AllocateID() );
-	handle->Device = ( KernelFileDevice^ )_kernel->FindDevice( path );
-	handle->CanWrite = !handle->Device->ReadOnly;
-	handle->CanSeek = handle->Device->IsSeekable;
+	IMediaDevice^ device = file->Device;
+	KDevice* dev = NULL;
+	for( int n = 0; n < DEVICECOUNT; n++ )
+	{
+		IMediaDevice^ rdev = _kernel->Devices[ n ]->Device;
+		if( rdev == device )
+		{
+			dev = _kernel->Devices[ n ];
+			break;
+		}
+	}
+	assert( dev != NULL );
+
+	KFile* handle = new KFile( dev, file, stream, !stream->CanWrite );
+	handle->CanSeek = stream->CanSeek;
 	handle->IsOpen = true;
-	handle->MediaItem = file;
-	handle->Stream = stream;
-	_kernel->AddHandle( handle );
+	_kernel->Handles->Add( handle );
 
 #ifdef VERBOSEIO
-	Debug::WriteLine( String::Format( "sceIoOpen: opened file {0} with ID {1}", path, handle->ID ) );
+	Debug::WriteLine( String::Format( "sceIoOpen: opened file {0} with ID {1}", path, handle->UID ) );
 #endif
 
-	return handle->ID;
+	return handle->UID;
 }
 
 // SceUID sceIoOpenAsync(const char *file, int flags, SceMode mode); (/user/pspiofilemgr.h:73)
@@ -112,17 +125,20 @@ int IoFileMgrForUser::sceIoOpenAsync( IMemory^ memory, int file, int flags, int 
 // int sceIoClose(SceUID fd); (/user/pspiofilemgr.h:85)
 int IoFileMgrForUser::sceIoClose( int fd )
 {
-	KernelFileHandle^ handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
-	if( handle == nullptr )
+	KFile* handle = ( KFile* )_kernel->Handles->Lookup( fd );
+	if( handle == NULL )
 	{
 		Debug::WriteLine( String::Format( "sceIoClose: kernel file handle {0} not found", fd ) );
 		return -1;
 	}
 
-	if( handle->Stream != nullptr )
-		handle->Stream->Close();
+	Stream^ stream = handle->BoundStream;
+	if( stream != nullptr )
+		stream->Close();
 	handle->IsOpen = false;
-	_kernel->RemoveHandle( handle );
+	_kernel->Handles->Remove( handle );
+
+	delete handle;
 
 	return 0;
 }
@@ -133,8 +149,8 @@ int IoFileMgrForUser::sceIoCloseAsync( int fd ){ return NISTUBRETURN; }
 // int sceIoRead(SceUID fd, void *data, SceSize size); (/user/pspiofilemgr.h:109)
 int IoFileMgrForUser::sceIoRead( IMemory^ memory, int fd, int data, int size )
 {
-	KernelFileHandle^ handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
-	if( handle == nullptr )
+	KFile* handle = ( KFile* )_kernel->Handles->Lookup( fd );
+	if( handle == NULL )
 	{
 		Debug::WriteLine( String::Format( "sceIoRead: kernel file handle {0} not found", fd ) );
 		return -1;
@@ -143,11 +159,14 @@ int IoFileMgrForUser::sceIoRead( IMemory^ memory, int fd, int data, int size )
 	if( fd == 0 )
 	{
 		// stdin
+		return 0;
 	}
 
-	int length = MIN2( size, ( int )( handle->Stream->Length - handle->Stream->Position ) );
+	Stream^ stream = handle->BoundStream;
 
-	memory->WriteStream( data, handle->Stream, length );
+	int length = MIN2( size, ( int )( stream->Length - stream->Position ) );
+
+	memory->WriteStream( data, stream, length );
 
 	return length;
 }
@@ -162,32 +181,22 @@ int IoFileMgrForUser::sceIoWrite( IMemory^ memory, int fd, int data, int size )
 	// a1 = const void *data
 	// a2 = SceSize size
 
-	KernelFileHandle^ handle;
-	if( fd == 1 )
-		handle = _kernel->StdOut;
-	else
-		handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
-	if( handle == nullptr )
+	KFile* handle = ( KFile* )_kernel->Handles->Lookup( fd );
+	if( handle == NULL )
 	{
 		Debug::WriteLine( String::Format( "sceIoWrite: kernel file handle {0} not found", fd ) );
 		return -1;
 	}
 
-	memory->ReadStream( data, handle->Stream, size );
-
-	if( fd == 1 )
+	if( handle->IsStd == true )
 	{
-		// stdout
-		array<byte>^ buffer = memory->ReadBytes( data, size );
-		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length )->TrimEnd();
-		Debug::WriteLine( String::Format( "stdout: {0}", str ) );
+		const char* pdata = ( const char* )MSI( memory )->Translate( data );
+		handle->Write( pdata );
 	}
-	else if( fd == 2 )
+	else
 	{
-		// stderr
-		array<byte>^ buffer = memory->ReadBytes( data, size );
-		String^ str = System::Text::Encoding::ASCII->GetString( buffer, 0, buffer->Length )->TrimEnd();
-		Debug::WriteLine( String::Format( "stderr: {0}", str ) );
+		Stream^ stream = handle->BoundStream;
+		memory->ReadStream( data, stream, size );
 	}
 
 	return 0;
@@ -199,12 +208,14 @@ int IoFileMgrForUser::sceIoWriteAsync( IMemory^ memory, int fd, int data, int si
 // SceOff sceIoLseek(SceUID fd, SceOff offset, int whence); (/user/pspiofilemgr.h:169)
 int64 IoFileMgrForUser::sceIoLseek( int fd, int64 offset, int whence )
 {
-	KernelFileHandle^ handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
-	if( handle == nullptr )
+	KFile* handle = ( KFile* )_kernel->Handles->Lookup( fd );
+	if( handle == NULL )
 	{
 		Debug::WriteLine( String::Format( "sceIoLseek: kernel file handle {0} not found", fd ) );
 		return -1;
 	}
+
+	Stream^ stream = handle->BoundStream;
 
 	SeekOrigin seekOrigin = SeekOrigin::Current;
 	switch( whence )
@@ -212,7 +223,7 @@ int64 IoFileMgrForUser::sceIoLseek( int fd, int64 offset, int whence )
 		case 0:
 			seekOrigin = SeekOrigin::Begin;
 			//Debug.Assert( offset < handle.Stream.Length );
-			if( offset > handle->Stream->Length )
+			if( offset > stream->Length )
 			{
 				offset = 0;
 				//return ( int )handle.Stream.Position;
@@ -220,15 +231,15 @@ int64 IoFileMgrForUser::sceIoLseek( int fd, int64 offset, int whence )
 			break;
 		case 1:
 			seekOrigin = SeekOrigin::Current;
-			Debug::Assert( handle->Stream->Position + offset <= handle->Stream->Length );
+			Debug::Assert( stream->Position + offset <= stream->Length );
 			break;
 		case 2:
 			seekOrigin = SeekOrigin::End;
-			Debug::Assert( handle->Stream->Length + offset <= handle->Stream->Length );
+			Debug::Assert( stream->Length + offset <= stream->Length );
 			break;
 	}
 
-	int64 newPosition = handle->Stream->Seek( offset, seekOrigin );
+	int64 newPosition = stream->Seek( offset, seekOrigin );
 	return newPosition;
 }
 
@@ -238,12 +249,14 @@ int IoFileMgrForUser::sceIoLseekAsync( int fd, int64 offset, int whence ){ retur
 // int sceIoLseek32(SceUID fd, int offset, int whence); (/user/pspiofilemgr.h:198)
 int IoFileMgrForUser::sceIoLseek32( int fd, int offset, int whence )
 {
-	KernelFileHandle^ handle = ( KernelFileHandle^ )_kernel->FindHandle( fd );
-	if( handle == nullptr )
+	KFile* handle = ( KFile* )_kernel->Handles->Lookup( fd );
+	if( handle == NULL )
 	{
 		Debug::WriteLine( String::Format( "sceIoLseek: kernel file handle {0} not found", fd ) );
 		return -1;
 	}
+
+	Stream^ stream = handle->BoundStream;
 
 	SeekOrigin seekOrigin = SeekOrigin::Current;
 	switch( whence )
@@ -251,7 +264,7 @@ int IoFileMgrForUser::sceIoLseek32( int fd, int offset, int whence )
 		case 0:
 			seekOrigin = SeekOrigin::Begin;
 			//Debug.Assert( offset < handle.Stream.Length );
-			if( offset > handle->Stream->Length )
+			if( offset > stream->Length )
 			{
 				offset = 0;
 				//return ( int )handle.Stream.Position;
@@ -259,15 +272,15 @@ int IoFileMgrForUser::sceIoLseek32( int fd, int offset, int whence )
 			break;
 		case 1:
 			seekOrigin = SeekOrigin::Current;
-			Debug::Assert( handle->Stream->Position + offset < handle->Stream->Length );
+			Debug::Assert( stream->Position + offset < stream->Length );
 			break;
 		case 2:
 			seekOrigin = SeekOrigin::End;
-			Debug::Assert( handle->Stream->Length + offset < handle->Stream->Length );
+			Debug::Assert( stream->Length + offset < stream->Length );
 			break;
 	}
 
-	int64 newPosition = handle->Stream->Seek( offset, seekOrigin );
+	int64 newPosition = stream->Seek( offset, seekOrigin );
 	return ( int )newPosition;
 }
 

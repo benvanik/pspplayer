@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class sceWlanDrv : public Module
 					{
 					public:
-						sceWlanDrv( Kernel^ kernel ) : Module( kernel ) {}
+						sceWlanDrv( IntPtr kernel ) : Module( kernel ) {}
 						~sceWlanDrv(){}
 
 					public:

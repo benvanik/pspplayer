@@ -7,6 +7,10 @@
 #pragma once
 
 #include <assert.h>
+//#include "gcref.h"
+
+// This must be in project settings!!
+//#define _WIN32_WINNT	0x0502
 
 typedef unsigned char byte;
 typedef unsigned short ushort;

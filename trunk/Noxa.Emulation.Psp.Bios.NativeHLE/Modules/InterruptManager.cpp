@@ -10,7 +10,7 @@
 
 #include "InterruptManager.h"
 #include "Kernel.h"
-#include "KernelInterruptHandler.h"
+#include "KIntHandler.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -75,40 +75,27 @@ void* InterruptManager::QueryNativePointer( uint nid )
 // int sceKernelRegisterSubIntrHandler(int intno, int no, void *handler, void *arg); (/user/pspintrman.h:119)
 int InterruptManager::sceKernelRegisterSubIntrHandler( int intno, int no, int handler, int arg )
 {
-	KernelInterruptHandler^ h = gcnew KernelInterruptHandler( _kernel->AllocateID() );
-	h->InterruptCode = intno;
-	h->SubCode = no;
-	h->EntryAddress = handler;
-	h->Argument = arg;
+	KIntHandler* inth = new KIntHandler( _kernel, intno, no, handler, arg );
 
-	_kernel->AddHandle( h );
-	array<KernelInterruptHandler^>^ list = _kernel->InterruptHandlers[ intno ];
-	if( list == nullptr )
-	{
-		list = gcnew array<KernelInterruptHandler^>( 32 );
-		_kernel->InterruptHandlers[ intno ] = list;
-	}
-	list[ no ] = h;
+	assert( _kernel->Interrupts[ intno ][ no ] == NULL );
+	_kernel->Interrupts[ intno ][ no ] = inth;
 
 	Debug::WriteLine( String::Format( "sceKernelRegisterSubIntrHandler: registered handler for interrupt {0} (slot {1}), calling code at {2:X8}", intno, no, handler ) );
 
-	return h->ID;
+	return 0;
 }
 
 // int sceKernelReleaseSubIntrHandler(int intno, int no); (/user/pspintrman.h:129)
 int InterruptManager::sceKernelReleaseSubIntrHandler( int intno, int no )
 {
-	array<KernelInterruptHandler^>^ list = _kernel->InterruptHandlers[ intno ];
-	if( list == nullptr )
-		return 0;
-
-	KernelInterruptHandler^ h = list[ no ];
-	if( h == nullptr )
+	KIntHandler* inth = _kernel->Interrupts[ intno ][ no ];
+	assert( inth != NULL );
+	if( inth == NULL )
 		return -1;
-	
-	list[ no ] = nullptr;
 
-	_kernel->RemoveHandle( h );
+	_kernel->Interrupts[ intno ][ no ] = NULL;
+
+	delete inth;
 
 	return 0;
 }
@@ -116,15 +103,12 @@ int InterruptManager::sceKernelReleaseSubIntrHandler( int intno, int no )
 // int sceKernelEnableSubIntr(int intno, int no); (/user/pspintrman.h:139)
 int InterruptManager::sceKernelEnableSubIntr( int intno, int no )
 {
-	array<KernelInterruptHandler^>^ list = _kernel->InterruptHandlers[ intno ];
-	if( list == nullptr )
-		return 0;
-
-	KernelInterruptHandler^ h = list[ no ];
-	if( h == nullptr )
+	KIntHandler* inth = _kernel->Interrupts[ intno ][ no ];
+	assert( inth != NULL );
+	if( inth == NULL )
 		return -1;
 
-	h->Enabled = true;
+	inth->SetEnabled( true );
 
 	return 0;
 }
@@ -132,15 +116,12 @@ int InterruptManager::sceKernelEnableSubIntr( int intno, int no )
 // int sceKernelDisableSubIntr(int intno, int no); (/user/pspintrman.h:149)
 int InterruptManager::sceKernelDisableSubIntr( int intno, int no )
 {
-	array<KernelInterruptHandler^>^ list = _kernel->InterruptHandlers[ intno ];
-	if( list == nullptr )
-		return 0;
-
-	KernelInterruptHandler^ h = list[ no ];
-	if( h == nullptr )
+	KIntHandler* inth = _kernel->Interrupts[ intno ][ no ];
+	assert( inth != NULL );
+	if( inth == NULL )
 		return -1;
 
-	h->Enabled = false;
+	inth->SetEnabled( false );
 
 	return 0;
 }
@@ -148,23 +129,20 @@ int InterruptManager::sceKernelDisableSubIntr( int intno, int no )
 // int QueryIntrHandlerInfo(SceUID intr_code, SceUID sub_intr_code, PspIntrHandlerOptionParam *data); (/user/pspintrman.h:170)
 int InterruptManager::QueryIntrHandlerInfo( IMemory^ memory, int intr_code, int sub_intr_code, int data )
 {
-	array<KernelInterruptHandler^>^ list = _kernel->InterruptHandlers[ intr_code ];
-	if( list == nullptr )
-		return -1;
-
-	KernelInterruptHandler^ h = list[ sub_intr_code ];
-	if( h == nullptr )
+	KIntHandler* inth = _kernel->Interrupts[ intr_code ][ sub_intr_code ];
+	assert( inth != NULL );
+	if( inth == NULL )
 		return -1;
 
 	memory->WriteWord( data, 4, 0x38 );		// size
-	memory->WriteWord( data + 4, 4, h->EntryAddress );
-	memory->WriteWord( data + 8, 4, 0 ); // common ?
+	memory->WriteWord( data + 4, 4, inth->Address );
+	memory->WriteWord( data + 8, 4, inth->Argument ); // common
 	memory->WriteWord( data + 0xC, 4, 0 ); // gp?
 	memory->WriteWord( data + 0x10, 2, intr_code );
 	memory->WriteWord( data + 0x12, 2, sub_intr_code );
-	memory->WriteWord( data + 0x14, 2, h->InterruptLevel );
-	memory->WriteWord( data + 0x16, 2, h->Enabled ? 1 : 0 );
-	memory->WriteWord( data + 0x18, 4, h->CallCount );
+	memory->WriteWord( data + 0x14, 2, 0 );
+	memory->WriteWord( data + 0x16, 2, inth->IsEnabled() ? 1 : 0 );
+	memory->WriteWord( data + 0x18, 4, inth->CallCount );
 	memory->WriteWord( data + 0x1C, 4, 0 ); // field_1C?
 	memory->WriteWord( data + 0x20, 4, 0 ); // total clock lo
 	memory->WriteWord( data + 0x24, 4, 0 ); // total clock hi

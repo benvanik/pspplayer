@@ -24,7 +24,7 @@ namespace Noxa {
 					public ref class ThreadManForUser : public Module
 					{
 					public:
-						ThreadManForUser( Kernel^ kernel ) : Module( kernel ) {}
+						ThreadManForUser( IntPtr kernel ) : Module( kernel ) {}
 						~ThreadManForUser(){}
 
 					public:
@@ -41,11 +41,6 @@ namespace Noxa {
 
 						// - Callbacks ------------------------------------------------------------------------------------------
 
-						[NotImplemented]
-						[BiosFunction( 0x6E9EA350, "_sceKernelReturnFromCallback" )] [Stateless]
-						// void _sceKernelReturnFromCallback(); (/user/pspthreadman.h:1453)
-						void _sceKernelReturnFromCallback(){}
-
 						[BiosFunction( 0xE81CAF8F, "sceKernelCreateCallback" )] [Stateless]
 						// int sceKernelCreateCallback(const char *name, SceKernelCallbackFunction func, void *arg); (/user/pspthreadman.h:985)
 						int sceKernelCreateCallback( IMemory^ memory, int name, int func, int arg );
@@ -54,7 +49,6 @@ namespace Noxa {
 						// int sceKernelDeleteCallback(SceUID cb); (/user/pspthreadman.h:1005)
 						int sceKernelDeleteCallback( int cb );
 
-						[NotImplemented]
 						[BiosFunction( 0xC11BA8C4, "sceKernelNotifyCallback" )] [Stateless]
 						// int sceKernelNotifyCallback(SceUID cb, int arg2); (/user/pspthreadman.h:1015)
 						int sceKernelNotifyCallback( int cb, int arg2 );
@@ -67,7 +61,6 @@ namespace Noxa {
 						// int sceKernelGetCallbackCount(SceUID cb); (/user/pspthreadman.h:1033)
 						int sceKernelGetCallbackCount( int cb );
 
-						[NotImplemented]
 						[BiosFunction( 0x349D6D6C, "sceKernelCheckCallback" )] [Stateless]
 						// int sceKernelCheckCallback(); (/user/pspthreadman.h:1040)
 						int sceKernelCheckCallback();
@@ -80,7 +73,7 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x0C106E53, "sceKernelRegisterThreadEventHandler" )] [Stateless]
-						// SceUID sceKernelRegisterThreadEventHandler(const char *name, SceUID threadID, int mask, SceKernelThreadEventHandler handler, void *common); (/user/pspthreadman.h:1729)
+						// SceUID sceKernelRegisterThreadEventHandler(const char *name, SceUID threadID, int mask, SceKThreadEventHandler handler, void *common); (/user/pspthreadman.h:1729)
 						int sceKernelRegisterThreadEventHandler( IMemory^ memory, int name, int threadID, int mask, int handler, int common );
 
 						[NotImplemented]
@@ -90,11 +83,11 @@ namespace Noxa {
 
 						[NotImplemented]
 						[BiosFunction( 0x369EEB6B, "sceKernelReferThreadEventHandlerStatus" )] [Stateless]
-						// int sceKernelReferThreadEventHandlerStatus(SceUID uid, struct SceKernelThreadEventHandlerInfo *info); (/user/pspthreadman.h:1748)
+						// int sceKernelReferThreadEventHandlerStatus(SceUID uid, struct SceKThreadEventHandlerInfo *info); (/user/pspthreadman.h:1748)
 						int sceKernelReferThreadEventHandlerStatus( IMemory^ memory, int uid, int info );
 
 						[BiosFunction( 0x446D8DE6, "sceKernelCreateThread" )] [Stateless]
-						// SceUID sceKernelCreateThread(const char *name, SceKernelThreadEntry entry, int initPriority, int stackSize, SceUInt attr, SceKernelThreadOptParam *option); (/user/pspthreadman.h:169)
+						// SceUID sceKernelCreateThread(const char *name, SceKThreadEntry entry, int initPriority, int stackSize, SceUInt attr, SceKThreadOptParam *option); (/user/pspthreadman.h:169)
 						int sceKernelCreateThread( IMemory^ memory, int name, int entry, int initPriority, int stackSize, int attr, int option );
 
 						[BiosFunction( 0x9FA03CD3, "sceKernelDeleteThread" )]
@@ -104,11 +97,6 @@ namespace Noxa {
 						[BiosFunction( 0xF475845D, "sceKernelStartThread" )]
 						// int sceKernelStartThread(SceUID thid, SceSize arglen, void *argp); (/user/pspthreadman.h:188)
 						int sceKernelStartThread( int thid, int arglen, int argp );
-
-						[NotImplemented]
-						[BiosFunction( 0x532A522E, "_sceKernelExitThread" )] [Stateless]
-						// void _sceKernelExitThread(); (/user/pspthreadman.h:1679)
-						void _sceKernelExitThread();
 
 						[BiosFunction( 0xAA73C935, "sceKernelExitThread" )]
 						// int sceKernelExitThread(int status); (/user/pspthreadman.h:195)
@@ -176,11 +164,11 @@ namespace Noxa {
 						int sceKernelGetThreadStackFreeSize( int thid );
 
 						[BiosFunction( 0x17C1684E, "sceKernelReferThreadStatus" )] [Stateless]
-						// int sceKernelReferThreadStatus(SceUID thid, SceKernelThreadInfo *info); (/user/pspthreadman.h:458)
+						// int sceKernelReferThreadStatus(SceUID thid, SceKThreadInfo *info); (/user/pspthreadman.h:458)
 						int sceKernelReferThreadStatus( IMemory^ memory, int thid, int info );
 
 						[BiosFunction( 0xFFC36A14, "sceKernelReferThreadRunStatus" )] [Stateless]
-						// int sceKernelReferThreadRunStatus(SceUID thid, SceKernelThreadRunStatus *status); (/user/pspthreadman.h:468)
+						// int sceKernelReferThreadRunStatus(SceUID thid, SceKThreadRunStatus *status); (/user/pspthreadman.h:468)
 						int sceKernelReferThreadRunStatus( IMemory^ memory, int thid, int status );
 
 						[BiosFunction( 0x627E6F3A, "sceKernelReferSystemStatus" )] [Stateless]
@@ -417,12 +405,10 @@ namespace Noxa {
 
 						// - VPL ------------------------------------------------------------------------------------------------
 
-						[NotImplemented]
 						[BiosFunction( 0x56C039B5, "sceKernelCreateVpl" )] [Stateless]
 						// SceUID sceKernelCreateVpl(const char *name, int part, int attr, unsigned int size, struct SceKernelVplOptParam *opt); (/user/pspthreadman.h:1256)
 						int sceKernelCreateVpl( IMemory^ memory, int name, int part, int attr, int size, int opt );
 
-						[NotImplemented]
 						[BiosFunction( 0x89B3D48C, "sceKernelDeleteVpl" )] [Stateless]
 						// int sceKernelDeleteVpl(SceUID uid); (/user/pspthreadman.h:1265)
 						int sceKernelDeleteVpl( int uid );
@@ -437,12 +423,10 @@ namespace Noxa {
 						// int sceKernelAllocateVplCB(SceUID uid, unsigned int size, void **data, unsigned int *timeout); (/user/pspthreadman.h:1289)
 						int sceKernelAllocateVplCB( IMemory^ memory, int uid, int size, int data, int timeout );
 
-						[NotImplemented]
 						[BiosFunction( 0xAF36D708, "sceKernelTryAllocateVpl" )] [Stateless]
 						// int sceKernelTryAllocateVpl(SceUID uid, unsigned int size, void **data); (/user/pspthreadman.h:1300)
 						int sceKernelTryAllocateVpl( IMemory^ memory, int uid, int size, int data );
 
-						[NotImplemented]
 						[BiosFunction( 0xB736E9FF, "sceKernelFreeVpl" )] [Stateless]
 						// int sceKernelFreeVpl(SceUID uid, void *data); (/user/pspthreadman.h:1310)
 						int sceKernelFreeVpl( IMemory^ memory, int uid, int data );
@@ -467,10 +451,12 @@ namespace Noxa {
 						// int sceKernelDeleteFpl(SceUID uid); (/user/pspthreadman.h:1369)
 						int sceKernelDeleteFpl( int uid );
 
+						[NotImplemented]
 						[BiosFunction( 0xD979E9BF, "sceKernelAllocateFpl" )] [Stateless]
 						// int sceKernelAllocateFpl(SceUID uid, void **data, unsigned int *timeout); (/user/pspthreadman.h:1380)
 						int sceKernelAllocateFpl( IMemory^ memory, int uid, int data, int timeout );
 
+						[NotImplemented]
 						[BiosFunction( 0xE7282CB6, "sceKernelAllocateFplCB" )] [Stateless]
 						// int sceKernelAllocateFplCB(SceUID uid, void **data, unsigned int *timeout); (/user/pspthreadman.h:1391)
 						int sceKernelAllocateFplCB( IMemory^ memory, int uid, int data, int timeout );
@@ -494,11 +480,6 @@ namespace Noxa {
 						int sceKernelReferFplStatus( IMemory^ memory, int uid, int info );
 
 						// - Time -----------------------------------------------------------------------------------------------
-
-						[NotImplemented]
-						[BiosFunction( 0x0E927AED, "_sceKernelReturnFromTimerHandler" )] [Stateless]
-						// void _sceKernelReturnFromTimerHandler(); (/user/pspthreadman.h:1447)
-						void _sceKernelReturnFromTimerHandler();
 
 						[BiosFunction( 0x110DEC9A, "sceKernelUSec2SysClock" )] [Stateless]
 						// int sceKernelUSec2SysClock(unsigned int usec, SceKernelSysClock *clock); (/user/pspthreadman.h:1463)

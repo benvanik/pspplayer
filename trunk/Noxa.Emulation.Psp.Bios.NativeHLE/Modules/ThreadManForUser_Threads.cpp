@@ -8,9 +8,9 @@
 #include "ThreadManForUser.h"
 #include "Kernel.h"
 #include "KernelHelpers.h"
-#include "KernelPartition.h"
-#include "KernelStatistics.h"
-#include "KernelThread.h"
+#include "KPartition.h"
+#include "KThread.h"
+#include "KEvent.h"
 
 using namespace System;
 using namespace System::Diagnostics;
@@ -18,41 +18,47 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Bios::Modules;
 
-// SceUID sceKernelRegisterThreadEventHandler(const char *name, SceUID threadID, int mask, SceKernelThreadEventHandler handler, void *common); (/user/pspthreadman.h:1729)
+// SceUID sceKernelRegisterThreadEventHandler(const char *name, SceUID threadID, int mask, SceKThreadEventHandler handler, void *common); (/user/pspthreadman.h:1729)
 int ThreadManForUser::sceKernelRegisterThreadEventHandler( IMemory^ memory, int name, int threadID, int mask, int handler, int common ){ return NISTUBRETURN; }
 
 // int sceKernelReleaseThreadEventHandler(SceUID uid); (/user/pspthreadman.h:1738)
 int ThreadManForUser::sceKernelReleaseThreadEventHandler( int uid ){ return NISTUBRETURN; }
 
-// int sceKernelReferThreadEventHandlerStatus(SceUID uid, struct SceKernelThreadEventHandlerInfo *info); (/user/pspthreadman.h:1748)
+// int sceKernelReferThreadEventHandlerStatus(SceUID uid, struct SceKThreadEventHandlerInfo *info); (/user/pspthreadman.h:1748)
 int ThreadManForUser::sceKernelReferThreadEventHandlerStatus( IMemory^ memory, int uid, int info ){ return NISTUBRETURN; }
 
-// SceUID sceKernelCreateThread(const char *name, SceKernelThreadEntry entry, int initPriority, int stackSize, SceUInt attr, SceKernelThreadOptParam *option); (/user/pspthreadman.h:169)
+// SceUID sceKernelCreateThread(const char *name, SceKThreadEntry entry, int initPriority, int stackSize, SceUInt attr, SceKThreadOptParam *option); (/user/pspthreadman.h:169)
 int ThreadManForUser::sceKernelCreateThread( IMemory^ memory, int name, int entry, int initPriority, int stackSize, int attr, int option )
 {
-	String^ nameString = KernelHelpers::ReadString( memory, name );
-	int id = _kernel->AllocateID();
-	KernelThread^ thread = gcnew KernelThread( id, nameString, entry, initPriority, stackSize, attr );
+	char buffer[ 64 ];
+	int nameLength = KernelHelpers::ReadString( MSI( memory ), ( const int )name, ( byte* )buffer, ( const int )64 );
 
-	_kernel->AddHandle( thread );
-	_kernel->CreateThread( thread );
+	KThread* thread = new KThread( _kernel, _kernel->Partitions[ 2 ], buffer, entry, initPriority, ( KThreadAttributes )attr, stackSize );
+
+	_kernel->Handles->Add( thread );
 
 	// Option unused?
+	assert( option == NULL );
+
+	Debug::WriteLine( String::Format( "sceKernelCreateThread: creating thread {0:X8} {1}", thread->UID, gcnew String( thread->Name ) ) );
 	
-	return id;
+	return thread->UID;
 }
 
 // int sceKernelDeleteThread(SceUID thid); (/user/pspthreadman.h:179)
 int ThreadManForUser::sceKernelDeleteThread( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	Debug::Assert( _kernel->ActiveThread != thread );
+	assert( _kernel->ActiveThread != thread );
 
-	_kernel->DeleteThread( thread );
-	_kernel->RemoveHandle( thread );
+	Debug::WriteLine( String::Format( "sceKernelDeleteThread: deleting thread {0:X8} {1}", thread->UID, gcnew String( thread->Name ) ) );
+
+	_kernel->Handles->Remove( thread );
+
+	SAFEDELETE( thread );
 
 	return 0;
 }
@@ -60,32 +66,32 @@ int ThreadManForUser::sceKernelDeleteThread( int thid )
 // int sceKernelStartThread(SceUID thid, SceSize arglen, void *argp); (/user/pspthreadman.h:188)
 int ThreadManForUser::sceKernelStartThread( int thid, int arglen, int argp )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	// TODO: Switch partition based on kernel/user status?
-	thread->Start( _kernel->Partitions[ 1 ], arglen, argp );
+	Debug::WriteLine( String::Format( "sceKernelStartThread: starting thread {0:X8} {1}", thread->UID, gcnew String( thread->Name ) ) );
 
-	_kernel->ContextSwitch();
+	// TODO: Switch partition based on kernel/user status?
+	thread->Start( arglen, argp );
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
 
-// void _sceKernelExitThread(); (/user/pspthreadman.h:1679)
-void ThreadManForUser::_sceKernelExitThread(){}
-
 // int sceKernelExitThread(int status); (/user/pspthreadman.h:195)
 int ThreadManForUser::sceKernelExitThread( int status )
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
 	thread->Exit( status );
 
 	if( _kernel->ActiveThread == thread )
-		_kernel->ContextSwitch();
+		_kernel->Schedule();
 
 	return 0;
 }
@@ -93,17 +99,18 @@ int ThreadManForUser::sceKernelExitThread( int status )
 // int sceKernelExitDeleteThread(int status); (/user/pspthreadman.h:202)
 int ThreadManForUser::sceKernelExitDeleteThread( int status )
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
 	thread->Exit( status );
 
 	if( _kernel->ActiveThread == thread )
-		_kernel->ContextSwitch();
+		_kernel->Schedule();
 
-	_kernel->DeleteThread( thread );
-	_kernel->RemoveHandle( thread );
+	_kernel->Handles->Remove( thread );
+
+	SAFEDELETE( thread );
 
 	return 0;
 }
@@ -111,14 +118,14 @@ int ThreadManForUser::sceKernelExitDeleteThread( int status )
 // int sceKernelTerminateThread(SceUID thid); (/user/pspthreadman.h:211)
 int ThreadManForUser::sceKernelTerminateThread( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
 	thread->Exit( 0 );
 
 	if( _kernel->ActiveThread == thread )
-		_kernel->ContextSwitch();
+		_kernel->Schedule();
 
 	return 0;
 }
@@ -126,17 +133,18 @@ int ThreadManForUser::sceKernelTerminateThread( int thid )
 // int sceKernelTerminateDeleteThread(SceUID thid); (/user/pspthreadman.h:220)
 int ThreadManForUser::sceKernelTerminateDeleteThread( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
 	thread->Exit( 0 );
 
 	if( _kernel->ActiveThread == thread )
-		_kernel->ContextSwitch();
+		_kernel->Schedule();
 
-	_kernel->DeleteThread( thread );
-	_kernel->RemoveHandle( thread );
+	_kernel->Handles->Remove( thread );
+
+	SAFEDELETE( thread );
 
 	return 0;
 }
@@ -150,11 +158,11 @@ int ThreadManForUser::sceKernelResumeDispatchThread( int state ){ return NISTUBR
 // int sceKernelChangeCurrentThreadAttr(int unknown, SceUInt attr); (/user/pspthreadman.h:364)
 int ThreadManForUser::sceKernelChangeCurrentThreadAttr( int unknown, int attr )
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
-	thread->Attributes = ( KernelThreadAttributes )attr;
+	thread->Attributes = ( KThreadAttributes )attr;
 
 	return 0;
 }
@@ -162,11 +170,12 @@ int ThreadManForUser::sceKernelChangeCurrentThreadAttr( int unknown, int attr )
 // int sceKernelChangeThreadPriority(SceUID thid, int priority); (/user/pspthreadman.h:381)
 int ThreadManForUser::sceKernelChangeThreadPriority( int thid, int priority )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	thread->Priority = priority;
+	if( thread->Priority != priority )
+		thread->ChangePriority( priority );
 
 	return 0;
 }
@@ -177,13 +186,17 @@ int ThreadManForUser::sceKernelRotateThreadReadyQueue( int priority ){ return NI
 // int sceKernelReleaseWaitThread(SceUID thid); (/user/pspthreadman.h:399)
 int ThreadManForUser::sceKernelReleaseWaitThread( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	thread->State = KernelThreadState::Ready;
-	thread->WaitID = 0;
-	thread->ReleaseCount++;
+	thread->ReleaseWait();
+
+	// Is tihs right?
+	assert( false );
+	if( _kernel->Schedule() == true )
+	{
+	}
 
 	return 0;
 }
@@ -191,18 +204,18 @@ int ThreadManForUser::sceKernelReleaseWaitThread( int thid )
 // int sceKernelGetThreadId(); (/user/pspthreadman.h:406)
 int ThreadManForUser::sceKernelGetThreadId()
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
-	return thread->ID;
+	return thread->UID;
 }
 
 // int sceKernelGetThreadCurrentPriority(); (/user/pspthreadman.h:413)
 int ThreadManForUser::sceKernelGetThreadCurrentPriority()
 {
-	KernelThread^ thread = _kernel->ActiveThread;
-	if( thread == nullptr )
+	KThread* thread = _kernel->ActiveThread;
+	if( thread == NULL )
 		return -1;
 
 	return thread->Priority;
@@ -211,8 +224,8 @@ int ThreadManForUser::sceKernelGetThreadCurrentPriority()
 // int sceKernelGetThreadExitStatus(SceUID thid); (/user/pspthreadman.h:422)
 int ThreadManForUser::sceKernelGetThreadExitStatus( int thid )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
 	return thread->ExitCode;
@@ -224,19 +237,19 @@ int ThreadManForUser::sceKernelCheckThreadStack(){ return NISTUBRETURN; }
 // int sceKernelGetThreadStackFreeSize(SceUID thid); (/user/pspthreadman.h:439)
 int ThreadManForUser::sceKernelGetThreadStackFreeSize( int thid ){ return NISTUBRETURN; }
 
-// int sceKernelReferThreadStatus(SceUID thid, SceKernelThreadInfo *info); (/user/pspthreadman.h:458)
+// int sceKernelReferThreadStatus(SceUID thid, SceKThreadInfo *info); (/user/pspthreadman.h:458)
 int ThreadManForUser::sceKernelReferThreadStatus( IMemory^ memory, int thid, int info )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	//typedef struct SceKernelThreadInfo {
+	//typedef struct SceKThreadInfo {
 	//    SceSize     size;
 	//    char    	name[32];
 	//    SceUInt     attr;
 	//    int     	status;
-	//    SceKernelThreadEntry    entry;
+	//    SceKThreadEntry    entry;
 	//    void *  	stack;
 	//    int     	stackSize;
 	//    void *  	gpReg;
@@ -250,7 +263,7 @@ int ThreadManForUser::sceKernelReferThreadStatus( IMemory^ memory, int thid, int
 	//    SceUInt     intrPreemptCount;
 	//    SceUInt     threadPreemptCount;
 	//    SceUInt     releaseCount;
-	//} SceKernelThreadInfo;
+	//} SceKThreadInfo;
 
 	SysClock runClocks;
 	runClocks.QuadPart = thread->RunClocks;
@@ -262,17 +275,22 @@ int ThreadManForUser::sceKernelReferThreadStatus( IMemory^ memory, int thid, int
 			memory->ReadWord( info ) ) );
 		return -1;
 	}
-	KernelHelpers::WriteString( memory, info + 4, thread->Name );
+	KernelHelpers::WriteString( MSI( memory ), ( const int )( info + 4 ), ( const char* )thread->Name );
 	memory->WriteWord( info + 36, 4, ( int )thread->Attributes );
 	memory->WriteWord( info + 40, 4, ( int )thread->State );
 	memory->WriteWord( info + 44, 4, thread->EntryAddress );
 	memory->WriteWord( info + 48, 4, ( int )thread->StackBlock->Address );
-	memory->WriteWord( info + 52, 4, ( int )thread->StackSize );
-	memory->WriteWord( info + 56, 4, 0 ); // TODO: get thread gp pointer
+	memory->WriteWord( info + 52, 4, ( int )thread->StackBlock->Size );
+	memory->WriteWord( info + 56, 4, thread->GlobalPointer );
 	memory->WriteWord( info + 60, 4, thread->InitialPriority );
 	memory->WriteWord( info + 64, 4, thread->Priority );
-	memory->WriteWord( info + 68, 4, ( int )thread->WaitClass );
-	memory->WriteWord( info + 72, 4, thread->WaitID );
+	memory->WriteWord( info + 68, 4, ( int )thread->WaitingOn );
+	if( thread->WaitingOn == KThreadWaitEvent )
+		memory->WriteWord( info + 72, 4, thread->WaitEvent->UID );
+	else if( thread->WaitingOn == KThreadWaitJoin )
+		memory->WriteWord( info + 72, 4, thread->WaitThread->UID );
+	else
+		memory->WriteWord( info + 72, 4, 0 );
 	memory->WriteWord( info + 76, 4, ( int )thread->WakeupCount );
 	memory->WriteWord( info + 80, 4, thread->ExitCode );
 	memory->WriteWord( info + 84, 4, ( int )runClocks.LowPart );
@@ -285,14 +303,14 @@ int ThreadManForUser::sceKernelReferThreadStatus( IMemory^ memory, int thid, int
 	return 0;
 }
 
-// int sceKernelReferThreadRunStatus(SceUID thid, SceKernelThreadRunStatus *status); (/user/pspthreadman.h:468)
+// int sceKernelReferThreadRunStatus(SceUID thid, SceKThreadRunStatus *status); (/user/pspthreadman.h:468)
 int ThreadManForUser::sceKernelReferThreadRunStatus( IMemory^ memory, int thid, int status )
 {
-	KernelThread^ thread = _kernel->FindThread( thid );
-	if( thread == nullptr )
+	KThread* thread = ( KThread* )_kernel->Handles->Lookup( thid );
+	if( thread == NULL )
 		return -1;
 
-	//typedef struct SceKernelThreadRunStatus {
+	//typedef struct SceKThreadRunStatus {
 	//    SceSize 	size;
 	//    int 		status;
 	//    int 		currentPriority;
@@ -303,7 +321,7 @@ int ThreadManForUser::sceKernelReferThreadRunStatus( IMemory^ memory, int thid, 
 	//    SceUInt 	intrPreemptCount;
 	//    SceUInt 	threadPreemptCount;
 	//    SceUInt 	releaseCount;
-	//} SceKernelThreadRunStatus;
+	//} SceKThreadRunStatus;
 
 	SysClock runClocks;
 	runClocks.QuadPart = thread->RunClocks;
@@ -317,8 +335,13 @@ int ThreadManForUser::sceKernelReferThreadRunStatus( IMemory^ memory, int thid, 
 	}
 	memory->WriteWord( status +  4, 4, ( int )thread->State );
 	memory->WriteWord( status +  8, 4, thread->Priority );
-	memory->WriteWord( status + 12, 4, ( int )thread->WaitClass );
-	memory->WriteWord( status + 16, 4, thread->WaitID );
+	memory->WriteWord( status + 12, 4, ( int )thread->WaitingOn );
+	if( thread->WaitingOn == KThreadWaitEvent )
+		memory->WriteWord( status + 16, 4, thread->WaitEvent->UID );
+	else if( thread->WaitingOn == KThreadWaitJoin )
+		memory->WriteWord( status + 16, 4, thread->WaitThread->UID );
+	else
+		memory->WriteWord( status + 16, 4, 0 );
 	memory->WriteWord( status + 20, 4, ( int )thread->WakeupCount );
 	memory->WriteWord( status + 24, 4, ( int )runClocks.LowPart );
 	memory->WriteWord( status + 28, 4, ( int )runClocks.HighPart );
@@ -343,7 +366,7 @@ int ThreadManForUser::sceKernelReferSystemStatus( IMemory^ memory, int status )
 	//} SceKernelSystemStatus;
 
 	SysClock idleClocks;
-	idleClocks.QuadPart = _kernel->IdleClocks;
+	idleClocks.QuadPart = ( int64 )0;// _kernel->IdleClocks;
 
 	// Ensure 28 bytes
 	if( memory->ReadWord( status ) != 28 )
@@ -352,12 +375,15 @@ int ThreadManForUser::sceKernelReferSystemStatus( IMemory^ memory, int status )
 			memory->ReadWord( status ) ) );
 		return -1;
 	}
-	memory->WriteWord( status +  4, 4, _kernel->Status );
+	memory->WriteWord( status +  4, 4, 1 ); // ?????
 	memory->WriteWord( status +  8, 4, ( int )idleClocks.LowPart );
 	memory->WriteWord( status + 12, 4, ( int )idleClocks.HighPart );
-	memory->WriteWord( status + 16, 4, ( int )_kernel->Statistics->LeaveIdleCount );
-	memory->WriteWord( status + 20, 4, ( int )_kernel->Statistics->ThreadSwitchCount );
-	memory->WriteWord( status + 24, 4, ( int )_kernel->Statistics->VfpuSwitchCount );
+	//memory->WriteWord( status + 16, 4, ( int )_kernel->Statistics->LeaveIdleCount );
+	//memory->WriteWord( status + 20, 4, ( int )_kernel->Statistics->ThreadSwitchCount );
+	//memory->WriteWord( status + 24, 4, ( int )_kernel->Statistics->VfpuSwitchCount );
+	memory->WriteWord( status + 16, 4, 0 );
+	memory->WriteWord( status + 20, 4, 0 );
+	memory->WriteWord( status + 24, 4, 0 );
 
 	// int
 	return 0;

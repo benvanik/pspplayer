@@ -41,7 +41,10 @@ int UtilsForUser::sceKernelLibcTime( IMemory^ memory, int t )
 	time_t tm = time( NULL );
 	uint tm32 = ( uint )tm;
 	if( t != 0x0 )
-		memory->WriteWord( t, 4, tm32 );
+	{
+		int* pt = ( int* )MSI( memory )->Translate( t );
+		*pt = tm32;
+	}
 
 	return tm32;
 }
@@ -58,11 +61,13 @@ int UtilsForUser::sceKernelLibcGettimeofday( IMemory^ memory, int tp, int tzp )
 	if( tp != 0x0 )
 	{
 		// usec = 1000000 per sec
-		int64 time = _kernel->ClockTime;
+		int64 time = _kernel->GetClockTime();
 		uint tsec = ( uint )( time / 1000000 );
 		uint tusec = ( uint )( time % 1000000 );
-		memory->WriteWord( tp, 4, ( int )tsec );
-		memory->WriteWord( tp + 4, 4, ( int )tusec );
+
+		int* ptp = ( int* )MSI( memory )->Translate( tp );
+		*ptp = ( int )tsec;
+		*( ptp + 1 ) = ( int )tusec;
 	}
 	else
 		return -1;
@@ -76,8 +81,10 @@ int UtilsForUser::sceKernelLibcGettimeofday( IMemory^ memory, int tp, int tzp )
 			minutesWest = -minutesWest + ( 12 * 60 );
 		}
 		int dst = DateTime::Today.IsDaylightSavingTime() == true ? 1 : 0;
-		memory->WriteWord( tzp, 4, minutesWest );
-		memory->WriteWord( tzp + 4, 4, dst );
+
+		int* ptzp = ( int* )MSI( memory )->Translate( tzp );
+		*ptzp = minutesWest;
+		*( ptzp + 1 ) = dst;
 	}
 	
 	return 0;
