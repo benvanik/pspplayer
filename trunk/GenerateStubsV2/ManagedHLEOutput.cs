@@ -13,10 +13,10 @@ using System.Text.RegularExpressions;
 
 namespace GenerateStubsV2
 {
-	class FastHLEOutput : IOutput
+	class ManagedHLEOutput : IOutput
 	{
-		public const string FileExt = ".h";
-		public const string Int64Name = "int64";
+		public const string FileExt = ".cs";
+		public const string Int64Name = "long";
 
 		private List<string> _searchPaths;
 		private string _outputPath;
@@ -31,13 +31,13 @@ namespace GenerateStubsV2
 
 		private const string VersionLine = "GenerateStubsV2: auto-generated";
 
-		public const string FileHeader = "FileHeader.txt";
-		public const string FileFooter = "FileFooter.txt";
-		public const int IndentLevel = 6;
+		public const string FileHeader = "FileHeaderCS.txt";
+		public const string FileFooter = "FileFooterCS.txt";
+		public const int IndentLevel = 2;
 
 		private List<string> _int64types;
 
-		public FastHLEOutput( List<string> searchPaths, string outputPath )
+		public ManagedHLEOutput( List<string> searchPaths, string outputPath )
 		{
 			_searchPaths = searchPaths;
 			_outputPath = outputPath;
@@ -241,21 +241,23 @@ namespace GenerateStubsV2
 				}
 			}
 			sourceFile = sourceFile.Replace( '\\', '/' );
-			
+
 			// Attributes
 			_writer.WriteLine( "{0}[NotImplemented]", _indent );
-			_writer.WriteLine( "{0}[BiosFunction( 0x{1:X8}, \"{2}\" )] [Stateless]", _indent, function.NID, function.Name );
+			_writer.WriteLine( "{0}[Stateless]", _indent );
+			_writer.WriteLine( "{0}[BiosFunction( 0x{1:X8}, \"{2}\" )]", _indent, function.NID, function.Name );
 
 			// Original decl & source
-			_writer.WriteLine( "{0}// {1} ({2}:{3})", _indent, function.Source.DeclarationBlock, sourceFile, function.Source.LineNumber );
+			_writer.WriteLine( "{0}// SDK location: {1}:{2}", _indent, sourceFile, function.Source.LineNumber );
+			_writer.WriteLine( "{0}// SDK declaration: {1}", _indent, function.Source.DeclarationBlock );
 
 			bool hasReturn;
 			string transformed = TransformDeclaration( function.Name, function.Source.DeclarationBlock, out hasReturn );
-			
+
 			// Function body
 			_writer.Write( "{0}{1}", _indent, transformed );
 			if( hasReturn == true )
-				_writer.WriteLine( "{ return NISTUBRETURN; }" );
+				_writer.WriteLine( "{ return Module.NotImplementedReturn; }" );
 			else
 				_writer.WriteLine( "{}" );
 

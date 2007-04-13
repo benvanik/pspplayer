@@ -36,7 +36,8 @@ namespace GenerateStubsV2
 			foreach( string path in paths )
 				finder.AddPath( path );
 
-			IOutput output = new FastHLEOutput( paths, @"C:\Dev\Noxa.Emulation\trunk\Noxa.Emulation.Psp.Bios.FastHLE\Modules\" );
+			//IOutput output = new FastHLEOutput( paths, @"C:\Dev\Noxa.Emulation\trunk\Noxa.Emulation.Psp.Bios.FastHLE\Modules\" );
+			IOutput output = new ManagedHLEOutput( paths, @"C:\Dev\Noxa.Emulation\trunk\Noxa.Emulation.Psp.Bios.ManagedHLE\Modules\" );
 
 			// These are ones that give us trouble
 			List<string> functionIgnores = new List<string>();
@@ -144,8 +145,8 @@ namespace GenerateStubsV2
 				{
 					//if( ( library.Flags & PrxLibrary.UserFlag ) == 0x0 )
 					//    continue;
-					//if( skipLibraries.Contains( library ) == true )
-					//    continue;
+					if( skipLibraries.Contains( library ) == true )
+					    continue;
 
 					bool hasBegun = false;
 
