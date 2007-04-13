@@ -69,11 +69,20 @@ namespace Noxa {
 				class KMemoryBlock;
 				class KEvent;
 				class KCallback;
+				class KThread;
 
 				typedef struct KThreadContext_t
 				{
 					int			ContextID;
 				} KThreadContext;
+
+				typedef void (*SpecialHandlerFn)( Kernel* kernel, KThread* thread, int arg );
+
+				typedef struct KSpecialHandler_t
+				{
+					SpecialHandlerFn	Function;
+					int					Argument;
+				} KSpecialHandler;
 
 				class KThread : public KHandle
 				{
@@ -119,6 +128,9 @@ namespace Noxa {
 					uint				WaitArgument;
 					uint				WaitAddress;		// For output parameters
 
+					Vector<KSpecialHandler*>*	SpecialHandlers;
+					int							ActiveSpecialHandler;
+
 				public:
 					KThread( Bios::Kernel* kernel, KPartition* partition, char* name, uint entryAddress, int priority, KThreadAttributes attributes, uint stackSize );
 					~KThread();
@@ -139,6 +151,9 @@ namespace Noxa {
 
 					void AddToSchedule();
 					void RemoveFromSchedule();
+
+					int AddSpecialHandler( SpecialHandlerFn function, int arg );
+					void SetSpecialHandler( int specialId );
 				};
 
 			}
