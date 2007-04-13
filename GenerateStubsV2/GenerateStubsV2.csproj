@@ -37,15 +37,16 @@
     <Compile Include="CRC32.cs" />
     <Compile Include="FastHLEOutput.cs" />
     <Compile Include="IOutput.cs" />
+    <Compile Include="ManagedHLEOutput.cs" />
     <Compile Include="NidList.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FileFooter.txt">
+    <Content Include="FileFooterCS.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="FileHeader.txt">
+    <Content Include="FileHeaderCS.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="IgnoreList.txt">
