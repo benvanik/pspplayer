@@ -19,6 +19,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Media;
 
+void kmodule_thread_end( Kernel* kernel, KThread* thread, int arg );
+
 Loader::Loader( NativeBios^ bios )
 {
 	Debug::Assert( bios != nullptr );
@@ -476,11 +478,16 @@ LoadResults^ Loader::LoadModule( ModuleType type, Stream^ moduleStream, LoadPara
 		uint envp = argp;// + args;
 		// write envp??
 
-		// Create a thread
-		KThread* thread = new KThread( kernel, kernel->Partitions[ 2 ], "kmodule_thread", results->EntryAddress, 99, KThreadUser, 0x4000 );
-		thread->GlobalPointer = results->GlobalPointer;
-
+		// What we do here simulates what the modulemgr does - it creates a user mode thread that
+		// runs module_start (_start, etc) and then exits when complete.
 		// NOTE: If we are a PRX, the entry address will correspond to module_start, so we don't need to do anything!
+
+		// Create a thread
+		KThread* thread = new KThread( kernel, kernel->Partitions[ 2 ], "kmodule_thread", results->EntryAddress, 1, KThreadUser, 0x4000 );
+		thread->GlobalPointer = results->GlobalPointer;
+		
+		int specialId = thread->AddSpecialHandler( &kmodule_thread_end, 0 );
+		thread->SetSpecialHandler( specialId );
 
 		thread->Start( args, argp );
 
@@ -492,4 +499,11 @@ err:
 	SAFEFREE( buffer );
 
 	return results;
+}
+
+void kmodule_thread_end( Kernel* kernel, KThread* thread, int arg )
+{
+	// Delete thread and reschedule
+	thread->Exit( 0 );
+	kernel->Schedule();
 }

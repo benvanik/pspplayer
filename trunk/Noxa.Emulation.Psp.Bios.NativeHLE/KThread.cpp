@@ -47,6 +47,9 @@ KThread::KThread( Bios::Kernel* kernel, KPartition* partition, char* name, uint 
 	WaitTimeout = 0;
 	WaitTimestamp = 0;
 
+	SpecialHandlers = new Vector<KSpecialHandler*>( 10 );
+	ActiveSpecialHandler = -1;
+
 	State = KThreadStopped;
 
 	Context = ( KThreadContext* )calloc( 1, sizeof( KThreadContext ) );
@@ -68,6 +71,8 @@ KThread::~KThread()
 {
 	if( State != KThreadDead )
 		this->Exit( 0 );
+
+	SAFEDELETE( SpecialHandlers );
 
 	SAFEDELETE( ExitWaiters );
 
@@ -314,4 +319,17 @@ void KThread::RemoveFromSchedule()
 	LLEntry<KThread*>* entry = Kernel->SchedulableThreads->Find( this );
 	if( entry != NULL )
 		Kernel->SchedulableThreads->Remove( entry );
+}
+
+int KThread::AddSpecialHandler( SpecialHandlerFn function, int arg )
+{
+	KSpecialHandler* handler = new KSpecialHandler();
+	handler->Function = function;
+	handler->Argument = arg;
+	return SpecialHandlers->Add( handler );
+}
+
+void KThread::SetSpecialHandler( int specialId )
+{
+	ActiveSpecialHandler = specialId;
 }
