@@ -1,0 +1,247 @@
+// ----------------------------------------------------------------------------
+// PSP Player Emulation Suite
+// Copyright (C) 2006 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+
+using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Games;
+
+namespace Noxa.Emulation.Psp.Bios.ManagedHLE
+{
+	partial class Bios : IBios
+	{
+		public ComponentParameters _parameters;
+		public IEmulationInstance _emulator;
+		
+		public Loader _loader;
+		public Kernel _kernel;
+
+		public List<BiosModule> _metaModules;
+		public Dictionary<string, BiosModule> _metaModuleLookup;
+		public List<BiosFunction> _functions;
+		public Dictionary<uint, BiosFunction> _functionLookup;
+		public List<Module> _modules;
+		public Dictionary<uint, IntPtr> _nativePointerLookup;
+
+		public GameInformation _game;
+		public Stream _bootStream;
+		public AutoResetEvent _gameSetEvent;
+
+		#region Properties
+
+		public ComponentParameters Parameters
+		{
+			get
+			{
+				return _parameters;
+			}
+		}
+
+		public IEmulationInstance Emulator
+		{
+			get
+			{
+				return _emulator;
+			}
+		}
+
+		public Type Factory
+		{
+			get
+			{
+				return typeof( ManagedHLE );
+			}
+		}
+
+		public ILoader Loader
+		{
+			get
+			{
+				return _loader;
+			}
+		}
+
+		#endregion
+
+		#region Modules and Functions
+
+		public BiosModule[] Modules
+		{
+			get
+			{
+				return _metaModules.ToArray();
+			}
+		}
+
+		public BiosFunction[] Functions
+		{
+			get
+			{
+				return _functions.ToArray();
+			}
+		}
+
+		public BiosModule FindModule( string name )
+		{
+			BiosModule module;
+			if( _metaModuleLookup.TryGetValue( name, out module ) == true )
+				return module;
+			return null;
+		}
+
+		public BiosFunction FindFunction( uint nid )
+		{
+			BiosFunction function;
+			if( _functionLookup.TryGetValue( nid, out function ) == true )
+				return function;
+			return null;
+		}
+
+		private void GatherModulesAndFunctions()
+		{
+			int moduleCount = 0;
+			int functionCount = 0;
+			int implementedCount = 0;
+
+			_metaModules = new List<BiosModule>();
+			_metaModuleLookup = new Dictionary<string, BiosModule>();
+			_functions = new List<BiosFunction>();
+			_functionLookup = new Dictionary<uint, BiosFunction>();
+			_modules = new List<Module>();
+			_nativePointerLookup = new Dictionary<uint, IntPtr>();
+
+			foreach( Type type in Assembly.GetCallingAssembly().GetTypes() )
+			{
+				if( type.BaseType.Equals( typeof( Module ) ) == false )
+					continue;
+				if( type.IsAbstract == true )
+					continue;
+				
+				Module module = ( Module )Activator.CreateInstance( type, _kernel );
+				Debug.Assert( module != null );
+				if( module == null )
+					continue;
+
+				_modules.Add( module );
+				
+				BiosModule metaModule = new BiosModule( module.Name );
+				_metaModules.Add( metaModule );
+				_metaModuleLookup.Add( metaModule.Name, metaModule );
+
+				moduleCount++;
+
+				foreach( MethodInfo mi in type.GetMethods() )
+				{
+					object[] attrs = mi.GetCustomAttributes( typeof( BiosFunctionAttribute ), false );
+					if( attrs.Length == 0 )
+						continue;
+					BiosFunctionAttribute attr = ( BiosFunctionAttribute )attrs[ 0 ];
+
+					bool isImplemented = ( mi.GetCustomAttributes( typeof( NotImplementedAttribute ), false ).Length == 0 );
+					bool isStateless = ( mi.GetCustomAttributes( typeof( StatelessAttribute ), false ).Length > 0 );
+
+					functionCount++;
+
+					IntPtr nativePointer = IntPtr.Zero;
+					if( isImplemented == true )
+					{
+					    implementedCount++;
+					//    void* nativePtr = module.QueryNativePointer( attr.NID );
+					//    if( nativePtr != 0x0 )
+					//        nativePointer = IntPtr( nativePtr );
+					}
+
+					BiosFunction function = new BiosFunction(
+						metaModule, module,
+						attr.NID, attr.Name,
+						isImplemented, isStateless,
+						mi, nativePointer );
+					this.RegisterFunction( function );
+				}
+			}
+
+			Debug.WriteLine( String.Format( "Bios: found {0} functions in {1} modules. {2} ({3}%) implemented", functionCount, moduleCount, implementedCount, ( implementedCount / ( float )functionCount ) * 100.0f ) );
+		}
+
+		private void RegisterFunction( BiosFunction function )
+		{
+			Debug.Assert( function != null );
+			if( _functionLookup.ContainsKey( function.NID ) == true )
+			{
+				Debug.WriteLine( String.Format( "Bios::RegisterFunction: NID 0x{0:X8} already registered", function.NID ) );
+				return;
+			}
+			_functionLookup.Add( function.NID, function );
+			_functions.Add( function );
+		}
+
+		#endregion
+
+		public GameInformation Game
+		{
+			get
+			{
+				return _game;
+			}
+			set
+			{
+				if( _game != null )
+				{
+					Debug.Assert( value == null );
+					_game = null;
+					return;
+				}
+				_game = value;
+				_kernel.StartGame();
+				_gameSetEvent.Set();
+			}
+		}
+
+		public Stream BootStream
+		{
+			get
+			{
+				return _bootStream;
+			}
+			set
+			{
+				_bootStream = value;
+			}
+		}
+
+		public Bios( IEmulationInstance emulator, ComponentParameters parameters )
+		{
+			Debug.Assert( emulator != null );
+			Debug.Assert( parameters != null );
+			_emulator = emulator;
+			_parameters = parameters;
+
+			_kernel = new Kernel( this );
+			_loader = new Loader( this );
+
+			_gameSetEvent = new AutoResetEvent( false );
+
+			this.GatherModulesAndFunctions();
+		}
+
+		public void Execute()
+		{
+			if( _game == null )
+				_gameSetEvent.WaitOne();
+			_kernel.Execute();
+		}
+
+		public void Cleanup()
+		{
+		}
+	}
+}

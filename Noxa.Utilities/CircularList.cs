@@ -30,7 +30,13 @@ namespace Noxa
 			}
 		}
 
-		public void Add( T item )
+		public void Clear()
+		{
+			_index = 0;
+			_length = 0;
+		}
+
+		public int Add( T item )
 		{
 			int target = _index + _length;
 			if( _length + 1 > _list.Length )
@@ -44,6 +50,7 @@ namespace Noxa
 			}
 			target %= _list.Length;
 			_list[ target ] = item;
+			return target;
 		}
 
 		public T Dequeue()
@@ -60,11 +67,6 @@ namespace Noxa
 			return item;
 		}
 
-		public List<T> Dequeue( int count )
-		{
-			return null;
-		}
-
 		public T Peek()
 		{
 			if( _length == 0 )
@@ -78,11 +80,6 @@ namespace Noxa
 				return default( T );
 			int index = ( _index + offset ) % _list.Length;
 			return _list[ index ];
-		}
-
-		public List<T> Peek( int count )
-		{
-			return null;
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace Noxa {
 			namespace Cpu {
 				namespace Native {
 
-					typedef void (*MarshalCompleteFunction)();
+					typedef void (*MarshalCompleteFunction)( int tcsId, int state );
 
 					typedef struct CpuApi_t
 					{
@@ -35,7 +35,7 @@ namespace Noxa {
 						// Save the current context and switch to the given new one
 						void (*SwitchContext)( int newTcsId );
 						// Suspend the current context and run the given callback in the given context, resuming when complete
-						void (*MarshalCallback)( int tcsId, int callbackAddress, int callbackArgs, MarshalCompleteFunction biosCallback );
+						void (*MarshalCallback)( int tcsId, int callbackAddress, int callbackArgs, MarshalCompleteFunction biosCallback, int state );
 
 						// -- Interrupts --
 

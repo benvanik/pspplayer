@@ -47,14 +47,5 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 			set;
 		}
-
-		/// <summary>
-		/// The current interrupts masking flag.
-		/// </summary>
-		uint InterruptsFlag
-		{
-			get;
-			set;
-		}
 	}
 }
