@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Security;
 
 namespace Noxa.Emulation.Psp.Utilities
 {
@@ -20,9 +21,11 @@ namespace Noxa.Emulation.Psp.Utilities
 	{
 		#region Interop
 
+		[SuppressUnmanagedCodeSecurity]
 		[DllImport( "Kernel32.dll", SetLastError = false )]
 		private static extern bool QueryPerformanceCounter( out long lpPerformanceCount );
 
+		[SuppressUnmanagedCodeSecurity]
 		[DllImport( "Kernel32.dll" )]
 		private static extern bool QueryPerformanceFrequency( out long lpFrequency );
 

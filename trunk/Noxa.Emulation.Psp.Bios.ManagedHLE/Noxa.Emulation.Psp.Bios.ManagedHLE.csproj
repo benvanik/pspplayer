@@ -1,0 +1,120 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{4B161B6A-14B4-4874-A883-F8D84ED733A7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Noxa.Emulation.Psp.Bios.ManagedHLE</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp.Bios.ManagedHLE</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Bios.Debugging.cs" />
+    <Compile Include="Kernel Types\KCallback.cs" />
+    <Compile Include="Kernel Types\KDevice.cs" />
+    <Compile Include="Kernel Types\KThread.Waiting.cs" />
+    <Compile Include="Kernel.cs" />
+    <Compile Include="Kernel Types\KEvent.cs" />
+    <Compile Include="Kernel Types\KFile.cs" />
+    <Compile Include="Kernel Types\KHandle.cs" />
+    <Compile Include="Kernel Types\KIntHandler.cs" />
+    <Compile Include="Kernel Types\KMemoryBlock.cs" />
+    <Compile Include="Kernel Types\KModule.cs" />
+    <Compile Include="Kernel Types\KPartition.cs" />
+    <Compile Include="Kernel Types\KPool.cs" />
+    <Compile Include="Kernel Types\KSemaphore.cs" />
+    <Compile Include="Kernel Types\KThread.cs" />
+    <Compile Include="Kernel.Helpers.cs" />
+    <Compile Include="Kernel.Scheduling.cs" />
+    <Compile Include="Kernel.Timers.cs" />
+    <Compile Include="Bios.cs" />
+    <Compile Include="Loader.cs" />
+    <Compile Include="ManagedHLE.cs" />
+    <Compile Include="MemorySystem.cs" />
+    <Compile Include="Module.cs" />
+    <Compile Include="Modules\InterruptManager.cs" />
+    <Compile Include="Modules\IoFileMgrForUser.cs" />
+    <Compile Include="Modules\Kernel_Library.cs" />
+    <Compile Include="Modules\LoadExecForUser.cs" />
+    <Compile Include="Modules\ModuleMgrForUser.cs" />
+    <Compile Include="Modules\sceAtrac3plus.cs" />
+    <Compile Include="Modules\sceAudio.cs" />
+    <Compile Include="Modules\sceAudiocodec.cs" />
+    <Compile Include="Modules\sceChnnlsv.cs" />
+    <Compile Include="Modules\sceCtrl.cs" />
+    <Compile Include="Modules\sceDisplay.cs" />
+    <Compile Include="Modules\sceDmac.cs" />
+    <Compile Include="Modules\sceGe_user.cs" />
+    <Compile Include="Modules\sceHprm.cs" />
+    <Compile Include="Modules\sceImpose.cs" />
+    <Compile Include="Modules\scePower.cs" />
+    <Compile Include="Modules\sceReg.cs" />
+    <Compile Include="Modules\sceRtc.cs" />
+    <Compile Include="Modules\sceSircs.cs" />
+    <Compile Include="Modules\sceSuspendForUser.cs" />
+    <Compile Include="Modules\sceUmdUser.cs" />
+    <Compile Include="Modules\sceUsb.cs" />
+    <Compile Include="Modules\sceUsbstorBoot.cs" />
+    <Compile Include="Modules\sceUtility.cs" />
+    <Compile Include="Modules\sceWlanDrv.cs" />
+    <Compile Include="Modules\StdioForUser.cs" />
+    <Compile Include="Modules\SysMemUserForUser.cs" />
+    <Compile Include="Modules\ThreadManForUser.cs" />
+    <Compile Include="Modules\UtilsForUser.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Options.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">
+      <Project>{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}</Project>
+      <Name>Noxa.Emulation.Psp.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
+      <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
+      <Name>Noxa.Emulation.Psp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj">
+      <Project>{67000884-BAF0-40B5-8D24-F06D2D623787}</Project>
+      <Name>Noxa.Utilities.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities\Noxa.Utilities.csproj">
+      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
+      <Name>Noxa.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

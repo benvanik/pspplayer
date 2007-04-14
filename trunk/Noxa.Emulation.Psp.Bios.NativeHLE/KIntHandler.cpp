@@ -18,8 +18,10 @@ using namespace Noxa::Emulation::Psp::Bios;
 KIntHandler::KIntHandler( Bios::Kernel* kernel, int interruptNumber, int slot, uint address, uint argument )
 {
 	Kernel = kernel;
+
 	InterruptNumber = interruptNumber;
 	Slot = slot;
+
 	Address = address;
 	Argument = argument;
 }
