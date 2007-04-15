@@ -41,7 +41,7 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 		protected Dictionary<string, ElfSection> _sectionLookup = new Dictionary<string, ElfSection>();
 
 		List<ElfSymbol> _symbols = new List<ElfSymbol>();
-		List<ElfRelocation> _relocations = new List<ElfRelocation>();
+		//List<ElfRelocation> _relocations = new List<ElfRelocation>();
 
 		#region Types/enums
 
@@ -780,11 +780,11 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 
 				uint pointer = relocation.Offset;
 
-				ElfSection offsetBase = null;
+				//ElfSection offsetBase = null;
 				//ElfSection addressBase = null;
 				if( ( relocation.Symbol & ( uint )RelocationOffset.Data ) == ( uint )RelocationOffset.Data )
 				{
-					offsetBase = dataSection;
+					//offsetBase = dataSection;
 					pointer += dataSection.Address;
 				}
 				//else if( relocation.BaseAddress == 0x1 )
@@ -794,7 +794,7 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 				//}
 				else
 				{
-					offsetBase = textSection;
+					//offsetBase = textSection;
 					pointer += baseAddress;
 				}
 				//ElfSection offsetBase = _sections[ ( int )relocation.Symbol ];
