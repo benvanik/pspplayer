@@ -63,7 +63,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.AddToSchedule();
 			
 			// We cannot schedule here - in a weird thread
-			Kernel.Cpu.Break();
+			Kernel.Cpu.BreakExecution();
 		}
 
 		public void Delay( uint waitTimeUs, bool canHandleCallbacks )
@@ -91,7 +91,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.AddToSchedule();
 			
 			// We cannot schedule here - in a weird thread
-			Kernel.Cpu.Break();
+			Kernel.Cpu.BreakExecution();
 		}
 
 		public void Join( KThread targetThread, uint timeoutUs, bool canHandleCallbacks )
@@ -125,7 +125,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.AddToSchedule();
 
 			// We cannot schedule here - in a weird thread
-			Kernel.Cpu.Break();
+			Kernel.Cpu.BreakExecution();
 		}
 
 		public void Wait( KEvent ev, KWaitType waitEventMode, uint userValue, uint outAddress, uint timeoutUs, bool canHandleCallbacks )

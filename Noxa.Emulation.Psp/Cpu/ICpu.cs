@@ -21,7 +21,8 @@ namespace Noxa.Emulation.Psp.Cpu
 	/// <param name="tcsId">The thread context storage ID that the callback was performed on.</param>
 	/// <param name="state">User-passed state argument.</param>
 	/// <param name="result">The value of $v0 (probably the result).</param>
-	public delegate void MarshalCompleteDelegate( int tcsId, int state, int result );
+	/// <returns><c>true</c> if execution should continue, <c>false</c> if it should break.</returns>
+	public delegate bool MarshalCompleteDelegate( int tcsId, int state, int result );
 
 	/// <summary>
 	/// A CPU.
@@ -196,32 +197,41 @@ namespace Noxa.Emulation.Psp.Cpu
 		void ReleaseContextStorage( int tcsId );
 
 		/// <summary>
+		/// Get a register value from the given thread context storage block.
+		/// </summary>
+		/// <param name="tcsId">The ID of the thread context storage to access.</param>
+		/// <param name="reg">The ordinal of the register (0-31).</param>
+		/// <returns>The value of the register in the given thread context storage block.</returns>
+		uint GetContextRegister( int tcsId, int reg );
+
+		/// <summary>
+		/// Set a register value in the given thread context storage block.
+		/// </summary>
+		/// <param name="tcsId">The ID of the thread context storage to access.</param>
+		/// <param name="reg">The ordinal of the register (0-31).</param>
+		/// <param name="value">The new value of the register.</param>
+		void SetContextRegister( int tcsId, int reg, uint value );
+
+		/// <summary>
 		/// Switch thread contexts.
 		/// </summary>
 		/// <param name="newTcsId">The thread context storage ID to switch to.</param>
 		void SwitchContext( int newTcsId );
 
 		/// <summary>
-		/// Suspend the current thread and execute the given callback, resuming at the prior address.
+		/// Suspend the current thread and execute the given user code, resuming at the prior address.
 		/// </summary>
 		/// <param name="tcsId">The thread context storage ID to run the callback on.</param>
-		/// <param name="callbackAddress">The user address of the callback code.</param>
-		/// <param name="callbackArguments">A list of arguments to pass to the callback (placed in $a0+).</param>
+		/// <param name="address">The user address of the code to execute.</param>
+		/// <param name="arguments">A list of arguments to pass to the user code (placed in $a0+).</param>
 		/// <param name="resultCallback">Caller-defined handler to execute once the callback has completed.</param>
 		/// <param name="state">Caller-defined state to be passed to the handler.</param>
-		void MarshalCallback( int tcsId, int callbackAddress, int[] callbackArguments, MarshalCompleteDelegate resultCallback, int state );
+		/// <remarks>
+		/// <paramref name="resultCallback"/> is called before execution resumes.
+		/// </remarks>
+		void MarshalCall( int tcsId, uint address, uint[] arguments, MarshalCompleteDelegate resultCallback, int state );
 
 		#endregion
-
-		/// <summary>
-		/// Resume execution.
-		/// </summary>
-		void Resume();
-
-		/// <summary>
-		/// Break execution.
-		/// </summary>
-		void Break();
 
 		/// <summary>
 		/// Setup the CPU with the given parameters.
@@ -233,8 +243,14 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// <summary>
 		/// Execute a block of instructions.
 		/// </summary>
-		/// <returns>The number of instructions executed.</returns>
-		int ExecuteBlock();
+		/// <param name="breakFlag"><c>true</c> if a break was requested.</param>
+		/// <param name="instructionsExecuted">The number of instructions executed.</param>
+		void Execute( out bool breakFlag, out uint instructionsExecuted );
+
+		/// <summary>
+		/// Break execution.
+		/// </summary>
+		void BreakExecution();
 
 		/// <summary>
 		/// Stop the CPU.

@@ -22,7 +22,7 @@ namespace Noxa {
 					typedef struct VideoApi_t
 					{
 						// Setup & tear-down
-						void (*Setup)( MemorySystem* memory, MemoryPool* pool );
+						void (*Setup)( NativeMemorySystem* memory, MemoryPool* pool );
 						void (*Cleanup)();
 
 						uint (*GetVcount)();

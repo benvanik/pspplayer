@@ -54,7 +54,7 @@ int R4000Cpu::LookupOrAddModule( IModule^ module )
 // as the first parameter will we pass it through.
 
 // Here we are in the x86 dynarec CPU emitting MSIL. I'm craaazzy ----___----
-BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem* memory, void* registers )
+BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem^ memory, void* registers )
 {
 	//Type^ voidStar = ( void::typeid )->MakePointerType();
 	array<Type^>^ shimArgs = { R4000Cpu::typeid };
@@ -109,12 +109,12 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem* memory, void
 	ilgen->Emit( OpCodes::Ldelem_Ref );
 
 	// Handle IMemory usage - this is always the first parameter
-	if( function->UsesMemorySystem == true )
-	{
-		// Perform a cpu->_memory load (cpu in arg0)
-		ilgen->Emit( OpCodes::Ldarg_0 );
-		ilgen->Emit( OpCodes::Ldfld, _privateMemoryFieldInfo );
-	}
+	//if( function->UsesMemorySystem == true )
+	//{
+	//	// Perform a cpu->_memory load (cpu in arg0)
+	//	ilgen->Emit( OpCodes::Ldarg_0 );
+	//	ilgen->Emit( OpCodes::Ldfld, _privateMemoryFieldInfo );
+	//}
 
 	// Push on remaining parameters
 	// The first 8 arguments go in $a0 to $t3 ($4 to $12) - rest go on the stack.
@@ -260,7 +260,7 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem* memory, void
 	return del;
 }
 
-void* R4000Cpu::EmitShimN( BiosFunction^ function, MemorySystem* memory, void* registers )
+void* R4000Cpu::EmitShimN( BiosFunction^ function, NativeMemorySystem* memory, void* registers )
 {
 	R4000Generator* g = _context->Generator;
 

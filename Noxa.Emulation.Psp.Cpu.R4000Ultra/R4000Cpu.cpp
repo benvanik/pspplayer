@@ -23,9 +23,6 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace Noxa::Emulation::Psp::Debugging::DebugData;
 
-extern int niExecute( int* breakFlags );
-extern void niBreakExecute( int flags );
-
 extern uint _instructionsExecuted;
 
 R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters )
@@ -74,10 +71,14 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 
 	_nativeInterface = ( CpuApi* )calloc( 1, sizeof( CpuApi ) );
 	this->SetupNativeInterface();
+
+	this->SetupThreading();
 }
 
 R4000Cpu::~R4000Cpu()
 {
+	this->DestroyThreading();
+
 	this->DestroyNativeInterface();
 	SAFEFREE( _nativeInterface );
 
@@ -88,7 +89,7 @@ R4000Cpu::~R4000Cpu()
 	SAFEDELETE( _codeCache );
 }
 
-int R4000Cpu::RegisterSyscall( unsigned int nid )
+uint R4000Cpu::RegisterSyscall( unsigned int nid )
 {
 	BiosFunction^ function = _emu->Bios->FindFunction( nid );
 	if( function == nullptr )
@@ -98,10 +99,13 @@ int R4000Cpu::RegisterSyscall( unsigned int nid )
 	_syscalls[ sid ] = function;
 
 	void* registers = ( ( R4000Ctx* )_ctx )->Registers;
-	_syscallShims[ sid ] = EmitShim( function, _memory->SystemInstance, registers );
-	_syscallShimsN[ sid ] = IntPtr( EmitShimN( function, _memory->SystemInstance, registers ) );
+	_syscallShims[ sid ] = EmitShim( function, _memory->System, registers );
+	if( function->NativeMethod != IntPtr::Zero )
+		_syscallShimsN[ sid ] = IntPtr( EmitShimN( function, _memory->NativeSystem, registers ) );
+	else
+		_syscallShimsN[ sid ] = IntPtr::Zero;
 
-	return sid;
+	return ( uint )sid;
 }
 
 void R4000Cpu::RegisterUserExports( BiosModule^ module )
@@ -152,17 +156,6 @@ void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 
 		_hasExecuted = true;
 	}
-}
-
-int R4000Cpu::ExecuteBlock()
-{
-	int breakFlags;
-	return niExecute( &breakFlags );
-}
-
-void R4000Cpu::Stop()
-{
-	niBreakExecute( 1 );
 }
 
 void R4000Cpu::PrintStatistics()

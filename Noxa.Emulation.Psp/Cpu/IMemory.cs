@@ -44,9 +44,10 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// </summary>
 		/// <param name="baseAddress">The base address of the segment to look for.</param>
 		/// <returns>The <see cref="IMemorySegment"/> at the given <paramref name="baseAddress"/> or <c>null</c> if none was found.</returns>
-		IMemorySegment FindSegment( int baseAddress );
+		IMemorySegment FindSegment( int baseAddress );
+
 		/// <summary>
-		/// A native instance of <c>MemorySystem</c>.
+		/// A native instance of <c>NativeMemorySystem</c>.
 		/// </summary>
 		/// <remarks>
 		/// Defined in MemorySystem.h.

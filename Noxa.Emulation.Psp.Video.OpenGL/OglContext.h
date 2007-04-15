@@ -16,7 +16,7 @@ namespace Noxa {
 				typedef struct OglContext_t
 				{
 					// Memory from the CPU
-					MemorySystem*	Memory;
+					NativeMemorySystem*	Memory;
 
 					// FrameBuffer
 					uint			FrameBufferPointer;
