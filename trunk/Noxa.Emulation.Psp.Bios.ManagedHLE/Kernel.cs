@@ -71,7 +71,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Cpu = Emulator.Cpu;
 			CpuCore = Cpu.Cores[ 0 ];
 			Memory = Cpu.Memory;
-			MemorySystem = new MemorySystem( Memory );
+			MemorySystem = Memory.MemorySystem;
+
+			UserModules = new List<KModule>( 10 );
 
 			Threads = new List<KThread>( 128 );
 			SchedulableThreads = new FastLinkedList<KThread>();

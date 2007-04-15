@@ -31,14 +31,6 @@ void R4000Cpu::EnableDebugging( IDebugger^ debugger )
 		_debugger->CpuHook = this;
 }
 
-void R4000Cpu::Resume()
-{
-}
-
-void R4000Cpu::Break()
-{
-}
-
 CoreState^ R4000Cpu::GetCoreState( int core )
 {
 	Debug::Assert( core == 0 );

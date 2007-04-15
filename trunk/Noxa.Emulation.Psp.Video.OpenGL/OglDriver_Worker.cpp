@@ -191,9 +191,8 @@ void OglDriver::WorkerThread()
 	this->SetupOpenGL();
 
 	// Setup the context
-	bool supportInternalMemory = ( _emu->Cpu->Memory->MainMemoryPointer != NULL );
-	Debug::Assert( supportInternalMemory == true );
-	_context->Memory = ( MemorySystem* )_emu->Cpu->Memory->MemorySystemInstance;
+	_context->Memory = ( NativeMemorySystem* )_emu->Cpu->Memory->NativeMemorySystem.ToPointer();
+	Debug::Assert( _context->Memory != NULL );
 
 	_startTime = DateTime::Now;
 

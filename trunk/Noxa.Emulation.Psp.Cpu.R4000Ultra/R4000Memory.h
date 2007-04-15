@@ -25,7 +25,8 @@ namespace Noxa {
 					byte*			MainMemory;
 					byte*			VideoMemory;
 
-					MemorySystem*	SystemInstance;
+					NativeMemorySystem*	NativeSystem;
+					MemorySystem^		System;
 
 				protected:
 					IMemorySegment^	_frameBuffer;
@@ -45,27 +46,19 @@ namespace Noxa {
 					virtual IMemorySegment^ FindSegment( String^ name );
 					virtual IMemorySegment^ FindSegment( int baseAddress );
 
-					property void* MainMemoryPointer
+					property IntPtr NativeMemorySystem
 					{
-						virtual void* get()
+						virtual IntPtr get()
 						{
-							return MainMemory;
+							return IntPtr( NativeSystem );
 						}
 					}
 
-					property void* VideoMemoryPointer
+					property Cpu::MemorySystem^ MemorySystem
 					{
-						virtual void* get()
+						virtual Cpu::MemorySystem^ get()
 						{
-							return VideoMemory;
-						}
-					}
-
-					property void* MemorySystemInstance
-					{
-						virtual void* get()
-						{
-							return SystemInstance;
+							return System;
 						}
 					}
 

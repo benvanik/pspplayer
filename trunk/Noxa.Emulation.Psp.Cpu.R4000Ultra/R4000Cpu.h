@@ -74,6 +74,7 @@ namespace Noxa {
 					void*						_bounce;
 
 					CpuApi*						_nativeInterface;
+					List<IntPtr>^				_threadContexts;
 
 				internal:
 					int							_lastSyscall;
@@ -222,26 +223,50 @@ namespace Noxa {
 
 					virtual void Cleanup();
 
-					virtual int RegisterSyscall( unsigned int nid );
+					// -- Syscalls / Exports
+					virtual uint RegisterSyscall( uint nid );
 					virtual void RegisterUserExports( BiosModule^ module );
 					virtual uint LookupUserExport( uint nid );
 
-					virtual void Resume();
-					virtual void Break();
+					// -- Interrupts
+					property uint InterruptsMask
+					{
+						virtual uint get();
+						virtual void set( uint value );
+					}
+					virtual void RegisterInterruptHandler( int interruptNumber, int slot, uint address, uint argument );
+					virtual void UnregisterInterruptHandler( int interruptNumber, int slot );
+					virtual void SetPendingInterrupt( int interruptNumber );
+
+					// -- Threading
+					virtual int AllocateContextStorage( uint pc, array<uint>^ registers );
+					virtual void ReleaseContextStorage( int tcsId );
+					virtual uint GetContextRegister( int tcsId, int reg );
+					virtual void SetContextRegister( int tcsId, int reg, uint value );
+					virtual void SwitchContext( int newTcsId );
+					virtual void MarshalCall( int tcsId, uint address, array<uint>^ arguments, MarshalCompleteDelegate^ resultCallback, int state );
 
 					virtual void SetupGame( GameInformation^ game, Stream^ bootStream );
-					virtual int ExecuteBlock();
+					
+					virtual void Execute(
+						[System::Runtime::InteropServices::Out] bool% breakFlag,
+						[System::Runtime::InteropServices::Out] uint% instructionsExecuted );
+					virtual void BreakExecution();
+
 					virtual void Stop();
 
 					virtual void PrintStatistics();
 
 				protected:
 					int LookupOrAddModule( IModule^ module );
-					BiosShim^ EmitShim( BiosFunction^ function, MemorySystem* memory, void* registers );
-					void* EmitShimN( BiosFunction^ function, MemorySystem* memory, void* registers );
+					BiosShim^ EmitShim( BiosFunction^ function, MemorySystem^ memory, void* registers );
+					void* EmitShimN( BiosFunction^ function, NativeMemorySystem* memory, void* registers );
 
 					void SetupNativeInterface();
 					void DestroyNativeInterface();
+
+					void SetupThreading();
+					void DestroyThreading();
 
 				public:
 					virtual CoreState^ GetCoreState( int core );

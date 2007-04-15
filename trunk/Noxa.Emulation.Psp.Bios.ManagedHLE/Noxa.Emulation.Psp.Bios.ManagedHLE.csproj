@@ -56,7 +56,6 @@
     <Compile Include="Bios.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="ManagedHLE.cs" />
-    <Compile Include="MemorySystem.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Modules\InterruptManager.cs" />
     <Compile Include="Modules\IoFileMgrForUser.cs" />

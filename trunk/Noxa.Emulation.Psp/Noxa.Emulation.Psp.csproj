@@ -56,6 +56,7 @@
     <Compile Include="Bios\LoadResults.cs" />
     <Compile Include="ComponentIssue.cs" />
     <Compile Include="ComponentParameters.cs" />
+    <Compile Include="Cpu\MemorySystem.cs" />
     <Compile Include="Debugging\DebugModel\CoreState.cs" />
     <Compile Include="Cpu\IAvcDecoder.cs" />
     <Compile Include="Cpu\ICpu.cs" />

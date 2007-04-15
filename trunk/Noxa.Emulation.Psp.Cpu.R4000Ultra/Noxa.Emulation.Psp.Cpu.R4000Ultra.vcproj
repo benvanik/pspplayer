@@ -237,11 +237,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Cpu_Interrupts.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Cpu_NativeInterface.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\R4000Cpu_Shim.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Cpu_Threading.cpp"
 				>
 			</File>
 			<File

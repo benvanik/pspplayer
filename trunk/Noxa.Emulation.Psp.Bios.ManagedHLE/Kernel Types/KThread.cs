@@ -106,6 +106,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			ExitWaiters = new FastLinkedList<KThread>();
 
+			RunClocks = 0;
+			InterruptPreemptionCount = 0;
+			ThreadPreemptionCount = 0;
+
 			Partition = partition;
 			StackBlock = partition.Allocate( KAllocType.High, 0, stackSize );
 			Debug.Assert( StackBlock != null );

@@ -16,16 +16,47 @@ namespace Noxa.Emulation.Psp.Cpu
 	/// </summary>
 	public unsafe class MemorySystem
 	{
+		#region Constants
+
+		/// <summary>
+		/// The lower bound of main memory.
+		/// </summary>
 		public const uint MainMemoryBase = 0x08000000;
+		/// <summary>
+		/// The size, in bytes, of main memory.
+		/// </summary>
 		public const uint MainMemorySize = 0x01FFFFFF;
+		/// <summary>
+		/// The upper bound of main memory.
+		/// </summary>
 		public const uint MainMemoryBound = ( MainMemoryBase + MainMemorySize );
+		/// <summary>
+		/// The lower bound of the scratch pad.
+		/// </summary>
 		public const uint ScratchPadBase = 0x00010000;
+		/// <summary>
+		/// The size, in bytes, of the scratch pad.
+		/// </summary>
 		public const uint ScratchPadSize = 0x00003FFF;
+		/// <summary>
+		/// The upper bound of the scratch pad.
+		/// </summary>
 		public const uint ScratchPadBound = ( ScratchPadBase + ScratchPadSize );
+		/// <summary>
+		/// The lower bound of video memory.
+		/// </summary>
 		public const uint VideoMemoryBase = 0x04000000;
+		/// <summary>
+		/// The size, in bytes, of video memory.
+		/// </summary>
 		public const uint VideoMemorySize = 0x001FFFFF;
+		/// <summary>
+		/// The upper bound of video memory.
+		/// </summary>
 		public const uint VideoMemoryBound = ( VideoMemoryBase + VideoMemorySize );
-		
+
+		#endregion
+
 		/// <summary>
 		/// A pointer to the host main memory buffer.
 		/// </summary>

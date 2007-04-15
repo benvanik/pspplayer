@@ -30,9 +30,9 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 VdlRef* _outstandingLists;
 VdlRef* _outstandingListsTail;
 
-MemorySystem*	_memory;
-VideoApi*		_videoApi;
-MemoryPool*		_memoryPool;
+NativeMemorySystem*	_memory;
+VideoApi*			_videoApi;
+MemoryPool*			_memoryPool;
 
 void ClearOutstandingLists();
 
@@ -57,10 +57,10 @@ R4000VideoInterface::~R4000VideoInterface()
 
 void R4000VideoInterface::Prepare()
 {
-	_memory = _cpu->_memory->SystemInstance;
+	_memory = _cpu->_memory->NativeSystem;
 	_videoApi = ( VideoApi* )_cpu->Emulator->Video->NativeInterface.ToPointer();
 	if( _videoApi != NULL )
-		_videoApi->Setup( _cpu->_memory->SystemInstance, _pool );
+		_videoApi->Setup( _memory, _pool );
 }
 
 void __break()

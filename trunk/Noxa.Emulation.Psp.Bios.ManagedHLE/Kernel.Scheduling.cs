@@ -70,10 +70,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			if( ActiveThread != null )
 			{
 				// Execute active thread
-				Cpu.Resume();
-				this.Schedule();
-
-				Debug.WriteLine( string.Format( "Kernel: CPU returned to us" ) );
+				bool breakFlag;
+				uint instructionsExecuted;
+				Cpu.Execute( out breakFlag, out instructionsExecuted );
+				if( breakFlag == true )
+					this.Schedule();
+				else
+				{
+					// Only if not broken by choice
+					Debug.WriteLine( string.Format( "Kernel: CPU returned to us after {0} instructions", instructionsExecuted ) );
+				}
 			}
 			else
 			{
@@ -115,7 +121,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private KCallback _runningCallback;
 		private bool _runningUserCall;
 
-		public bool IssueCallback( KCallback callback, int argument )
+		public bool IssueCallback( KCallback callback, uint argument )
 		{
 			Debug.Assert( callback != null );
 			Debug.Assert( _runningUserCall == false );
@@ -126,12 +132,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			_runningCallback = callback;
 
-			Cpu.MarshalCallback( ActiveThread.ContextID, ( int )callback.Address, new int[] { argument }, new MarshalCompleteDelegate( this.CallbackComplete ), 0 );
+			Cpu.MarshalCall( ActiveThread.ContextID, callback.Address, new uint[] { argument }, new MarshalCompleteDelegate( this.CallbackComplete ), 0 );
 
 			return true;
 		}
 
-		private void CallbackComplete( int tcsId, int state, int result )
+		private bool CallbackComplete( int tcsId, int state, int result )
 		{
 			Debug.Assert( _oldThread != null );
 			Debug.Assert( _runningCallback != null );
@@ -141,21 +147,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			ActiveThread = _oldThread;
 			_oldThread = null;
 			_runningCallback = null;
+
+			return true;
 		}
 
-		public bool IssueUserCall( uint address, int[] arguments )
+		public bool IssueUserCall( uint address, uint[] arguments )
 		{
 			Debug.Assert( _runningUserCall == false );
 			Debug.Assert( _runningCallback == null );
 
 			_runningUserCall = true;
 
-			Cpu.MarshalCallback( ActiveThread.ContextID, ( int )address, arguments, new MarshalCompleteDelegate( this.UserCallComplete ), ( int )address );
+			Cpu.MarshalCall( ActiveThread.ContextID, address, arguments, new MarshalCompleteDelegate( this.UserCallComplete ), ( int )address );
 
 			return true;
 		}
 
-		private void UserCallComplete( int tcsId, int state, int result )
+		private bool UserCallComplete( int tcsId, int state, int result )
 		{
 			Debug.Assert( _runningUserCall == true );
 
@@ -163,6 +171,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			// Something ? return value?
 
 			_runningUserCall = false;
+
+			return true;
 		}
 	}
 }

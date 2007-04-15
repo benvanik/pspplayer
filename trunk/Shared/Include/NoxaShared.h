@@ -39,6 +39,7 @@ typedef union SysClock_u
 #define MIN2( a, b ) ( a < b ) ? a : b
 
 // Stupid standard...
+#pragma unmanaged
 __inline int power( int base, int exponent )
 {
 	if( base == 2 )
@@ -50,6 +51,7 @@ __inline int power( int base, int exponent )
 	else
 		return base * power( base, exponent - 1 );
 }
+#pragma managed
 
 // Memory ---------------------------------------------------------------------
 // These are some useful constants dealing with memory addresses
@@ -66,7 +68,9 @@ __inline int power( int base, int exponent )
 // If defined, the scratch pad memory will be supported - if it's not, things may be faster
 //#define SUPPORTSCRATCHPAD
 
-typedef struct MemorySystem_t
+#pragma unmanaged
+namespace Noxa { namespace Emulation { namespace Psp {
+typedef struct NativeMemorySystem_t
 {
 	byte*	MainMemory;
 	byte*	VideoMemory;
@@ -98,4 +102,6 @@ typedef struct MemorySystem_t
 			return 0;
 		}
 	}
-} MemorySystem;
+} NativeMemorySystem;
+} } }
+#pragma managed

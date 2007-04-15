@@ -53,7 +53,7 @@ VdlRef* _pendingBatch;
 int _pendingCount;
 
 MemoryPool* _pool;
-MemorySystem* _memory;
+NativeMemorySystem* _memory;
 
 int64 _lastVsync;
 
@@ -188,7 +188,7 @@ void MigrateBatch( bool waitIfPending )
 	_pendingBatch = batch;
 }
 
-void niSetup( MemorySystem* memory, MemoryPool* pool )
+void niSetup( NativeMemorySystem* memory, MemoryPool* pool )
 {
 	_memory = memory;
 	_pool = pool;
