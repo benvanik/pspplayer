@@ -6,8 +6,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Text;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
@@ -44,28 +44,22 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// </summary>
 		/// <param name="baseAddress">The base address of the segment to look for.</param>
 		/// <returns>The <see cref="IMemorySegment"/> at the given <paramref name="baseAddress"/> or <c>null</c> if none was found.</returns>
-		IMemorySegment FindSegment( int baseAddress );
-
+		IMemorySegment FindSegment( int baseAddress );
 		/// <summary>
-		/// A pointer to main memory.
+		/// A native instance of <c>MemorySystem</c>.
 		/// </summary>
-		unsafe void* MainMemoryPointer
+		/// <remarks>
+		/// Defined in MemorySystem.h.
+		/// </remarks>
+		IntPtr NativeMemorySystem
 		{
 			get;
 		}
-
+		
 		/// <summary>
-		/// A pointer to video memory.
+		/// A utility class that allows for easy access to the native memory blocks.
 		/// </summary>
-		unsafe void* VideoMemoryPointer
-		{
-			get;
-		}
-
-		/// <summary>
-		/// An instance of <c>MemorySystem</c>.
-		/// </summary>
-		unsafe void* MemorySystemInstance
+		MemorySystem MemorySystem
 		{
 			get;
 		}
