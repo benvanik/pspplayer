@@ -18,6 +18,10 @@ uint _jumpBlockThunkHits;
 uint _jumpBlockInlineHits;
 uint _jumpBlockInlineMisses;
 
+uint _executionLoops;
+uint _codeCacheHits;
+uint _codeCacheMisses;
+
 uint _managedMemoryReadCount;
 uint _managedMemoryWriteCount;
 
@@ -33,6 +37,10 @@ void R4000Statistics::GatherStats()
 	JumpBlockInlineHits = _jumpBlockInlineHits;
 	JumpBlockInlineMisses = _jumpBlockInlineMisses;
 
+	ExecutionLoops = _executionLoops;
+	CodeCacheHits = _codeCacheHits;
+	CodeCacheMisses = _codeCacheMisses;
+
 	ManagedMemoryReadCount = _managedMemoryReadCount;
 	ManagedMemoryWriteCount = _managedMemoryWriteCount;
 
@@ -43,6 +51,10 @@ void R4000Statistics::GatherStats()
 	_jumpBlockThunkHits = 0;
 	_jumpBlockInlineHits = 0;
 	_jumpBlockInlineMisses = 0;
+
+	_executionLoops = 0;
+	_codeCacheHits = 0;
+	_codeCacheMisses = 0;
 	
 	_managedMemoryReadCount = 0;
 	_managedMemoryWriteCount = 0;

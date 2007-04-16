@@ -16,7 +16,7 @@ namespace Noxa {
 			namespace Cpu {
 
 #pragma unmanaged
-				int QuickPointerLookup( int address );
+				void* QuickPointerLookup( int address );
 #pragma managed
 
 				typedef struct CodeBlock_t

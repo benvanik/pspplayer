@@ -409,6 +409,7 @@ void niWaitForVsync()
 void OglDriver::SetupNativeInterface()
 {
 	VideoApi* ni = ( VideoApi* )_nativeInterface;
+	memset( ni, 0, sizeof( VideoApi ) );
 
 	ni->Setup = &niSetup;
 	ni->Cleanup = &niCleanup;
@@ -430,6 +431,8 @@ void OglDriver::SetupNativeInterface()
 
 void OglDriver::DestroyNativeInterface()
 {
+	memset( _nativeInterface, 0, sizeof( VideoApi ) );
+
 	CloseHandle( _hSyncEvent );
 	_hSyncEvent = NULL;
 

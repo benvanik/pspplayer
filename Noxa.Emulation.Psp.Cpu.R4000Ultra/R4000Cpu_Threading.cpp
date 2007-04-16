@@ -7,9 +7,13 @@
 #include "StdAfx.h"
 #include "R4000Cpu.h"
 #include "R4000Core.h"
+#include "R4000BlockBuilder.h"
 #include "R4000Memory.h"
 #include "Tracer.h"
 #include "gcref.h"
+#pragma unmanaged
+#include "LL.h"
+#pragma managed
 
 #include "R4000Ctx.h"
 #include "R4000Generator.h"
@@ -26,9 +30,14 @@ using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 
+extern uint _executionLoops;
+extern uint _codeCacheHits;
+extern uint _codeCacheMisses;
+
 typedef struct ThreadContext_t
 {
 	R4000Ctx		Ctx;
+	LL<R4000Ctx*>	CtxStack;		// Used by call system
 } ThreadContext;
 
 typedef struct SwitchRequest_t
@@ -44,6 +53,7 @@ public:
 	uint			CallArguments[ 12 ];
 	int				CallArgumentCount;
 
+	bool			ResultCallbackValid;
 	gcref<MarshalCompleteDelegate^>	ResultCallback;
 	int				CallbackState;
 } SwitchRequest;
@@ -68,6 +78,9 @@ int						_currentTcsId;
 ThreadContext*			_currentTcs;
 
 SwitchRequest			_switchRequest;
+
+// From interrupts file
+void PerformInterrupt();
 
 #pragma managed
 
@@ -105,7 +118,8 @@ int R4000Cpu::AllocateContextStorage( uint pc, array<uint>^ registers )
 	UNLOCK;
 
 	context->Ctx.PC = pc;
-	memcpy( context->Ctx.Registers, registers, sizeof( int ) * 32 );
+	for( int n = 0; n < 32; n++ )
+		context->Ctx.Registers[ n ] = registers[ n ];
 
 	// Preserve GP if possible
 	context->Ctx.Registers[ 28 ] = _cpuCtx->Registers[ 28 ];
@@ -118,7 +132,7 @@ void R4000Cpu::ReleaseContextStorage( int tcsId )
 	Debug::Assert( tcsId >= 0 );
 	Debug::Assert( tcsId < _threadContexts->Count );
 	LOCK;
-	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ];
+	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	_threadContexts->RemoveAt( tcsId );
 	UNLOCK;
 
@@ -128,19 +142,19 @@ void R4000Cpu::ReleaseContextStorage( int tcsId )
 uint R4000Cpu::GetContextRegister( int tcsId, int reg )
 {
 	LOCK;
-	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ];
+	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	UNLOCK;
 
-	return context->Ctx->Registers[ reg ];
+	return context->Ctx.Registers[ reg ];
 }
 
 void R4000Cpu::SetContextRegister( int tcsId, int reg, uint value )
 {
 	LOCK;
-	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ];
+	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	UNLOCK;
 
-	context->Ctx->Registers[ reg ] = value;
+	context->Ctx.Registers[ reg ] = value;
 }
 
 void R4000Cpu::SwitchContext( int newTcsId )
@@ -150,7 +164,7 @@ void R4000Cpu::SwitchContext( int newTcsId )
 		return;
 
 	LOCK;
-	ThreadContext* targetContext = ( ThreadContext* )_threadContexts[ tcsId ];
+	ThreadContext* targetContext = ( ThreadContext* )_threadContexts[ newTcsId ].ToPointer();
 	UNLOCK;
 
 	// Create switch request
@@ -167,8 +181,11 @@ void R4000Cpu::SwitchContext( int newTcsId )
 void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, MarshalCompleteDelegate^ resultCallback, int state )
 {
 	LOCK;
-	ThreadContext* targetContext = ( ThreadContext* )_threadContexts[ tcsId ];
+	ThreadContext* targetContext = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	UNLOCK;
+
+	// Don't support more than one at a time right now
+	Debug::Assert( _switchRequest.MakeCall == false );
 
 	// Marshal context setup
 	_switchRequest.Previous = _currentTcs;
@@ -177,11 +194,12 @@ void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, Mar
 	_switchRequest.TargetID = tcsId;
 	
 	_switchRequest.MakeCall = true;
-	_switchRequest.CallbackAddress = address;
+	_switchRequest.CallAddress = address;
 	_switchRequest.CallArgumentCount = arguments->Length;
 	for( int n = 0; n < arguments->Length; n++ )
 		_switchRequest.CallArguments[ n ] = arguments[ n ];
 
+	_switchRequest.ResultCallbackValid = ( resultCallback != nullptr );
 	_switchRequest.ResultCallback = resultCallback;
 	_switchRequest.CallbackState = state;
 
@@ -189,7 +207,34 @@ void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, Mar
 	_currentTcs->Ctx.StopFlag = CtxMarshal;
 }
 
+CodeBlock* BuildBlock( int pc )
+{
+	return R4000Cpu::GlobalCpu->_builder->Build( pc );
+}
+
+bool MakeResultCallback( int v0 )
+{
+	MarshalCompleteDelegate^ del = _switchRequest.ResultCallback;
+	return del( _currentTcsId, _switchRequest.CallbackState, v0 );
+}
+
 #pragma unmanaged
+
+void PushState()
+{
+	R4000Ctx* ctxCopy = ( R4000Ctx* )malloc( sizeof( R4000Ctx ) );
+	memcpy( ctxCopy, _cpuCtx, sizeof( R4000Ctx ) );
+	_currentTcs->CtxStack.Enqueue( ctxCopy );
+}
+
+void PopState()
+{
+	R4000Ctx* ctxCopy = _currentTcs->CtxStack.Dequeue();
+	memcpy( _cpuCtx, ctxCopy, sizeof( R4000Ctx ) );
+	SAFEDELETE( ctxCopy );
+
+	_cpuCtx->StopFlag = CtxContinue;
+}
 
 void PerformSwitch()
 {
@@ -248,62 +293,84 @@ void PerformSwitchBack( SwitchType type )
 	// Clear for safety
 	_switchRequest.Previous = NULL;
 	_switchRequest.PreviousID = -1;
-	_switchRequest.MakeCallback = false;
+	_switchRequest.MakeCall = false;
 }
 
 #ifdef DEBUGBOUNCE
 // UNMANAGED
-int __debugBounce( bouncefn f, int pointer )
+uint __debugBounce( int codePointer )
 {
-	return f( pointer );
+	return _bounceFn( codePointer );
 }
 #endif
 
-#pragma managed
-
-void R4000Cpu::Execute(
-					   [System::Runtime::InteropServices::Out] bool% breakFlag,
-					   [System::Runtime::InteropServices::Out] uint% instructionsExecuted )
+uint NativeExecute( bool* breakFlag )
 {
-	breakFlag = false;
-	instructionsExecuted = 0;
-
 	// If we came in with a switch flag, it's possible we are the first run
 	if( _cpuCtx->StopFlag == CtxContextSwitch )
-		PerformSwitchM();
+		PerformSwitch();
 	_cpuCtx->StopFlag = CtxContinue;
+
+	// Check for callback end
+	if( _cpuCtx->PC == CALL_RETURN_DUMMY )
+	{
+		int v0 = _cpuCtx->Registers[ 2 ];
+		//int v1 = _cpuCtx->Registers[ 3 ];
+		PopState();
+
+		// Switch state back
+		PerformSwitchBack( SwitchNormal );
+		
+		// Make callback
+		_switchRequest.MakeCall = false;
+		if( _switchRequest.ResultCallbackValid == true )
+		{
+			bool exitEarly = MakeResultCallback( v0 );
+			if( exitEarly == false )
+			{
+				*breakFlag = false;
+				return 0;
+			}
+		}
+	}
+
+	uint instructionCount = 0;
+
+executeStart:		// Arrived at from call/interrupt handling below
 
 	// Get/build block
 	int pc = _cpuCtx->PC & 0x3FFFFFFF;
-	CodeBlock* block = _cache->Find( pc );
-	if( block == NULL )
+	void* codePointer = QuickPointerLookup( pc );
+	if( codePointer == NULL )
 	{
-		block = BuildBlock( pc );
+		CodeBlock* block = BuildBlock( pc );
+		assert( block != NULL );
+		codePointer = block->Pointer;
+
 #ifdef STATISTICS
-		_stats->CodeCacheMisses++;
-#endif
+		_codeCacheMisses++;
 	}
 	else
-	{
-#ifdef STATISTICS
-		_stats->CodeCacheHits++;
-#endif
+		_codeCacheHits++;
+#else
 	}
-	assert( block != NULL );
-
-#ifdef STATISTICS
-	_stats->ExecutionLoops++;
-
-	block->ExecutionCount++;
 #endif
 
-	Debug::WriteLine( String::Format( "Executing block 0x{0:X8} (codegen at 0x{1:X8})", pc, ( uint )block->Pointer ) );
+#ifdef STATISTICS
+	CodeBlock* block = _cache->Find( pc );
+	assert( block != NULL );
+	block->ExecutionCount++;
+
+	_executionLoops++;
+#endif
+
+	//Debug::WriteLine( String::Format( "Executing block 0x{0:X8} (codegen at 0x{1:X8})", pc, ( uint )block->Pointer ) );
 
 	// Bounce in to it
 #ifdef DEBUGBOUNCE
-	int x = __debugBounce( _bounceFn, ( int )block->Pointer );
+	instructionCount += __debugBounce( ( int )codePointer );
 #else
-	int x = _bounceFn( ( int )block->Pointer );
+	instructionCount += _bounceFn( ( int )codePointer );
 #endif
 
 	// See what we need to do now
@@ -316,7 +383,7 @@ void R4000Cpu::Execute(
 		case CtxBreakRequest:
 			// This happens when the BIOS requests a break
 			// Not sure when this happens, really ^_^
-			breakFlag = true;
+			*breakFlag = true;
 			break;
 		case CtxContextSwitch:
 			// Means that a context switch is pending and we should do it and continue
@@ -325,45 +392,39 @@ void R4000Cpu::Execute(
 		case CtxMarshal:
 			// We need to marshal a callback on to another thread and then handle
 			// what happens when it ends
-			Debug::Assert( false ); // this is totally wrong!
-			Debug::Assert( _switchRequest.MakeCall == true );
+			assert( false ); // this is totally wrong!
+			assert( _switchRequest.MakeCall == true );
 			PerformSwitch();
-			_cpuCtx->PC = _switchRequest.CallbackAddress;
-			_inHandler = true;
-			// args?
-			niExecute( NULL );
-			_inHandler = false;
-			PerformSwitchBack( SwitchMinimal );
-			break;
+			PushState();
+			_cpuCtx->PC = _switchRequest.CallAddress;
+			for( int n = 0; n < _switchRequest.CallArgumentCount; n++ )
+				_cpuCtx->Registers[ n + 4 ] = _switchRequest.CallArguments[ n ];
+			_cpuCtx->Registers[ 31 ] = CALL_RETURN_DUMMY;
+			goto executeStart;
 		case CtxInterruptPending:
 			// An interrupt is pending and we need to redirect to the handler
-			// ???
-			assert( false );
-			assert( _pendingIntNo != -1 );
-			assert( _inHandler == false );
-			_inHandler = true;
-			LLEntry<InterruptHandler*>* e = _interrupts[ _pendingIntNo ].GetHead();
-			assert( e != NULL );
-			while( e != NULL )
-			{
-				InterruptHandler* handler = e->Value;
-				e = e->Next;
-
-				// Fire it?
-			}
-			_inHandler = false;
-			_pendingIntNo = -1;
+			PerformInterrupt();
 			break;
 		}
 	}
 
-	return 0;
+	return instructionCount;
+}
+
+#pragma managed
+
+void R4000Cpu::Execute(
+					   [System::Runtime::InteropServices::Out] bool% breakFlag,
+					   [System::Runtime::InteropServices::Out] uint% instructionsExecuted )
+{
+	bool bf;
+	instructionsExecuted = NativeExecute( &bf );
+	breakFlag = bf;
 }
 
 void R4000Cpu::BreakExecution()
 {
-	assert( flags == 1 ); // Only thing supported right now
-	_cpuCtx->StopFlag = ( CtxStopFlags )flags;
+	_cpuCtx->StopFlag = CtxBreakRequest;
 }
 
 void R4000Cpu::Stop()
