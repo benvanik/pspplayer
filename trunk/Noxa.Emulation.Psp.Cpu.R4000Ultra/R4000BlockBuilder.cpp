@@ -326,7 +326,7 @@ void R4000BlockBuilder::EmitJumpBlock( int targetAddress )
 // method will go and replace the callers thunk call with a direct jump
 // to the generated block.
 #pragma unmanaged
-void __fixupBlockJump( void* sourceAddress, int newTarget )
+void __fixupBlockJump( void* sourceAddress, void* newTarget )
 {
 	// Starting point is 15 bytes back (before all instructions)
 	byte* startPtr = ( byte* )sourceAddress - THUNKJUMPSIZE;
@@ -338,7 +338,7 @@ void __fixupBlockJump( void* sourceAddress, int newTarget )
 	*startPtr = 0xB8 + 0; // MOV+rd (+rd for EAX = 0)
 	startPtr++;
 	int* istartPtr = ( int* )startPtr;
-	*istartPtr = newTarget;
+	*istartPtr = ( int )newTarget;
 	startPtr += 4;
 
 	// Add jump to real target
@@ -352,7 +352,7 @@ void __fixupBlockJump( void* sourceAddress, int newTarget )
 // This method is called by generated code when the target block is not found.
 // Here we try to look it up and see if we can find the block, and if not we
 // generate it. Once we do that, we go back and fix up the caller.
-int __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackPointer )
+void* __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackPointer )
 {
 	R4000BlockBuilder^ builder = R4000Cpu::GlobalCpu->_builder;
 	Debug::Assert( builder != nullptr );
@@ -381,7 +381,7 @@ int __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stackP
 #endif
 	}
 
-	return ( int )targetBlock->Pointer;
+	return targetBlock->Pointer;
 }
 
 #ifdef __cplusplus
@@ -403,7 +403,7 @@ void __missingBlockThunk( void* targetAddress, void* stackPointer )
 	void* sourceAddress = _ReturnAddress();
 
 	// We try to use the unmanaged fast QPL in the code cache first
-	int jumpTarget = QuickPointerLookup( ( int )targetAddress );
+	void* jumpTarget = QuickPointerLookup( ( int )targetAddress );
 	if( jumpTarget == NULL )
 	{
 		// If we failed to get the pointer, it probably doesn't exist

@@ -27,6 +27,10 @@ using namespace Noxa::Emulation::Psp::Cpu::Native;
 
 #pragma unmanaged
 
+extern R4000Ctx* _cpuCtx;
+
+extern int _pendingIntNo;
+
 int niGetInterruptState()
 {
 	return _cpuCtx->InterruptMask;
@@ -47,63 +51,28 @@ int niSetInterruptState( int newState )
 	return old;
 }
 
-void niRegisterInterruptHandler( int intNumber, int subNumber, int callbackAddress, int callbackArgs )
-{
-	InterruptHandler* handler = ( InterruptHandler* )malloc( sizeof( InterruptHandler ) );
-	handler->SubNumber = subNumber;
-	handler->CallbackAddress = callbackAddress;
-	handler->CallbackArgs = callbackArgs;
-
-	_interrupts[ intNumber ].Enqueue( handler );
-}
-
-void niUnregisterInterruptHandler( int intNumber, int subNumber )
-{
-	LLEntry<InterruptHandler*>* e = _interrupts[ intNumber ].GetHead();
-	while( e != NULL )
-	{
-		if( e->Value->SubNumber == subNumber )
-		{
-			_interrupts[ intNumber ].Remove( e );
-			break;
-		}
-		e = e->Next;
-	}
-}
-
 void niSetPendingInterrupt( int intNumber )
 {
-	// If no handlers, ignore
-	if( _interrupts[ intNumber ].GetCount() == 0 )
-		return;
-
 	assert( _pendingIntNo == -1 );	// only support one at a time right now
 	_pendingIntNo = intNumber;
 
 	// Put stop request in
-	_currentTcs->Ctx.StopFlag = CtxInterruptPending;
+	_cpuCtx->StopFlag = CtxInterruptPending;
 }
 
 #pragma managed
 
 void R4000Cpu::SetupNativeInterface()
 {
-	CpuApi* ni = ( CpuApi* )_nativeInterface;
+	CpuApi* ni = _nativeInterface;
 	memset( ni, 0, sizeof( CpuApi ) );
 
-	//ni->Execute = &niExecute;
-	//ni->BreakExecute = &niBreakExecute;
-	//ni->AllocateContextStorage = &niAllocateContextStorage;
-	//ni->ReleaseContextStorage = &niReleaseContextStorage;
-	//ni->SwitchContext = &niSwitchContext;
-	//ni->MarshalCallback = &niMarshalCallback;
 	ni->GetInterruptState = &niGetInterruptState;
 	ni->SetInterruptState = &niSetInterruptState;
-	ni->RegisterInterruptHandler = &niRegisterInterruptHandler;
-	ni->UnregisterInterruptHandler = &niUnregisterInterruptHandler;
 	ni->SetPendingInterrupt = &niSetPendingInterrupt;
 }
 
 void R4000Cpu::DestroyNativeInterface()
 {
+	memset( _nativeInterface, 0, sizeof( CpuApi ) );
 }

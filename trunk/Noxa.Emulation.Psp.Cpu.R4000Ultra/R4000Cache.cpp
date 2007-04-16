@@ -42,7 +42,7 @@ static int*** CCLookupTable;
 
 #pragma unmanaged
 
-int Noxa::Emulation::Psp::Cpu::QuickPointerLookup( int address )
+void* Noxa::Emulation::Psp::Cpu::QuickPointerLookup( int address )
 {
 	uint addr = ( address & 0x0FFFFFFF ) >> 2;
 
@@ -59,8 +59,10 @@ int Noxa::Emulation::Psp::Cpu::QuickPointerLookup( int address )
 	int ret = *( pblock1 + b2 );
 	if( ret == 0xCCCCCCCC )
 		return 0;
-	return ret;
+	return ( void* )ret;
 }
+
+#pragma managed
 
 R4000Cache::R4000Cache()
 {
@@ -284,5 +286,3 @@ void R4000Cache::Clear( bool realloc )
 	}
 	UNLOCK;
 }
-
-#pragma managed
