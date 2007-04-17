@@ -52,7 +52,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0xDBA6C4C4, "sceDisplayGetFramePerSec" )]
 		// manual add - is this int or float return?
-		int sceDisplayGetFramePerSec()
+		public int sceDisplayGetFramePerSec()
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -62,40 +62,40 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x0E20F177, "sceDisplaySetMode" )]
 		// SDK location: /display/pspdisplay.h:53
 		// SDK declaration: int sceDisplaySetMode(int mode, int width, int height);
-		int sceDisplaySetMode( int mode, int width, int height ){ return Module.NotImplementedReturn; }
+		public int sceDisplaySetMode( int mode, int width, int height ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xDEA197D4, "sceDisplayGetMode" )]
 		// SDK location: /display/pspdisplay.h:64
 		// SDK declaration: int sceDisplayGetMode(int *pmode, int *pwidth, int *pheight);
-		int sceDisplayGetMode( int pmode, int pwidth, int pheight ){ return Module.NotImplementedReturn; }
+		public int sceDisplayGetMode( int pmode, int pwidth, int pheight ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x289D82FE, "sceDisplaySetFrameBuf" )]
 		// SDK location: /display/pspdisplay.h:74
 		// SDK declaration: void sceDisplaySetFrameBuf(void *topaddr, int bufferwidth, int pixelformat, int sync);
-		void sceDisplaySetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int sync ){}
+		public void sceDisplaySetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int sync ){}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xEEDA2E54, "sceDisplayGetFrameBuf" )]
 		// SDK location: /display/pspdisplay.h:84
 		// SDK declaration: int sceDisplayGetFrameBuf(void **topaddr, int *bufferwidth, int *pixelformat, int *unk1);
-		int sceDisplayGetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int unk1 ){ return Module.NotImplementedReturn; }
+		public int sceDisplayGetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int unk1 ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9C6EAAD7, "sceDisplayGetVcount" )]
 		// SDK location: /display/pspdisplay.h:89
 		// SDK declaration: unsigned int sceDisplayGetVcount();
-		int sceDisplayGetVcount(){ return Module.NotImplementedReturn; }
+		public int sceDisplayGetVcount(){ return Module.NotImplementedReturn; }
 
 		[Stateless]
 		[BiosFunction( 0x773DD3A3, "sceDisplayGetCurrentHcount" )]
 		// manual add
-		int sceDisplayGetCurrentHcount()
+		public int sceDisplayGetCurrentHcount()
 		{
 			return 0;
 		}
@@ -104,7 +104,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x210EAB3A, "sceDisplayGetAccumulatedHcount" )]
 		// manual add
-		int sceDisplayGetAccumulatedHcount()
+		public int sceDisplayGetAccumulatedHcount()
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -114,28 +114,28 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x36CDFADE, "sceDisplayWaitVblank" )]
 		// SDK location: /display/pspdisplay.h:104
 		// SDK declaration: int sceDisplayWaitVblank();
-		int sceDisplayWaitVblank(){ return Module.NotImplementedReturn; }
+		public int sceDisplayWaitVblank(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x8EB9EC49, "sceDisplayWaitVblankCB" )]
 		// SDK location: /display/pspdisplay.h:109
 		// SDK declaration: int sceDisplayWaitVblankCB();
-		int sceDisplayWaitVblankCB(){ return Module.NotImplementedReturn; }
+		public int sceDisplayWaitVblankCB(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x984C27E7, "sceDisplayWaitVblankStart" )]
 		// SDK location: /display/pspdisplay.h:94
 		// SDK declaration: int sceDisplayWaitVblankStart();
-		int sceDisplayWaitVblankStart(){ return Module.NotImplementedReturn; }
+		public int sceDisplayWaitVblankStart(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x46F186C3, "sceDisplayWaitVblankStartCB" )]
 		// SDK location: /display/pspdisplay.h:99
 		// SDK declaration: int sceDisplayWaitVblankStartCB();
-		int sceDisplayWaitVblankStartCB(){ return Module.NotImplementedReturn; }
+		public int sceDisplayWaitVblankStartCB(){ return Module.NotImplementedReturn; }
 
 	}
 }

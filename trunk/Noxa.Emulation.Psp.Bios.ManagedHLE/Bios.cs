@@ -58,7 +58,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			get
 			{
-				return typeof( ManagedHLE );
+				return typeof( MHLE );
 			}
 		}
 

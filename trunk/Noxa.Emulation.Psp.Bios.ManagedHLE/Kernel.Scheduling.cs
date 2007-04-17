@@ -20,7 +20,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 	{
 		public bool Schedule()
 		{
-			while( this.SchedulableThreads.Count > 0 )
+			while( this.SchedulableThreads.Count == 0 )
 			{
 				// No threads to run? Check for delayed
 				KThread earliest = null;

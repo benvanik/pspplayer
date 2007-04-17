@@ -53,20 +53,20 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x46EBB729, "sceUmdCheckMedium" )]
 		// SDK location: /umd/pspumd.h:42
 		// SDK declaration: int sceUmdCheckMedium(int a);
-		int sceUmdCheckMedium( int a ){ return Module.NotImplementedReturn; }
+		public int sceUmdCheckMedium( int a ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xC6183D47, "sceUmdActivate" )]
 		// SDK location: /umd/pspumd.h:66
 		// SDK declaration: int sceUmdActivate(int unit, const char *drive);
-		int sceUmdActivate( int unit, int drive ){ return Module.NotImplementedReturn; }
+		public int sceUmdActivate( int unit, int drive ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE83742BA, "sceUmdDeactivate" )]
 		// manual add
-		int sceUmdDeactivate( int unit, int drive )
+		public int sceUmdDeactivate( int unit, int drive )
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -75,7 +75,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x6B4A146C, "sceUmdGetDriveStat" )]
 		// manual add
-		int sceUmdGetDriveStat()
+		public int sceUmdGetDriveStat()
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -84,7 +84,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x20628E6F, "sceUmdGetErrorStat" )]
 		// manual add
-		int sceUmdGetErrorStat()
+		public int sceUmdGetErrorStat()
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -94,13 +94,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x8EF08FCE, "sceUmdWaitDriveStat" )]
 		// SDK location: /umd/pspumd.h:75
 		// SDK declaration: int sceUmdWaitDriveStat(int stat);
-		int sceUmdWaitDriveStat( int stat ){ return Module.NotImplementedReturn; }
+		public int sceUmdWaitDriveStat( int stat ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x56202973, "sceUmdWaitDriveStatWithTimer" )]
 		// manual add - params not right?
-		int sceUmdWaitDriveStatWithTimer( int stat )
+		public int sceUmdWaitDriveStatWithTimer( int stat )
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -109,7 +109,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x4A9E5E29, "sceUmdWaitDriveStatCB" )]
 		// manual add
-		int sceUmdWaitDriveStatCB( int stat )
+		public int sceUmdWaitDriveStatCB( int stat )
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -119,13 +119,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xAEE7404D, "sceUmdRegisterUMDCallBack" )]
 		// SDK location: /umd/pspumd.h:89
 		// SDK declaration: int sceUmdRegisterUMDCallBack(int cbid);
-		int sceUmdRegisterUMDCallBack( int cbid ){ return Module.NotImplementedReturn; }
+		public int sceUmdRegisterUMDCallBack( int cbid ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xBD2BDE07, "sceUmdUnRegisterUMDCallBack" )]
 		// manual add
-		int sceUmdUnRegisterUMDCallBack( int cbid )
+		public int sceUmdUnRegisterUMDCallBack( int cbid )
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -134,7 +134,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x340B7686, "sceUmdGetDiscInfo" )]
 		// manual add
-		int sceUmdGetDiscInfo( int discInfo )
+		public int sceUmdGetDiscInfo( int discInfo )
 		{
 			return Module.NotImplementedReturn;
 		}

@@ -53,35 +53,41 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xCA04A2B9, "sceKernelRegisterSubIntrHandler" )]
 		// SDK location: /user/pspintrman.h:119
 		// SDK declaration: int sceKernelRegisterSubIntrHandler(int intno, int no, void *handler, void *arg);
-		int sceKernelRegisterSubIntrHandler( int intno, int no, int handler, int arg ){ return Module.NotImplementedReturn; }
+		public int sceKernelRegisterSubIntrHandler( int intno, int no, int handler, int arg )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xD61E6961, "sceKernelReleaseSubIntrHandler" )]
 		// SDK location: /user/pspintrman.h:129
 		// SDK declaration: int sceKernelReleaseSubIntrHandler(int intno, int no);
-		int sceKernelReleaseSubIntrHandler( int intno, int no ){ return Module.NotImplementedReturn; }
+		public int sceKernelReleaseSubIntrHandler( int intno, int no )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xFB8E22EC, "sceKernelEnableSubIntr" )]
 		// SDK location: /user/pspintrman.h:139
 		// SDK declaration: int sceKernelEnableSubIntr(int intno, int no);
-		int sceKernelEnableSubIntr( int intno, int no ){ return Module.NotImplementedReturn; }
+		public int sceKernelEnableSubIntr( int intno, int no ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x8A389411, "sceKernelDisableSubIntr" )]
 		// SDK location: /user/pspintrman.h:149
 		// SDK declaration: int sceKernelDisableSubIntr(int intno, int no);
-		int sceKernelDisableSubIntr( int intno, int no ){ return Module.NotImplementedReturn; }
+		public int sceKernelDisableSubIntr( int intno, int no ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xD2E8363F, "QueryIntrHandlerInfo" )]
 		// SDK location: /user/pspintrman.h:170
 		// SDK declaration: int QueryIntrHandlerInfo(SceUID intr_code, SceUID sub_intr_code, PspIntrHandlerOptionParam *data);
-		int QueryIntrHandlerInfo( int intr_code, int sub_intr_code, int data ){ return Module.NotImplementedReturn; }
+		public int QueryIntrHandlerInfo( int intr_code, int sub_intr_code, int data ){ return Module.NotImplementedReturn; }
 
 	}
 }

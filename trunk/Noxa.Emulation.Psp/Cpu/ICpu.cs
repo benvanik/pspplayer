@@ -16,6 +16,13 @@ using Noxa.Emulation.Psp.Bios;
 namespace Noxa.Emulation.Psp.Cpu
 {
 	/// <summary>
+	/// Delegate used to indicate that a thread has jumped back in to nothing.
+	/// </summary>
+	/// <param name="tcsId">The thread context storage ID that made the jump.</param>
+	/// <param name="state">User-passed state argument.</param>
+	public delegate void ContextSafetyDelegate( int tcsId, int state );
+
+	/// <summary>
 	/// Delegate used to indicate that a callback marshalling operation has completed.
 	/// </summary>
 	/// <param name="tcsId">The thread context storage ID that the callback was performed on.</param>
@@ -195,6 +202,14 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// </summary>
 		/// <param name="tcsId">The ID of the thread context storage to release.</param>
 		void ReleaseContextStorage( int tcsId );
+
+		/// <summary>
+		/// Set a safety callback for a thread context. If the thread returns to nothing, the callback will be called.
+		/// </summary>
+		/// <param name="tcsId">The ID of the thread context storage to add the callback to.</param>
+		/// <param name="callback">The method that will be called.</param>
+		/// <param name="state">Caller-defined state to be passed to the handler.</param>
+		void SetContextSafetyCallback( int tcsId, ContextSafetyDelegate callback, int state );
 
 		/// <summary>
 		/// Get a register value from the given thread context storage block.

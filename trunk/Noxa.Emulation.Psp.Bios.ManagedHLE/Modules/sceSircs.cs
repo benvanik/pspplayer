@@ -53,7 +53,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x71EEF62D, "sceSircsSend" )]
 		// SDK location: /sircs/pspsircs.h:37
 		// SDK declaration: int sceSircsSend(struct sircs_data* sd, int count);
-		int sceSircsSend( int sd, int count ){ return Module.NotImplementedReturn; }
+		public int sceSircsSend( int sd, int count ){ return Module.NotImplementedReturn; }
 
 	}
 }

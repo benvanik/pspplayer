@@ -4,8 +4,13 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
+#if DEBUG
+#define ANALCHECKS
+#endif
+
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Noxa
@@ -75,11 +80,14 @@ namespace Noxa
 		{
 			LinkedListEntry<T> entry = new LinkedListEntry<T>();
 			entry.Value = value;
+			if( _tail != null )
+				_tail.Next = entry;
 			entry.Previous = _tail;
 			_tail = entry;
 			if( _head == null )
 				_head = entry;
 			_count++;
+			this.AssertCount();
 			return entry;
 		}
 
@@ -92,6 +100,7 @@ namespace Noxa
 			if( _tail == null )
 				_tail = entry;
 			_count++;
+			this.AssertCount();
 			return entry;
 		}
 
@@ -99,12 +108,15 @@ namespace Noxa
 		{
 			LinkedListEntry<T> entry = new LinkedListEntry<T>();
 			entry.Value = value;
+			if( proceeding.Previous != null )
+				proceeding.Previous.Next = entry;
 			entry.Next = proceeding;
 			entry.Previous = proceeding.Previous;
 			proceeding.Previous = entry;
 			if( entry.Previous == null )
 				_head = entry;
 			_count++;
+			this.AssertCount();
 			return entry;
 		}
 
@@ -112,12 +124,15 @@ namespace Noxa
 		{
 			LinkedListEntry<T> entry = new LinkedListEntry<T>();
 			entry.Value = value;
+			if( preceeding.Next != null )
+				preceeding.Next.Previous = entry;
 			entry.Next = preceeding.Next;
 			entry.Previous = preceeding;
 			preceeding.Next = entry;
 			if( entry.Next == null )
 				_tail = entry;
 			_count++;
+			this.AssertCount();
 			return entry;
 		}
 
@@ -132,6 +147,7 @@ namespace Noxa
 			else
 				_tail = null;
 			_count--;
+			this.AssertCount();
 			return entry.Value;
 		}
 
@@ -153,6 +169,7 @@ namespace Noxa
 			else
 				entry.Next.Previous = entry.Previous;
 			_count--;
+			this.AssertCount();
 		}
 
 		public void Clear()
@@ -172,6 +189,27 @@ namespace Noxa
 				entry = entry.Next;
 			}
 			return null;
+		}
+
+		[Conditional( "ANALCHECKS" )]
+		private void AssertCount()
+		{
+			int headCount = 0;
+			int tailCount = 0;
+			LinkedListEntry<T> e = _head;
+			while( e != null )
+			{
+				headCount++;
+				e = e.Next;
+			}
+			e = _tail;
+			while( e != null )
+			{
+				tailCount++;
+				e = e.Previous;
+			}
+			Debug.Assert( headCount == tailCount );
+			Debug.Assert( headCount == _count );
 		}
 	}
 }

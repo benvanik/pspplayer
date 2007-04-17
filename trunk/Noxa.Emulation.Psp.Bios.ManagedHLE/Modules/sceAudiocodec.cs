@@ -95,7 +95,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x9D3F790C, "sceAudiocodecCheckNeedMem" )]
 		// manual add
-		int sceAudiocodecCheckNeedMem( int Buffer, int Type )
+		public int sceAudiocodecCheckNeedMem( int Buffer, int Type )
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -105,28 +105,28 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x5B37EB1D, "sceAudiocodecInit" )]
 		// SDK location: /audio/pspaudiocodec.h:18
 		// SDK declaration: int sceAudiocodecInit(unsigned long *Buffer, int Type);
-		int sceAudiocodecInit( int Buffer, int Type ){ return Module.NotImplementedReturn; }
+		public int sceAudiocodecInit( int Buffer, int Type ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x70A703F8, "sceAudiocodecDecode" )]
 		// SDK location: /audio/pspaudiocodec.h:19
 		// SDK declaration: int sceAudiocodecDecode(unsigned long *Buffer, int Type);
-		int sceAudiocodecDecode( int Buffer, int Type ){ return Module.NotImplementedReturn; }
+		public int sceAudiocodecDecode( int Buffer, int Type ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x3A20A200, "sceAudiocodecGetEDRAM" )]
 		// SDK location: /audio/pspaudiocodec.h:20
 		// SDK declaration: int sceAudiocodecGetEDRAM(unsigned long *Buffer, int Type);
-		int sceAudiocodecGetEDRAM( int Buffer, int Type ){ return Module.NotImplementedReturn; }
+		public int sceAudiocodecGetEDRAM( int Buffer, int Type ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x29681260, "sceAudiocodecReleaseEDRAM" )]
 		// SDK location: /audio/pspaudiocodec.h:21
 		// SDK declaration: int sceAudiocodecReleaseEDRAM(unsigned long *Buffer);
-		int sceAudiocodecReleaseEDRAM( int Buffer ){ return Module.NotImplementedReturn; }
+		public int sceAudiocodecReleaseEDRAM( int Buffer ){ return Module.NotImplementedReturn; }
 
 	}
 }

@@ -241,6 +241,7 @@ namespace Noxa {
 					// -- Threading
 					virtual int AllocateContextStorage( uint pc, array<uint>^ registers );
 					virtual void ReleaseContextStorage( int tcsId );
+					virtual void SetContextSafetyCallback( int tcsId, ContextSafetyDelegate^ callback, int state );
 					virtual uint GetContextRegister( int tcsId, int reg );
 					virtual void SetContextRegister( int tcsId, int reg, uint value );
 					virtual void SwitchContext( int newTcsId );

@@ -8,9 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Noxa.Emulation.Psp.Bios.ManagedHLE
+using Noxa.Emulation.Psp.Bios.ManagedHLE;
+
+namespace Noxa.Emulation.Psp.Bios
 {
-	public class ManagedHLE : IComponent
+	public class MHLE : IComponent
 	{
 		public ComponentType Type
 		{
@@ -72,6 +74,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 		}
 
+		public override string ToString()
+		{
+			return this.Name;
+		}
+
 		public bool IsTestable
 		{
 			get
@@ -100,7 +107,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public IComponentInstance CreateInstance( IEmulationInstance emulator, ComponentParameters parameters )
 		{
-			return new Bios( emulator, parameters );
+			return new Noxa.Emulation.Psp.Bios.ManagedHLE.Bios( emulator, parameters );
 		}
 	}
 }
