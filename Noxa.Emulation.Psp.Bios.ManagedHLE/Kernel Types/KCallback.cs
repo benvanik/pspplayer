@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 {
-	class KCallback
+	class KCallback : KHandle
 	{
 		public Kernel Kernel;
 
