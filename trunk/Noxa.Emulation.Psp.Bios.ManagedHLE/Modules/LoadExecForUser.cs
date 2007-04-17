@@ -55,27 +55,55 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelLoadExec(const char *file, struct SceKernelLoadExecParam *param);
 		public int sceKernelLoadExec( int file, int param ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x05572A5F, "sceKernelExitGame" )]
 		// SDK location: /user/psploadexec.h:57
 		// SDK declaration: void sceKernelExitGame();
-		public void sceKernelExitGame(){}
+		public void sceKernelExitGame()
+		{
+			this.sceKernelExitGameWithStatus( 0 );
+		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x2AC9954B, "sceKernelExitGameWithStatus" )]
 		// manual add
 		public void sceKernelExitGameWithStatus( int status )
 		{
+			Debug.WriteLine( string.Format( "sceKernelExitGameWithStatus: exiting with status code {0}", status ) );
+
+			// Call exit callbacks
+			FastLinkedList<KCallback> cbll = _kernel.Callbacks[ Kernel.CallbackTypes.Exit ];
+			if( cbll.Count > 0 )
+			{
+				LinkedListEntry<KCallback> cbs = cbll.HeadEntry;
+				while( cbs != null )
+				{
+					_kernel.IssueCallback( cbs.Value, ( uint )status );
+					cbs = cbs.Next;
+				}
+			}
+			else
+			{
+				// Do the callbacks kill the game for us?
+				_kernel.StopGame( status );
+			}
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x4AC57943, "sceKernelRegisterExitCallback" )]
 		// SDK location: /user/psploadexec.h:49
 		// SDK declaration: int sceKernelRegisterExitCallback(int cbid);
-		public int sceKernelRegisterExitCallback( int cbid ){ return Module.NotImplementedReturn; }
+		public int sceKernelRegisterExitCallback( int cbid )
+		{
+			KCallback cb = _kernel.GetHandle<KCallback>( cbid );
+			if( cb == null )
+			{
+				Debug.WriteLine( string.Format( "sceKernelRegisterExitCallback: callback ID {0} not found", cbid ) );
+				return -1;
+			}
+
+			_kernel.Callbacks[ Kernel.CallbackTypes.Exit ].Enqueue( cb );
+
+			return 0;
+		}
 
 	}
 }

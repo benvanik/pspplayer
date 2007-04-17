@@ -59,6 +59,9 @@
     <Compile Include="Module.cs" />
     <Compile Include="Modules\InterruptManager.cs" />
     <Compile Include="Modules\IoFileMgrForUser.cs" />
+    <Compile Include="Modules\IoFileMgrForUser.Devices.cs" />
+    <Compile Include="Modules\IoFileMgrForUser.Directories.cs" />
+    <Compile Include="Modules\IoFileMgrForUser.Files.cs" />
     <Compile Include="Modules\Kernel_Library.cs" />
     <Compile Include="Modules\LoadExecForUser.cs" />
     <Compile Include="Modules\ModuleMgrForUser.cs" />

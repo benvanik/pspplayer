@@ -18,6 +18,31 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 {
 	partial class Kernel
 	{
+		public KDevice FindDevice( string path )
+		{
+			int colonPos = path.IndexOf( ':' );
+			if( colonPos >= 0 )
+				path = path.Substring( 0, colonPos );
+			KDevice device;
+			if( DeviceLookup.TryGetValue( path, out device ) == true )
+				return device;
+			else
+			{
+				Debug.Assert( false, string.Format( "Unable to find a device matching the alias '{0}'", path ) );
+				return null;
+			}
+		}
+
+		public KDevice FindDevice( IMediaDevice device )
+		{
+			for( int n = 0; n < Devices.Length; n++ )
+			{
+				if( Devices[ n ].Device == device )
+					return Devices[ n ];
+			}
+			return null;
+		}
+
 		public IMediaItem FindPath( string path )
 		{
 			int colonPos = path.IndexOf( ':' );

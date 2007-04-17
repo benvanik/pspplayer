@@ -189,24 +189,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				return null;
 		}
 
+		public T GetHandle<T>( int uid ) where T : KHandle
+		{
+			KHandle handle;
+			if( Handles.TryGetValue( ( uint )uid, out handle ) == true )
+				return ( T )handle;
+			else
+				return null;
+		}
+
 		public void RemoveHandle( uint uid )
 		{
 			Handles.Remove( uid );
 		}
 
-		public KDevice FindDevice( string path )
+		public void RemoveHandle( int uid )
 		{
-			int colonPos = path.IndexOf( ':' );
-			if( colonPos >= 0 )
-				path = path.Substring( 0, colonPos );
-			KDevice device;
-			if( DeviceLookup.TryGetValue( path, out device ) == true )
-				return device;
-			else
-			{
-				Debug.Assert( false, string.Format( "Unable to find a device matching the alias '{0}'", path ) );
-				return null;
-			}
+			Handles.Remove( ( uint )uid );
 		}
 
 		/// <summary>
