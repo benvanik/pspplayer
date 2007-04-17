@@ -66,7 +66,7 @@ namespace Noxa {
 						int sceKernelFreePartitionMemory( int blockid );
 
 						[BiosFunction( 0x9D9A5BA1, "sceKernelGetBlockHeadAddr" )] [Stateless]
-						// void * sceKernelGetBlockHeadAddr(SceUID blockid); (/user/pspsysmem.h:74)
+						// void* sceKernelGetBlockHeadAddr(SceUID blockid); (/user/pspsysmem.h:74)
 						int sceKernelGetBlockHeadAddr( int blockid );
 
 						[BiosFunction( 0x3FC9AE6A, "sceKernelDevkitVersion" )] [Stateless]

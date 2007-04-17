@@ -48,19 +48,31 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xA291F107, "sceKernelMaxFreeMemSize" )]
 		// SDK location: /user/pspsysmem.h:88
 		// SDK declaration: SceSize sceKernelMaxFreeMemSize();
-		public int sceKernelMaxFreeMemSize(){ return Module.NotImplementedReturn; }
+		public int sceKernelMaxFreeMemSize()
+		{
+			// This is wrong!
+			int count = 0;
+			for( int n = 0; n < _kernel.Partitions.Length; n++ )
+				count += ( int )_kernel.Partitions[ n ].Size;
+			return count;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xF919F628, "sceKernelTotalFreeMemSize" )]
 		// SDK location: /user/pspsysmem.h:81
 		// SDK declaration: SceSize sceKernelTotalFreeMemSize();
-		public int sceKernelTotalFreeMemSize(){ return Module.NotImplementedReturn; }
+		public int sceKernelTotalFreeMemSize()
+		{
+			// This is wrong!
+			int count = 0;
+			for( int n = 0; n < _kernel.Partitions.Length; n++ )
+				count += ( int )_kernel.Partitions[ n ].FreeSize;
+			return count;
+		}
 
 		[NotImplemented]
 		[Stateless]
@@ -68,57 +80,105 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// manual add
 		public int sceKPartitionMaxFreeMemSize( int partitionid )
 		{
-			return Module.NotImplementedReturn;
+			KPartition partition = _kernel.Partitions[ partitionid ];
+			Debug.Assert( partition != null );
+			if( partition == null )
+				return -1;
+			return ( int )partition.Size;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9697CD32, "sceKPartitionTotalFreeMemSize" )]
 		// manual add
 		public int sceKPartitionTotalFreeMemSize( int partitionid )
 		{
-			return Module.NotImplementedReturn;
+			KPartition partition = _kernel.Partitions[ partitionid ];
+			Debug.Assert( partition != null );
+			if( partition == null )
+				return -1;
+			return ( int )partition.FreeSize;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x237DBD4F, "sceKernelAllocPartitionMemory" )]
 		// SDK location: /user/pspsysmem.h:56
 		// SDK declaration: SceUID sceKernelAllocPartitionMemory(SceUID partitionid, const char *name, int type, SceSize size, void *addr);
-		public int sceKernelAllocPartitionMemory( int partitionid, int name, int type, int size, int addr ){ return Module.NotImplementedReturn; }
+		public int sceKernelAllocPartitionMemory( int partitionid, int name, int type, int size, int addr )
+		{
+			KPartition partition = _kernel.Partitions[ partitionid ];
+			Debug.Assert( partition != null );
+			if( partition == null )
+				return -1;
 
-		[NotImplemented]
+			KMemoryBlock block = partition.Allocate( ( KAllocType )type, ( uint )addr, ( uint )size );
+			Debug.Assert( block != null );
+			if( block == null )
+				return -1;
+
+			if( name != 0 )
+				block.Name = _kernel.ReadString( ( uint )name );
+			_kernel.AddHandle( block );
+
+			return ( int )block.UID;
+		}
+
 		[Stateless]
 		[BiosFunction( 0xB6D61D02, "sceKernelFreePartitionMemory" )]
 		// SDK location: /user/pspsysmem.h:65
 		// SDK declaration: int sceKernelFreePartitionMemory(SceUID blockid);
-		public int sceKernelFreePartitionMemory( int blockid ){ return Module.NotImplementedReturn; }
+		public int sceKernelFreePartitionMemory( int blockid )
+		{
+			KMemoryBlock block = _kernel.GetHandle<KMemoryBlock>( blockid );
+			if( block == null )
+				return -1;
 
-		[NotImplemented]
+			block.Partition.Free( block );
+			_kernel.RemoveHandle( block.UID );
+
+			return 0;
+		}
+
 		[Stateless]
 		[BiosFunction( 0x9D9A5BA1, "sceKernelGetBlockHeadAddr" )]
 		// SDK location: /user/pspsysmem.h:74
 		// SDK declaration: void * sceKernelGetBlockHeadAddr(SceUID blockid);
-		public int sceKernelGetBlockHeadAddr( int blockid ){ return Module.NotImplementedReturn; }
+		public int sceKernelGetBlockHeadAddr( int blockid )
+		{
+			KMemoryBlock block = _kernel.GetHandle<KMemoryBlock>( blockid );
+			if( block == null )
+				return -1;
+			return ( int )block.Address;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x3FC9AE6A, "sceKernelDevkitVersion" )]
 		// SDK location: /user/pspsysmem.h:104
 		// SDK declaration: int sceKernelDevkitVersion();
-		public int sceKernelDevkitVersion(){ return Module.NotImplementedReturn; }
+		public int sceKernelDevkitVersion()
+		{
+			// 0x01000300 on v1.00 unit
+			// 0x01050001 on v1.50 unit
+			Debug.WriteLine( "sceKernelDevkitVersion: game requested devkit version - make sure it isn't doing something tricky!" );
+			return 0x01050001;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xF77D77CB, "sceKernelSetCompilerVersion" )]
 		// manual add - check?
-		public int sceKernelSetCompilerVersion( int version ){ return 0; }
+		public int sceKernelSetCompilerVersion( int version )
+		{
+			Debug.WriteLine( string.Format( "sceKernelSetCompilerVersion: set to version {0}", version ) );
+			return 0;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x7591C7DB, "sceKernelSetCompiledSdkVersion" )]
 		// manual add - check?
-		public int sceKernelSetCompiledSdkVersion( int version ){ return 0; }
+		public int sceKernelSetCompiledSdkVersion( int version )
+		{
+			Debug.WriteLine( string.Format( "sceKernelSetCompiledSdkVersion: set to version {0}", version ) );
+			return 0;
+		}
 
 		[NotImplemented]
 		[Stateless]

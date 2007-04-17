@@ -87,7 +87,17 @@
     <Compile Include="Modules\sceWlanDrv.cs" />
     <Compile Include="Modules\StdioForUser.cs" />
     <Compile Include="Modules\SysMemUserForUser.cs" />
+    <Compile Include="Modules\ThreadManForUser.Callbacks.cs" />
     <Compile Include="Modules\ThreadManForUser.cs" />
+    <Compile Include="Modules\ThreadManForUser.Events.cs" />
+    <Compile Include="Modules\ThreadManForUser.Mailboxes.cs" />
+    <Compile Include="Modules\ThreadManForUser.Memory.cs" />
+    <Compile Include="Modules\ThreadManForUser.MsgPipes.cs" />
+    <Compile Include="Modules\ThreadManForUser.Semaphores.cs" />
+    <Compile Include="Modules\ThreadManForUser.ThreadControl.cs" />
+    <Compile Include="Modules\ThreadManForUser.Threads.cs" />
+    <Compile Include="Modules\ThreadManForUser.Time.cs" />
+    <Compile Include="Modules\ThreadManForUser.Timers.cs" />
     <Compile Include="Modules\UtilsForUser.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Options.cs" />
