@@ -51,7 +51,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x617F3FE6, "sceDmacMemcpy" )]
 		// manual add
-		int sceDmacMemcpy( int dest, int source, int size )
+		public int sceDmacMemcpy( int dest, int source, int size )
 		{
 			return Module.NotImplementedReturn;
 		}

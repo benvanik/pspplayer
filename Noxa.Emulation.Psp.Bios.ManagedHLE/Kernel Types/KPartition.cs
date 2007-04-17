@@ -197,6 +197,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						FreeList.InsertBefore( block, e );
 						return;
 					}
+					e = e.Next;
 				}
 				// Didn't find - add to tail
 				FreeList.Enqueue( block );

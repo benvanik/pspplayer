@@ -54,7 +54,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0xEADB1BD7, "sceKernelPowerLock" )]
 		// manual add
-		int sceKernelPowerLock( int type )
+		public int sceKernelPowerLock( int type )
 		{
 			return 0;
 		}
@@ -62,7 +62,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x3AEE7261, "sceKernelPowerUnlock" )]
 		// manual add
-		int sceKernelPowerUnlock( int type )
+		public int sceKernelPowerUnlock( int type )
 		{
 			return 0;
 		}
@@ -70,7 +70,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x090CCB3F, "sceKernelPowerTick" )]
 		// int sceKernelPowerTick(int ticktype); (/include/kernelutils.h:167)
-		int sceKernelPowerTick( int type )
+		public int sceKernelPowerTick( int type )
 		{
 			return 0;
 		}

@@ -53,35 +53,35 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x93440B11, "sceWlanDevIsPowerOn" )]
 		// SDK location: /wlan/pspwlan.h:24
 		// SDK declaration: int sceWlanDevIsPowerOn();
-		int sceWlanDevIsPowerOn(){ return Module.NotImplementedReturn; }
+		public int sceWlanDevIsPowerOn(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xD7763699, "sceWlanGetSwitchState" )]
 		// SDK location: /wlan/pspwlan.h:31
 		// SDK declaration: int sceWlanGetSwitchState();
-		int sceWlanGetSwitchState(){ return Module.NotImplementedReturn; }
+		public int sceWlanGetSwitchState(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x0C622081, "sceWlanGetEtherAddr" )]
 		// SDK location: /wlan/pspwlan.h:40
 		// SDK declaration: int sceWlanGetEtherAddr(u8 *etherAddr);
-		int sceWlanGetEtherAddr( int etherAddr ){ return Module.NotImplementedReturn; }
+		public int sceWlanGetEtherAddr( int etherAddr ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x482CAE9A, "sceWlanDevAttach" )]
 		// SDK location: /wlan/pspwlan.h:47
 		// SDK declaration: int sceWlanDevAttach();
-		int sceWlanDevAttach(){ return Module.NotImplementedReturn; }
+		public int sceWlanDevAttach(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xC9A8CAB7, "sceWlanDevDetach" )]
 		// SDK location: /wlan/pspwlan.h:54
 		// SDK declaration: int sceWlanDevDetach();
-		int sceWlanDevDetach(){ return Module.NotImplementedReturn; }
+		public int sceWlanDevDetach(){ return Module.NotImplementedReturn; }
 
 	}
 }

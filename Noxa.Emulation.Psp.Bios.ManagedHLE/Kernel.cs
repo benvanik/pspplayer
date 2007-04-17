@@ -67,12 +67,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Bios = bios;
 			Emulator = Bios.Emulator;
 
-			Debug.Assert( Emulator.Cpu != null );
-			Cpu = Emulator.Cpu;
-			CpuCore = Cpu.Cores[ 0 ];
-			Memory = Cpu.Memory;
-			MemorySystem = Memory.MemorySystem;
-
 			UserModules = new List<KModule>( 10 );
 
 			Threads = new List<KThread>( 128 );
@@ -101,6 +95,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Debug.Assert( Bios.Game != null );
 			if( Bios.Game == null )
 				return;
+
+			Debug.Assert( Emulator.Cpu != null );
+			Cpu = Emulator.Cpu;
+			CpuCore = Cpu.Cores[ 0 ];
+			Memory = Cpu.Memory;
+			MemorySystem = Memory.MemorySystem;
 
 			Partitions = new KPartition[]{
 				new KPartition( this, 0x00000000, 0x00000000 ), // dummy

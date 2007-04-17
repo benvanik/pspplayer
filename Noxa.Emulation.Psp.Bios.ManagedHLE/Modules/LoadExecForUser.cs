@@ -53,20 +53,20 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xBD2F1094, "sceKernelLoadExec" )]
 		// SDK location: /user/psploadexec.h:80
 		// SDK declaration: int sceKernelLoadExec(const char *file, struct SceKernelLoadExecParam *param);
-		int sceKernelLoadExec( int file, int param ){ return Module.NotImplementedReturn; }
+		public int sceKernelLoadExec( int file, int param ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x05572A5F, "sceKernelExitGame" )]
 		// SDK location: /user/psploadexec.h:57
 		// SDK declaration: void sceKernelExitGame();
-		void sceKernelExitGame(){}
+		public void sceKernelExitGame(){}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x2AC9954B, "sceKernelExitGameWithStatus" )]
 		// manual add
-		void sceKernelExitGameWithStatus( int status )
+		public void sceKernelExitGameWithStatus( int status )
 		{
 		}
 
@@ -75,7 +75,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x4AC57943, "sceKernelRegisterExitCallback" )]
 		// SDK location: /user/psploadexec.h:49
 		// SDK declaration: int sceKernelRegisterExitCallback(int cbid);
-		int sceKernelRegisterExitCallback( int cbid ){ return Module.NotImplementedReturn; }
+		public int sceKernelRegisterExitCallback( int cbid ){ return Module.NotImplementedReturn; }
 
 	}
 }

@@ -40,6 +40,7 @@ namespace Noxa {
 				void InsertAtHead( T value );
 				void Enqueue( T value );
 				T Dequeue();
+				T Pop();
 				
 				void InsertBefore( T value, LLEntry<T>* proceeding );
 				void InsertAfter( T value, LLEntry<T>* preceeding );
@@ -101,6 +102,21 @@ namespace Noxa {
 
 			template<typename T>
 			T LL<T>::Dequeue()
+			{
+				if( _head == NULL )
+					return NULL;
+				LLEntry<T>* entry = _head;
+				_head = entry->Next;
+				if( _head == NULL )
+					_tail = NULL;
+				T value = entry->Value;
+				free( entry );
+				_count--;
+				return value;
+			}
+
+			template<typename T>
+			T LL<T>::Pop()
 			{
 				if( _tail == NULL )
 					return NULL;

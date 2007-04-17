@@ -53,20 +53,20 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xA291F107, "sceKernelMaxFreeMemSize" )]
 		// SDK location: /user/pspsysmem.h:88
 		// SDK declaration: SceSize sceKernelMaxFreeMemSize();
-		int sceKernelMaxFreeMemSize(){ return Module.NotImplementedReturn; }
+		public int sceKernelMaxFreeMemSize(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xF919F628, "sceKernelTotalFreeMemSize" )]
 		// SDK location: /user/pspsysmem.h:81
 		// SDK declaration: SceSize sceKernelTotalFreeMemSize();
-		int sceKernelTotalFreeMemSize(){ return Module.NotImplementedReturn; }
+		public int sceKernelTotalFreeMemSize(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE6581468, "sceKPartitionMaxFreeMemSize" )]
 		// manual add
-		int sceKPartitionMaxFreeMemSize( int partitionid )
+		public int sceKPartitionMaxFreeMemSize( int partitionid )
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -75,7 +75,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[Stateless]
 		[BiosFunction( 0x9697CD32, "sceKPartitionTotalFreeMemSize" )]
 		// manual add
-		int sceKPartitionTotalFreeMemSize( int partitionid )
+		public int sceKPartitionTotalFreeMemSize( int partitionid )
 		{
 			return Module.NotImplementedReturn;
 		}
@@ -85,46 +85,46 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x237DBD4F, "sceKernelAllocPartitionMemory" )]
 		// SDK location: /user/pspsysmem.h:56
 		// SDK declaration: SceUID sceKernelAllocPartitionMemory(SceUID partitionid, const char *name, int type, SceSize size, void *addr);
-		int sceKernelAllocPartitionMemory( int partitionid, int name, int type, int size, int addr ){ return Module.NotImplementedReturn; }
+		public int sceKernelAllocPartitionMemory( int partitionid, int name, int type, int size, int addr ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xB6D61D02, "sceKernelFreePartitionMemory" )]
 		// SDK location: /user/pspsysmem.h:65
 		// SDK declaration: int sceKernelFreePartitionMemory(SceUID blockid);
-		int sceKernelFreePartitionMemory( int blockid ){ return Module.NotImplementedReturn; }
+		public int sceKernelFreePartitionMemory( int blockid ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9D9A5BA1, "sceKernelGetBlockHeadAddr" )]
 		// SDK location: /user/pspsysmem.h:74
 		// SDK declaration: void * sceKernelGetBlockHeadAddr(SceUID blockid);
-		int sceKernelGetBlockHeadAddr( int blockid ){ return Module.NotImplementedReturn; }
+		public int sceKernelGetBlockHeadAddr( int blockid ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x3FC9AE6A, "sceKernelDevkitVersion" )]
 		// SDK location: /user/pspsysmem.h:104
 		// SDK declaration: int sceKernelDevkitVersion();
-		int sceKernelDevkitVersion(){ return Module.NotImplementedReturn; }
+		public int sceKernelDevkitVersion(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xF77D77CB, "sceKernelSetCompilerVersion" )]
 		// manual add - check?
-		int sceKernelSetCompilerVersion( int version ){ return 0; }
+		public int sceKernelSetCompilerVersion( int version ){ return 0; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x7591C7DB, "sceKernelSetCompiledSdkVersion" )]
 		// manual add - check?
-		int sceKernelSetCompiledSdkVersion( int version ){ return 0; }
+		public int sceKernelSetCompiledSdkVersion( int version ){ return 0; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x13A5ABEF, "sceKernelPrintf" )]
 		// manual add - printf( char* format, ... ) <-- right 2nd arg?
-		int sceKernelPrintf( int format, int varg ){ return Module.NotImplementedReturn; }
+		public int sceKernelPrintf( int format, int varg ){ return Module.NotImplementedReturn; }
 
 	}
 }

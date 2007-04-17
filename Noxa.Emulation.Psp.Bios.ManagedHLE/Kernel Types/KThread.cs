@@ -113,8 +113,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Partition = partition;
 			StackBlock = partition.Allocate( KAllocType.High, 0, stackSize );
 			Debug.Assert( StackBlock != null );
+			StackBlock.Name = string.Format( "Thread '{0}' Stack", name );
 			TlsBlock = partition.Allocate( KAllocType.High, 0, 0x4000 ); // 16k of thread local storage --- enough?
 			Debug.Assert( TlsBlock != null );
+			TlsBlock.Name = string.Format( "Thread '{0}' TLS", name );
 		}
 
 		~KThread()
@@ -151,10 +153,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public void Exit( int code )
 		{
 			State = KThreadState.Dead;
+			this.RemoveFromSchedule();
+			
 			ExitCode = code;
 
 			Partition.Free( StackBlock );
-			Partition.Free( TlsBlock );
+			if( TlsBlock != null )
+				Partition.Free( TlsBlock );
 			StackBlock = null;
 			TlsBlock = null;
 
@@ -164,7 +169,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				thread.Wake();
 			}
 
-			this.RemoveFromSchedule();
+			Kernel.Cpu.ReleaseContextStorage( ContextID );
+
 			Kernel.Threads.Remove( this );
 		}
 

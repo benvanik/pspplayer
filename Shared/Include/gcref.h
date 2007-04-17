@@ -59,6 +59,11 @@ namespace Noxa {
 					_handle = 0; // should fail if reconstituted
 				}
 
+				bool IsValid()
+				{
+					return ( _handle != NULL );
+				}
+
 				[System::Diagnostics::DebuggerStepThroughAttribute]
 				gcref& operator=(T t)
 				{

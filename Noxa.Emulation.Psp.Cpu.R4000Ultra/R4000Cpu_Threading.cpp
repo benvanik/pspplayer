@@ -38,6 +38,9 @@ typedef struct ThreadContext_t
 {
 	R4000Ctx		Ctx;
 	LL<R4000Ctx*>	CtxStack;		// Used by call system
+
+	gcref<ContextSafetyDelegate^>	SafetyCallback;
+	int				SafetyState;
 } ThreadContext;
 
 typedef struct SwitchRequest_t
@@ -110,7 +113,7 @@ void R4000Cpu::DestroyThreading()
 
 int R4000Cpu::AllocateContextStorage( uint pc, array<uint>^ registers )
 {
-	ThreadContext* context = ( ThreadContext* )calloc( 1, sizeof( ThreadContext ) );
+	ThreadContext* context = new ThreadContext(); // ( ThreadContext* )calloc( 1, sizeof( ThreadContext ) );
 
 	LOCK;
 	int index = _threadContexts->Count;
@@ -122,7 +125,11 @@ int R4000Cpu::AllocateContextStorage( uint pc, array<uint>^ registers )
 		context->Ctx.Registers[ n ] = registers[ n ];
 
 	// Preserve GP if possible
-	context->Ctx.Registers[ 28 ] = _cpuCtx->Registers[ 28 ];
+	if( _cpuCtx->Registers[ 28 ] != 0 )
+		context->Ctx.Registers[ 28 ] = _cpuCtx->Registers[ 28 ];
+
+	// Set safety callback
+	context->Ctx.Registers[ 31 ] = BIOS_SAFETY_DUMMY;
 
 	return index;
 }
@@ -131,12 +138,23 @@ void R4000Cpu::ReleaseContextStorage( int tcsId )
 {
 	Debug::Assert( tcsId >= 0 );
 	Debug::Assert( tcsId < _threadContexts->Count );
+	Debug::Assert( _currentTcsId != tcsId );
 	LOCK;
 	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	_threadContexts->RemoveAt( tcsId );
 	UNLOCK;
 
 	SAFEDELETE( context );
+}
+
+void R4000Cpu::SetContextSafetyCallback( int tcsId, ContextSafetyDelegate^ callback, int state )
+{
+	LOCK;
+	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
+	UNLOCK;
+
+	context->SafetyCallback = callback;
+	context->SafetyState = state;
 }
 
 uint R4000Cpu::GetContextRegister( int tcsId, int reg )
@@ -212,6 +230,20 @@ CodeBlock* BuildBlock( int pc )
 	return R4000Cpu::GlobalCpu->_builder->Build( pc );
 }
 
+void MakeSafetyCallback( int tcsId, ThreadContext* tcs )
+{
+	if( tcs->SafetyCallback.IsValid() == true )
+	{
+		ContextSafetyDelegate^ del = tcs->SafetyCallback;
+		del( tcsId, tcs->SafetyState );
+	}
+	else
+	{
+		// No callback defined - we will probably die if we continue
+		assert( false );
+	}
+}
+
 bool MakeResultCallback( int v0 )
 {
 	MarshalCompleteDelegate^ del = _switchRequest.ResultCallback;
@@ -229,7 +261,7 @@ void PushState()
 
 void PopState()
 {
-	R4000Ctx* ctxCopy = _currentTcs->CtxStack.Dequeue();
+	R4000Ctx* ctxCopy = _currentTcs->CtxStack.Pop();
 	memcpy( _cpuCtx, ctxCopy, sizeof( R4000Ctx ) );
 	SAFEDELETE( ctxCopy );
 
@@ -332,6 +364,12 @@ uint NativeExecute( bool* breakFlag )
 				return 0;
 			}
 		}
+	}
+	else if( _cpuCtx->PC == BIOS_SAFETY_DUMMY )
+	{
+		// BIOS wants to know about the code hitting this location
+		MakeSafetyCallback( _currentTcsId, _currentTcs );
+		return 0;
 	}
 
 	uint instructionCount = 0;

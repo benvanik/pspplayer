@@ -222,8 +222,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private struct PspModuleInfo
 		{
 			public uint flags;
-			[MarshalAs( UnmanagedType.LPArray, SizeConst = 28 )]
-			public byte* name;
+			
+			public sbyte name;	// name is 28 bytes - this takes up the first 1
+			public uint name1;	// following is the rest of the 27 bytes
+			public uint name2;
+			public uint name3;
+			public uint name4;
+			public uint name5;
+			public uint name6;
+			public ushort name7;
+			public byte name8;
+
 			public uint gp;
 			public uint exports;
 			public uint exp_end;
@@ -325,7 +334,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				if( header->e_machine != Elf32_Ehdr.MachineMips )
 					return results;
 
-				switch( type )
+				/*switch( type )
 				{
 				case ModuleType.Boot:
 					//Debug.Assert( header->e_type == ELF_EXEC_TYPE );
@@ -333,7 +342,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				case ModuleType.Prx:
 					//Debug.Assert( header->e_type == ELF_PRX_TYPE );
 					break;
-				}
+				}*/
 
 				results.EntryAddress = header->e_entry;
 				bool needsRelocation = (
@@ -341,10 +350,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					( header->e_type == ElfType.Prx ) );
 
 				// p-hdrs
-				for( int n = 0; n < header->e_phnum; n++ )
-				{
-					Elf32_Phdr* phdr = ( Elf32_Phdr* )( buffer + header->e_phoff + ( header->e_phentsize * n ) );
-				}
+				//for( int n = 0; n < header->e_phnum; n++ )
+				//{
+				//    Elf32_Phdr* phdr = ( Elf32_Phdr* )( buffer + header->e_phoff + ( header->e_phentsize * n ) );
+				//}
 
 				// s-hdrs
 				uint extents = 0;
@@ -369,7 +378,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				Debug.Assert( moduleInfoShdr != null );
 				PspModuleInfo* moduleInfo = ( PspModuleInfo* )( buffer + moduleInfoShdr->sh_offset );
 				results.GlobalPointer = moduleInfo->gp;
-				results.Name = new string( ( sbyte* )moduleInfo->name, 0, 28 );
+				results.Name = new string( &moduleInfo->name );
 
 				uint baseAddress = 0;
 				KMemoryBlock moduleBlock = null;
@@ -693,12 +702,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					// NOTE: If we are a PRX, the entry address will correspond to module_start, so we don't need to do anything!
 
 					// Create a thread
-					KThread thread = new KThread( kernel, kernel.Partitions[ 2 ], "kmodule_thread", results.EntryAddress, 1, KThreadAttributes.User, 0x4000 );
+					KThread thread = new KThread( kernel, kernel.Partitions[ 2 ], "kmodule_thread", results.EntryAddress, 0, KThreadAttributes.User, 0x4000 );
 					thread.GlobalPointer = results.GlobalPointer;
-					
-					// End handler?
-
+					kernel.AddHandle( thread );
 					thread.Start( args, argp );
+
+					// Setup handler so that we get the callback when the thread ends and we can kill it
+					cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleThreadEnd ), ( int )thread.UID );
+
+					Debug.WriteLine( string.Format( "Loader: starting kmodule loading thread with UID {0}", thread.UID ) );
 
 					// Schedule so that our thread runs
 					kernel.Schedule();
@@ -711,6 +723,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 
 			return results;
+		}
+
+		private void KmoduleThreadEnd( int tcsId, int state )
+		{
+			// Our loader thread ended - kill it!
+			Kernel kernel = _bios._kernel;
+			KThread thread = kernel.GetHandle<KThread>( ( uint )state );
+			Debug.Assert( thread != null );
+			if( thread != null )
+			{
+				Debug.WriteLine( string.Format( "Loader: killing kmodule loading thread with UID {0}", thread.UID ) );
+
+				thread.Exit( 0 );
+				kernel.RemoveHandle( thread.UID );
+
+				kernel.Schedule();
+			}
 		}
 	}
 }

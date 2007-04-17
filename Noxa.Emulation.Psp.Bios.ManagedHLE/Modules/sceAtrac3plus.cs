@@ -69,73 +69,73 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[NotImplemented]
 		[BiosFunction( 0x780F88D1, "sceAtracGetAtracID" )] [Stateless]
 		// manual add
-		int sceAtracGetAtracID( int codec ){ return Module.NotImplementedReturn; }
+		public int sceAtracGetAtracID( int codec ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x61EB33F5, "sceAtracReleaseAtracID" )]
 		// SDK location: /atrac3/pspatrac3.h:87
 		// SDK declaration: int sceAtracReleaseAtracID(int atracID);
-		int sceAtracReleaseAtracID( int atracID ){ return Module.NotImplementedReturn; }
+		public int sceAtracReleaseAtracID( int atracID ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[BiosFunction( 0x0E2A73AB, "sceAtracSetData" )] [Stateless]
 		// manual add
-		int sceAtracSetData( int atracID, int buf, int bufsize ){ return Module.NotImplementedReturn; }
+		public int sceAtracSetData( int atracID, int buf, int bufsize ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x7A20E7AF, "sceAtracSetDataAndGetID" )]
 		// SDK location: /atrac3/pspatrac3.h:27
 		// SDK declaration: int sceAtracSetDataAndGetID(void *buf, SceSize bufsize);
-		int sceAtracSetDataAndGetID( int buf, int bufsize ){ return Module.NotImplementedReturn; }
+		public int sceAtracSetDataAndGetID( int buf, int bufsize ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x6A8C3CD5, "sceAtracDecodeData" )]
 		// SDK location: /atrac3/pspatrac3.h:43
 		// SDK declaration: int sceAtracDecodeData(int atracID, u16 *outSamples, int *outN, int *outEnd, int *outRemainFrame);
-		int sceAtracDecodeData( int atracID, int outSamples, int outN, int outEnd, int outRemainFrame ){ return Module.NotImplementedReturn; }
+		public int sceAtracDecodeData( int atracID, int outSamples, int outN, int outEnd, int outRemainFrame ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9AE849A7, "sceAtracGetRemainFrame" )]
 		// SDK location: /atrac3/pspatrac3.h:55
 		// SDK declaration: int sceAtracGetRemainFrame(int atracID, int *outRemainFrame);
-		int sceAtracGetRemainFrame( int atracID, int outRemainFrame ){ return Module.NotImplementedReturn; }
+		public int sceAtracGetRemainFrame( int atracID, int outRemainFrame ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xD6A5F2F7, "sceAtracGetMaxSample" )]
 		// SDK location: /atrac3/pspatrac3.h:109
 		// SDK declaration: int sceAtracGetMaxSample(int atracID, int *outMax);
-		int sceAtracGetMaxSample( int atracID, int outMax ){ return Module.NotImplementedReturn; }
+		public int sceAtracGetMaxSample( int atracID, int outMax ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x36FAABFB, "sceAtracGetNextSample" )]
 		// SDK location: /atrac3/pspatrac3.h:98
 		// SDK declaration: int sceAtracGetNextSample(int atracID, int *outN);
-		int sceAtracGetNextSample( int atracID, int outN ){ return Module.NotImplementedReturn; }
+		public int sceAtracGetNextSample( int atracID, int outN ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xA554A158, "sceAtracGetBitrate" )]
 		// SDK location: /atrac3/pspatrac3.h:66
 		// SDK declaration: int sceAtracGetBitrate(int atracID, int *outBitrate);
-		int sceAtracGetBitrate( int atracID, int outBitrate ){ return Module.NotImplementedReturn; }
+		public int sceAtracGetBitrate( int atracID, int outBitrate ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x868120B5, "sceAtracSetLoopNum" )]
 		// SDK location: /atrac3/pspatrac3.h:77
 		// SDK declaration: int sceAtracSetLoopNum(int atracID, int nloops);
-		int sceAtracSetLoopNum( int atracID, int nloops ){ return Module.NotImplementedReturn; }
+		public int sceAtracSetLoopNum( int atracID, int nloops ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[BiosFunction( 0xE88F759B, "sceAtracGetInternalErrorInfo" )] [Stateless]
 		// manual add
-		int sceAtracGetInternalErrorInfo(){ return Module.NotImplementedReturn; }
+		public int sceAtracGetInternalErrorInfo(){ return Module.NotImplementedReturn; }
 
 	}
 }
