@@ -54,6 +54,8 @@ namespace Noxa {
 				[System::Diagnostics::DebuggerStepThroughAttribute]
 				~gcref()
 				{
+					if( _handle == 0 )
+						return;
 					GCHandle g = __VOIDPTR_TO_GCHANDLE(_handle);
 					g.Free();
 					_handle = 0; // should fail if reconstituted
