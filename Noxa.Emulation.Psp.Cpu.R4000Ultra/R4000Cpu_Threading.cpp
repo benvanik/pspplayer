@@ -30,9 +30,12 @@ using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 
+#ifdef STATISTICS
+extern uint _instructionsExecuted;
 extern uint _executionLoops;
 extern uint _codeCacheHits;
 extern uint _codeCacheMisses;
+#endif
 
 typedef struct ThreadContext_t
 {
@@ -376,6 +379,10 @@ uint NativeExecute( bool* breakFlag )
 
 executeStart:		// Arrived at from call/interrupt handling below
 
+#ifdef STATISTICS
+	uint startInstructionCount = _instructionsExecuted;
+#endif
+
 	// Get/build block
 	int pc = _cpuCtx->PC & 0x3FFFFFFF;
 	void* codePointer = QuickPointerLookup( pc );
@@ -406,9 +413,13 @@ executeStart:		// Arrived at from call/interrupt handling below
 
 	// Bounce in to it
 #ifdef DEBUGBOUNCE
-	instructionCount += __debugBounce( ( int )codePointer );
+	__debugBounce( ( int )codePointer );
 #else
-	instructionCount += _bounceFn( ( int )codePointer );
+	_bounceFn( ( int )codePointer );
+#endif
+
+#ifdef STATISTICS
+	instructionCount += _instructionsExecuted - startInstructionCount;
 #endif
 
 	// See what we need to do now

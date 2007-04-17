@@ -680,40 +680,45 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 				if( results.Successful == true )
 				{
-					KModule module = new KModule( kernel, new BiosModule( results.Name, results.Exports.ToArray() ) );
-					kernel.UserModules.Add( module );
+					// If we are the boot load - we do some special stuff like run start, etc
+					// If we are a PRX, all that is taken care of for us by the user code making calls
 					if( type == ModuleType.Boot )
+					{
+						KModule module = new KModule( kernel, new BiosModule( results.Name, results.Exports.ToArray() ) );
+						kernel.UserModules.Add( module );
+						Debug.Assert( kernel.MainModule == null );
 						kernel.MainModule = module;
 
-					// Allocate room for args
-					KMemoryBlock argsBlock = kernel.Partitions[ 2 ].Allocate( KAllocType.High, 0, 0xFF ); // 256b of args - enough?
+						// Allocate room for args
+						KMemoryBlock argsBlock = kernel.Partitions[ 2 ].Allocate( KAllocType.High, 0, 0xFF ); // 256b of args - enough?
 
-					// Set arguments - we put these right below user space, and right above the stack
-					uint args = 0;
-					uint argp = argsBlock.Address;
-					string arg0 = parameters.Path.AbsolutePath.Replace( '\\', '/' ) + "/";
-					args += ( uint )arg0.Length + 1;
-					kernel.WriteString( argp, arg0 );
-					uint envp = argp;// + args;
-					// write envp??
+						// Set arguments - we put these right below user space, and right above the stack
+						uint args = 0;
+						uint argp = argsBlock.Address;
+						string arg0 = parameters.Path.AbsolutePath.Replace( '\\', '/' ) + "/";
+						args += ( uint )arg0.Length + 1;
+						kernel.WriteString( argp, arg0 );
+						uint envp = argp;// + args;
+						// write envp??
 
-					// What we do here simulates what the modulemgr does - it creates a user mode thread that
-					// runs module_start (_start, etc) and then exits when complete.
-					// NOTE: If we are a PRX, the entry address will correspond to module_start, so we don't need to do anything!
+						// What we do here simulates what the modulemgr does - it creates a user mode thread that
+						// runs module_start (_start, etc) and then exits when complete.
+						// NOTE: If we are a PRX, the entry address will correspond to module_start, so we don't need to do anything!
 
-					// Create a thread
-					KThread thread = new KThread( kernel, kernel.Partitions[ 2 ], "kmodule_thread", results.EntryAddress, 0, KThreadAttributes.User, 0x4000 );
-					thread.GlobalPointer = results.GlobalPointer;
-					kernel.AddHandle( thread );
-					thread.Start( args, argp );
+						// Create a thread
+						KThread thread = new KThread( kernel, kernel.Partitions[ 2 ], "kmodule_thread", results.EntryAddress, 0, KThreadAttributes.User, 0x4000 );
+						thread.GlobalPointer = results.GlobalPointer;
+						kernel.AddHandle( thread );
+						thread.Start( args, argp );
 
-					// Setup handler so that we get the callback when the thread ends and we can kill it
-					cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleThreadEnd ), ( int )thread.UID );
+						// Setup handler so that we get the callback when the thread ends and we can kill it
+						cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleThreadEnd ), ( int )thread.UID );
 
-					Debug.WriteLine( string.Format( "Loader: starting kmodule loading thread with UID {0}", thread.UID ) );
+						Debug.WriteLine( string.Format( "Loader: starting kmodule loading thread with UID {0}", thread.UID ) );
 
-					// Schedule so that our thread runs
-					kernel.Schedule();
+						// Schedule so that our thread runs
+						kernel.Schedule();
+					}
 				}
 			}
 			finally
