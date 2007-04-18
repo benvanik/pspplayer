@@ -51,6 +51,42 @@ namespace Noxa.Emulation.Psp.Bios
 
 	#endregion
 
+	#region SuggestNativeAttribute
+
+	/// <summary>
+	/// Marks a BIOS function as being suggested for native inlining in the CPU.
+	/// </summary>
+	[global::System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
+	public sealed class SuggestNativeAttribute : Attribute
+	{
+		/// <summary>
+		/// Marks the given method as being suggested for native inlining.
+		/// </summary>
+		public SuggestNativeAttribute()
+		{
+		}
+	}
+
+	#endregion
+
+	#region DontTraceAttribute
+
+	/// <summary>
+	/// Marks a BIOS function as being ignored during function tracing.
+	/// </summary>
+	[global::System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
+	public sealed class DontTraceAttribute : Attribute
+	{
+		/// <summary>
+		/// Marks the given method as being ignored during function tracing.
+		/// </summary>
+		public DontTraceAttribute()
+		{
+		}
+	}
+
+	#endregion
+
 	/// <summary>
 	/// Represents a function defined inside the BIOS.
 	/// </summary>
@@ -90,6 +126,16 @@ namespace Noxa.Emulation.Psp.Bios
 		public readonly bool IsStateless;
 
 		/// <summary>
+		/// <c>true</c> if the BIOS author has suggested that this method be implemented by the CPU.
+		/// </summary>
+		public readonly bool NativeImplementationSuggested;
+
+		/// <summary>
+		/// <c>true</c> if the function should not be written to the trace.
+		/// </summary>
+		public readonly bool DontTrace;
+
+		/// <summary>
 		/// The <see cref="MethodInfo"/> for the method that implements the managed version of the function.
 		/// </summary>
 		public readonly MethodInfo MethodInfo;
@@ -123,9 +169,11 @@ namespace Noxa.Emulation.Psp.Bios
 		/// <param name="name">Human-friendly name of the function.</param>
 		/// <param name="isImplemented"><c>true</c> if the function is implemented.</param>
 		/// <param name="isStateless"><c>true</c> if the function does not change the BIOS state.</param>
+		/// <param name="nativeImplementationSuggested"><c>true</c> if a native implementation is suggested.</param>
+		/// <param name="dontTrace"><c>true</c> to not write this function to the trace.</param>
 		/// <param name="methodInfo"><see cref="MethodInfo"/> of the managed implementation of the function.</param>
 		/// <param name="nativePointer">Pointer to the native implementation of the function.</param>
-		public BiosFunction( BiosModule module, IModule moduleInstance, uint nid, string name, bool isImplemented, bool isStateless, MethodInfo methodInfo, IntPtr nativePointer )
+		public BiosFunction( BiosModule module, IModule moduleInstance, uint nid, string name, bool isImplemented, bool isStateless, bool nativeImplementationSuggested, bool dontTrace, MethodInfo methodInfo, IntPtr nativePointer )
 		{
 			this.Module = module;
 			this.ModuleInstance = moduleInstance;
@@ -133,6 +181,8 @@ namespace Noxa.Emulation.Psp.Bios
 			this.Name = name;
 			this.IsImplemented = isImplemented;
 			this.IsStateless = isStateless;
+			this.NativeImplementationSuggested = nativeImplementationSuggested;
+			this.DontTrace = dontTrace;
 
 			this.MethodInfo = methodInfo;
 			this.NativeMethod = nativePointer;

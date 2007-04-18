@@ -48,6 +48,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x172D316E, "sceKernelStdin" )]
 		// SDK location: /user/pspstdio.h:35
@@ -57,6 +58,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( int )_kernel.StdIn.UID;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0xA6BAB2E9, "sceKernelStdout" )]
 		// SDK location: /user/pspstdio.h:42
@@ -66,6 +68,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( int )_kernel.StdOut.UID;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0xF78BA90A, "sceKernelStderr" )]
 		// SDK location: /user/pspstdio.h:49

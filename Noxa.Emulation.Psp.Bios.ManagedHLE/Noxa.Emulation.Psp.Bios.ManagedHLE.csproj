@@ -99,6 +99,9 @@
     <Compile Include="Modules\ThreadManForUser.Time.cs" />
     <Compile Include="Modules\ThreadManForUser.Timers.cs" />
     <Compile Include="Modules\UtilsForUser.cs" />
+    <Compile Include="Modules\UtilsForUser.MD5.cs" />
+    <Compile Include="Modules\UtilsForUser.MT19937.cs" />
+    <Compile Include="Modules\UtilsForUser.SHA1.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

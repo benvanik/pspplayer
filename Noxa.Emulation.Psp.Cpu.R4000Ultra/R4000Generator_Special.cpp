@@ -35,13 +35,7 @@ void __logSyscall( int syscallId, int address )
 	Debug::Assert( function != nullptr );
 	if( function != nullptr )
 	{
-		if( ( function->NID == 0x42EC03AC ) ||		// sceIoWrite
-			( function->NID == 0x6A638D83 ) ||		// sceIoRead
-			( function->NID == 0x27EB27B8 ) ||		// sceIoLseek
-			( function->NID == 0x0B588501 ) ||		// sceCtrlReadLatch
-			( function->NID == 0x3A622550 ) ||		// sceCtrlPeekBufferPositive
-			( function->NID == 0x1F803938 ) ||		// sceCtrlReadBufferPositive
-			( function->NID == 0x0892448C ) )		// sceKernelStdout
+		if( function->DontTrace == true )
 			return;
 	
 		R4000Ctx* ctx = ( R4000Ctx* )cpu->_ctx;
