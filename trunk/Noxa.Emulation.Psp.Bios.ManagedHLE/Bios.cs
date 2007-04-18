@@ -148,6 +148,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 					bool isImplemented = ( mi.GetCustomAttributes( typeof( NotImplementedAttribute ), false ).Length == 0 );
 					bool isStateless = ( mi.GetCustomAttributes( typeof( StatelessAttribute ), false ).Length > 0 );
+					bool nativeImplSuggested = ( mi.GetCustomAttributes( typeof( SuggestNativeAttribute ), false ).Length > 0 );
+					bool dontTrace = ( mi.GetCustomAttributes( typeof( DontTraceAttribute ), false ).Length > 0 );
 
 					functionCount++;
 
@@ -164,6 +166,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						metaModule, module,
 						attr.NID, attr.Name,
 						isImplemented, isStateless,
+						nativeImplSuggested, dontTrace,
 						mi, nativePointer );
 					this.RegisterFunction( function );
 				}

@@ -86,6 +86,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		}
 
 		[NotImplemented]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x3A622550, "sceCtrlPeekBufferPositive" )]
 		// SDK location: /ctrl/pspctrl.h:148
@@ -93,6 +94,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceCtrlPeekBufferPositive( int pad_data, int count ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0xC152080A, "sceCtrlPeekBufferNegative" )]
 		// SDK location: /ctrl/pspctrl.h:150
@@ -100,6 +102,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceCtrlPeekBufferNegative( int pad_data, int count ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x1F803938, "sceCtrlReadBufferPositive" )]
 		// SDK location: /ctrl/pspctrl.h:168
@@ -107,6 +110,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceCtrlReadBufferPositive( int pad_data, int count ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x60B81F86, "sceCtrlReadBufferNegative" )]
 		// SDK location: /ctrl/pspctrl.h:170
@@ -114,6 +118,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceCtrlReadBufferNegative( int pad_data, int count ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0xB1D0E5CD, "sceCtrlPeekLatch" )]
 		// SDK location: /ctrl/pspctrl.h:172
@@ -121,6 +126,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceCtrlPeekLatch( int latch_data ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x0B588501, "sceCtrlReadLatch" )]
 		// SDK location: /ctrl/pspctrl.h:174

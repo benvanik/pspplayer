@@ -151,6 +151,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x6A638D83, "sceIoRead" )]
 		// SDK location: /user/pspiofilemgr.h:109
@@ -188,6 +189,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x42EC03AC, "sceIoWrite" )]
 		// SDK location: /user/pspiofilemgr.h:141
@@ -225,6 +227,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x27EB27B8, "sceIoLseek" )]
 		// SDK location: /user/pspiofilemgr.h:169
@@ -270,6 +273,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x68963324, "sceIoLseek32" )]
 		// SDK location: /user/pspiofilemgr.h:198
