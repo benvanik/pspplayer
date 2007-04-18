@@ -48,6 +48,7 @@ namespace Noxa {
 					void* BuildBounce();
 
 					void EmitJumpBlock( int targetAddress );
+					void EmitJumpBlockEbx();
 				};
 
 			}

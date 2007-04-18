@@ -160,7 +160,8 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		willCall = function->IsImplemented;
 
 		// Take its word on its statelessness
-		context->LastSyscallStateless = function->IsStateless;
+		//context->LastSyscallStateless = function->IsStateless;
+		context->LastSyscallStateless = true;
 
 		hasReturn = ( function->MethodInfo->ReturnType != void::typeid );
 		wideReturn = ( function->MethodInfo->ReturnType == Int64::typeid );

@@ -38,8 +38,8 @@ using namespace Noxa::Emulation::Psp::Cpu;
 #define MAXCODELENGTH 200
 
 // Debugging addresses
-//#define BREAKADDRESS1		0x0892D71C
-//#define BREAKADDRESS2		0x0895c9b8
+//#define BREAKADDRESS1		0x08909ECC
+//#define BREAKADDRESS2		0x08900160
 //#define GENBREAKADDRESS		0x089534E4
 
 extern uint _instructionsExecuted;
@@ -115,13 +115,17 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 #endif
 #ifdef BREAKADDRESS1
 			if( pass == 1 ){ if( address == BREAKADDRESS1 ){
+#ifdef TRACE
 				g->call( ( uint )&__flushTrace );
+#endif
 				g->int3();
 			} }
 #endif
 #ifdef BREAKADDRESS2
 			if( pass == 1 ){ if( address == BREAKADDRESS2 ){
+#ifdef TRACE
 				g->call( ( uint )&__flushTrace );
+#endif
 				g->int3();
 			} }
 #endif
@@ -417,8 +421,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 
 			switch( result )
 			{
-			case GenerationResult::Branch:
 			case GenerationResult::Jump:
+			case GenerationResult::JumpNoBreakout:
+			case GenerationResult::Branch:
 			case GenerationResult::BranchAndNullifyDelay:
 				_ctx->UpdatePC = true;
 				if( pass == 0 )
@@ -555,6 +560,15 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 					_ctx->InDelay = true;
 				}
 				break;
+			case GenerationResult::JumpNoBreakout:
+#ifdef VERBOSEBUILD
+				Debug::WriteLine( String::Format( "JumpNoBreakout at {0:X8} - continuing", address ) );
+#endif
+				_ctx->InDelay = true;
+				//lastResult = result;
+				if( pass == 1 )
+					jumpDelay = true;
+				break;
 			case GenerationResult::BranchAndNullifyDelay:
 				_ctx->InDelay = true;
 				if( pass == 1 )
@@ -672,6 +686,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 	R4000Generator *g = _gen;
 
 	// NOTE: EAX has jump target address if tailJump==true && targetAddress==-1 - DO NOT OVERWRITE
+	// This is for the jr case
 
 	// 1 = pc updated, 0 = pc update needed
 	if( _ctx->UpdatePC == true )
@@ -702,9 +717,12 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 		{
 			Label* nullPtrLabel = g->DefineLabel();
 
+			//g->int3();
+
 			g->push( EAX );
 			g->call( ( uint )&QuickPointerLookup );
-			g->add( ESP, 4 );
+			g->pop( EBX ); // used below, maybe
+			//g->add( ESP, 4 );
 
 			// EAX = NULL or address to jump to
 			g->test( EAX, 0xFFFFFFFF );
@@ -724,9 +742,14 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 			g->add( g->dword_ptr[ &_jumpBlockInlineMisses ], 1 );
 #endif
 
-			g->xor( EAX, EAX );
-			g->ret();
-			//Debug::WriteLine( "returning when could build jump block" );
+			// We can just return and let the main loop take care of it
+			//g->xor( EAX, EAX );
+			//g->ret();
+#ifdef VERBOSEBUILD
+			Debug::WriteLine( "No target block, emitting tail jump block to register" );
+#endif
+			// EBX contains the user code address
+			this->EmitJumpBlockEbx();
 
 #ifdef STATISTICS
 			_cpu->_stats->JumpBlockLookupCount++;
