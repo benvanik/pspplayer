@@ -68,7 +68,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private void DelayCallback( Timer timer )
 		{
 			State = KThreadState.Ready;
-			ReturnValue = 0;
+			Kernel.Cpu.SetContextRegister( ContextID, 4, 0 );
 
 			this.AddToSchedule();
 			
@@ -96,7 +96,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private void JoinCallback( Timer timer )
 		{
 			State = KThreadState.Ready;
-			ReturnValue = -1;
+			Kernel.Cpu.SetContextRegister( ContextID, 4, unchecked( ( uint )-1 ) );
 
 			this.AddToSchedule();
 			

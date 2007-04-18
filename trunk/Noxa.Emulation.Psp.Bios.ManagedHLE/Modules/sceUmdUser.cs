@@ -14,6 +14,7 @@ using Noxa.Utilities;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
@@ -48,95 +49,147 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		[NotImplemented]
+		enum UmdStatus
+		{
+			Init = 0x00,
+			MediaOut = 0x01,
+			MediaIn = 0x02,
+			MediaChange = 0x04,
+			NotReady = 0x08,
+			Ready = 0x10,
+			Readable = 0x20,
+		}
+
+		enum UmdMode
+		{
+			PowerOn = 0x01,
+			PowerCurrent = 0x02,
+		}
+
 		[Stateless]
 		[BiosFunction( 0x46EBB729, "sceUmdCheckMedium" )]
 		// SDK location: /umd/pspumd.h:42
-		// SDK declaration: int sceUmdCheckMedium(int a);
-		public int sceUmdCheckMedium( int a ){ return Module.NotImplementedReturn; }
+		// SDK declaration: int sceUmdCheckMedium();
+		public int sceUmdCheckMedium()
+		{
+			IUmdDevice umd = _kernel.Emulator.Umd;
+			if( umd == null )
+				return 0;
+			else
+				return ( umd.State == MediaState.Present ) ? 1 : 0;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xC6183D47, "sceUmdActivate" )]
 		// SDK location: /umd/pspumd.h:66
 		// SDK declaration: int sceUmdActivate(int unit, const char *drive);
-		public int sceUmdActivate( int unit, int drive ){ return Module.NotImplementedReturn; }
+		public int sceUmdActivate( int unit, int drive )
+		{
+			Debug.WriteLine( string.Format( "sceUmdActivate: activating unit {0} / drive {1}", unit, _kernel.ReadString( ( uint )drive ) ) );
+			return 0;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE83742BA, "sceUmdDeactivate" )]
 		// manual add
 		public int sceUmdDeactivate( int unit, int drive )
 		{
-			return Module.NotImplementedReturn;
+			Debug.WriteLine( string.Format( "sceUmdDeactivate: deactivating unit {0} / drive {1}", unit, _kernel.ReadString( ( uint )drive ) ) );
+			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x6B4A146C, "sceUmdGetDriveStat" )]
 		// manual add
 		public int sceUmdGetDriveStat()
 		{
-			return Module.NotImplementedReturn;
+			//return ( UmdInit | UmdMediaIn | UmdReady | UmdReadable );
+			return ( int )( UmdStatus.MediaIn | UmdStatus.Readable );
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x20628E6F, "sceUmdGetErrorStat" )]
 		// manual add
 		public int sceUmdGetErrorStat()
 		{
-			return Module.NotImplementedReturn;
+			// Is this right?
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x8EF08FCE, "sceUmdWaitDriveStat" )]
 		// SDK location: /umd/pspumd.h:75
 		// SDK declaration: int sceUmdWaitDriveStat(int stat);
-		public int sceUmdWaitDriveStat( int stat ){ return Module.NotImplementedReturn; }
-
-		[NotImplemented]
-		[Stateless]
-		[BiosFunction( 0x56202973, "sceUmdWaitDriveStatWithTimer" )]
-		// manual add - params not right?
-		public int sceUmdWaitDriveStatWithTimer( int stat )
+		public int sceUmdWaitDriveStat( int stat )
 		{
-			return Module.NotImplementedReturn;
+			// Just hope we never get here
+			Debug.WriteLine( string.Format( "sceUmdWaitDriveStat: waiting on status {0}", stat ) );
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
+		[BiosFunction( 0x56202973, "sceUmdWaitDriveStatWithTimer" )]
+		// manual add - assuming timer = timeout
+		public int sceUmdWaitDriveStatWithTimer( int stat, int timeout )
+		{
+			// Just hope we never get here
+			Debug.WriteLine( string.Format( "sceUmdWaitDriveStatWithTimer: waiting on status {0}", stat ) );
+			return 0;
+		}
+
 		[BiosFunction( 0x4A9E5E29, "sceUmdWaitDriveStatCB" )]
 		// manual add
-		public int sceUmdWaitDriveStatCB( int stat )
+		public int sceUmdWaitDriveStatCB( int stat, int timeout )
 		{
-			return Module.NotImplementedReturn;
+			// Just hope we never get here
+			Debug.WriteLine( string.Format( "sceUmdWaitDriveStatCB: waiting on status {0}", stat ) );
+			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xAEE7404D, "sceUmdRegisterUMDCallBack" )]
 		// SDK location: /umd/pspumd.h:89
 		// SDK declaration: int sceUmdRegisterUMDCallBack(int cbid);
-		public int sceUmdRegisterUMDCallBack( int cbid ){ return Module.NotImplementedReturn; }
+		public int sceUmdRegisterUMDCallBack( int cbid )
+		{
+			KCallback cb = _kernel.GetHandle<KCallback>( cbid );
+			if( cb == null )
+				return -1;
 
-		[NotImplemented]
+			_kernel.Callbacks[ Kernel.CallbackTypes.Umd ].Enqueue( cb );
+
+			return 0;
+		}
+
 		[Stateless]
 		[BiosFunction( 0xBD2BDE07, "sceUmdUnRegisterUMDCallBack" )]
 		// manual add
 		public int sceUmdUnRegisterUMDCallBack( int cbid )
 		{
-			return Module.NotImplementedReturn;
+			KCallback cb = _kernel.GetHandle<KCallback>( cbid );
+			if( cb == null )
+				return -1;
+
+			_kernel.Callbacks[ Kernel.CallbackTypes.Umd ].Remove( cb );
+
+			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x340B7686, "sceUmdGetDiscInfo" )]
 		// manual add
 		public int sceUmdGetDiscInfo( int discInfo )
 		{
-			return Module.NotImplementedReturn;
+			IUmdDevice umd = _kernel.Emulator.Umd;
+			if( umd == null )
+				return -1;
+
+			unsafe
+			{
+				uint* pinfo = ( uint* )_memorySystem.Translate( ( uint )discInfo );
+				*pinfo = ( uint )umd.Capacity;
+				*( pinfo + 1 ) = ( uint )umd.DiscType;
+			}
+
+			return 0;
 		}
 
 	}

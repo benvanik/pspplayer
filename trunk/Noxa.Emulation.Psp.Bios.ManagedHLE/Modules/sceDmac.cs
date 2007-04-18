@@ -53,7 +53,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// manual add
 		public int sceDmacMemcpy( int dest, int source, int size )
 		{
-			return Module.NotImplementedReturn;
+			unsafe
+			{
+				byte* pdest = _memorySystem.Translate( ( uint )dest );
+				byte* psrc = _memorySystem.Translate( ( uint )source );
+				MemorySystem.CopyMemory( psrc, pdest, ( uint )size );
+			}
+
+			return 0;
 		}
 
 	}

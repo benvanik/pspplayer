@@ -70,7 +70,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public FastLinkedList<KThread> ExitWaiters;
 
 		public int ContextID;		// TCS ID in CPU
-		public int ReturnValue;		// After woken, the return value for $v0 (or int.MinValue for invalid)
 
 		public long RunClocks;
 		public uint WakeupCount;
@@ -100,8 +99,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			InitialPriority = priority;
 			Priority = priority;
 			Attributes = attributes;
-			ReturnValue = int.MinValue;
-
+			
 			State = KThreadState.Stopped;
 
 			ExitWaiters = new FastLinkedList<KThread>();
