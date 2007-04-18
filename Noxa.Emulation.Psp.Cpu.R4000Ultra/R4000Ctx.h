@@ -27,8 +27,9 @@ using namespace Noxa::Emulation::Psp;
 #define SSE_ALIGN __declspec( align( 16 ) )
 
 // This address is used as $ra to detect the end of a marshalled call/interrupt
-#define CALL_RETURN_DUMMY	0xCAFEBABE
-#define BIOS_SAFETY_DUMMY	0xCAFEBABE + 1
+#define CUSTOM_METHOD_TRAP	0xCAFE0000
+#define CALL_RETURN_DUMMY	CUSTOM_METHOD_TRAP + 1
+#define BIOS_SAFETY_DUMMY	CUSTOM_METHOD_TRAP + 2
 
 namespace Noxa {
 	namespace Emulation {

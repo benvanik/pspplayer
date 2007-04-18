@@ -31,7 +31,8 @@ namespace Noxa {
 					Branch,
 					BranchAndNullifyDelay,
 
-					Jump
+					Jump,
+					JumpNoBreakout,
 				};
 
 				ref class LabelMarker

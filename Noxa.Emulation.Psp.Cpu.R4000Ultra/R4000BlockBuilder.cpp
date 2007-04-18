@@ -21,10 +21,11 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
 
+extern R4000Ctx* _cpuCtx;
 extern uint _jumpBlockThunkHits;
 
 void __fixupBlockJump( void* sourceAddress, int newTarget );
-void __missingBlockThunk( void* targetAddress, void* stackPointer );
+void __missingBlockThunk( void* targetAddress, byte needFixup, void* stackPointer );
 
 R4000BlockBuilder::R4000BlockBuilder( R4000Cpu^ cpu, R4000Core^ core )
 {
@@ -295,12 +296,13 @@ void* R4000BlockBuilder::BuildBounce()
 	of NOPs I will implement 2) and profile both. I think in the long run 1) will be better.
 */
 
-/* Format for a jump that has not been cached (as per method 1 above):
+/* Format for a jump that has not been cached (as per method 1 above): note that esp must be pushed first!!
    PUSH ESP				54					push stack pointer
+   PUSH 0/1             6A 00/1				push fixup flag
    PUSH NNNNNNNN		68 NN NN NN NN		push target address
    MOV EAX, NNNNNNNN	B8 NN NN NN NN		eax = __missingBlockThunk address
    CALL					FF D0				call eax
-       13 bytes [THUNKJUMPSIZE]
+       15 bytes [THUNKJUMPSIZE]
 
    This is replaced with the following code:
    MOV EAX, NNNNNNNN	B8 NN NN NN NN		eax = address of target method
@@ -309,13 +311,24 @@ void* R4000BlockBuilder::BuildBounce()
        7 bytes [THUNKJUMPNEWSIZE]
 	     + 6 byte pad (0x90 = NOP)
 */
-#define THUNKJUMPSIZE		13
+#define THUNKJUMPSIZE		15
 #define THUNKJUMPNEWSIZE	7
 
 void R4000BlockBuilder::EmitJumpBlock( int targetAddress )
 {
-	_gen->db( 0x54 );
+	_gen->db( 0x54 );											// PUSH ESP
+	_gen->db( 0x6A ); _gen->db( 1 );							// PUSH 1 (fixup)
 	_gen->db( 0x68 ); _gen->dd( targetAddress );				// PUSH targetAddress
+	_gen->db( 0xB8 ); _gen->dd( ( int )__missingBlockThunk );	// MOV EAX, &__missingBlockThunk
+	_gen->db( 0xFF ); _gen->db( 0xD0 );							// CALL EAX
+}
+
+void R4000BlockBuilder::EmitJumpBlockEbx()
+{
+	// This is smaller than the normal jump block - DON'T CALL FIXUP ON THIS!
+	_gen->db( 0x54 );											// PUSH ESP
+	_gen->db( 0x6A ); _gen->db( 0 );							// PUSH 0 (no fixup)
+	_gen->db( 0x53 );											// PUSH EBX
 	_gen->db( 0xB8 ); _gen->dd( ( int )__missingBlockThunk );	// MOV EAX, &__missingBlockThunk
 	_gen->db( 0xFF ); _gen->db( 0xD0 );							// CALL EAX
 }
@@ -398,9 +411,21 @@ EXTERNC void * _ReturnAddress ( void );
 
 // Unmanaged portion of the thunk
 #pragma unmanaged
-void __missingBlockThunk( void* targetAddress, void* stackPointer )
+void __missingBlockThunk( void* targetAddress, byte needFixup, void* stackPointer )
 {
 	void* sourceAddress = _ReturnAddress();
+
+	if( ( ( ( uint )targetAddress ) & CUSTOM_METHOD_TRAP ) == CUSTOM_METHOD_TRAP )
+	{
+		// Special trap - need to return to cpu
+		//_cpuCtx->PC = ( uint )targetAddress;
+		__asm
+		{
+			xor eax, eax
+			mov esp, stackPointer
+			ret
+		}
+	}
 
 	// We try to use the unmanaged fast QPL in the code cache first
 	void* jumpTarget = QuickPointerLookup( ( int )targetAddress );
@@ -417,7 +442,8 @@ void __missingBlockThunk( void* targetAddress, void* stackPointer )
 	}
 
 	// Fixup to target
-	__fixupBlockJump( sourceAddress, jumpTarget );
+	if( needFixup == 1 )
+		__fixupBlockJump( sourceAddress, jumpTarget );
 
 	// We cannot do RET, so need to do jump, but must fix up stack pointer first
 	__asm

@@ -20,7 +20,7 @@
 
 // When true, __debugBounce will be used to marshal the bounce, allowing for
 // easy breakpoint setting
-#define DEBUGBOUNCE
+//#define DEBUGBOUNCE
 
 using namespace System::Collections::Generic;
 using namespace System::Diagnostics;
@@ -339,6 +339,13 @@ uint __debugBounce( int codePointer )
 }
 #endif
 
+#pragma managed
+void __debugRunPrint( int pc, int codePointer )
+{
+	Debug::WriteLine( String::Format( "Executing block 0x{0:X8} (codegen at 0x{1:X8})", pc, codePointer ) );
+}
+#pragma unmanaged
+
 uint NativeExecute( bool* breakFlag )
 {
 	// If we came in with a switch flag, it's possible we are the first run
@@ -409,7 +416,7 @@ executeStart:		// Arrived at from call/interrupt handling below
 	_executionLoops++;
 #endif
 
-	//Debug::WriteLine( String::Format( "Executing block 0x{0:X8} (codegen at 0x{1:X8})", pc, ( uint )block->Pointer ) );
+	//__debugRunPrint( pc, ( int )codePointer );
 
 	// Bounce in to it
 #ifdef DEBUGBOUNCE

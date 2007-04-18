@@ -54,7 +54,7 @@ GenerationResult JALR( R4000GenContext^ context, int pass, int address, uint cod
 		g->mov( MPC( CTX ), EAX );
 		g->mov( MPCVALID( CTX ), 1 );
 	}
-	return GenerationResult::Jump;
+	return GenerationResult::JumpNoBreakout;
 }
 
 GenerationResult J( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
@@ -93,7 +93,7 @@ GenerationResult JAL( R4000GenContext^ context, int pass, int address, uint code
 		g->mov( MPC( CTX ), pc );
 		g->mov( MPCVALID( CTX ), 1 );
 	}
-	return GenerationResult::Jump;
+	return GenerationResult::JumpNoBreakout;
 }
 
 GenerationResult BEQ( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
