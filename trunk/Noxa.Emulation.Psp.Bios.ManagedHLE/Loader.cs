@@ -688,6 +688,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						kernel.UserModules.Add( module );
 						Debug.Assert( kernel.MainModule == null );
 						kernel.MainModule = module;
+						kernel.AddHandle( module );
 
 						// Allocate room for args
 						KMemoryBlock argsBlock = kernel.Partitions[ 2 ].Allocate( KAllocType.High, 0, 0xFF ); // 256b of args - enough?

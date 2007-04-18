@@ -62,7 +62,8 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem^ memory, void
 
 	DynamicMethod^ shim = gcnew DynamicMethod( String::Format( "Shim{0:X8}", function->NID ),
 		void::typeid, shimArgs,
-		BiosShim::typeid->Module );
+		BiosShim::typeid->Module,
+		true ); // skip visibility checks
 	ILGenerator^ ilgen = shim->GetILGenerator();
 
 	bool hasReturn = ( mi->ReturnType != void::typeid );
