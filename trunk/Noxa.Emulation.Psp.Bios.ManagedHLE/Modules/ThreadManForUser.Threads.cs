@@ -28,6 +28,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		//{
 		//}
 
+		//[NotImplemented]
+		//[Stateless]
+		//[BiosFunction( 0x532A522E, "_sceKernelExitThread" )]
+		//// SDK location: /user/pspthreadman.h:1679
+		//// SDK declaration: void _sceKernelExitThread();
+		//public void _sceKernelExitThread()
+		//{
+		//}
+
 		#region Event Handlers
 
 		[NotImplemented]
@@ -62,103 +71,154 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		
 		#endregion
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x446D8DE6, "sceKernelCreateThread" )]
 		// SDK location: /user/pspthreadman.h:169
 		// SDK declaration: SceUID sceKernelCreateThread(const char *name, SceKernelThreadEntry entry, int initPriority, int stackSize, SceUInt attr, SceKernelThreadOptParam *option);
 		public int sceKernelCreateThread( int name, int entry, int initPriority, int stackSize, int attr, int option )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = new KThread( _kernel,
+				_kernel.Partitions[ 2 ],
+				_kernel.ReadString( ( uint )name ),
+				( uint )entry,
+				initPriority,
+				( KThreadAttributes )attr,
+				( uint )stackSize );
+			_kernel.AddHandle( thread );
+
+			// Option unused?
+			Debug.Assert( option == 0 );
+
+			Debug.WriteLine( string.Format( "sceKernelCreateThread: created thread {0} {1} with entry {2:X8}", thread.UID, thread.Name, thread.EntryAddress ) );
+
+			return ( int )thread.UID;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9FA03CD3, "sceKernelDeleteThread" )]
 		// SDK location: /user/pspthreadman.h:179
 		// SDK declaration: int sceKernelDeleteThread(SceUID thid);
 		public int sceKernelDeleteThread( int thid )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.GetHandle<KThread>( thid );
+			if( thread == null )
+				return -1;
+
+			// Don't support this
+			Debug.Assert( _kernel.ActiveThread != thread );
+			Debug.Assert( thread.State == KThreadState.Dead );
+
+			Debug.WriteLine( string.Format( "sceKernelDeleteThread: deleting thread {0} {1}", thread.UID, thread.Name ) );
+
+			thread.Delete();
+			_kernel.RemoveHandle( thread.UID );
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xF475845D, "sceKernelStartThread" )]
 		// SDK location: /user/pspthreadman.h:188
 		// SDK declaration: int sceKernelStartThread(SceUID thid, SceSize arglen, void *argp);
 		public int sceKernelStartThread( int thid, int arglen, int argp )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.GetHandle<KThread>( thid );
+			if( thread == null )
+				return -1;
+
+			Debug.WriteLine( string.Format( "sceKernelStartThread: starting thread {0} {1}", thread.UID, thread.Name ) );
+
+			thread.Start( ( uint )arglen, ( uint )argp );
+			_kernel.Schedule();
+
+			return 0;
 		}
 
-		//[NotImplemented]
-		//[Stateless]
-		//[BiosFunction( 0x532A522E, "_sceKernelExitThread" )]
-		//// SDK location: /user/pspthreadman.h:1679
-		//// SDK declaration: void _sceKernelExitThread();
-		//public void _sceKernelExitThread()
-		//{
-		//}
-
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xAA73C935, "sceKernelExitThread" )]
 		// SDK location: /user/pspthreadman.h:195
 		// SDK declaration: int sceKernelExitThread(int status);
 		public int sceKernelExitThread( int status )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.ActiveThread;
+			if( thread == null )
+				return -1;
+
+			thread.Exit( status );
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x809CE29B, "sceKernelExitDeleteThread" )]
 		// SDK location: /user/pspthreadman.h:202
 		// SDK declaration: int sceKernelExitDeleteThread(int status);
 		public int sceKernelExitDeleteThread( int status )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.ActiveThread;
+			if( thread == null )
+				return -1;
+
+			int ret = this.sceKernelExitThread( status );
+			if( ret < 0 )
+				return ret;
+			return this.sceKernelDeleteThread( ( int )thread.UID );
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x616403BA, "sceKernelTerminateThread" )]
 		// SDK location: /user/pspthreadman.h:211
 		// SDK declaration: int sceKernelTerminateThread(SceUID thid);
 		public int sceKernelTerminateThread( int thid )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.GetHandle<KThread>( thid );
+			if( thread == null )
+				return -1;
+
+			thread.Exit( 0 );
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x383F7BCC, "sceKernelTerminateDeleteThread" )]
 		// SDK location: /user/pspthreadman.h:220
 		// SDK declaration: int sceKernelTerminateDeleteThread(SceUID thid);
 		public int sceKernelTerminateDeleteThread( int thid )
 		{
-			return Module.NotImplementedReturn;
+			int ret = this.sceKernelTerminateThread( thid );
+			if( ret < 0 )
+				return ret;
+			return this.sceKernelDeleteThread( thid );
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xEA748E31, "sceKernelChangeCurrentThreadAttr" )]
 		// SDK location: /user/pspthreadman.h:364
 		// SDK declaration: int sceKernelChangeCurrentThreadAttr(int unknown, SceUInt attr);
 		public int sceKernelChangeCurrentThreadAttr( int unknown, int attr )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.ActiveThread;
+			if( thread == null )
+				return -1;
+
+			thread.Attributes &= ~( ( KThreadAttributes )unknown );
+			thread.Attributes |= ( KThreadAttributes )attr;
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x71BC9871, "sceKernelChangeThreadPriority" )]
 		// SDK location: /user/pspthreadman.h:381
 		// SDK declaration: int sceKernelChangeThreadPriority(SceUID thid, int priority);
 		public int sceKernelChangeThreadPriority( int thid, int priority )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.GetHandle<KThread>( thid );
+			if( thread == null )
+				return -1;
+
+			if( thread.Priority != priority )
+			{
+				thread.ChangePriority( priority );
+				_kernel.Schedule();
+			}
+
+			return 0;
 		}
 
 		[NotImplemented]
@@ -168,37 +228,44 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelRotateThreadReadyQueue(int priority);
 		public int sceKernelRotateThreadReadyQueue( int priority )
 		{
+			// At the given priority, move the head thread to the tail
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x293B45B8, "sceKernelGetThreadId" )]
 		// SDK location: /user/pspthreadman.h:406
 		// SDK declaration: int sceKernelGetThreadId();
 		public int sceKernelGetThreadId()
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.ActiveThread;
+			if( thread == null )
+				return -1;
+			return ( int )thread.UID;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x94AA61EE, "sceKernelGetThreadCurrentPriority" )]
 		// SDK location: /user/pspthreadman.h:413
 		// SDK declaration: int sceKernelGetThreadCurrentPriority();
 		public int sceKernelGetThreadCurrentPriority()
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.ActiveThread;
+			if( thread == null )
+				return -1;
+			return thread.Priority;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x3B183E26, "sceKernelGetThreadExitStatus" )]
 		// SDK location: /user/pspthreadman.h:422
 		// SDK declaration: int sceKernelGetThreadExitStatus(SceUID thid);
 		public int sceKernelGetThreadExitStatus( int thid )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.GetHandle<KThread>( thid );
+			if( thread == null )
+				return -1;
+			return thread.ExitCode;
 		}
 
 		[NotImplemented]
@@ -208,6 +275,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelCheckThreadStack();
 		public int sceKernelCheckThreadStack()
 		{
+			// I think this is supposed to check the bounds and make sure it hasn't overrun?
 			return Module.NotImplementedReturn;
 		}
 
@@ -218,6 +286,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelGetThreadStackFreeSize(SceUID thid);
 		public int sceKernelGetThreadStackFreeSize( int thid )
 		{
+			KThread thread = _kernel.GetHandle<KThread>( thid );
+			if( thread == null )
+				return -1;
+			// We have stack block address - do we peek $sp and calc?
 			return Module.NotImplementedReturn;
 		}
 
@@ -228,6 +300,62 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelReferThreadStatus(SceUID thid, SceKernelThreadInfo *info);
 		public int sceKernelReferThreadStatus( int thid, int info )
 		{
+			//typedef struct SceKThreadInfo {
+			//    SceSize     size;
+			//    char    	name[32];
+			//    SceUInt     attr;
+			//    int     	status;
+			//    SceKThreadEntry    entry;
+			//    void *  	stack;
+			//    int     	stackSize;
+			//    void *  	gpReg;
+			//    int     	initPriority;
+			//    int     	currentPriority;
+			//    int     	waitType;
+			//    SceUID  	waitId;
+			//    int     	wakeupCount;
+			//    int     	exitStatus;
+			//    SceKernelSysClock   runClocks;
+			//    SceUInt     intrPreemptCount;
+			//    SceUInt     threadPreemptCount;
+			//    SceUInt     releaseCount;
+			//} SceKThreadInfo;
+
+			/*
+			SysClock runClocks;
+			runClocks.QuadPart = thread->RunClocks;
+
+			// Ensure 104 bytes
+			if( memory->ReadWord( info ) != 104 )
+			{
+				Debug::WriteLine( String::Format( "ThreadManForUser::sceKernelReferThreadStatus: app passed struct with size {0}, expected 104",
+					memory->ReadWord( info ) ) );
+				return -1;
+			}
+			KernelHelpers::WriteString( MSI( memory ), ( const int )( info + 4 ), ( const char* )thread->Name );
+			memory->WriteWord( info + 36, 4, ( int )thread->Attributes );
+			memory->WriteWord( info + 40, 4, ( int )thread->State );
+			memory->WriteWord( info + 44, 4, thread->EntryAddress );
+			memory->WriteWord( info + 48, 4, ( int )thread->StackBlock->Address );
+			memory->WriteWord( info + 52, 4, ( int )thread->StackBlock->Size );
+			memory->WriteWord( info + 56, 4, thread->GlobalPointer );
+			memory->WriteWord( info + 60, 4, thread->InitialPriority );
+			memory->WriteWord( info + 64, 4, thread->Priority );
+			memory->WriteWord( info + 68, 4, ( int )thread->WaitingOn );
+			if( thread->WaitingOn == KThreadWaitEvent )
+				memory->WriteWord( info + 72, 4, thread->WaitEvent->UID );
+			else if( thread->WaitingOn == KThreadWaitJoin )
+				memory->WriteWord( info + 72, 4, thread->WaitThread->UID );
+			else
+				memory->WriteWord( info + 72, 4, 0 );
+			memory->WriteWord( info + 76, 4, ( int )thread->WakeupCount );
+			memory->WriteWord( info + 80, 4, thread->ExitCode );
+			memory->WriteWord( info + 84, 4, ( int )runClocks.LowPart );
+			memory->WriteWord( info + 88, 4, ( int )runClocks.HighPart );
+			memory->WriteWord( info + 92, 4, ( int )thread->InterruptPreemptionCount );
+			memory->WriteWord( info + 96, 4, ( int )thread->ThreadPreemptionCount );
+			memory->WriteWord( info + 100, 4, ( int )thread->ReleaseCount );
+			*/
 			return Module.NotImplementedReturn;
 		}
 
@@ -238,6 +366,46 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelReferThreadRunStatus(SceUID thid, SceKernelThreadRunStatus *status);
 		public int sceKernelReferThreadRunStatus( int thid, int status )
 		{
+			//typedef struct SceKThreadRunStatus {
+			//    SceSize 	size;
+			//    int 		status;
+			//    int 		currentPriority;
+			//    int 		waitType;
+			//    int 		waitId;
+			//    int 		wakeupCount;
+			//    SceKernelSysClock runClocks;
+			//    SceUInt 	intrPreemptCount;
+			//    SceUInt 	threadPreemptCount;
+			//    SceUInt 	releaseCount;
+			//} SceKThreadRunStatus;
+
+			/*
+			SysClock runClocks;
+			runClocks.QuadPart = thread->RunClocks;
+
+			// Ensure 44 bytes
+			if( memory->ReadWord( status ) != 44 )
+			{
+				Debug::WriteLine( String::Format( "ThreadManForUser: sceKernelReferThreadRunStatus app passed struct with size {0}, expected 44",
+					memory->ReadWord( status ) ) );
+				return -1;
+			}
+			memory->WriteWord( status +  4, 4, ( int )thread->State );
+			memory->WriteWord( status +  8, 4, thread->Priority );
+			memory->WriteWord( status + 12, 4, ( int )thread->WaitingOn );
+			if( thread->WaitingOn == KThreadWaitEvent )
+				memory->WriteWord( status + 16, 4, thread->WaitEvent->UID );
+			else if( thread->WaitingOn == KThreadWaitJoin )
+				memory->WriteWord( status + 16, 4, thread->WaitThread->UID );
+			else
+				memory->WriteWord( status + 16, 4, 0 );
+			memory->WriteWord( status + 20, 4, ( int )thread->WakeupCount );
+			memory->WriteWord( status + 24, 4, ( int )runClocks.LowPart );
+			memory->WriteWord( status + 28, 4, ( int )runClocks.HighPart );
+			memory->WriteWord( status + 32, 4, ( int )thread->InterruptPreemptionCount );
+			memory->WriteWord( status + 36, 4, ( int )thread->ThreadPreemptionCount );
+			memory->WriteWord( status + 40, 4, ( int )thread->ReleaseCount );
+			*/
 			return Module.NotImplementedReturn;
 		}
 	}

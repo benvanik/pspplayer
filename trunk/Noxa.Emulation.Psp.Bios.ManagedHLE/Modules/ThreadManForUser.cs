@@ -53,7 +53,41 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x627E6F3A, "sceKernelReferSystemStatus" )]
 		// SDK location: /user/pspthreadman.h:1100
 		// SDK declaration: int sceKernelReferSystemStatus(SceKernelSystemStatus *status);
-		public int sceKernelReferSystemStatus( int status ){ return Module.NotImplementedReturn; }
+		public int sceKernelReferSystemStatus( int status )
+		{
+			//typedef struct SceKernelSystemStatus {
+			//    SceSize 	size;
+			//    SceUInt 	status;
+			//    SceKernelSysClock 	idleClocks;
+			//    SceUInt 	comesOutOfIdleCount;
+			//    SceUInt 	threadSwitchCount;
+			//    SceUInt 	vfpuSwitchCount;
+			//} SceKernelSystemStatus;
+
+			/*
+			SysClock idleClocks;
+			idleClocks.QuadPart = ( int64 )0;// _kernel->IdleClocks;
+
+			// Ensure 28 bytes
+			if( memory->ReadWord( status ) != 28 )
+			{
+				Debug::WriteLine( String::Format( "ThreadManForUser: sceKernelReferSystemStatus app passed struct with size {0}, expected 28",
+					memory->ReadWord( status ) ) );
+				return -1;
+			}
+			memory->WriteWord( status +  4, 4, 1 ); // ?????
+			memory->WriteWord( status +  8, 4, ( int )idleClocks.LowPart );
+			memory->WriteWord( status + 12, 4, ( int )idleClocks.HighPart );
+			//memory->WriteWord( status + 16, 4, ( int )_kernel->Statistics->LeaveIdleCount );
+			//memory->WriteWord( status + 20, 4, ( int )_kernel->Statistics->ThreadSwitchCount );
+			//memory->WriteWord( status + 24, 4, ( int )_kernel->Statistics->VfpuSwitchCount );
+			memory->WriteWord( status + 16, 4, 0 );
+			memory->WriteWord( status + 20, 4, 0 );
+			memory->WriteWord( status + 24, 4, 0 );
+			*/
+
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]

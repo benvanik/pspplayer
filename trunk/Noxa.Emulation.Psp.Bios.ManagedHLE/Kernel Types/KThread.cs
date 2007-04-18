@@ -130,6 +130,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			if( State != KThreadState.Dead )
 				this.Exit( 0 );
+			if( ContextID >= 0 )
+				this.Delete();
 		}
 
 		public void Start( uint argumentsLength, uint argumentsPointer )
@@ -157,19 +159,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			
 			ExitCode = code;
 
+			while( ExitWaiters.Count > 0 )
+			{
+				KThread thread = ExitWaiters.Dequeue();
+				thread.Wake( 0 );
+			}
+		}
+
+		public void Delete()
+		{
 			Partition.Free( StackBlock );
 			if( TlsBlock != null )
 				Partition.Free( TlsBlock );
 			StackBlock = null;
 			TlsBlock = null;
 
-			while( ExitWaiters.Count > 0 )
-			{
-				KThread thread = ExitWaiters.Dequeue();
-				thread.Wake();
-			}
-
 			Kernel.Cpu.ReleaseContextStorage( ContextID );
+			ContextID = -1;
 
 			Kernel.Threads.Remove( this );
 		}
