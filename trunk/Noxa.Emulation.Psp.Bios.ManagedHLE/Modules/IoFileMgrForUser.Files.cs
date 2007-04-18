@@ -253,7 +253,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					break;
 				case 2:
 					seekOrigin = SeekOrigin.End;
-					Debug.Assert( handle.Stream.Length + offset < handle.Stream.Length );
+					Debug.Assert( handle.Stream.Length + offset <= handle.Stream.Length );
 					break;
 			}
 
@@ -298,7 +298,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					break;
 				case 2:
 					seekOrigin = SeekOrigin.End;
-					Debug.Assert( handle.Stream.Length + offset < handle.Stream.Length );
+					Debug.Assert( handle.Stream.Length + offset <= handle.Stream.Length );
 					break;
 			}
 

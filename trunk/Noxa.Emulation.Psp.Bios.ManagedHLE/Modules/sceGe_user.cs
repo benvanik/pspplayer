@@ -52,6 +52,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// the native interface and are never called here. I marked them as implemented
 		// so that I wouldn't see the debug spew.
 
+		// sceGeBreak/sceGeContinue are just nopped
+
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xB77905EA, "sceGeEdramSetAddrTranslation" )]
@@ -61,19 +63,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x1F6752AD, "sceGeEdramGetSize" )]
 		// SDK location: /ge/pspge.h:47
 		// SDK declaration: unsigned int sceGeEdramGetSize();
-		public int sceGeEdramGetSize(){ return Module.NotImplementedReturn; }
+		public int sceGeEdramGetSize()
+		{
+			return ( int )MemorySystem.VideoMemorySize;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE47E40E4, "sceGeEdramGetAddr" )]
 		// SDK location: /ge/pspge.h:54
 		// SDK declaration: void * sceGeEdramGetAddr();
-		public int sceGeEdramGetAddr(){ return Module.NotImplementedReturn; }
+		public int sceGeEdramGetAddr()
+		{
+			return ( int )MemorySystem.VideoMemoryBase;
+		}
 
 		[NotImplemented]
 		[Stateless]
@@ -103,42 +109,42 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceGeRestoreContext(const PspGeContext *context);
 		public int sceGeRestoreContext( int context ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xAB49E76A, "sceGeListEnQueue" )]
 		// SDK location: /ge/pspge.h:124
 		// SDK declaration: int sceGeListEnQueue(const void *list, void *stall, int cbid, void *arg);
 		public int sceGeListEnQueue( int list, int stall, int cbid, int arg ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x1C0D95A6, "sceGeListEnQueueHead" )]
 		// SDK location: /ge/pspge.h:137
 		// SDK declaration: int sceGeListEnQueueHead(const void *list, void *stall, int cbid, void *arg);
 		public int sceGeListEnQueueHead( int list, int stall, int cbid, int arg ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x5FB86AB0, "sceGeListDeQueue" )]
 		// SDK location: /ge/pspge.h:146
 		// SDK declaration: int sceGeListDeQueue(int qid);
 		public int sceGeListDeQueue( int qid ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE0D68148, "sceGeListUpdateStallAddr" )]
 		// SDK location: /ge/pspge.h:156
 		// SDK declaration: int sceGeListUpdateStallAddr(int qid, void *stall);
 		public int sceGeListUpdateStallAddr( int qid, int stall ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x03444EB4, "sceGeListSync" )]
 		// SDK location: /ge/pspge.h:176
 		// SDK declaration: int sceGeListSync(int qid, int syncType);
 		public int sceGeListSync( int qid, int syncType ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xB287BD61, "sceGeDrawSync" )]
 		// SDK location: /ge/pspge.h:185
@@ -150,31 +156,47 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xA4FC06A4, "sceGeSetCallback" )]
 		// SDK location: /ge/pspge.h:193
 		// SDK declaration: int sceGeSetCallback(PspGeCallbackData *cb);
-		public int sceGeSetCallback( int cb ){ return Module.NotImplementedReturn; }
+		public int sceGeSetCallback( int cb )
+		{
+			unsafe
+			{
+				uint* pcb = ( uint* )_memorySystem.Translate( ( uint )cb );
+				//*pcb; // signal function
+				//*( pcb + 1 ); // signal arg
+				//*( pcb + 2 ); // finish function
+				//*( pcb + 3 ); // finish arg
+			}
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x05DB22CE, "sceGeUnsetCallback" )]
 		// SDK location: /ge/pspge.h:201
 		// SDK declaration: int sceGeUnsetCallback(int cbid);
-		public int sceGeUnsetCallback( int cbid ){ return Module.NotImplementedReturn; }
+		public int sceGeUnsetCallback( int cbid )
+		{
+			return Module.NotImplementedReturn;
+		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xB448EC0D, "sceGeBreak" )]
 		// manual add
 		public int sceGeBreak( int mode, int unknown )
 		{
-			return Module.NotImplementedReturn;
+			// Stop the GE from pulling lists?
+			return 0;
 		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x4C06E472, "sceGeContinue" )]
 		// manual add
 		public int sceGeContinue()
 		{
-			return Module.NotImplementedReturn;
+			// Let GE continue pulling lists?
+			return 0;
 		}
 
 	}

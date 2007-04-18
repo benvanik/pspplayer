@@ -65,7 +65,8 @@ namespace Noxa
 	public class Timer
 	{
 		internal IntPtr Handle;
-		internal int Index;
+		internal int ID;
+		internal LinkedListEntry<Timer> Entry;
 
 		/// <summary>
 		/// The <see cref="TimerQueue"/> that owns the current timer instance.
@@ -176,16 +177,18 @@ namespace Noxa
 		public const int MaximumTimers = 256;
 
 		private IntPtr _hQueue;
-		private List<Timer> _timers;
-		private int _timerIndex;
+		private FastLinkedList<Timer> _timers;
+		private int _timerId;
+		private object _syncRoot;
 
 		/// <summary>
 		/// Initialize a new <see cref="TimerQueue"/> instance.
 		/// </summary>
 		public TimerQueue()
 		{
-			_timers = new List<Timer>( MaximumTimers );
-			_timerIndex = -1;
+			_timers = new FastLinkedList<Timer>();
+			_timerId = 0;
+			_syncRoot = new object();
 
 			_hQueue = NativeMethods.CreateTimerQueue();
 			Debug.Assert( _hQueue != IntPtr.Zero );
@@ -219,9 +222,11 @@ namespace Noxa
 
 			IntPtr hQueue = _hQueue;
 			_hQueue = IntPtr.Zero;
-			_timerIndex = -1;
-			for( int n = 0; n < _timers.Count; n++ )
-				_timers[ n ] = null;
+			lock( _syncRoot )
+			{
+				_timerId = -1;
+				_timers.Clear();
+			}
 
 			if( hQueue != IntPtr.Zero )
 			{
@@ -260,19 +265,22 @@ namespace Noxa
 				flags |= NativeMethods.TimerQueueFlags.WT_EXECUTELONGFUNCTION;
 
 			Timer timer = new Timer( this, mode, context, isLongRunning, dueTime, period, callback );
-			int index = Interlocked.Increment( ref _timerIndex );
-			timer.Index = index;
-			_timers[ index ] = timer;
+			lock( _syncRoot )
+			{
+				timer.Entry = _timers.Enqueue( timer );
+				timer.ID = _timerId++;
+			}
 
 			IntPtr handle = IntPtr.Zero;
 			bool result = NativeMethods.CreateTimerQueueTimer(
 				ref handle, _hQueue,
-				new WaitOrTimerDelegate( this.Callback ), new IntPtr( index ),
+				new WaitOrTimerDelegate( this.Callback ), new IntPtr( timer.ID ),
 				dueTime, period, flags );
 			Debug.Assert( result == true );
 			if( result == false )
 			{
-				_timers[ index ] = null;
+				lock( _syncRoot )
+					_timers.Remove( timer.Entry );
 				int error = Marshal.GetLastWin32Error();
 				throw new Win32Exception( error, "Unable to create timer instance." );
 			}
@@ -369,7 +377,8 @@ namespace Noxa
 				throw new ArgumentNullException( "timer" );
 
 			// This will kill the timer if it is about to run
-			_timers[ timer.Index ] = null;
+			lock( _syncRoot )
+				_timers.Remove( timer.Entry );
 
 			bool result = NativeMethods.DeleteTimerQueueTimer( _hQueue, timer.Handle, new IntPtr( -1 ) );
 			if( result == false )
@@ -379,9 +388,25 @@ namespace Noxa
 			}
 		}
 
+		private static int _searchCount = 0;
+
 		private void Callback( IntPtr param, bool timerOrWaitFired )
 		{
-			Timer timer = _timers[ param.ToInt32() ];
+			int id = param.ToInt32();
+
+			// This could be faster...
+			Timer timer = null;
+			LinkedListEntry<Timer> e = _timers.HeadEntry;
+			while( e != null )
+			{
+				if( e.Value.ID == id )
+				{
+					timer = e.Value;
+					break;
+				}
+				e = e.Next;
+				_searchCount++;
+			}
 			Debug.Assert( timer != null );
 			if( timer == null )
 				return;
