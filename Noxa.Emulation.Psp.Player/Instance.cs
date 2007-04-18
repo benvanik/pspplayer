@@ -210,10 +210,10 @@ namespace Noxa.Emulation.Psp.Player
 				_audio = _params.AudioComponent.CreateInstance( this, _params[ _params.AudioComponent ] ) as IAudioDriver;
 				_instances.Add( ( IComponentInstance )_audio );
 			}
-			_bios = _params.BiosComponent.CreateInstance( this, _params[ _params.BiosComponent ] ) as IBios;
-			_instances.Add( ( IComponentInstance )_bios );
 			_cpu = _params.CpuComponent.CreateInstance( this, _params[ _params.CpuComponent ] ) as ICpu;
 			_instances.Add( ( IComponentInstance )_cpu );
+			_bios = _params.BiosComponent.CreateInstance( this, _params[ _params.BiosComponent ] ) as IBios;
+			_instances.Add( ( IComponentInstance )_bios );
 			foreach( IComponent component in _params.IOComponents )
 			{
 				IIODriver driver = component.CreateInstance( this, _params[ component ] ) as IIODriver;
