@@ -93,9 +93,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				bool matches = this.Matches( thread.WaitArgument, thread.WaitEventMode );
 				if( matches == true )
 				{
-					// Wake thread
-					thread.Wake();
-
 					// Finish wait
 					if( thread.WaitAddress != 0x0 )
 					{
@@ -112,6 +109,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						this.Value = this.Value & ~thread.WaitArgument;
 
 					WaitingThreads.Remove( e );
+
+					// Wake thread
+					thread.Wake( 0 );
 
 					needsSwitch = true;
 				}

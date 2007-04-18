@@ -19,64 +19,165 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
 	partial class ThreadManForUser
 	{
-		[NotImplemented]
+		#region VPL
+
 		[Stateless]
 		[BiosFunction( 0x56C039B5, "sceKernelCreateVpl" )]
 		// SDK location: /user/pspthreadman.h:1256
 		// SDK declaration: SceUID sceKernelCreateVpl(const char *name, int part, int attr, unsigned int size, struct SceKernelVplOptParam *opt);
 		public int sceKernelCreateVpl( int name, int part, int attr, int size, int opt )
 		{
-			return Module.NotImplementedReturn;
+			KPartition partition = _kernel.Partitions[ part ];
+			Debug.Assert( partition != null );
+			if( partition == null )
+				return -1;
+
+			KVariablePool pool = new KVariablePool( _kernel, partition,
+				_kernel.ReadString( ( uint )name ),
+				( uint )attr, ( uint )size );
+			_kernel.AddHandle( pool );
+
+			// option unused?
+			Debug.Assert( opt == 0 );
+
+			return ( int )pool.UID;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x89B3D48C, "sceKernelDeleteVpl" )]
 		// SDK location: /user/pspthreadman.h:1265
 		// SDK declaration: int sceKernelDeleteVpl(SceUID uid);
 		public int sceKernelDeleteVpl( int uid )
 		{
-			return Module.NotImplementedReturn;
+			KVariablePool pool = _kernel.GetHandle<KVariablePool>( uid );
+			if( pool == null )
+				return -1;
+
+			pool.Dispose();
+
+			_kernel.RemoveHandle( pool.UID );
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xBED27435, "sceKernelAllocateVpl" )]
 		// SDK location: /user/pspthreadman.h:1277
 		// SDK declaration: int sceKernelAllocateVpl(SceUID uid, unsigned int size, void **data, unsigned int *timeout);
 		public int sceKernelAllocateVpl( int uid, int size, int data, int timeout )
 		{
-			return Module.NotImplementedReturn;
+			KVariablePool pool = _kernel.GetHandle<KVariablePool>( uid );
+			if( pool == null )
+				return -1;
+
+			KMemoryBlock block = pool.Allocate();
+			if( block != null )
+			{
+				Debug.Assert( data != 0 );
+				unsafe
+				{
+					uint* pdata = ( uint* )_memorySystem.Translate( ( uint )data );
+					*pdata = block.Address;
+				}
+
+				return 0;
+			}
+			else
+			{
+				uint timeoutUs = 0;
+				if( timeout != 0 )
+				{
+					unsafe
+					{
+						uint* ptimeout = ( uint* )_memorySystem.Translate( ( uint )timeout );
+						timeoutUs = *ptimeout;
+					}
+				}
+				KThread thread = _kernel.ActiveThread;
+				Debug.Assert( thread != null );
+				thread.Wait( pool, ( uint )data, timeoutUs, false );
+				_kernel.Schedule();
+				return 0;
+			}
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xEC0A693F, "sceKernelAllocateVplCB" )]
 		// SDK location: /user/pspthreadman.h:1289
 		// SDK declaration: int sceKernelAllocateVplCB(SceUID uid, unsigned int size, void **data, unsigned int *timeout);
 		public int sceKernelAllocateVplCB( int uid, int size, int data, int timeout )
 		{
-			return Module.NotImplementedReturn;
+			KVariablePool pool = _kernel.GetHandle<KVariablePool>( uid );
+			if( pool == null )
+				return -1;
+
+			KMemoryBlock block = pool.Allocate();
+			if( block != null )
+			{
+				Debug.Assert( data != 0 );
+				unsafe
+				{
+					uint* pdata = ( uint* )_memorySystem.Translate( ( uint )data );
+					*pdata = block.Address;
+				}
+
+				return 0;
+			}
+			else
+			{
+				uint timeoutUs = 0;
+				if( timeout != 0 )
+				{
+					unsafe
+					{
+						uint* ptimeout = ( uint* )_memorySystem.Translate( ( uint )timeout );
+						timeoutUs = *ptimeout;
+					}
+				}
+				KThread thread = _kernel.ActiveThread;
+				Debug.Assert( thread != null );
+				thread.Wait( pool, ( uint )data, timeoutUs, true );
+				_kernel.Schedule();
+				return 0;
+			}
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xAF36D708, "sceKernelTryAllocateVpl" )]
 		// SDK location: /user/pspthreadman.h:1300
 		// SDK declaration: int sceKernelTryAllocateVpl(SceUID uid, unsigned int size, void **data);
 		public int sceKernelTryAllocateVpl( int uid, int size, int data )
 		{
-			return Module.NotImplementedReturn;
+			KVariablePool pool = _kernel.GetHandle<KVariablePool>( uid );
+			if( pool == null )
+				return -1;
+
+			KMemoryBlock block = pool.Allocate();
+			if( block == null )
+				return -1;
+
+			Debug.Assert( data != 0 );
+			unsafe
+			{
+				uint* pdata = ( uint* )_memorySystem.Translate( ( uint )data );
+				*pdata = block.Address;
+			}
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xB736E9FF, "sceKernelFreeVpl" )]
 		// SDK location: /user/pspthreadman.h:1310
 		// SDK declaration: int sceKernelFreeVpl(SceUID uid, void *data);
 		public int sceKernelFreeVpl( int uid, int data )
 		{
-			return Module.NotImplementedReturn;
+			KVariablePool pool = _kernel.GetHandle<KVariablePool>( uid );
+			if( pool == null )
+				return -1;
+
+			bool wokeWaiter = pool.Free( data );
+			if( wokeWaiter == true )
+				_kernel.Schedule();
+
+			return 0;
 		}
 
 		[NotImplemented]
@@ -99,64 +200,167 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
+		#endregion
+
+		#region FPL
+
 		[Stateless]
 		[BiosFunction( 0xC07BB470, "sceKernelCreateFpl" )]
 		// SDK location: /user/pspthreadman.h:1360
 		// SDK declaration: int sceKernelCreateFpl(const char *name, int part, int attr, unsigned int size, unsigned int blocks, struct SceKernelFplOptParam *opt);
 		public int sceKernelCreateFpl( int name, int part, int attr, int size, int blocks, int opt )
 		{
-			return Module.NotImplementedReturn;
+			KPartition partition = _kernel.Partitions[ part ];
+			Debug.Assert( partition != null );
+			if( partition == null )
+				return -1;
+
+			KFixedPool pool = new KFixedPool( _kernel, partition,
+				_kernel.ReadString( ( uint )name ),
+				( uint )attr, ( uint )size, blocks );
+			_kernel.AddHandle( pool );
+
+			// option unused?
+			Debug.Assert( opt == 0 );
+
+			return ( int )pool.UID;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xED1410E0, "sceKernelDeleteFpl" )]
 		// SDK location: /user/pspthreadman.h:1369
 		// SDK declaration: int sceKernelDeleteFpl(SceUID uid);
 		public int sceKernelDeleteFpl( int uid )
 		{
-			return Module.NotImplementedReturn;
+			KFixedPool pool = _kernel.GetHandle<KFixedPool>( uid );
+			if( pool == null )
+				return -1;
+
+			pool.Dispose();
+
+			_kernel.RemoveHandle( pool.UID );
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xD979E9BF, "sceKernelAllocateFpl" )]
 		// SDK location: /user/pspthreadman.h:1380
 		// SDK declaration: int sceKernelAllocateFpl(SceUID uid, void **data, unsigned int *timeout);
 		public int sceKernelAllocateFpl( int uid, int data, int timeout )
 		{
-			return Module.NotImplementedReturn;
+			KFixedPool pool = _kernel.GetHandle<KFixedPool>( uid );
+			if( pool == null )
+				return -1;
+
+			KMemoryBlock block = pool.Allocate();
+			if( block != null )
+			{
+				Debug.Assert( data != 0 );
+				unsafe
+				{
+					uint* pdata = ( uint* )_memorySystem.Translate( ( uint )data );
+					*pdata = block.Address;
+				}
+
+				return 0;
+			}
+			else
+			{
+				uint timeoutUs = 0;
+				if( timeout != 0 )
+				{
+					unsafe
+					{
+						uint* ptimeout = ( uint* )_memorySystem.Translate( ( uint )timeout );
+						timeoutUs = *ptimeout;
+					}
+				}
+				KThread thread = _kernel.ActiveThread;
+				Debug.Assert( thread != null );
+				thread.Wait( pool, ( uint )data, timeoutUs, false );
+				_kernel.Schedule();
+				return 0;
+			}
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xE7282CB6, "sceKernelAllocateFplCB" )]
 		// SDK location: /user/pspthreadman.h:1391
 		// SDK declaration: int sceKernelAllocateFplCB(SceUID uid, void **data, unsigned int *timeout);
 		public int sceKernelAllocateFplCB( int uid, int data, int timeout )
 		{
-			return Module.NotImplementedReturn;
+			KFixedPool pool = _kernel.GetHandle<KFixedPool>( uid );
+			if( pool == null )
+				return -1;
+
+			KMemoryBlock block = pool.Allocate();
+			if( block != null )
+			{
+				Debug.Assert( data != 0 );
+				unsafe
+				{
+					uint* pdata = ( uint* )_memorySystem.Translate( ( uint )data );
+					*pdata = block.Address;
+				}
+
+				return 0;
+			}
+			else
+			{
+				uint timeoutUs = 0;
+				if( timeout != 0 )
+				{
+					unsafe
+					{
+						uint* ptimeout = ( uint* )_memorySystem.Translate( ( uint )timeout );
+						timeoutUs = *ptimeout;
+					}
+				}
+				KThread thread = _kernel.ActiveThread;
+				Debug.Assert( thread != null );
+				thread.Wait( pool, ( uint )data, timeoutUs, true );
+				_kernel.Schedule();
+				return 0;
+			}
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x623AE665, "sceKernelTryAllocateFpl" )]
 		// SDK location: /user/pspthreadman.h:1401
 		// SDK declaration: int sceKernelTryAllocateFpl(SceUID uid, void **data);
 		public int sceKernelTryAllocateFpl( int uid, int data )
 		{
-			return Module.NotImplementedReturn;
+			KFixedPool pool = _kernel.GetHandle<KFixedPool>( uid );
+			if( pool == null )
+				return -1;
+
+			KMemoryBlock block = pool.Allocate();
+			if( block == null )
+				return -1;
+
+			Debug.Assert( data != 0 );
+			unsafe
+			{
+				uint* pdata = ( uint* )_memorySystem.Translate( ( uint )data );
+				*pdata = block.Address;
+			}
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xF6414A71, "sceKernelFreeFpl" )]
 		// SDK location: /user/pspthreadman.h:1411
 		// SDK declaration: int sceKernelFreeFpl(SceUID uid, void *data);
 		public int sceKernelFreeFpl( int uid, int data )
 		{
-			return Module.NotImplementedReturn;
+			KFixedPool pool = _kernel.GetHandle<KFixedPool>( uid );
+			if( pool == null )
+				return -1;
+
+			bool wokeWaiter = pool.Free( data );
+			if( wokeWaiter == true )
+				_kernel.Schedule();
+
+			return 0;
 		}
 
 		[NotImplemented]
@@ -178,5 +382,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			return Module.NotImplementedReturn;
 		}
+
+		#endregion
 	}
 }

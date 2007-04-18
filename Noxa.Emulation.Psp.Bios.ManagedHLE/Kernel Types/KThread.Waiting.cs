@@ -22,6 +22,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.AddToSchedule();
 		}
 
+		public void Wake( int returnValue )
+		{
+			State = KThreadState.Ready;
+			Kernel.Cpu.SetContextRegister( ContextID, 4, ( uint )returnValue );
+
+			WakeupCount++;
+
+			this.AddToSchedule();
+		}
+
 		public void ReleaseWait()
 		{
 			State = KThreadState.Ready;
@@ -119,13 +129,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		private void WaitCallback( Timer timer )
 		{
-			State = KThreadState.Ready;
-			ReturnValue = -1;
-			
-			this.AddToSchedule();
+			// If we have not been made ready already, we wake
+			if( State == KThreadState.Waiting )
+			{
+				State = KThreadState.Ready;
+				Kernel.Cpu.SetContextRegister( ContextID, 4, unchecked( ( uint )-1 ) );
 
-			// We cannot schedule here - in a weird thread
-			Kernel.Cpu.BreakExecution();
+				this.AddToSchedule();
+
+				// We cannot schedule here - in a weird thread
+				Kernel.Cpu.BreakExecution();
+			}
 		}
 
 		public void Wait( KEvent ev, KWaitType waitEventMode, uint userValue, uint outAddress, uint timeoutUs, bool canHandleCallbacks )
@@ -154,7 +168,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			WaitAddress = outAddress;
 		}
 
-		public void Wait( KPool pool, uint timeoutUs, bool canHandleCallbacks )
+		public void Wait( KPool pool, uint pdata, uint timeoutUs, bool canHandleCallbacks )
 		{
 			State = KThreadState.Waiting;
 			this.RemoveFromSchedule();
@@ -178,6 +192,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			else
 				WaitTimeout = 0;
 			WaitHandle = pool;
+			WaitAddress = pdata;
 		}
 	}
 }

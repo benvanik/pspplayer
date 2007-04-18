@@ -132,7 +132,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			_runningCallback = callback;
 
-			Cpu.MarshalCall( ActiveThread.ContextID, callback.Address, new uint[] { argument }, new MarshalCompleteDelegate( this.CallbackComplete ), 0 );
+			// Format is arg1, arg2, commonAddress
+			// arg1 = ?
+			// arg2 is passed during notify and given to use in argument
+			Cpu.MarshalCall( ActiveThread.ContextID, callback.Address, new uint[] { callback.NotifyCount, argument, callback.CommonAddress }, new MarshalCompleteDelegate( this.CallbackComplete ), 0 );
 
 			return true;
 		}

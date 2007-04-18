@@ -19,74 +19,124 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
 	partial class ThreadManForUser
 	{
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE81CAF8F, "sceKernelCreateCallback" )]
 		// SDK location: /user/pspthreadman.h:985
 		// SDK declaration: int sceKernelCreateCallback(const char *name, SceKernelCallbackFunction func, void *arg);
 		public int sceKernelCreateCallback( int name, int func, int arg )
 		{
-			return Module.NotImplementedReturn;
+			KThread thread = _kernel.ActiveThread;
+			if( thread == null )
+				return -1;
+
+			KCallback cb = new KCallback( _kernel,
+				_kernel.ReadString( ( uint )name ),
+				thread,
+				( uint )func,
+				( uint )arg );
+			_kernel.AddHandle( cb );
+
+			return ( int )cb.UID;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xEDBA5844, "sceKernelDeleteCallback" )]
 		// SDK location: /user/pspthreadman.h:1005
 		// SDK declaration: int sceKernelDeleteCallback(SceUID cb);
-		public int sceKernelDeleteCallback( int cb )
+		public int sceKernelDeleteCallback( int cbid )
 		{
-			return Module.NotImplementedReturn;
+			KCallback cb = _kernel.GetHandle<KCallback>( cbid );
+			if( cb == null )
+				return -1;
+
+			// Unset?? walk callback listings and remove?
+
+			_kernel.RemoveHandle( cb.UID );
+
+			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xC11BA8C4, "sceKernelNotifyCallback" )]
 		// SDK location: /user/pspthreadman.h:1015
 		// SDK declaration: int sceKernelNotifyCallback(SceUID cb, int arg2);
-		public int sceKernelNotifyCallback( int cb, int arg2 )
+		public int sceKernelNotifyCallback( int cbid, int arg2 )
 		{
-			return Module.NotImplementedReturn;
+			KCallback cb = _kernel.GetHandle<KCallback>( cbid );
+			if( cb == null )
+				return -1;
+
+			cb.NotifyCount++;
+			//cb.NotifyArguments = arg2;
+
+			_kernel.IssueCallback( cb, ( uint )arg2 );
+
+			// Real return set by marshaller
+			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xBA4051D6, "sceKernelCancelCallback" )]
 		// SDK location: /user/pspthreadman.h:1024
 		// SDK declaration: int sceKernelCancelCallback(SceUID cb);
-		public int sceKernelCancelCallback( int cb )
+		public int sceKernelCancelCallback( int cbid )
 		{
-			return Module.NotImplementedReturn;
+			// We don't allow cancels - screw you!
+			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x2A3D44FF, "sceKernelGetCallbackCount" )]
 		// SDK location: /user/pspthreadman.h:1033
 		// SDK declaration: int sceKernelGetCallbackCount(SceUID cb);
-		public int sceKernelGetCallbackCount( int cb )
+		public int sceKernelGetCallbackCount( int cbid )
 		{
-			return Module.NotImplementedReturn;
+			KCallback cb = _kernel.GetHandle<KCallback>( cbid );
+			if( cb == null )
+				return -1;
+			return ( int )cb.NotifyCount;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x349D6D6C, "sceKernelCheckCallback" )]
 		// SDK location: /user/pspthreadman.h:1040
 		// SDK declaration: int sceKernelCheckCallback();
 		public int sceKernelCheckCallback()
 		{
-			return Module.NotImplementedReturn;
+			// No clue what this does - related to checkthreadstack?
+			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x730ED8BC, "sceKernelReferCallbackStatus" )]
 		// SDK location: /user/pspthreadman.h:996
 		// SDK declaration: int sceKernelReferCallbackStatus(SceUID cb, SceKernelCallbackInfo *status);
-		public int sceKernelReferCallbackStatus( int cb, int status )
+		public int sceKernelReferCallbackStatus( int cbid, int status )
 		{
-			return Module.NotImplementedReturn;
+			KCallback cb = _kernel.GetHandle<KCallback>( cbid );
+			if( cb == null )
+				return -1;
+
+			unsafe
+			{
+				uint* pstatus = ( uint* )_memorySystem.Translate( ( uint )status );
+				if( *pstatus == 56 )
+				{
+					_kernel.WriteString( ( uint )status + 4, cb.Name );
+					// Skip over name and size field
+					pstatus += 9;
+					*pstatus = cb.Thread.UID;
+					*( pstatus + 1 ) = cb.Address;
+					*( pstatus + 2 ) = cb.CommonAddress;
+					*( pstatus + 3 ) = cb.NotifyCount;
+					*( pstatus + 4 ) = cb.NotifyArguments;
+					return 0;
+				}
+				else
+				{
+					Debug.WriteLine( string.Format( "sceKernelReferCallbackStatus: expected SceKernelCallbackInfo size of 56, got {0}", *pstatus ) );
+					return -1;
+				}
+			}
 		}
 	}
 }
