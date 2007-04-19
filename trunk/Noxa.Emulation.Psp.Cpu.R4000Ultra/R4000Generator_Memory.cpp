@@ -110,9 +110,9 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 #if 0
 	Label* skipTest = g->DefineLabel();
 	Label* hitTest = g->DefineLabel();
-	g->cmp( EAX, 0x97BF6BC );
+	g->cmp( EAX, 0x08910d68 );
 	g->je( hitTest );
-	g->cmp( EAX, 0x97BF6BD );
+	/*g->cmp( EAX, 0x97BF6BD );
 	g->je( hitTest );
 	g->cmp( EAX, 0x97BF6BE );
 	g->je( hitTest );
@@ -121,7 +121,7 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 	g->cmp( EAX, 0x97BF6C0 );
 	g->je( hitTest );
 	g->cmp( EAX, 0x97BF6C1 );
-	g->je( hitTest );
+	g->je( hitTest );*/
 	g->jmp( skipTest );
 	g->MarkLabel( hitTest );
 	g->int3();

@@ -117,6 +117,8 @@ void R4000Cpu::DestroyThreading()
 int R4000Cpu::AllocateContextStorage( uint pc, array<uint>^ registers )
 {
 	ThreadContext* context = new ThreadContext(); // ( ThreadContext* )calloc( 1, sizeof( ThreadContext ) );
+	memset( &context->Ctx, 0, sizeof( R4000Ctx ) );
+	context->SafetyState = 0;
 
 	LOCK;
 	int index = _threadContexts->Count;
