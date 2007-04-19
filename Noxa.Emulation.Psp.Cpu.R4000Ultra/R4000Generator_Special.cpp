@@ -218,16 +218,6 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 			//g->mov( MPCVALID( CTX ), 1 );
 		}
 
-		// Emit stop flag check - if the flag is set we return
-		Label* skipStopLabel = g->DefineLabel();
-		g->mov( EAX, MSTOPFLAG( CTX ) );
-		g->test( EAX, EAX );
-		g->je( skipStopLabel );
-		//g->int3();
-		g->mov( EAX, 0 );
-		g->ret();
-		g->MarkLabel( skipStopLabel );
-
 		// Override if we can - we do this regardless of whether or not the BIOS implements it
 #ifdef OVERRIDESYSCALLS
 		if( canEmit == true )
@@ -301,6 +291,16 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				g->mov( MREG( CTX, 2 ), ( int )NIRETURN );
 			}
 		}
+
+		// Emit stop flag check - if the flag is set we return
+		Label* skipStopLabel = g->DefineLabel();
+		g->mov( EAX, MSTOPFLAG( CTX ) );
+		g->test( EAX, EAX );
+		g->je( skipStopLabel );
+		//g->int3();
+		g->mov( EAX, 0 );
+		g->ret();
+		g->MarkLabel( skipStopLabel );
 	}
 
 	return GenerationResult::Syscall;
