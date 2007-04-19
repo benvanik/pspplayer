@@ -181,6 +181,8 @@ namespace Noxa
 		private int _timerId;
 		private object _syncRoot;
 
+		private WaitOrTimerDelegate _delegate;
+
 		/// <summary>
 		/// Initialize a new <see cref="TimerQueue"/> instance.
 		/// </summary>
@@ -189,6 +191,7 @@ namespace Noxa
 			_timers = new FastLinkedList<Timer>();
 			_timerId = 0;
 			_syncRoot = new object();
+			_delegate = new WaitOrTimerDelegate( this.Callback );
 
 			_hQueue = NativeMethods.CreateTimerQueue();
 			Debug.Assert( _hQueue != IntPtr.Zero );
@@ -274,7 +277,7 @@ namespace Noxa
 			IntPtr handle = IntPtr.Zero;
 			bool result = NativeMethods.CreateTimerQueueTimer(
 				ref handle, _hQueue,
-				new WaitOrTimerDelegate( this.Callback ), new IntPtr( timer.ID ),
+				_delegate, new IntPtr( timer.ID ),
 				dueTime, period, flags );
 			Debug.Assert( result == true );
 			if( result == false )
