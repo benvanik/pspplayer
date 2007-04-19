@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#include "TraceOptions.h"
 #include "Tracer.h"
 #include "R4000BlockBuilder.h"
 #include "R4000Cpu.h"

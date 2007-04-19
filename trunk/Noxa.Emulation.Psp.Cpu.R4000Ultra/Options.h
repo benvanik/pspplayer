@@ -25,13 +25,7 @@
 // Define to support the native video interface
 #define NATIVEVIDEOINTERFACE
 
-// Emit trace file
-//#define TRACE
-#define TRACEFILE		"Trace-Ultra.txt"
-#define TRACEAFTER		0x089000E4
-#define TRACESYMBOLS			// Trace function names on calls - really slow, I think!
-#define TRACEREGISTERS			// Trace register values on each instruction - ULTRA SLOW
-//#define TRACEFPUREGS			// Trace the FPU registers (cop1)
+// -- TRACE -- Options live in TraceOptions.h
 
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG
@@ -66,9 +60,4 @@
 #endif
 #ifndef RUNTIMEDEBUG
 #undef RUNTIMEREGS
-#endif
-#ifndef TRACE
-#undef TRACESYMBOLS
-#undef TRACEREGISTERS
-#undef TRACEFPUREGS
 #endif

@@ -426,6 +426,10 @@
 				RelativePath=".\Stdafx.h"
 				>
 			</File>
+			<File
+				RelativePath=".\TraceOptions.h"
+				>
+			</File>
 			<Filter
 				Name="Shared"
 				>

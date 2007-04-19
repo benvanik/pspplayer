@@ -30,6 +30,14 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 				_methodLookup.Add( method.EntryAddress, method );
 		}
 
+		public int MethodCount
+		{
+			get
+			{
+				return _methodLookup.Count;
+			}
+		}
+
 		public Method[] Methods
 		{
 			get

@@ -90,9 +90,7 @@ namespace Noxa {
 					FieldInfo^					_privateMemoryFieldInfo;
 					FieldInfo^					_privateModuleInstancesFieldInfo;
 
-#ifdef TRACESYMBOLS
 					IProgramDebugData^			_symbols;
-#endif
 
 				public:
 

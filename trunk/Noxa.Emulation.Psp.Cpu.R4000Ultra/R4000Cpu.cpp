@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#include "TraceOptions.h"
 #include "R4000Cpu.h"
 #include "R4000Core.h"
 #include "R4000Memory.h"
@@ -148,6 +149,9 @@ void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 #ifdef TRACESYMBOLS
 		Debug::Assert( bootStream != nullptr );
 		_symbols = ProgramDebugData::Load( Debugging::DebugDataType::Symbols, bootStream );
+		if( ( _symbols == nullptr ) ||
+			( _symbols->MethodCount == 0 ) )
+			Debug::WriteLine( "Cpu: no debug information found in program - method names will be unavailable" );
 #endif
 
 		// Has to happen late in the game because we need to
