@@ -18,6 +18,14 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 	public interface IProgramDebugData
 	{
 		/// <summary>
+		/// The number of methods found for the program.
+		/// </summary>
+		int MethodCount
+		{
+			get;
+		}
+
+		/// <summary>
 		/// A list of methods in the program.
 		/// </summary>
 		Method[] Methods
