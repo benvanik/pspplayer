@@ -83,7 +83,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		private void CallStartModule( KModule module, int args, int argp )
 		{
 			if( module.ModuleStart == 0 )
+			{
+				// Probably a fake load
+				Debug.WriteLine( string.Format( "ModuleMgrForUser: not starting module {0} - no ModuleStart defined - probably faked", module.Name ) );
 				return;
+			}
 
 			// Create a thread
 			KThread thread = new KThread( _kernel, _kernel.Partitions[ 2 ], "module_start_thread", module.ModuleStart, 0, KThreadAttributes.User, 0x4000 );
@@ -282,7 +286,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				}
 			}
 
-			this.CallStartModule( _kernel.MainModule, argsize, argp );
+			this.CallStartModule( module, argsize, argp );
 
 			return 0;
 		}
