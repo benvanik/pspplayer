@@ -40,7 +40,7 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			Debug.Assert( hostPath != null );
 			Debug.Assert( File.Exists( hostPath ) == true );
 
-			this.Load( hostPath );
+			this.Load( hostPath, false );
 		}
 
 		public ComponentParameters Parameters
@@ -148,14 +148,14 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			}
 		}
 
-		public bool Load( string path )
+		public bool Load( string path, bool minimalCache )
 		{
 			_hostPath = path;
 
 			FileInfo fi = new FileInfo( path );
 			_capacity = fi.Length;
 
-			_root = ParseIsoFileSystem( path );
+			_root = ParseIsoFileSystem( path, minimalCache );
 			Debug.Assert( _root != null );
 			_root.CalculateSize();
 

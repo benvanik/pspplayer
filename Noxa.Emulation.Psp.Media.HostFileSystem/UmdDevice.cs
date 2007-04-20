@@ -37,7 +37,7 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 
 			_capacity = capacity;
 
-			this.Load( hostPath );
+			this.Load( hostPath, false );
 		}
 
 		public ComponentParameters Parameters
@@ -145,7 +145,7 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 			}
 		}
 
-		public bool Load( string path )
+		public bool Load( string path, bool minimalCache )
 		{
 			_hostPath = path;
 

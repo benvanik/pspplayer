@@ -70,9 +70,9 @@ namespace Noxa.Emulation.Psp.Media.Iso
 
 				reader.BaseStream.Seek( 8, SeekOrigin.Current );
 				long x = reader.BaseStream.Position;
-				NativePathEntry? npev = NativePathEntry.FromReader( reader );
-				Debug.Assert( npev != null );
-				npd.Root = npev.Value;
+				NativePathEntry npe = NativePathEntry.FromReader( reader );
+				Debug.Assert( npe != null );
+				npd.Root = npe;
 				long z = reader.BaseStream.Position - x;
 				reader.BaseStream.Seek( 34 - z, SeekOrigin.Current );
 
@@ -92,16 +92,20 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			}
 		}
 
-		protected struct NativePathEntry
+		protected class NativePathEntry
 		{
 			public bool IsRoot;
 			public int FirstSector;
 			public int ParentEntry;
 			public string Name;
 
-			public static NativePathEntry? FromReader( BinaryReader reader )
+			public int Length;		// Filled by NPE walk
+			public Dictionary<string, int> ChildLengths;
+
+			public static NativePathEntry FromReader( BinaryReader reader )
 			{
 				NativePathEntry npe = new NativePathEntry();
+				npe.ChildLengths = new Dictionary<string, int>();
 
 				byte nameLength = reader.ReadByte();
 
@@ -133,6 +137,7 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			Normal = 0x0,
 			Hidden = 0x1,
 			Directory = 0x2,
+			LastEntry = 0x80,
 		}
 
 		protected struct NativeEntry
@@ -214,7 +219,7 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			return Encoding.ASCII.GetString( buffer ).Trim();
 		}
 
-		protected MediaFolder ParseIsoFileSystem( string path )
+		protected MediaFolder ParseIsoFileSystem( string path, bool minimalCache )
 		{
 			Debug.Assert( path != null );
 			Debug.Assert( File.Exists( path ) == true );
@@ -235,11 +240,11 @@ namespace Noxa.Emulation.Psp.Media.Iso
 				stream.Seek( npd.PathTableStart * 2048, SeekOrigin.Begin );
 				while( stream.Position < ( npd.PathTableStart * 2048 ) + npd.PathTableLength )
 				{
-					NativePathEntry? npev = NativePathEntry.FromReader( reader );
-					if( npev == null )
+					NativePathEntry npe = NativePathEntry.FromReader( reader );
+					if( npe == null )
 						continue;
 
-					npes.Add( npev.Value );
+					npes.Add( npe );
 				}
 
 				List<MediaFolder> folders = new List<MediaFolder>( npes.Count );
@@ -252,44 +257,67 @@ namespace Noxa.Emulation.Psp.Media.Iso
 					if( npe.IsRoot == false )
 						parent = folders[ npe.ParentEntry ];
 
-					int m = 0;
-					stream.Seek( npe.FirstSector * 2048, SeekOrigin.Begin );
-					while( true )
+					if( npe.Length == 0 )
 					{
-						NativeEntry? nev = NativeEntry.FromReader( reader );
-						if( nev == null )
-							break;
-						NativeEntry ne = nev.Value;
-
-						if( m == 0 )
+						// Look in parent for length
+						if( parent != null )
 						{
-							// '.' this dir
-							MediaItemAttributes attributes = MediaItemAttributes.Normal;
-							if( ( ne.Flags & NativeEntryFlags.Hidden ) == NativeEntryFlags.Hidden )
-								attributes |= MediaItemAttributes.Hidden;
-							current = new MediaFolder( this, parent, npe.Name, attributes, ne.Timestamp );
-							folders.Add( current );
-						}
-						else if( m == 1 )
-						{
-							// '..' parent dir - ignored
+							NativePathEntry pe = npes[ npe.ParentEntry ];
+							npe.Length = pe.ChildLengths[ npe.Name ];
 						}
 						else
+							npe.Length = 2048;
+					}
+
+					int m = 0;
+					for( int s = 0; s < npe.Length / 2048; s++ )
+					{
+						stream.Seek( ( npe.FirstSector + s ) * 2048, SeekOrigin.Begin );
+						while( true )
 						{
-							// Child
-							if( ( ne.Flags & NativeEntryFlags.Directory ) == NativeEntryFlags.Directory )
+							NativeEntry? nev = NativeEntry.FromReader( reader );
+							if( nev == null )
+								break;
+							NativeEntry ne = nev.Value;
+
+							if( m == 0 )
 							{
-								// Directories are handled when it is their turn to be added
-							}
-							else
-							{
+								// '.' this dir
 								MediaItemAttributes attributes = MediaItemAttributes.Normal;
 								if( ( ne.Flags & NativeEntryFlags.Hidden ) == NativeEntryFlags.Hidden )
 									attributes |= MediaItemAttributes.Hidden;
-								MediaFile file = new MediaFile( this, current, ne.Name, attributes, ne.Timestamp, ne.FirstSector * 2048, ne.Length );
+								current = new MediaFolder( this, parent, npe.Name, attributes, ne.Timestamp );
+								folders.Add( current );
 							}
+							else if( m == 1 )
+							{
+								// '..' parent dir - ignored
+							}
+							else
+							{
+								// Child
+								if( ( ne.Flags & NativeEntryFlags.Directory ) == NativeEntryFlags.Directory )
+								{
+									// Directories are handled when it is their turn to be added
+									// EXCEPT for size, which we need to get now and store back
+									// At this time in the code, we have all dirs prior to the one whose length
+									// we just got - since we have already added ourselves, we know we have its
+									// parent too
+									npe.ChildLengths.Add( ne.Name, ne.Length );
+								}
+								else
+								{
+									MediaItemAttributes attributes = MediaItemAttributes.Normal;
+									if( ( ne.Flags & NativeEntryFlags.Hidden ) == NativeEntryFlags.Hidden )
+										attributes |= MediaItemAttributes.Hidden;
+									MediaFile file = new MediaFile( this, current, ne.Name, attributes, ne.Timestamp, ne.FirstSector * 2048, ne.Length );
+								}
+							}
+							m++;
+
+							if( ( ne.Flags & NativeEntryFlags.LastEntry ) == NativeEntryFlags.LastEntry )
+								break;
 						}
-						m++;
 					}
 				}
 

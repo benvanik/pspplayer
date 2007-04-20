@@ -53,7 +53,8 @@ namespace Noxa.Emulation.Psp.Media
 		/// Load from the given UMD image.
 		/// </summary>
 		/// <param name="path">The path of the UMD image to load.</param>
+		/// <param name="minimalCache"><c>true</c> to only cache PSP_GAME and SYSDIR.</param>
 		/// <returns><c>true</c> if the load was successful; otherwise <c>false</c>.</returns>
-		bool Load( string path );
+		bool Load( string path, bool minimalCache );
 	}
 }
