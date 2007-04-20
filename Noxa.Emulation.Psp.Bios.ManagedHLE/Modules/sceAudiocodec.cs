@@ -91,43 +91,56 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		0x1004 might be wma in newer ME code (haven't checked)
 		*/
 
-		[NotImplemented]
+		//http://forums.ps2dev.org/viewtopic.php?t=4249&view=previous&sid=9d8a720000a0a90209a4286162677861
+
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9D3F790C, "sceAudiocodecCheckNeedMem" )]
 		// manual add
 		public int sceAudiocodecCheckNeedMem( int Buffer, int Type )
 		{
-			return Module.NotImplementedReturn;
+			return 0;
 		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x5B37EB1D, "sceAudiocodecInit" )]
 		// SDK location: /audio/pspaudiocodec.h:18
 		// SDK declaration: int sceAudiocodecInit(unsigned long *Buffer, int Type);
-		public int sceAudiocodecInit( int Buffer, int Type ){ return Module.NotImplementedReturn; }
+		public int sceAudiocodecInit( int Buffer, int Type )
+		{
+			return 0;
+		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x70A703F8, "sceAudiocodecDecode" )]
 		// SDK location: /audio/pspaudiocodec.h:19
 		// SDK declaration: int sceAudiocodecDecode(unsigned long *Buffer, int Type);
-		public int sceAudiocodecDecode( int Buffer, int Type ){ return Module.NotImplementedReturn; }
+		public int sceAudiocodecDecode( int Buffer, int Type )
+		{
+			return 0;
+		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x3A20A200, "sceAudiocodecGetEDRAM" )]
 		// SDK location: /audio/pspaudiocodec.h:20
 		// SDK declaration: int sceAudiocodecGetEDRAM(unsigned long *Buffer, int Type);
-		public int sceAudiocodecGetEDRAM( int Buffer, int Type ){ return Module.NotImplementedReturn; }
+		public int sceAudiocodecGetEDRAM( int Buffer, int Type )
+		{
+			return 0;
+		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x29681260, "sceAudiocodecReleaseEDRAM" )]
 		// SDK location: /audio/pspaudiocodec.h:21
 		// SDK declaration: int sceAudiocodecReleaseEDRAM(unsigned long *Buffer);
-		public int sceAudiocodecReleaseEDRAM( int Buffer ){ return Module.NotImplementedReturn; }
-
+		public int sceAudiocodecReleaseEDRAM( int Buffer )
+		{
+			return 0;
+		}
 	}
 }
 

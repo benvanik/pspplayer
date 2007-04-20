@@ -154,7 +154,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 	class KVariablePool : KPool
 	{
-		public const int GrowthCount = 64;
+		// 1 seems to be the only way to do this - unfortunately VPL's are sometimes used to allocate 10MB of ram...
+		public const int GrowthCount = 1;
 
 		public KVariablePool( Kernel kernel, KPartition partition, string name, uint attributes, uint blockSize )
 			: base( kernel, partition, name, attributes, blockSize )

@@ -176,6 +176,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_kernel.Schedule();
 		}
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x36CDFADE, "sceDisplayWaitVblank" )]
@@ -187,6 +188,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x8EB9EC49, "sceDisplayWaitVblankCB" )]
 		// SDK location: /display/pspdisplay.h:109
@@ -197,6 +199,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x984C27E7, "sceDisplayWaitVblankStart" )]
@@ -208,6 +211,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x46F186C3, "sceDisplayWaitVblankStartCB" )]
 		// SDK location: /display/pspdisplay.h:99

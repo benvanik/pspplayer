@@ -112,6 +112,9 @@ namespace Noxa.Emulation.Psp.Media.Iso
 
 		public IMediaItem Find( string path )
 		{
+			if( path == "/" )
+				return this;
+
 			int slashIndex = path.IndexOfAny( new char[] { '/', '\\' } );
 			if( slashIndex < 0 )
 			{

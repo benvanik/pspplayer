@@ -745,6 +745,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				kernel.RemoveHandle( thread.UID );
 
 				kernel.Schedule();
+
+				//thread.Delete();
 			}
 		}
 	}

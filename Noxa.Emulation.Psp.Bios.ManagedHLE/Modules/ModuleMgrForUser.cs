@@ -116,6 +116,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				_kernel.RemoveHandle( thread.UID );
 
 				_kernel.Schedule();
+
+				//thread.Delete();
 			}
 		}
 
@@ -276,7 +278,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 
 			// Don't current support getting result - just set to 0?
-			Debug.Assert( status == 0 );
+			//Debug.Assert( status == 0 );
 			if( status != 0 )
 			{
 				unsafe

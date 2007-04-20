@@ -151,7 +151,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[DontTrace]
+		//[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x6A638D83, "sceIoRead" )]
 		// SDK location: /user/pspiofilemgr.h:109
@@ -206,7 +206,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( handle is KStdFile )
 			{
 				// Handle stdout/err write
-				( ( KStdFile )handle ).Write( ( uint )data );
+				( ( KStdFile )handle ).Write( ( uint )data, size );
 			}
 			else
 			{

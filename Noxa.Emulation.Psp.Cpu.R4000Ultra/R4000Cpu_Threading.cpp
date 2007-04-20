@@ -237,9 +237,9 @@ CodeBlock* BuildBlock( int pc )
 
 void MakeSafetyCallback( int tcsId, ThreadContext* tcs )
 {
-	if( tcs->SafetyCallback.IsValid() == true )
+	ContextSafetyDelegate^ del = tcs->SafetyCallback;
+	if( del != nullptr )
 	{
-		ContextSafetyDelegate^ del = tcs->SafetyCallback;
 		del( tcsId, tcs->SafetyState );
 	}
 	else
