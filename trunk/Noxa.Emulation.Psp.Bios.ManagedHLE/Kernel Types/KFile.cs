@@ -97,9 +97,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			_sb = new StringBuilder();
 		}
 
-		public void Write( uint address )
+		public unsafe void Write( uint address, int length )
 		{
-			string s = Kernel.ReadString( address );
+			sbyte* p = ( sbyte* )Kernel.MemorySystem.Translate( address );
+			string s = new string( p, 0, length );
 
 			_sb.Append( s );
 			if( _sb[ _sb.Length - 1 ] == '\n' )

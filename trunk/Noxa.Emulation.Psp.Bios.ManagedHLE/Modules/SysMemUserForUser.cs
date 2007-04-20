@@ -161,7 +161,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// manual add - check?
 		public int sceKernelSetCompilerVersion( int version )
 		{
-			Debug.WriteLine( string.Format( "sceKernelSetCompilerVersion: set to version {0}", version ) );
+			//02080010
+			Version v = new Version(
+				( version >> 24 ) & 0xFF,
+				( version >> 16 ) & 0xFF,
+				( version >> 8 ) & 0xFF,
+				version & 0xFF );
+			Debug.WriteLine( string.Format( "sceKernelSetCompilerVersion: set to version {0:X8} ({1})", version, v.ToString() ) );
 			return 0;
 		}
 
@@ -170,7 +176,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// manual add - check?
 		public int sceKernelSetCompiledSdkVersion( int version )
 		{
-			Debug.WriteLine( string.Format( "sceKernelSetCompiledSdkVersion: set to version {0}", version ) );
+			Version v = new Version(
+				( version >> 24 ) & 0xFF,
+				( version >> 16 ) & 0xFF,
+				( version >> 8 ) & 0xFF,
+				version & 0xFF );
+			Debug.WriteLine( string.Format( "sceKernelSetCompiledSdkVersion: set to version {0:X8} ({1})", version, v.ToString() ) );
 			return 0;
 		}
 

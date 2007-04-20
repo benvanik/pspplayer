@@ -51,6 +51,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// Currently just ignore power switch locking - maybe one day
 		// we should obey it so saves don't get corrupt/etc?
 
+		[DontTrace]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xEADB1BD7, "sceKernelPowerLock" )]
 		// manual add
@@ -59,6 +61,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x3AEE7261, "sceKernelPowerUnlock" )]
 		// manual add
@@ -67,6 +71,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x090CCB3F, "sceKernelPowerTick" )]
 		// int sceKernelPowerTick(int ticktype); (/include/kernelutils.h:167)

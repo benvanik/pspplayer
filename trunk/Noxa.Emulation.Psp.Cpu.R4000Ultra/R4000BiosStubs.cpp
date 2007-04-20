@@ -32,6 +32,12 @@ int scePowerSetClockFrequency( int cpuFreq, int ramFreq, int busFreq );
 int scePowerSetBusClockFrequency( int busFreq );
 int scePowerSetCpuClockFrequency( int cpuFreq );
 
+// sceSuspendForUser -----------------------------------
+// All inlined
+//int sceKernelPowerLock( int type );
+//int sceKernelPowerUnlock( int type );
+//int sceKernelPowerTick( int ticktype );
+
 // sceDisplayUser --------------------------------------
 //int sceDisplayGetCurrentHcount(); <-- inlined
 extern int sceDisplayGetVcount();
@@ -107,6 +113,13 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 		g->push( MREG( CTX, 4 ) );
 		g->call( ( uint )&scePowerSetCpuClockFrequency );
 		g->add( ESP, 4 );
+		return true;
+
+	// sceSuspendForUser -----------------------------------
+	case 0xEADB1BD7:		// sceKernelPowerLock
+	case 0x3AEE7261:		// sceKernelPowerUnlock
+	case 0x090CCB3F:		// sceKernelPowerTick
+		g->xor( EAX, EAX );
 		return true;
 
 	// sceUtilsForUser -------------------------------------

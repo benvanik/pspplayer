@@ -109,10 +109,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			ThreadPreemptionCount = 0;
 
 			Partition = partition;
-			StackBlock = partition.Allocate( KAllocType.High, 0, stackSize );
+			//StackBlock = partition.Allocate( KAllocType.High, 0, stackSize );
+			StackBlock = partition.Allocate( KAllocType.Low, 0, stackSize );
 			Debug.Assert( StackBlock != null );
 			StackBlock.Name = string.Format( "Thread '{0}' Stack", name );
-			TlsBlock = partition.Allocate( KAllocType.High, 0, 0x4000 ); // 16k of thread local storage --- enough?
+			TlsBlock = partition.Allocate( KAllocType.Low, 0, 0x4000 ); // 16k of thread local storage --- enough?
 			Debug.Assert( TlsBlock != null );
 			TlsBlock.Name = string.Format( "Thread '{0}' TLS", name );
 		}
@@ -138,9 +139,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			registers[ 4 ] = argumentsLength;
 			registers[ 5 ] = argumentsPointer;
 			registers[ 6 ] = 0;
-			registers[ 26 ] = TlsBlock.Address;			// TLS
+			if( TlsBlock != null )
+				registers[ 26 ] = TlsBlock.Address;		// TLS
+			else
+				registers[ 26 ] = 0;
 			registers[ 28 ] = GlobalPointer;			// gp - set by cpu?
-			registers[ 29 ] = StackBlock.Address;
+			registers[ 29 ] = StackBlock.UpperBound;
 
 			ContextID = Kernel.Cpu.AllocateContextStorage( EntryAddress, registers );
 

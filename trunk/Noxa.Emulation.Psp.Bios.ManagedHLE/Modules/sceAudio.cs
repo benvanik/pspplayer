@@ -185,38 +185,45 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE9D97901, "sceAudioGetChannelRestLen" )]
 		// SDK location: /audio/pspaudio.h:97
 		// SDK declaration: int sceAudioGetChannelRestLen(int channel);
 		public int sceAudioGetChannelRestLen( int channel )
-		{ return Module.NotImplementedReturn; }
+		{
+			return 0;
+		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xCB2E439E, "sceAudioSetChannelDataLen" )]
 		// SDK location: /audio/pspaudio.h:103
 		// SDK declaration: int sceAudioSetChannelDataLen(int channel, int samplecount);
 		public int sceAudioSetChannelDataLen( int channel, int samplecount )
-		{ return Module.NotImplementedReturn; }
+		{
+			return 0;
+		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x95FD0C2D, "sceAudioChangeChannelConfig" )]
 		// SDK location: /audio/pspaudio.h:109
 		// SDK declaration: int sceAudioChangeChannelConfig(int channel, int format);
 		public int sceAudioChangeChannelConfig( int channel, int format )
-		{ return Module.NotImplementedReturn; }
+		{
+			return 0;
+		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xB7E1D8E7, "sceAudioChangeChannelVolume" )]
 		// SDK location: /audio/pspaudio.h:115
 		// SDK declaration: int sceAudioChangeChannelVolume(int channel, int leftvol, int rightvol);
 		public int sceAudioChangeChannelVolume( int channel, int leftvol, int rightvol )
-		{ return Module.NotImplementedReturn; }
-
+		{
+			return 0;
+		}
 	}
 }
 

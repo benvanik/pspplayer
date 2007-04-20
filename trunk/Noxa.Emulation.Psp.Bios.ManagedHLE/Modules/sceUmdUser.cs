@@ -66,6 +66,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			PowerCurrent = 0x02,
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x46EBB729, "sceUmdCheckMedium" )]
 		// SDK location: /umd/pspumd.h:42
