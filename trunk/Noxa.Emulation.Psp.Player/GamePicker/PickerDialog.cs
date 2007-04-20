@@ -69,7 +69,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 				Debug.Assert( gamePath != null );
 
 				_emulator.Umd.Eject();
-				if( _emulator.Umd.Load( gamePath ) == false )
+				if( _emulator.Umd.Load( gamePath, false ) == false )
 				{
 					// Failed to load
 				}
@@ -119,23 +119,27 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 		private GameInformation LoadGameFromUmd( string gamePath )
 		{
-			try
+			//try
 			{
 				if( File.Exists( gamePath ) == false )
 					return null;
 
-				Type deviceType = _emulator.Umd.Factory;
-				IComponent component = ( IComponent )Activator.CreateInstance( deviceType );
-				Debug.Assert( component != null );
-				if( component == null )
-					throw new InvalidOperationException();
+				//Type deviceType = _emulator.Umd.Factory;
+				//IComponent component = ( IComponent )Activator.CreateInstance( deviceType );
+				//Debug.Assert( component != null );
+				//if( component == null )
+				//    throw new InvalidOperationException();
 
-				ComponentParameters parameters = new ComponentParameters();
-				parameters[ "path" ] = gamePath;
-				IUmdDevice umdDevice = component.CreateInstance( _emulator, parameters ) as IUmdDevice;
-				Debug.Assert( umdDevice != null );
-				if( umdDevice == null )
-					throw new InvalidOperationException();
+				//ComponentParameters parameters = new ComponentParameters();
+				//parameters[ "path" ] = gamePath;
+				//IUmdDevice umdDevice = component.CreateInstance( _emulator, parameters ) as IUmdDevice;
+				//Debug.Assert( umdDevice != null );
+				//if( umdDevice == null )
+				//    throw new InvalidOperationException();
+
+				IUmdDevice umdDevice = _emulator.Umd;
+				if( umdDevice.Load( gamePath, true ) == false )
+					return null;
 
 				GameLoader loader = new GameLoader();
 				GameInformation game = loader.FindGame( umdDevice );
@@ -148,10 +152,10 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 				return game;
 			}
-			catch
+			//catch
 			{
-				Debug.Assert( false );
-				return null;
+				//Debug.Assert( false );
+				//return null;
 			}
 		}
 
