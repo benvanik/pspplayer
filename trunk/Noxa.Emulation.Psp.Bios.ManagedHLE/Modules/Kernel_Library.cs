@@ -51,6 +51,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// We should hope - for performance sake, that these
 		// are implemented by the CPU natively
 
+		[SuggestNative]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x092968F4, "sceKernelCpuSuspendIntr" )]
 		// SDK location: /user/pspintrman.h:77
@@ -62,6 +64,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( int )cpuFlags;
 		}
 
+		[SuggestNative]
+		[DontTrace]
+		[Stateless]
 		[BiosFunction( 0x5F10D406, "sceKernelCpuResumeIntr" )]
 		// SDK location: /user/pspintrman.h:84
 		// SDK declaration: void sceKernelCpuResumeIntr(unsigned int flags);
@@ -70,6 +75,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_kernel.Cpu.InterruptsMask = ( uint )flags;
 		}
 
+		[SuggestNative]
+		[DontTrace]
+		[Stateless]
 		[BiosFunction( 0x3B84732D, "sceKernelCpuResumeIntrWithSync" )]
 		// SDK location: /user/pspintrman.h:91
 		// SDK declaration: void sceKernelCpuResumeIntrWithSync(unsigned int flags);
@@ -78,6 +86,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_kernel.Cpu.InterruptsMask = ( uint )flags;
 		}
 
+		[SuggestNative]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x47A0B729, "sceKernelIsCpuIntrSuspended" )]
 		// SDK location: /user/pspintrman.h:100
@@ -88,6 +98,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( ( cpuFlags & ( uint )flags ) != 0 ) ? 1 : 0;
 		}
 
+		[SuggestNative]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0xB55249D2, "sceKernelIsCpuIntrEnable" )]
 		// SDK location: /user/pspintrman.h:107

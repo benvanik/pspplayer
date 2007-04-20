@@ -106,7 +106,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				string line = _sb.ToString();
 				Debug.WriteLine( string.Format( "{0}: {1}", _name, line ) );
-				_sb = new StringBuilder();
+				_sb.Remove( 0, _sb.Length );
 			}
 		}
 	}

@@ -53,6 +53,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		public IVideoDriver _driver;
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xDBA6C4C4, "sceDisplayGetFramePerSec" )]
 		// manual add - is this int or float return?
@@ -97,6 +98,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x289D82FE, "sceDisplaySetFrameBuf" )]
 		// SDK location: /display/pspdisplay.h:74
@@ -137,6 +139,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x9C6EAAD7, "sceDisplayGetVcount" )]
 		// SDK location: /display/pspdisplay.h:89
@@ -146,6 +149,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( int )_driver.Vcount;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x773DD3A3, "sceDisplayGetCurrentHcount" )]
 		// manual add
@@ -155,6 +159,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		}
 
 		[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x210EAB3A, "sceDisplayGetAccumulatedHcount" )]
 		// manual add
@@ -163,34 +168,55 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
+		private void WaitVblank( bool allowCallbacks )
+		{
+			KThread thread = _kernel.ActiveThread;
+			Debug.Assert( thread != null );
+			thread.Delay( 16777, allowCallbacks );
+			_kernel.Schedule();
+		}
+
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x36CDFADE, "sceDisplayWaitVblank" )]
 		// SDK location: /display/pspdisplay.h:104
 		// SDK declaration: int sceDisplayWaitVblank();
-		public int sceDisplayWaitVblank(){ return Module.NotImplementedReturn; }
+		public int sceDisplayWaitVblank()
+		{
+			this.WaitVblank( false );
+			return 0;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x8EB9EC49, "sceDisplayWaitVblankCB" )]
 		// SDK location: /display/pspdisplay.h:109
 		// SDK declaration: int sceDisplayWaitVblankCB();
-		public int sceDisplayWaitVblankCB(){ return Module.NotImplementedReturn; }
+		public int sceDisplayWaitVblankCB()
+		{
+			this.WaitVblank( true );
+			return 0;
+		}
 
-		[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x984C27E7, "sceDisplayWaitVblankStart" )]
 		// SDK location: /display/pspdisplay.h:94
 		// SDK declaration: int sceDisplayWaitVblankStart();
-		public int sceDisplayWaitVblankStart(){ return Module.NotImplementedReturn; }
+		public int sceDisplayWaitVblankStart()
+		{
+			this.WaitVblank( false );
+			return 0;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x46F186C3, "sceDisplayWaitVblankStartCB" )]
 		// SDK location: /display/pspdisplay.h:99
 		// SDK declaration: int sceDisplayWaitVblankStartCB();
-		public int sceDisplayWaitVblankStartCB(){ return Module.NotImplementedReturn; }
-
+		public int sceDisplayWaitVblankStartCB()
+		{
+			this.WaitVblank( true );
+			return 0;
+		}
 	}
 }
 

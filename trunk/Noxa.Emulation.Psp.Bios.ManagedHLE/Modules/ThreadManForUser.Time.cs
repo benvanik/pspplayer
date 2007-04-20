@@ -129,6 +129,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( currentTick - _kernel.StartTick ) / ( _kernel.TickFrequency / 1000000 );
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x369ED59D, "sceKernelGetSystemTimeLow" )]
 		// SDK location: /user/pspthreadman.h:1517
