@@ -1,0 +1,13 @@
+#summary TODO list
+#labels Featured
+
+= TODO =
+The following are items on my TODO list. Just because something isn't on here doesn't mean I won't do it; I either forgot about it or it's probably under [WouldBeCool] (where I imply that I want you to do it :). See [KnownIssues] for workarounds or other information regarding problems with the current code.
+
+== Short-term ==
+ * VFPU support in the Ultra CPU
+ * Fix cleanup code so no need for a reset between runs
+
+== Long-term ==
+ * Build a site/database of unimplemented BIOS routines and playable games
+  * This is about half done - I had to do a project for a class and used this. The player can submit game information to the service and it will be displayed to users. Need to finish it up one day!
