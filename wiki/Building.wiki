@@ -1,0 +1,31 @@
+#summary How to build the emulator
+#labels Featured
+
+= Building PSP Player =
+
+== Prerequisites ==
+=== Windows ===
+ * [http://msdn.microsoft.com/vstudio/ Visual Studio 2005] SP1
+   * It should be possible to compile things separately with [http://msdn.microsoft.com/vstudio/express/visualcsharp/ VC# Express] and [http://msdn.microsoft.com/vstudio/express/visualc/default.aspx VC++ Express]
+ * [http://msdn.microsoft.com/directx/sdk/ DirectX 9.0 April 2007 SDK] (or later)
+ * [http://tortoisesvn.tigris.org/ TortoiseSVN] (or your favorite SVN client)
+
+=== Linux / OS X ===
+Everything has been designed and developed under Windows, with an aim towards keeping things somewhat portable. If you are running Linux/OS X you are welcome to mess with things, however I won't give you much help. See [Porting] for more information.
+
+== Getting the Code ==
+The SVN repository is publicy accessible for read-only access. You'll need everything in {{{trunk/}}} to compile, so make sure you grab it all.
+{{{
+svn://svn.ixtli.com/pspdev
+}}}
+
+If you haven't used SVN before, I recommend checking out the [http://www.tortoisesvn.net/support manual]. I won't help you with it, unless there is a problem with the server.
+
+== Compiling ==
+Opening {{{Noxa.Emulation.sln}}} in Visual Studio should be enough. Just make sure you are set to {{{Release}}} and build.
+
+== Running and Initial Configuration ==
+When built, you should find everything in your {{{trunk/debug}}} or {{{trunk/release}}} directory. Just run the exe and hit Configure. You'll need to pick the components you want to use (Use the Ultra CPU, ManagedHLE BIOS, and OpenGL video driver), and then make sure to set your Memory Stick folder by clicking the Configure button next to the User Media group. Save out, hit play, and select your game. Note that there is no need to restart.
+
+== Common Problems ==
+No one has tried, so no problems known.
