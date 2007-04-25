@@ -1,5 +1,4 @@
 #summary Code licensing and sharing guidelines
-#labels Featured
 
 = Open Source License =
 I've chosen to use the GNU Lesser General Public License 2.1 (LGPL 2.1) for this project, as I hate the standard GPL. You can find a copy of the license [wiki:LGPL locally], or on the [http://www.gnu.org/copyleft/lesser.html GNU website].
