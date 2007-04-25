@@ -1,5 +1,5 @@
+#summary Code licensing and sharing guidelines
 #labels Featured
-# Code licensing and sharing guidelines
 
 = Open Source License =
 I've chosen to use the GNU Lesser General Public License 2.1 (LGPL 2.1) for this project, as I hate the standard GPL. You can find a copy of the license [wiki:LGPL locally], or on the [http://www.gnu.org/copyleft/lesser.html GNU website].
@@ -12,4 +12,3 @@ The license is located in `trunk/` and under all project directories as License.
 
 == Before the License ==
 Some of the older revisions did not contain the LGPL text, however they should be considered to be under the license as the site was not made public until they had been properly tagged (the original SVN repository came from my local machine, months before I had decided to release the code).
-
