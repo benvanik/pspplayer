@@ -240,15 +240,15 @@ void PollXInput( int padIndex, bool* connected, int* buttons, short* analogX, sh
 				btns |= PADRightTrigger;
 			*buttons = btns;
 
-			short ax = state.Gamepad.sThumbLY;
+			short ax = -state.Gamepad.sThumbLY;
 			short ay = state.Gamepad.sThumbLX;
 
-			if( ( ax < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) &&
+			/*if( ( ax < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) &&
 				( ax > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) )
 				ax = 0;
 			if( ( ay < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) &&
 				( ay > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) )
-				ay = 0;
+				ay = 0;*/
 
 			*analogX = ax;
 			*analogY = ay;
