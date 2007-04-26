@@ -44,10 +44,13 @@ HANDLE _hSyncEvent;
 #define LOCK EnterCriticalSection( &_cs )
 #define UNLOCK LeaveCriticalSection( &_cs )
 
+HANDLE _hStallEvent;
+
 VdlRef* _lists;
 VdlRef* _listsTail;
 int _nextListId;
 int _listCount;
+int _unreadyCount;
 
 VdlRef* _pendingBatch;
 int _pendingCount;
@@ -90,7 +93,8 @@ VdlRef* GetNextListBatch()
 
 	UNLOCK;
 
-	PulseEvent( _hSyncEvent );
+	if( batch != NULL )
+		PulseEvent( _hSyncEvent );
 
 	return batch;
 }
@@ -142,44 +146,44 @@ void MigrateBatch( bool waitIfPending )
 	}
 
 	_pendingCount = 0;
+	if( _unreadyCount > 0 )
+	{
+		_pendingBatch = NULL;
+		_pendingCount = 0;
+		return;
+	}
 
 	ref = _lists;
 	VdlRef* prev = NULL;
 	while( ref != NULL )
 	{
-		if( ref->List->Ready == true )
+		assert( ref->List->Ready == true );
+		
+		VdlRef* next = ref->Next;
+		if( prev != NULL )
+			prev->Next = next;
+		ref->Next = NULL;
+
+		if( batch == NULL )
+			batch = ref;
+		if( batchTail != NULL )
+			batchTail->Next = ref;
+		batchTail = ref;
+
+		if( ref == _lists )
+			_lists = next;
+		if( ref == _listsTail )
 		{
-			VdlRef* next = ref->Next;
-			if( prev != NULL )
-				prev->Next = next;
-			ref->Next = NULL;
-
-			if( batch == NULL )
-				batch = ref;
-			if( batchTail != NULL )
-				batchTail->Next = ref;
-			batchTail = ref;
-
-			if( ref == _lists )
-				_lists = next;
-			if( ref == _listsTail )
-			{
-				if( next == NULL )
-					_listsTail = prev;
-				else
-					_listsTail = next;
-			}
-
-			fetched++;
-
-			// prev stays what it is as it is the previous still in the list
-			ref = next;
+			if( next == NULL )
+				_listsTail = prev;
+			else
+				_listsTail = next;
 		}
-		else
-		{
-			prev = ref;
-			ref = ref->Next;
-		}
+
+		fetched++;
+
+		// prev stays what it is as it is the previous still in the list
+		ref = next;
 	}
 
 	_listCount -= fetched;
@@ -196,6 +200,7 @@ void niSetup( NativeMemorySystem* memory, MemoryPool* pool )
 	_listsTail = NULL;
 	_nextListId = 1;
 	_listCount = 0;
+	_unreadyCount = 0;
 
 	_pendingBatch = NULL;
 	_pendingCount = 0;
@@ -229,6 +234,7 @@ void niCleanup()
 	_nextListId = 1;
 	_listCount = 0;
 	_pendingCount = 0;
+	_unreadyCount = 0;
 
 	_pool = NULL;
 	_memory = NULL;
@@ -313,6 +319,8 @@ int niEnqueueList( VideoDisplayList* list, bool immediate )
 	}
 
 	_listCount++;
+	if( list->Ready == false )
+		_unreadyCount++;
 
 	UNLOCK;
 
@@ -349,6 +357,9 @@ void niDequeueList( int listId )
 			if( ref == _listsTail )
 				_listsTail = prev;
 
+			if( ref->List->Ready == false )
+				_unreadyCount = false;
+
 			FreeList( ref->List );
 			SAFEFREE( ref );
 
@@ -364,13 +375,48 @@ void niDequeueList( int listId )
 	UNLOCK;
 }
 
-void niSyncList( int listId )
+void niSignalUpdate( int listId )
 {
+	VideoDisplayList* list = niFindList( listId );
+	if( list == NULL )
+		return;
+	if( list->Ready == true )
+		_unreadyCount--;
+	PulseEvent( _hStallEvent );
 }
 
-void niSync()
+void niSyncList( int listId, VideoSyncType syncType )
+{
+	VideoDisplayList* list = niFindList( listId );
+	if( list == NULL )
+		return;
+
+	switch( syncType )
+	{
+	case SYNC_LIST_DONE:
+	case SYNC_LIST_QUEUED:
+	case SYNC_LIST_DRAWING_DONE:
+		// Wait until flag set?
+		WaitForSingleObject( _hSyncEvent, 16 );
+		break;
+	case SYNC_LIST_STALL_REACHED:
+		WaitForSingleObject( _hStallEvent, 0 );
+		break;
+	case SYNC_LIST_CANCEL_DONE:
+		// Don't support cancel?
+		break;
+	}
+}
+
+void niSync( VideoSyncType syncType )
 {
 	LOCK;
+
+	if( _unreadyCount > 0 )
+	{
+		// Uh oh
+		int x = 5;
+	}
 
 #ifdef FRAMESKIPPING
 	MigrateBatch( false );
@@ -379,6 +425,8 @@ void niSync()
 #endif
 
 	UNLOCK;
+
+	WaitForSingleObject( _hSyncEvent, 16 );
 }
 
 void niWaitForVsync()
@@ -418,6 +466,7 @@ void OglDriver::SetupNativeInterface()
 	ni->FindList = &niFindList;
 	ni->EnqueueList = &niEnqueueList;
 	ni->DequeueList = &niDequeueList;
+	ni->SignalUpdate = &niSignalUpdate;
 	ni->SyncList = &niSyncList;
 	ni->Sync = &niSync;
 	ni->WaitForVsync = &niWaitForVsync;
@@ -425,6 +474,7 @@ void OglDriver::SetupNativeInterface()
 	InitializeCriticalSection( &_cs );
 
 	_hSyncEvent = CreateEvent( NULL, false, false, NULL );
+	_hStallEvent = CreateEvent( NULL, false, false, NULL );
 
 	_lastVsync = 0;
 }
@@ -435,6 +485,8 @@ void OglDriver::DestroyNativeInterface()
 
 	CloseHandle( _hSyncEvent );
 	_hSyncEvent = NULL;
+	CloseHandle( _hStallEvent );
+	_hStallEvent = NULL;
 
 	DeleteCriticalSection( &_cs );
 }

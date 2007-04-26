@@ -19,6 +19,15 @@ namespace Noxa {
 			namespace Video {
 				namespace Native {
 
+					typedef enum VideoSyncType_e
+					{
+						SYNC_LIST_DONE			= 0,
+						SYNC_LIST_QUEUED		= 1,
+						SYNC_LIST_DRAWING_DONE	= 2,
+						SYNC_LIST_STALL_REACHED	= 3,
+						SYNC_LIST_CANCEL_DONE	= 4,
+					} VideoSyncType;
+
 					typedef struct VideoApi_t
 					{
 						// Setup & tear-down
@@ -39,11 +48,14 @@ namespace Noxa {
 						// Dequeue an existing list (abort)
 						void (*DequeueList)( int listId );
 
+						// Signal that a list has been updated
+						void (*SignalUpdate)( int listId );
+
 						// Sync a list
-						void (*SyncList)( int listId );
+						void (*SyncList)( int listId, VideoSyncType syncType );
 
 						// Sync the video system
-						void (*Sync)();
+						void (*Sync)( VideoSyncType syncType );
 
 						void (*WaitForVsync)();
 
