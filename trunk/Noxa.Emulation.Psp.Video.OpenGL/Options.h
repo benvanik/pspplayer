@@ -17,7 +17,7 @@
 #define FRAMESKIPPING
 
 // Double buffer the display surface
-#define VSYNC
+//#define VSYNC
 
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG
