@@ -42,6 +42,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public override void Start()
 		{
 			_driver = _kernel.Emulator.Video;
+
+			_driver.Suspend();
+			DisplayProperties props = _driver.Properties;
+			props.BufferAddress = MemorySystem.VideoMemoryBase;
+			props.BufferSize = 512;
+			props.Width = 480;
+			props.Height = 272;
+			props.PixelFormat = PixelFormat.Rgba8888;
+			props.SyncMode = BufferSyncMode.NextFrame;
+			props.Mode = 0;
+			_driver.Resume();
 		}
 
 		public override void Stop()
