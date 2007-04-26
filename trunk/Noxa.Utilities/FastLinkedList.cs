@@ -5,7 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #if DEBUG
-#define ANALCHECKS
+//#define ANALCHECKS
 #endif
 
 using System;

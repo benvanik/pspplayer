@@ -175,9 +175,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			byte analogY;
 			if( _sampleMode == ControlSamplingMode.AnalogAndDigital )
 			{
-				float max = ushort.MaxValue;
-				analogX = ( byte )( ( ( ( float )sample.AnalogX / max ) + 0.5f ) * byte.MaxValue );
-				analogY = ( byte )( ( ( ( float )sample.AnalogY / max ) + 0.5f ) * byte.MaxValue );
+				analogX = ( byte )( ( ( ( float )sample.AnalogX / ( float )( ushort.MaxValue / 2 ) ) + 0.5f ) * ( float )( byte.MaxValue - 1 ) );
+				analogY = ( byte )( ( ( ( float )sample.AnalogY / ( float )( ushort.MaxValue / 2 ) ) + 0.5f ) * ( float )( byte.MaxValue - 1 ) );
 			}
 			else
 			{

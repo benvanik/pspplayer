@@ -178,7 +178,7 @@ namespace Noxa {
 			protected:
 				ObjectPointer* Allocate( int size )
 				{
-					void* ptr = malloc( size );
+					void* ptr = _aligned_malloc( size, 16 );
 					if( ptr == NULL )
 						return NULL;
 
@@ -195,7 +195,8 @@ namespace Noxa {
 					ObjectPointer* p = list;
 					while( p != NULL )
 					{
-						SAFEFREE( p->Target );
+						_aligned_free( p->Target );
+						p->Target = NULL;
 						p->Size = 0;
 
 						ObjectPointer* q = p;
