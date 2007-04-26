@@ -52,11 +52,11 @@ void OglDriver::Abort( int displayListId )
 void OglDriver::Sync( DisplayList^ displayList )
 {
 	VideoApi* ni = ( VideoApi* )_nativeInterface;
-	ni->SyncList( displayList->ID );
+	ni->SyncList( displayList->ID, SYNC_LIST_DONE );
 }
 
 void OglDriver::Sync()
 {
 	VideoApi* ni = ( VideoApi* )_nativeInterface;
-	ni->Sync();
+	ni->Sync( SYNC_LIST_DONE );
 }

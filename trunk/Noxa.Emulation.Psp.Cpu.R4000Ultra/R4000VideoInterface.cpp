@@ -284,9 +284,9 @@ int sceGeListEnQueue( uint list, uint stall, int cbid, uint arg, int head )
 	vdl->Packets = ( VideoPacket* )_memoryPool->Request( DEFAULTPACKETCAPACITY * sizeof( VideoPacket ) );
 
 	// BUG: seems to be a big issue here sometimes...
-//#ifdef _DEBUG
-//	memset( vdl->Packets, 0, DEFAULTPACKETCAPACITY * sizeof( VideoPacket ) );
-//#endif
+#ifdef _DEBUG
+	//memset( vdl->Packets, 0x0, DEFAULTPACKETCAPACITY * sizeof( VideoPacket ) );
+#endif
 
 	if( stall == NULL )
 	{
@@ -330,7 +330,6 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 {
 	VideoApi* ni = _videoApi;
 
-	//VideoDisplayList* vdl = ni->FindList( qid );
 	VideoDisplayList* vdl = FindOutstandingList( qid );
 	if( vdl == NULL )
 	{
@@ -342,10 +341,8 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 	{
 		bool done = ReadMorePackets( vdl, stall );
 		if( done == true )
-		{
 			RemoveOutstandingList( vdl );
-			ni->SyncList( vdl->ID );
-		}
+		ni->SignalUpdate( vdl->ID );
 	}
 
 	return 0;
@@ -355,25 +352,23 @@ int sceGeListSync( int qid, int syncType )
 {
 	VideoApi* ni = _videoApi;
 
-	//VideoDisplayList* vdl = ni->FindList( qid );
 	VideoDisplayList* vdl = FindOutstandingList( qid );
-	if( vdl == NULL )
+	if( vdl != NULL )
 	{
-		// Could have been processed already
-		return 0;
-	}
-
-	if( vdl->Ready == false )
-	{
-		bool done = ReadMorePackets( vdl, 0 );
-		if( done == false )
-			BREAK;
-		else
+		if( vdl->Ready == false )
 		{
-			RemoveOutstandingList( vdl );
-			ni->SyncList( vdl->ID );
+			bool done = ReadMorePackets( vdl, 0 );
+			if( done == false )
+				BREAK;
+			else
+			{
+				RemoveOutstandingList( vdl );
+				ni->SignalUpdate( vdl->ID );
+			}
 		}
 	}
+
+	ni->SyncList( qid, ( VideoSyncType )syncType );
 
 	return 0;
 }
@@ -382,6 +377,8 @@ int sceGeDrawSync( int syncType )
 {
 	// Can only handle syncType == 0
 	BREAKIF( syncType != 0 );
+
+	VideoApi* ni = _videoApi;
 
 	// This a full sync - we need to finish all lists
 	VdlRef* ref = _outstandingLists;
@@ -392,14 +389,14 @@ int sceGeDrawSync( int syncType )
 		{
 			bool done = ReadMorePackets( vdl, 0 );
 			BREAKIF( done == false );
+			ni->SignalUpdate( vdl->ID );
 		}
 		ref = ref->Next;
 	}
 
 	ClearOutstandingLists();
 
-	VideoApi* ni = _videoApi;
-	ni->Sync();
+	ni->Sync( ( VideoSyncType )syncType );
 
 	return 0;
 }
