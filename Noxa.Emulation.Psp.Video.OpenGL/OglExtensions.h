@@ -23,6 +23,7 @@ namespace Noxa {
 				bool SetupExtensions();
 
 				extern PFNGLBLENDEQUATIONPROC		glBlendEquation;
+				extern PFNWGLSWAPINTERVALEXTPROC	wglSwapIntervalEXT;
 
 			}
 		}
