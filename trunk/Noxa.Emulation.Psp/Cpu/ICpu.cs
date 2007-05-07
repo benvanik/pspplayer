@@ -19,7 +19,7 @@ namespace Noxa.Emulation.Psp.Cpu
 	/// Delegate used to indicate that a thread has jumped back in to nothing.
 	/// </summary>
 	/// <param name="tcsId">The thread context storage ID that made the jump.</param>
-	/// <param name="state">User-passed state argument.</param>
+	/// <param name="state">User-defined state argument.</param>
 	public delegate void ContextSafetyDelegate( int tcsId, int state );
 
 	/// <summary>
@@ -30,6 +30,13 @@ namespace Noxa.Emulation.Psp.Cpu
 	/// <param name="result">The value of $v0 (probably the result).</param>
 	/// <returns><c>true</c> if execution should continue, <c>false</c> if it should break.</returns>
 	public delegate bool MarshalCompleteDelegate( int tcsId, int state, int result );
+
+	/// <summary>
+	/// Delegate used to indicate that CPU execution is about to resume.
+	/// </summary>
+	/// <param name="timedOut"><c>true</c> if the resume was started by a timeout.</param>
+	/// <param name="state">User-defined state argument.</param>
+	public delegate void CpuResumeCallback( bool timedOut, object state );
 
 	/// <summary>
 	/// A CPU.
@@ -266,6 +273,36 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// Break execution.
 		/// </summary>
 		void BreakExecution();
+
+		#region Execution Control
+
+		/// <summary>
+		/// Resume CPU execution after a break and wait.
+		/// </summary>
+		void Resume();
+
+		/// <summary>
+		/// Break CPU execution and wait.
+		/// </summary>
+		/// <returns></returns>
+		void BreakAndWait();
+
+		/// <summary>
+		/// Break CPU execution and wait, cancelling the wait if the specified timeout period elapses.
+		/// </summary>
+		/// <param name="timeoutMs">The time, in milliseconds, to wait before resuming.</param>
+		void BreakAndWait( int timeoutMs );
+
+		/// <summary>
+		/// Break CPU execution and wait, cancelling the wait if the specified timeout period elapses.
+		/// Before the CPU resumes, the given callback is called.
+		/// </summary>
+		/// <param name="timeoutMs">The time, in milliseconds, to wait before resuming.</param>
+		/// <param name="callback">The callback to issue before resuming.</param>
+		/// <param name="state">User-defined state to pass to the callback.</param>
+		void BreakAndWait( int timeoutMs, CpuResumeCallback callback, object state );
+
+		#endregion
 
 		/// <summary>
 		/// Stop the CPU.

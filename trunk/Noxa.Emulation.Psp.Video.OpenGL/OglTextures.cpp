@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <cmath>
 #include <string>
+#include <stdlib.h>
 #pragma unmanaged
 #include <gl/gl.h>
 #include <gl/glu.h>
@@ -105,14 +106,14 @@ const TextureFormat __formats[] = {
 	{ TPSABGR8888,		4,		CopyPixel,			TFAlpha,		GL_UNSIGNED_BYTE,					},
 	{ TPSIndexed4,		0,		CopyPixelIndexed4,	TFAlpha,		GL_UNSIGNED_BYTE,					},
 	{ TPSIndexed8,		1,		CopyPixel,			TFAlpha,		GL_UNSIGNED_BYTE,					},
-	{ TPSIndexed16,		2,		CopyPixel,			TFAlpha,		GL_UNSIGNED_SHORT,					},
-	{ TPSIndexed32,		4,		CopyPixel,			TFAlpha,		GL_UNSIGNED_INT,					},
+	{ TPSIndexed16,		2,		CopyPixel,			TFAlpha,		GL_UNSIGNED_BYTE,					},
+	{ TPSIndexed32,		4,		CopyPixel,			TFAlpha,		GL_UNSIGNED_BYTE,					},
 	{ TPSDXT1,			4,		CopyPixel,			TFAlpha,		GL_COMPRESSED_RGBA_S3TC_DXT1_EXT,	},
 	{ TPSDXT3,			4,		CopyPixel,			TFAlpha,		GL_COMPRESSED_RGBA_S3TC_DXT3_EXT,	},
 	{ TPSDXT5,			4,		CopyPixel,			TFAlpha,		GL_COMPRESSED_RGBA_S3TC_DXT5_EXT,	},
 };
 
-void Unswizzle( const TextureFormat* format, const byte* in, byte* out, const uint width, const uint height )
+byte* Unswizzle( const TextureFormat* format, const byte* in, byte* out, const uint width, const uint height )
 {
 	int rowWidth = width * format->Size;
 	int pitch = ( rowWidth - 16 ) / 4;
@@ -139,7 +140,182 @@ void Unswizzle( const TextureFormat* format, const byte* in, byte* out, const ui
 		}
 		ydest += rowWidth * 8;
 	}
+	return out;
 }
+
+byte* Widen5650( const byte* in, byte* out, const uint width, const uint height )
+{
+	return out;
+}
+
+byte* Widen5551( const byte* in, byte* out, const uint width, const uint height )
+{
+	// Copy 1555 to 8888
+	short* input = ( short* )in;
+	uint* output = ( uint* )out;
+	for( uint n = 0; n < width * height; n++ )
+	{
+		short spixel = *input;
+		/*
+		  RRRRRGGGGGBBBBBA	<- GL
+		  ABBBBBGGGGGRRRRR	<- PSP
+		 */
+		unsigned short r = ( ( spixel & 0xF800 ) >> 11 ) * 8;
+		unsigned short g = ( ( spixel & 0x07C0 ) >> 6 ) * 8;
+		unsigned short b = ( ( spixel & 0x003E ) >> 1 ) * 8;
+		unsigned short a = ( spixel & 0x0001 );
+
+		uint dpixel = a ? 0x000000FF : 0x0;
+		dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
+		/*dpixel |=
+			( 8 * ( spixel & 0x1F ) ) |
+			( 8 * ( spixel >> 5 ) & 0x1F ) |
+			( 8 * ( spixel >> 10 ) & 0x1F );*/
+		*output = dpixel;
+
+		input++;
+		output++;
+	}
+	return out;
+}
+
+byte* Widen4444( const byte* in, byte* out, const uint width, const uint height )
+{
+	return out;
+}
+
+__inline uint ClutLookup( const OglContext* context, uint index )
+{
+	int finalIndex = ( ( context->ClutStart + index ) >> context->ClutShift ) & context->ClutMask;
+
+	if( context->ClutFormat == 0x3 )
+	{
+		// 32-bit ABGR 8888
+		uint entry = ( ( uint* )context->ClutTable )[ finalIndex ];
+		// Supposedly the intrinsic does the same thing
+		return _byteswap_ulong( entry );
+		/*__asm
+		{
+			; Swap bytes
+			MOV EAX, entry
+			BSWAP EAX
+			MOV entry, EAX
+		}
+		return entry;*/
+	}
+	else
+	{
+		ushort entry = ( ( ushort* )context->ClutTable )[ finalIndex ];
+		switch( context->ClutFormat )
+		{
+		case 0x0:
+			// 16-bit BGR 5650
+			return
+				( ( entry & 0x1F ) * 8 ) |
+				( ( ( ( entry >> 5 ) & 0x3F ) * 4 ) << 8 ) |
+				( ( ( ( entry >> 11 ) & 0x1F ) * 8 ) << 16 ) |
+				( 0xFF << 24 );
+			break;
+		case 0x1:
+			// 16-bit ABGR 5551
+			return
+				( ( entry & 0x1F ) * 8 ) |
+				( ( ( ( entry >> 5 ) & 0x1F ) * 8 ) << 8 ) |
+				( ( ( ( entry >> 10 ) & 0x1F ) * 8 ) << 16 ) |
+				( ( ( entry >> 15 ) * 255 ) << 24 );
+			break;
+		case 0x2:
+			// 16-bit ABGR 4444
+			return
+				( ( entry & 0xF ) * 16 ) |
+				( ( ( ( entry >> 4 ) & 0xF ) * 16 ) << 8 ) |
+				( ( ( ( entry >> 8 ) & 0xF ) * 16 ) << 16 ) |
+				( ( ( ( entry >> 12 ) & 0xF ) * 16 ) << 24 );
+		}
+	}
+
+	return 0;
+}
+
+byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint width, const uint height, const uint lineWidth )
+{
+	// Tricky, as each byte contains 2 indices (4 bits each)
+	byte* input = ( byte* )in;
+	uint* output = ( uint* )out;
+	//int diff = ( lineWidth / 2 ) - ( width / 2 ); // difference in actual width and buffer width (pixels)
+	for( uint y = 0; y < height; y++ )
+	{
+		for( uint x = 0; x < width; x++ )
+		{
+			byte index = *input;
+			if( x & 0x1 )
+			{
+				index >>= 4;
+				input++; // only advance after reading both
+			}
+			else
+				index &= 0x0F;
+			*( output++ ) = ClutLookup( context, index );
+		}
+		//input += diff;
+	}
+	return out;
+}
+
+byte* Decode8( const OglContext* context, const byte* in, byte* out, const uint width, const uint height, const uint lineWidth )
+{
+	byte* input = ( byte* )in;
+	uint* output = ( uint* )out;
+	//int diff = lineWidth - width; // difference in actual width and buffer width (pixels)
+	for( uint y = 0; y < height; y++ )
+	{
+		for( uint x = 0; x < width; x++ )
+		{
+			byte index = *( input++ );
+			*( output++ ) = ClutLookup( context, index );
+		}
+		//input += diff;
+	}
+	return out;
+}
+
+byte* Decode16( const OglContext* context, const byte* in, byte* out, const uint width, const uint height, const uint lineWidth )
+{
+	ushort* input = ( ushort* )in;
+	uint* output = ( uint* )out;
+	//int diff = lineWidth - width; // difference in actual width and buffer width (pixels)
+	for( uint y = 0; y < height; y++ )
+	{
+		for( uint x = 0; x < width; x++ )
+		{
+			ushort index = *( input++ );
+			*( output++ ) = ClutLookup( context, index );
+		}
+		//input += diff;
+	}
+	return out;
+}
+
+byte* Decode32( const OglContext* context, const byte* in, byte* out, const uint width, const uint height, const uint lineWidth )
+{
+	uint* input = ( uint* )in;
+	uint* output = ( uint* )out;
+	//int diff = lineWidth - width; // difference in actual width and buffer width (pixels)
+	for( uint y = 0; y < height; y++ )
+	{
+		for( uint x = 0; x < width; x++ )
+		{
+			uint index = *( input++ );
+			*( output++ ) = ClutLookup( context, index );
+		}
+		//input += diff;
+	}
+	return out;
+}
+
+// TODO: Free texture buffers
+byte* _unswizzleBuffer = NULL;
+byte* _decodeBuffer = NULL;
 
 extern void __break();
 bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTexture* texture )
@@ -156,55 +332,59 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 			__break();
 	}*/
 
+	if( _unswizzleBuffer == NULL )
+		_unswizzleBuffer = ( byte* )malloc( 512 * 512 * 4 );
+	if( _decodeBuffer == NULL )
+		_decodeBuffer = ( byte* )malloc( 512 * 512 * 4 );
+
 	byte* address = context->Memory->Translate( texture->Address );
 	TextureFormat* format = ( TextureFormat* )&__formats[ texture->PixelStorage ];
 	int size = texture->LineWidth * texture->Height * format->Size;
 
 	byte* buffer = address;
 	if( context->TexturesSwizzled == true )
+		buffer = Unswizzle( format, buffer, _unswizzleBuffer, texture->Width, texture->Height );
+
+	// buffer now contains an unswizzled texture - may need to un-CLUT it, or convert colors
+
+	switch( format->Format )
 	{
-		buffer = ( byte* )malloc( size );
-		Unswizzle( format, address, buffer, texture->Width, texture->Height );
-	}
-
-	if( format->Format != TPSABGR8888 )
-	{
-		// Special handling... Nasty!
-		if( format->Format == TPSABGR5551 )
-		{
-			assert( context->TexturesSwizzled == false );
-			int oldSize = size;
-			short* input = ( short* )buffer;
-			size = texture->Width * texture->Height * 4;
-			buffer = ( byte* )malloc( size );
-			format = ( TextureFormat *)&__formats[ 3 ];
-
-			// Copy 1555 to 8888
-			uint* output = ( uint* )buffer;
-			for( int n = 0; n < texture->Width * texture->Height; n++ )
-			{
-				short spixel = *input;
-				/*
-				  RRRRRGGGGGBBBBBA	<- GL
-				  ABBBBBGGGGGRRRRR	<- PSP
-				 */
-				unsigned short r = ( (spixel & 0xf800) >> 11 ) * 8;
-				unsigned short g = ( (spixel & 0x07c0) >> 6 ) * 8;
-				unsigned short b = ( (spixel & 0x003E) >> 1 ) * 8;
-				unsigned short a = (spixel & 0x0001);
-
-				uint dpixel = a ? 0x000000FF : 0x0;
-				dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
-				/*dpixel |=
-					( 8 * ( spixel & 0x1F ) ) |
-					( 8 * ( spixel >> 5 ) & 0x1F ) |
-					( 8 * ( spixel >> 10 ) & 0x1F );*/
-				*output = dpixel;
-
-				input++;
-				output++;
-			}
-		}
+	case TPSBGR5650:
+		//buffer = Widen5650( buffer, _decodeBuffer, texture->Width, texture->Height );
+		//format = ( TextureFormat* )&__formats[ 3 ];
+		break;
+	case TPSABGR5551:
+		buffer = Widen5551( buffer, _decodeBuffer, texture->Width, texture->Height );
+		format = ( TextureFormat* )&__formats[ 3 ];
+		break;
+	case TPSABGR4444:
+		//buffer = Widen4444( buffer, _decodeBuffer, texture->Width, texture->Height );
+		//format = ( TextureFormat* )&__formats[ 3 ];
+		break;
+	case TPSABGR8888:
+		// Pass through
+		break;
+	case TPSIndexed4:
+		buffer = Decode4( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
+		format = ( TextureFormat* )&__formats[ 3 ];
+		break;
+	case TPSIndexed8:
+		buffer = Decode8( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
+		format = ( TextureFormat* )&__formats[ 3 ];
+		break;
+	case TPSIndexed16:
+		buffer = Decode16( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
+		format = ( TextureFormat* )&__formats[ 3 ];
+		break;
+	case TPSIndexed32:
+		buffer = Decode32( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
+		format = ( TextureFormat* )&__formats[ 3 ];
+		break;
+	case TPSDXT1:
+	case TPSDXT3:
+	case TPSDXT5:
+		// Not supported
+		break;
 	}
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, format->Size );
@@ -221,9 +401,6 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
 		format->GLFormat,
 		( void* )buffer );
-
-	if( context->TexturesSwizzled == true )
-		SAFEFREE( buffer );
 
 	return true;
 }

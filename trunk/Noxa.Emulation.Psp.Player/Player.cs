@@ -180,8 +180,7 @@ namespace Noxa.Emulation.Psp.Player
 				Debug.WriteLine( string.Format( "Unable to find path {0}", path ) );
 				return;
 			}
-			Games.GameLoader loader = new Noxa.Emulation.Psp.Games.GameLoader();
-			Games.GameInformation game = loader.GetEbootGameInformation( folder );
+			Games.GameInformation game = Games.GameLoader.GetEbootGameInformation( folder );
 			if( game == null )
 			{
 				Debug.WriteLine( string.Format( "Unable to find eboot at path {0}", path ) );

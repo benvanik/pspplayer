@@ -43,8 +43,8 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	// A good optimization would be to find a way to do this so we can cache the results
 
 	// I don't think these are supported
-	assert( ( vertexType & VTNormalMask ) == 0 );
-	assert( ( vertexType & VTWeightMask ) == 0 );
+	//assert( ( vertexType & VTNormalMask ) == 0 );
+	//assert( ( vertexType & VTWeightMask ) == 0 );
 
 	byte* src = ptr;
 
@@ -175,24 +175,34 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 		vpos[ 3 ][ 0 ] = vpos[ 0 ][ 0 ];
 		vpos[ 3 ][ 1 ] = vpos[ 2 ][ 1 ];
 		vpos[ 3 ][ 2 ] = vpos[ 2 ][ 2 ];
-		vtex[ 1 ][ 0 ] = vtex[ 2 ][ 0 ];	// s
-		vtex[ 1 ][ 1 ] = vtex[ 0 ][ 1 ];	// t
-		vtex[ 3 ][ 0 ] = vtex[ 0 ][ 0 ];
-		vtex[ 3 ][ 1 ] = vtex[ 2 ][ 1 ];
+		if( textureType != 0 )
+		{
+			vtex[ 1 ][ 0 ] = vtex[ 2 ][ 0 ];	// s
+			vtex[ 1 ][ 1 ] = vtex[ 0 ][ 1 ];	// t
+			vtex[ 3 ][ 0 ] = vtex[ 0 ][ 0 ];
+			vtex[ 3 ][ 1 ] = vtex[ 2 ][ 1 ];
+		}
 
-		*( ( int* )vclr[ 0 ] ) = *( ( int* )vclr[ 2 ] );
-		*( ( int* )vclr[ 1 ] ) = *( ( int* )vclr[ 2 ] );
-		*( ( int* )vclr[ 3 ] ) = *( ( int* )vclr[ 2 ] );
+		if( colorType != 0 )
+		{
+			*( ( int* )vclr[ 0 ] ) = *( ( int* )vclr[ 2 ] );
+			*( ( int* )vclr[ 1 ] ) = *( ( int* )vclr[ 2 ] );
+			*( ( int* )vclr[ 3 ] ) = *( ( int* )vclr[ 2 ] );
+		}
 		
 		for( m = 0; m < 4; m++ )
 		{
 			if( textureType != 0 )
 			{
 				// The texture coords are not normalized
-				//glTexCoord2fv( vtex[ m ] );
-				glTexCoord2f(
-					vtex[ m ][ 0 ] / ( float )context->Textures[ 0 ].Width,
-					vtex[ m ][ 1 ] / ( float )context->Textures[ 0 ].Height );
+				if( transformed == true )
+				{
+					glTexCoord2f(
+						vtex[ m ][ 0 ] / ( float )context->Textures[ 0 ].Width,
+						vtex[ m ][ 1 ] / ( float )context->Textures[ 0 ].Height );
+				}
+				else
+					glTexCoord2fv( vtex[ m ] );
 			}
 			if( colorType != 0 )
 				glColor4ubv( vclr[ m ] );

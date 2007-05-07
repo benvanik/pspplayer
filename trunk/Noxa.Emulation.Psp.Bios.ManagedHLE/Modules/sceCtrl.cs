@@ -55,11 +55,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		public override void Start()
 		{
+			_device = _kernel.Emulator.Input;
+			if( _device == null )
+				return;
+
 			_buffer = new FastLinkedList<Sample>();
 			_bufferEvent = new AutoResetEvent( false );
 			_bufferSyncRoot = new object();
-
-			_device = _kernel.Emulator.Input;
 
 			_timer = _kernel.TimerQueue.CreatePeriodicTimer(
 				new TimerCallback( this.PollCallback ), 16,
@@ -68,10 +70,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		public override void Stop()
 		{
-			_kernel.TimerQueue.StopTimer( _timer );
+			if( ( _timer != null ) &&
+				( _kernel.TimerQueue != null ) )
+				_kernel.TimerQueue.StopTimer( _timer );
 			_timer = null;
 
-			_buffer.Clear();
+			if( _buffer != null )
+				_buffer.Clear();
 		}
 
 		private void PollCallback( Timer timer )

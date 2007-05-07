@@ -197,7 +197,10 @@ namespace Noxa.Emulation.Psp
 		{
 			get
 			{
-				return _params[ component ];
+				if( _params.ContainsKey( component ) == false )
+					return new ComponentParameters();
+				else
+					return _params[ component ];
 			}
 			set
 			{

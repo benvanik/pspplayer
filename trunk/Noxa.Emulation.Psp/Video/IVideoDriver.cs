@@ -51,14 +51,6 @@ namespace Noxa.Emulation.Psp.Video
 		}
 
 		/// <summary>
-		/// Set on each V blank.
-		/// </summary>
-		AutoResetEvent Vblank
-		{
-			get;
-		}
-
-		/// <summary>
 		/// The number of V blanks that have elapsed.
 		/// </summary>
 		uint Vcount
@@ -73,38 +65,6 @@ namespace Noxa.Emulation.Psp.Video
 		{
 			get;
 		}
-
-		/// <summary>
-		/// Find a display list with the given ID.
-		/// </summary>
-		/// <param name="displayListId">The ID of the display list to find.</param>
-		/// <returns>The <see cref="DisplayList"/> with the given <paramref name="displyaListId"/> or <c>null</c> if not found.</returns>
-		DisplayList FindDisplayList( int displayListId );
-
-		/// <summary>
-		/// Enqueue a display list.
-		/// </summary>
-		/// <param name="displayList">The display list to enqueue.</param>
-		/// <param name="immediate"><c>true</c> if the display list should be inserted at the head of the queue.</param>
-		/// <returns><c>true</c> if the list was inserted.</returns>
-		bool Enqueue( DisplayList displayList, bool immediate );
-
-		/// <summary>
-		/// Abort a previously issued display list.
-		/// </summary>
-		/// <param name="displayListId">The ID of the display list to abort.</param>
-		void Abort( int displayListId );
-
-		/// <summary>
-		/// Wait until a display list has been processed.
-		/// </summary>
-		/// <param name="displayList">The display list to wait on.</param>
-		void Sync( DisplayList displayList );
-
-		/// <summary>
-		/// Wait until all outstanding display lists have been processed.
-		/// </summary>
-		void Sync();
 
 		/// <summary>
 		/// Suspend the video driver.

@@ -1,0 +1,93 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{950D0FA2-7755-4599-8A31-6DF3CCEA2F25}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Noxa.Emulation.Psp.GameTester</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp.GameTester</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameFinder.cs" />
+    <Compile Include="TestHost.cs" />
+    <Compile Include="TestInstance.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestReport.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Bios.ManagedHLE\Noxa.Emulation.Psp.Bios.ManagedHLE.csproj">
+      <Project>{4B161B6A-14B4-4874-A883-F8D84ED733A7}</Project>
+      <Name>Noxa.Emulation.Psp.Bios.ManagedHLE</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">
+      <Project>{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}</Project>
+      <Name>Noxa.Emulation.Psp.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Cpu.R4000Ultra\Noxa.Emulation.Psp.Cpu.R4000Ultra.vcproj">
+      <Project>{F8A92180-DC91-4FCB-8F69-9B3594C75A7D}</Project>
+      <Name>Noxa.Emulation.Psp.Cpu.R4000Ultra</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Input.SimpleInput\Noxa.Emulation.Psp.Input.SimpleInput.vcproj">
+      <Project>{C4A3CB92-6CCA-41CA-B3AA-47754B6382E1}</Project>
+      <Name>Noxa.Emulation.Psp.Input.SimpleInput</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Media.HostFileSystem\Noxa.Emulation.Psp.Media.HostFileSystem.csproj">
+      <Project>{30EA9C83-286D-4560-8B12-6E4530A5ECAD}</Project>
+      <Name>Noxa.Emulation.Psp.Media.HostFileSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Media.Iso\Noxa.Emulation.Psp.Media.Iso.csproj">
+      <Project>{5724E076-9383-49DF-BFE2-21D206ED3E0A}</Project>
+      <Name>Noxa.Emulation.Psp.Media.Iso</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Video.OpenGL\Noxa.Emulation.Psp.Video.OpenGL.vcproj">
+      <Project>{78980526-7FCC-4DB8-BDDA-BEDBBE8C8705}</Project>
+      <Name>Noxa.Emulation.Psp.Video.OpenGL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
+      <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
+      <Name>Noxa.Emulation.Psp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj">
+      <Project>{67000884-BAF0-40B5-8D24-F06D2D623787}</Project>
+      <Name>Noxa.Utilities.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities\Noxa.Utilities.csproj">
+      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
+      <Name>Noxa.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

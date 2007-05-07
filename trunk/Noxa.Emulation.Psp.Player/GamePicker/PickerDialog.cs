@@ -75,8 +75,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 				}
 
 				// Regrab game info
-				GameLoader loader = new GameLoader();
-				game = loader.FindGame( _emulator.Umd );
+				game = GameLoader.FindGame( _emulator.Umd );
 
 				Properties.Settings.Default.LastPlayedGame = gamePath;
 				Properties.Settings.Default.Save();
@@ -90,9 +89,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		public void FindGames()
 		{
 			// Load the memory stick listing
-			GameLoader loader = new GameLoader();
 			List<GameInformation> eboots = new List<GameInformation>();
-			GameInformation[] ebootList = loader.FindGames( _emulator.MemoryStick );
+			GameInformation[] ebootList = GameLoader.FindGames( _emulator.MemoryStick );
 			foreach( GameInformation game in ebootList )
 			{
 				if( game.GameType == GameType.Eboot )
@@ -141,8 +139,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 				if( umdDevice.Load( gamePath, true ) == false )
 					return null;
 
-				GameLoader loader = new GameLoader();
-				GameInformation game = loader.FindGame( umdDevice );
+				GameInformation game = GameLoader.FindGame( umdDevice );
 				if( game != null )
 				{
 					game.Tag = gamePath;

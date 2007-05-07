@@ -75,6 +75,8 @@ void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int ve
 	}
 }
 
+float _textureCoordBuffer[ 1024 * 10 ];
+
 void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr )
 {
 	// DO NOT SUPPORT WEIGHTS/MORPHING
@@ -85,6 +87,8 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 	//unsigned int color;
 	//float nx,ny,nz;
 	//float x,y,z;
+
+	bool transformed = ( vertexType & VTTransformedMask ) != 0;
 
 	// Must be word (4 byte) aligned - if it's not, there will be padding we need to skip
 	if( ( vertexSize & 0x3 ) != 0 )
@@ -109,12 +113,13 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 	else if( careType == VTPositionFloat )
 		format = GL_V3F;
 
-	if( format != 0 )
+	/*if( format != 0 )
 	{
 		// Something we support - issue an interleaved array
 		glInterleavedArrays( format, vertexSize, ptr );
 	}
 	else
+	*/
 	{
 		// Interleaved unsupported - use separate arrays
 
@@ -150,11 +155,49 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 			src += 2;
 			break;
 		case VTTextureFixed16:
-			glTexCoordPointer( 2, GL_SHORT, vertexSize, src );
+			if( transformed == true )
+			{
+				byte* sp = src;
+				float* dp = _textureCoordBuffer;
+				int textureWidth = context->Textures[ 0 ].Width;
+				int textureHeight = context->Textures[ 0 ].Height;
+				for( int n = 0; n < vertexCount; n++ )
+				{
+					ushort* usp = ( ushort* )sp;
+					*dp = ( ( float )*usp / textureWidth );
+					usp++;
+					dp++;
+					*dp = ( ( float )*usp / textureHeight );
+					dp++;
+					sp += vertexSize;
+				}
+				glTexCoordPointer( 2, GL_FLOAT, 0, _textureCoordBuffer );
+			}
+			else
+				glTexCoordPointer( 2, GL_SHORT, vertexSize, src );
 			src += 4;
 			break;
 		case VTTextureFloat:
-			glTexCoordPointer( 2, GL_FLOAT, vertexSize, src );
+			if( transformed == true )
+			{
+				byte* sp = src;
+				float* dp = _textureCoordBuffer;
+				int textureWidth = context->Textures[ 0 ].Width;
+				int textureHeight = context->Textures[ 0 ].Height;
+				for( int n = 0; n < vertexCount; n++ )
+				{
+					float* usp = ( float* )sp;
+					*dp = ( ( float )*usp / textureWidth );
+					usp++;
+					dp++;
+					*dp = ( ( float )*usp / textureHeight );
+					dp++;
+					sp += vertexSize;
+				}
+				glTexCoordPointer( 2, GL_FLOAT, 0, _textureCoordBuffer );
+			}
+			else
+				glTexCoordPointer( 2, GL_FLOAT, vertexSize, src );
 			src += 8;
 			break;
 		}
@@ -198,7 +241,7 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 		switch( positionType )
 		{
 		case VTPositionFixed8:
-			assert( false );
+			glVertexPointer( 3, GL_BYTE, vertexSize, src );	// THIS MAY NOT WORK!!!
 			src += 3;
 			break;
 		case VTPositionFixed16:

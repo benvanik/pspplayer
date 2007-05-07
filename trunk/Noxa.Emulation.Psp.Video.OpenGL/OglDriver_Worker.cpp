@@ -18,6 +18,7 @@
 #include <string>
 #include "OglDriver.h"
 #include "VideoApi.h"
+#include "DisplayList.h"
 #include "OglContext.h"
 #include "OglExtensions.h"
 
@@ -32,13 +33,20 @@ bool _shutdown;
 // Statistics
 extern uint _vcount;
 extern uint _displayListsProcessed;
+extern uint _processedFrames;
+extern uint _abortedLists;
+
+extern HANDLE _hSyncEvent;
+extern HANDLE _hListSyncEvent;
+extern HANDLE _hWorkWaitingEvent;
+extern int _workWaiting;
+extern bool _vsyncWaiting;
 
 // NativeInterface
-VdlRef* GetNextListBatch();
-void FreeList( VideoDisplayList* list );
+DisplayList* GetNextDisplayList();
 
 // Processing
-void ProcessList( OglContext* context, VideoDisplayList* list );
+void ProcessList( OglContext* context, DisplayList* list );
 
 void WorkerThreadThunk( Object^ object );
 
@@ -78,37 +86,82 @@ void OglDriver::StopThread()
 #pragma unmanaged
 void NativeWorker( HDC hDC, OglContext* context )
 {
+	long long startTime;
+	long long endTime;
+	long long freq;
+
+	// We take ticks/sec to ticks/frame (16.6667 ms)
+	QueryPerformanceFrequency( ( LARGE_INTEGER* )&freq );
+	freq /= ( 1000 * 17 );
+
 	while( _shutdown == false )
 	{
-		// Try to get a batch of lists to draw (as a frame)
-		VdlRef* batch = GetNextListBatch();
-		if( batch != NULL )
+		int listsDone = 0;
+		if( ( _workWaiting > 0 ) ||
+			( WaitForSingleObject( _hWorkWaitingEvent, 100 ) == WAIT_OBJECT_0 ) )
 		{
-			VdlRef* ref = batch;
-			while( ref != NULL )
+			//QueryPerformanceCounter( ( LARGE_INTEGER* )&startTime );
+
+			// Work to do!
+			while( ( _shutdown == false ) &&
+				( _workWaiting > 0 ) )
 			{
-				// I've actually seen this happen!
-				assert( ref->List->Ready == true );
+				DisplayList* list = GetNextDisplayList();
+				if( list != NULL )
+				{
+					// Keep working on this list until we are done with it
+					do
+					{
+						// Wait until not stalled
+						while( ( list->Stalled == true ) &&
+							( _shutdown == false ) )
+						{
+							if( WaitForSingleObject( _hWorkWaitingEvent, 16 ) != WAIT_OBJECT_0 )
+							{
+								// Timeout - abort list!
+								/*list->Drawn = true;
+								list->Done = true;
+								PulseEvent( _hListSyncEvent );
+								_abortedLists++;
+								goto listAbort;*/
+							}
+						}
 
-				// Actually process the list
-				ProcessList( context, ref->List );
+						// Process
+						ProcessList( context, list );
 
+					} while( list->Done == false );
+listAbort:
 #ifdef STATISTICS
-				_displayListsProcessed++;
+					_displayListsProcessed++;
 #endif
 
-				// Move to next while freeing old - since we are
-				// done with it we also need to free the list
-				FreeList( ref->List );
-				VdlRef* next = ref->Next;
-				SAFEFREE( ref );
-				ref = next;
+					//QueryPerformanceCounter( ( LARGE_INTEGER* )&endTime );
+					//if( ( ( endTime - startTime ) / freq ) > 0 )
+					//	break;
+				}
+				else
+					break;
+
+				listsDone++;
+
+				//if( _vsyncWaiting == true )
+					break;
 			}
-
-			_vcount++;
-
-			SwapBuffers( hDC );
 		}
+
+		if( listsDone > 0 )
+		{
+			_processedFrames++;
+
+			// THIS IS WRONG
+			_vcount++;
+			SwapBuffers( hDC );
+			PulseEvent( _hSyncEvent );
+		}
+		else
+			Sleep( 0 );
+		_vsyncWaiting = false;
 	}
 }
 #pragma managed
@@ -149,7 +202,7 @@ void OglDriver::SetupOpenGL()
 	wglMakeCurrent( hDC, hRC );
 	
 	glShadeModel( GL_SMOOTH );
-	glClearColor( 0.0f, 0.0f, 0.0f, 0.5f );
+	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 	glClearDepth( 0.0f );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
@@ -158,7 +211,11 @@ void OglDriver::SetupOpenGL()
 
 	SetupExtensions();
 
+#ifndef VSYNC
 	wglSwapIntervalEXT( 0 );
+#endif
+
+	_context->ClutTable = calloc( 1, CLUTSIZE );
 }
 
 void OglDriver::DestroyOpenGL()
@@ -169,6 +226,8 @@ void OglDriver::DestroyOpenGL()
 	if( ( _handle != NULL ) &&
 		( _hDC != NULL ) )
 		ReleaseDC( ( HWND )_handle, ( HDC )_hDC );
+
+	SAFEFREE( _context->ClutTable );
 }
 
 void OglDriver::WorkerThread()
@@ -178,6 +237,8 @@ void OglDriver::WorkerThread()
 	// Setup the context
 	_context->Memory = ( NativeMemorySystem* )_emu->Cpu->Memory->NativeMemorySystem.ToPointer();
 	Debug::Assert( _context->Memory != NULL );
+	if( _context->Memory == NULL )
+		return;
 
 	_startTime = DateTime::Now;
 

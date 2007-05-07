@@ -67,53 +67,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public void Execute()
 		{
-			if( ActiveThread != null )
-			{
-				// Execute active thread
-				bool breakFlag;
-				uint instructionsExecuted;
-				Cpu.Execute( out breakFlag, out instructionsExecuted );
-				if( breakFlag == true )
-					this.Schedule();
-				else
-				{
-					// Only if not broken by choice
-					Debug.WriteLine( string.Format( "Kernel: CPU returned to us after {0} instructions", instructionsExecuted ) );
-				}
-			}
+			Debug.Assert( ActiveThread != null );
+
+			// Execute active thread
+			bool breakFlag;
+			uint instructionsExecuted;
+			Cpu.Execute( out breakFlag, out instructionsExecuted );
+			if( breakFlag == true )
+				this.Schedule();
 			else
 			{
-				// Load game
-
-				// Clear everything (needed?)
-				Emulator.LightReset();
-
-				// Get bootstream
-				Debug.Assert( Bios.BootStream == null );
-				GameLoader gameLoader = new GameLoader();
-				Bios.BootStream = gameLoader.FindBootStream( Bios.Game );
-				Debug.Assert( Bios.BootStream != null );
-
-				LoadParameters loadParams = new LoadParameters();
-				loadParams.Path = Bios.Game.Folder;
-				LoadResults results = Bios.Loader.LoadModule( ModuleType.Boot, Bios.BootStream, loadParams );
-
-				Debug.Assert( results.Successful == true );
-				if( results.Successful == false )
-				{
-					Debug.WriteLine( string.Format( "Kernel: load of game failed" ) );
-					Bios.Game = null;
-					return;
-				}
-
-				this.CurrentPath = Bios.Game.Folder;
-				this.Cpu.SetupGame( Bios.Game, Bios.BootStream );
-
-				// Start modules
-				foreach( Module module in Bios._modules )
-					module.Start();
-
-				Debug.WriteLine( string.Format( "Kernel: game loaded" ) );
+				// Only if not broken by choice
+				Debug.WriteLine( string.Format( "Kernel: CPU returned to us after {0} instructions", instructionsExecuted ) );
 			}
 		}
 

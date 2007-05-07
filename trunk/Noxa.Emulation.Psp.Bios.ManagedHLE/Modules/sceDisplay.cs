@@ -42,6 +42,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public override void Start()
 		{
 			_driver = _kernel.Emulator.Video;
+			if( _driver == null )
+				return;
 
 			_driver.Suspend();
 			DisplayProperties props = _driver.Properties;
@@ -195,6 +197,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceDisplayWaitVblank();
 		public int sceDisplayWaitVblank()
 		{
+			// RETURN FB ADDRESS
 			this.WaitVblank( false );
 			return 0;
 		}
@@ -206,6 +209,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceDisplayWaitVblankCB();
 		public int sceDisplayWaitVblankCB()
 		{
+			// RETURN FB ADDRESS
 			this.WaitVblank( true );
 			return 0;
 		}
@@ -218,6 +222,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceDisplayWaitVblankStart();
 		public int sceDisplayWaitVblankStart()
 		{
+			// RETURN FB ADDRESS
 			this.WaitVblank( false );
 			return 0;
 		}
@@ -229,6 +234,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceDisplayWaitVblankStartCB();
 		public int sceDisplayWaitVblankStartCB()
 		{
+			// RETURN FB ADDRESS
 			this.WaitVblank( true );
 			return 0;
 		}

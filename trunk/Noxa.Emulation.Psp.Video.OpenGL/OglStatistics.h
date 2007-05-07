@@ -24,6 +24,7 @@ namespace Noxa {
 					uint ProcessedFrames;					// # of frames processed
 					uint SkippedFrames;						// # of frames skipped
 					uint DisplayListsProcessed;				// # of display lists processed
+					uint AbortedDisplayLists;				// # of display lists forcefully aborted
 
 					array<uint>^ CommandCounts;				// Count of each command used
 

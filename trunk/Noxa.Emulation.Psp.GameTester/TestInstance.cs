@@ -4,8 +4,6 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-//#define XMB
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,18 +20,12 @@ using Noxa.Emulation.Psp.IO;
 using Noxa.Emulation.Psp.Input;
 using Noxa.Emulation.Psp.Media;
 
-namespace Noxa.Emulation.Psp.Player
+namespace Noxa.Emulation.Psp.GameTester
 {
-	class Instance : IEmulationInstance
+	class TestInstance : IEmulationInstance
 	{
-		protected Host _host;
+		protected TestHost _host;
 		protected EmulationParameters _params;
-
-#if XMB
-		protected CrossMediaBar.Manager _xmb;
-#else
-		protected GamePicker.PickerDialog _picker;
-#endif
 
 		protected List<IComponentInstance> _instances = new List<IComponentInstance>();
 		protected IAudioDriver _audio;
@@ -52,15 +44,13 @@ namespace Noxa.Emulation.Psp.Player
 		protected AutoResetEvent _stateChangeEvent = new AutoResetEvent( false );
 		protected bool _switchToXmb = true;
 
-		public Instance( Host host, EmulationParameters parameters, bool suppressXmb )
+		public TestInstance( TestHost host, EmulationParameters parameters )
 		{
 			Debug.Assert( host != null );
 			Debug.Assert( parameters != null );
 
 			_host = host;
 			_params = parameters;
-
-			_switchToXmb = !suppressXmb;
 		}
 
 		public IEmulationHost Host
@@ -166,10 +156,10 @@ namespace Noxa.Emulation.Psp.Player
 			{
 				if( required == true )
 					issues.Add( new ComponentIssue( null, IssueLevel.Error,
-						string.Format( Strings.ErrorRequiredComponentNotFound, type ) ) );
+						string.Format( "ErrorRequiredComponentNotFound", type ) ) );
 				else
 					issues.Add( new ComponentIssue( null, IssueLevel.Warning,
-						string.Format( Strings.ErrorOptionalComponentNotFound, type ) ) );
+						string.Format( "ErrorOptionalComponentNotFound", type ) ) );
 				return;
 			}
 
@@ -186,7 +176,7 @@ namespace Noxa.Emulation.Psp.Player
 			List<ComponentIssue> issues = new List<ComponentIssue>();
 			TestComponent( issues, _params.CpuComponent, ComponentType.Cpu, true );
 			TestComponent( issues, _params.BiosComponent, ComponentType.Bios, true );
-			TestComponent( issues, _params.VideoComponent, ComponentType.Video, true );
+			//TestComponent( issues, _params.VideoComponent, ComponentType.Video, true );
 			foreach( IComponent component in _params.IOComponents )
 				TestComponent( issues, component, component.Type, false );
 			TestComponent( issues, _params.AudioComponent, ComponentType.Audio, false );
@@ -224,7 +214,7 @@ namespace Noxa.Emulation.Psp.Player
 			{
 				_input = _params.InputComponent.CreateInstance( this, _params[ _params.InputComponent ] ) as IInputDevice;
 				_instances.Add( _input );
-				_input.WindowHandle = _host.Player.Handle;
+				//_input.WindowHandle = _host.Player.Handle;
 			}
 			if( _params.UmdComponent != null )
 			{
@@ -239,15 +229,10 @@ namespace Noxa.Emulation.Psp.Player
 			if( _params.VideoComponent != null )
 			{
 				_video = _params.VideoComponent.CreateInstance( this, _params[ _params.VideoComponent ] ) as IVideoDriver;
-				_video.ControlHandle = _host.Player.ControlHandle;
+				//_video.ControlHandle = _host.Player.ControlHandle;
 				_instances.Add( ( IComponentInstance )_video );
 			}
 
-#if XMB
-			_xmb = new CrossMediaBar.Manager( this, _host.Player.Handle, _host.Player.ControlHandle );
-#else
-#endif
-			
 			// Create thread
 			_thread = new Thread( new ThreadStart( this.RuntimeThread ) );
 			_thread.Name = "Host runtime thread";
@@ -279,19 +264,9 @@ namespace Noxa.Emulation.Psp.Player
 				Thread.Sleep( 10 );
 			_thread = null;
 
-#if XMB
-			// Destroy XMB
-			_xmb.Cleanup();
-			_xmb = null;
-#else
-#endif
-
 			// Destroy all the components
 			foreach( IComponentInstance component in _instances )
-			{
-				if( component != null )
-					component.Cleanup();
-			}
+				component.Cleanup();
 			_instances.Clear();
 			_audio = null;
 			_bios = null;
@@ -401,41 +376,19 @@ namespace Noxa.Emulation.Psp.Player
 
 		public void SwitchToXmb()
 		{
+			if( _bios.Game == null )
+				return;
 			Debug.WriteLine( "Instance: switching to XMB" );
 			_video.Cleanup();
-#if XMB
-			_xmb.Enable();
-#else
-			DummyDelegate del = delegate()
-			{
-				try
-				{
-					//this.Stop();
-					_picker = new Noxa.Emulation.Psp.Player.GamePicker.PickerDialog( this );
-					if( _picker.ShowDialog( _host.Player ) == System.Windows.Forms.DialogResult.OK )
-					{
-					}
-					_picker = null;
-				}
-				catch( Exception ex )
-				{
-					Debugger.Break();
-					throw ex;
-				}
-			};
-			_host.Player.Invoke( del );
-#endif
+			this.Stop();
+			this.Destroy();
 		}
 
-		public void SwitchToGame( Games.GameInformation game )
+		public LoadResults SwitchToGame( Games.GameInformation game )
 		{
 			Debug.WriteLine( "Instance: switching to game " + game.Parameters.Title );
-#if XMB
-			_xmb.Disable();
-#else
-#endif
 			_bios.Game = game;
-			LoadResults results = _bios.Load();
+			return _bios.Load();
 		}
 
 		private void RuntimeThread()
@@ -459,13 +412,12 @@ namespace Noxa.Emulation.Psp.Player
 							// TODO: debugging runtime loop code
 							break;
 						case InstanceState.Running:
-							while( _bios.Game == null )
+							Debug.Assert( _bios.Game != null );
+							if( _bios.Game != null )
 							{
-								// Wait for a game to get set
-								_bios.WaitUntilLoaded();
+								// Run the kernel
+								_bios.Execute();
 							}
-							// Run the kernel
-							_bios.Execute();
 							break;
 					}
 				}

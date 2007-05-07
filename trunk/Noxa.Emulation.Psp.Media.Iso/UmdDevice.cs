@@ -25,7 +25,7 @@ namespace Noxa.Emulation.Psp.Media.Iso
 
 		public UmdDevice( IEmulationInstance emulator, ComponentParameters parameters )
 		{
-			Debug.Assert( emulator != null );
+			//Debug.Assert( emulator != null );
 			Debug.Assert( parameters != null );
 
 			_emulator = emulator;
