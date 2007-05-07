@@ -4,6 +4,11 @@
 = Screenshots and Movies =
 Although the emulator is pretty advanced, it is also in its early stages. This means that the screenshots you see here aren't that pretty yet. Newer images are at the top because I expect them to be cooler.
 
+=== 2007-05-07 - Trigonometry Wars ==
+Fixed textures up and now trigwars runs. In fact, it runs REALLY well, and is fully playable. Cool!
+
+[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2007.05.07.01-TrigWars.png?format=raw]
+
 === 2007-03-24 - PSPTris (game) ===
 Whoa! By some form of black magic, PSPTris now runs in game! Sometimes control input is missed, and there is a random flicker here or there but other than that the game runs PERFECTLY. I have two or three things to fix (the OSK doesn't work because it does something weird, and I need to implement clipping in the video driver), but after that I can say that it works! Well, classic and original modes do, anyway. The color mode runs really slow, and I'm not sure why.
 
