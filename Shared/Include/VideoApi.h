@@ -6,10 +6,6 @@
 
 #pragma once
 
-#include "VideoCommands.h"
-#include "VideoPacket.h"
-#include "VideoDisplayList.h"
-
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
@@ -19,13 +15,21 @@ namespace Noxa {
 			namespace Video {
 				namespace Native {
 
+					typedef struct CallbackHandlers_t
+					{
+						uint	SignalAddress;
+						uint	SignalArg;
+						uint	FinishAddress;
+						uint	FinishArg;
+					} CallbackHandlers;
+
 					typedef enum VideoSyncType_e
 					{
-						SYNC_LIST_DONE			= 0,
-						SYNC_LIST_QUEUED		= 1,
-						SYNC_LIST_DRAWING_DONE	= 2,
-						SYNC_LIST_STALL_REACHED	= 3,
-						SYNC_LIST_CANCEL_DONE	= 4,
+						SyncListDone		= 0,
+						SyncListQueued		= 1,
+						SyncListDrawn		= 2,
+						SyncListStalled		= 3,
+						SyncListCancelled	= 4,
 					} VideoSyncType;
 
 					typedef struct VideoApi_t
@@ -39,22 +43,17 @@ namespace Noxa {
 						// Switch framebuffer (used to doublebuffer, etc)
 						void (*SwitchFrameBuffer)( int address, int bufferWidth, int pixelFormat, int syncMode );
 
-						// Find an enqueued display list
-						VideoDisplayList* (*FindList)( int listId );
+						int (*AddCallbackHandlers)( CallbackHandlers* handlers );
+						void (*RemoveCallbackHandlers)( int cbid );
 
-						// Enqueue a new display list
-						int (*EnqueueList)( VideoDisplayList* list, bool immediate );
+						void (*SaveContext)( void* buffer );
+						void (*RestoreContext)( void* buffer );
 
-						// Dequeue an existing list (abort)
-						void (*DequeueList)( int listId );
+						int (*EnqueueList)( void* startAddress, void* stallAddress, int callbackId, bool immediate );
+						void (*UpdateList)( int listId, void* stallAddress );
+						void (*CancelList)( int listId );
 
-						// Signal that a list has been updated
-						void (*SignalUpdate)( int listId );
-
-						// Sync a list
 						void (*SyncList)( int listId, VideoSyncType syncType );
-
-						// Sync the video system
 						void (*Sync)( VideoSyncType syncType );
 
 						void (*WaitForVsync)();

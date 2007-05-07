@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 		DrawScene();
 		FPS();
 
-		//sceDisplayWaitVblankStart();
+		sceDisplayWaitVblankStart();
 		fbp0 = sceGuSwapBuffers();
 
 	}

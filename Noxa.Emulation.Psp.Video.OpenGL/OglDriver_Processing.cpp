@@ -19,6 +19,7 @@
 
 #include "OglDriver.h"
 #include "VideoApi.h"
+#include "DisplayList.h"
 #include "OglContext.h"
 #include "OglTextures.h"
 #include "OglExtensions.h"
@@ -30,6 +31,9 @@ using namespace Noxa::Emulation::Psp::Video;
 using namespace Noxa::Emulation::Psp::Video::Native;
 
 extern uint _commandCounts[ 256 ];
+
+extern NativeMemorySystem* _memory;
+extern HANDLE _hListSyncEvent;
 
 #define COLORSWIZZLE( bgra ) bgra
 
@@ -47,9 +51,16 @@ extern void DrawSpriteList( OglContext* context, int vertexType, int vertexCount
 extern void TextureTransfer( OglContext* context );
 extern void SetTexture( OglContext* context, int stage );
 
+void __printVideoCommand( int command, int argi, float argf )
+{
+	Debug::WriteLine( String::Format( "{0:X2}: {1} {2}", command, argi, argf ) );
+}
+
+bool printCommands = false;
+
 #pragma unmanaged
 
-void ProcessList( OglContext* context, VideoDisplayList* list )
+void ProcessList( OglContext* context, DisplayList* list )
 {
 	int temp;
 	float matrixTemp[ 16 ];
@@ -66,30 +77,125 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 	bool areSprites;
 	int primitiveType;
 
+	int nopCount = 0;
+
+	int argi;
+	int argx;
+	float argf;
+
 	glDisable( GL_LIGHTING );
 	//glDisable( GL_CULL_FACE );
 
-	for( int n = 0; n < list->PacketCount; n++ )
+	// labels:
+	// - abortList
+
+	while( true )
 	{
-		Native::VideoPacket packet = list->Packets[ n ];
-		int argi = packet.Argument;
-		int argx = argi << 8;
-		float argf = *reinterpret_cast<float*>( &argx );
+		// Stall check
+		if( ( void* )list->Packets == list->StallAddress )
+		{
+			// Stalled
+			list->Stalled = true;
+			PulseEvent( _hListSyncEvent );
+			goto abortList;
+		}
+
+		VideoPacket* packet = list->Packets;
+
+		// Move to next packet
+		list->Packets++;
 
 #ifdef STATISTICS
-		_commandCounts[ packet.Command ]++;
+		_commandCounts[ packet->Command ]++;
 #endif
 
-		switch( packet.Command )
+		// NOP
+		if( packet->Command == 0 )
 		{
-		case NOP:
-			break;
+			nopCount++;
+			if( nopCount > 10 )
+			{
+				// Consider this list dead if we have a bunch of nops
+				list->Done = true;
+				goto abortList;
+			}
+			continue;
+		}
+		nopCount = 0;
+
+		// Extract arguments
+		argi = packet->Argument;
+		argx = argi << 8;
+		argf = *reinterpret_cast<float*>( &argx );
+
+#ifdef _DEBUG
+		if( printCommands == true )
+			__printVideoCommand( packet->Command, argi, argf );
+#endif
+
+		// Special commands
+		// continue if the command is not in the next switch()
+		switch( packet->Command )
+		{
+			// Control
+		case JUMP:
+			list->Packets = ( VideoPacket* )_memory->Translate( ( argi | list->Base ) & 0xFFFFFFFC );
+			continue;
+		case END:
+			// Stop list processing for now?
+			if( list->Drawn == true )
+			{
+				// If drawn (FINISH'ed), we are done
+				list->Done = true;
+				PulseEvent( _hListSyncEvent );
+				goto abortList;
+			}
+			else
+			{
+				// Otherwise, we are just ending for now
+				goto abortList;
+			}
+		case FINISH:
+		case Unknown0x11:
+			// A FINISH is followed by an END
+			// 0x11 is probably some kind of finish too
+			list->Drawn = true;
+			continue;
+
+			// Sublists
+		case CALL:
+			//list->ReturnAddress = list->Packets;
+			list->Stack[ list->StackIndex++ ] = list->Packets;
+			list->Packets = ( VideoPacket* )_memory->Translate( ( argi | list->Base ) & 0xFFFFFFFC );
+			continue;
+		case RET:
+			//list->Packets = ( VideoPacket* )list->ReturnAddress;
+			list->Packets = ( VideoPacket* )list->Stack[ --list->StackIndex ];
+			continue;
+
+			// Signals
+		case SIGNAL:
+			// ?????
+			// We do an early abort here!
+			//list->Done = true;
+			//PulseEvent( _hListSyncEvent );
+			//goto abortList;
+			continue;
+
+			// Address translation
+		case BASE:
+			list->Base = argi << 8;
+			continue;
+		}
+
+		switch( packet->Command )
+		{
 		case CLEAR:
 			if( ( argi & 0x1 ) == 0x1 )
 			{
 				temp = 0;
-				if( ( argi & 0x100 ) != 0 )
-					temp |= GL_COLOR_BUFFER_BIT; // target
+				//if( ( argi & 0x100 ) != 0 )
+				//	temp |= GL_COLOR_BUFFER_BIT; // target
 				if( ( argi & 0x200 ) != 0 )
 					temp |= GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT; // stencil/alpha
 				if( ( argi & 0x400 ) != 0 )
@@ -360,7 +466,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 
 		case FBP:
-			temp = argi;
+			temp = argi << 8;
 			break;
 		case FBW:
 			context->FrameBufferPointer = temp | ( ( ( uint )argi & 0x00FF0000 ) << 8 );
@@ -371,7 +477,7 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			verticesTransformed = ( argi >> 23 ) == 0;
 			skinningWeightCount = ( argi >> 14 ) & 0x3;
 			morphingVertexCount = ( argi >> 18 ) & 0x3;
-			vertexType = argi & 0x801FFF; // so we keep transformed bit
+			vertexType = argi & 0x00801FFF; // so we keep transformed bit
 			break;
 		case VADDR:
 			vertexBufferAddress = list->Base | argi;
@@ -578,10 +684,10 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			//assert( argf == 0.0f );
 			break;
 		case TBP0:
-			context->Textures[ 0 ].Address = argi;
+			context->Textures[ 0 ].Address = ( context->Textures[ 0 ].Address & 0xFF000000 ) | argi;
 			break;
 		case TBW0:
-			context->Textures[ 0 ].Address |= ( argi << 8 ) & 0xFF000000;
+			context->Textures[ 0 ].Address = ( ( argi << 8 ) & 0xFF000000 ) | ( context->Textures[ 0 ].Address & 0x00FFFFFF );
 			context->Textures[ 0 ].LineWidth = argi & 0x0000FFFF;
 			context->Textures[ 0 ].TextureID = 0;
 			break;
@@ -592,37 +698,68 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			context->Textures[ 0 ].TextureID = 0;
 			break;
 
+		case CBP:
+			context->ClutPointer = argi;
+			break;
+		case CBPH:
+			context->ClutPointer |= ( argi << 8 );
+			break;
+		case CLOAD:
+			{
+				if( context->ClutPointer != 0x0 )
+				{
+					byte* tablePointer = context->Memory->Translate( context->ClutPointer );
+					int entries = argi * 16;
+					memcpy( context->ClutTable, tablePointer, entries * ( ( context->ClutFormat < 3 ) ? 2 : 3 ) );
+				}
+			}
+			break;
+		case CMODE:
+			// Format:
+			// 00 16-bit BGR 5650
+			// 01 16-bit ABGR 5551
+			// 10 16-bit ABGR 4444
+			// 11 32-bit ABGR 8888
+			context->ClutFormat = argi & 0x3;
+			context->ClutShift = ( argi >> 2 ) & 0x1F;
+			context->ClutMask = ( argi >> 8 ) & 0xFF;
+			context->ClutStart = ( ( argi >> 16 ) & 0x1F ) * 16; // ??
+			break;
+
 		case PMS:
 			// Next 16 packets are 4x4 projection matrix
+			// packets points to the first of the 16 elements
 			for( int m = 0; m < 16; m++ )
 			{
-				argx = list->Packets[ n + m + 1 ].Argument << 8;
+				argx = list->Packets->Argument << 8;
+				list->Packets++;
 				matrixTemp[ m ] = *reinterpret_cast<float*>( &argx );
 			}
-			n += 16;
 			glMatrixMode( GL_PROJECTION );
 			glLoadMatrixf( matrixTemp );
 			break;
 		case VMS:
 			// Next 12 packets are 3x4 view matrix
+			// packets points to the first of the 12 elements
 			for( int m = 0; m < 12; m++ )
 			{
-				argx = list->Packets[ n + m + 1 ].Argument << 8;
+				argx = list->Packets->Argument << 8;
+				list->Packets++;
 				matrixTemp[ m ] = *reinterpret_cast<float*>( &argx );
 			}
-			n += 12;
 			WidenMatrix( matrixTemp, context->ViewMatrix );
 			glMatrixMode( GL_MODELVIEW );
 			glLoadMatrixf( context->ViewMatrix );
 			break;
 		case WMS:
 			// Next 12 packets are 3x4 world matrix
+			// packets points to the first of the 12 elements
 			for( int m = 0; m < 12; m++ )
 			{
-				argx = list->Packets[ n + m + 1 ].Argument << 8;
+				argx = list->Packets->Argument << 8;
+				list->Packets++;
 				matrixTemp[ m ] = *reinterpret_cast<float*>( &argx );
 			}
-			n += 12;
 			WidenMatrix( matrixTemp, context->WorldMatrix );
 			glMatrixMode( GL_MODELVIEW );
 			glLoadMatrixf( context->ViewMatrix );
@@ -630,19 +767,20 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			break;
 		case TMS:
 			// Next 12 packets are 3x4 texture matrix
+			// packets points to the first of the 12 elements
 			for( int m = 0; m < 12; m++ )
 			{
-				argx = list->Packets[ n + m + 1 ].Argument << 8;
+				argx = list->Packets->Argument << 8;
+				list->Packets++;
 				matrixTemp[ m ] = *reinterpret_cast<float*>( &argx );
 			}
-			n += 12;
 			// TODO: texture matrix
 			break;
-		case PROJ: // handled by PMS
-		case VIEW: // handled by VMS
-		case WORLD: // handled by WMS
-		case TMATRIX: // handled by TMS
-			break;
+		//case PROJ: // handled by PMS
+		//case VIEW: // handled by VMS
+		//case WORLD: // handled by WMS
+		//case TMATRIX: // handled by TMS
+		//	break;
 
 			// -- Following commands are for texture copy (to video ram)
 		case TRXSBP: // Transmission Source Buffer Pointer
@@ -676,19 +814,13 @@ void ProcessList( OglContext* context, VideoDisplayList* list )
 			TextureTransfer( context );
 			break;
 
-		case BASE:
-		case FINISH:
-		case END:
-		case Unknown0x11:
-		case JUMP:
-			// Handled by display list processor
-			break;
-
 		default:
 			// Unknown command
 			break;
 		}
 	}
+
+abortList:
 
 	glDisableClientState( GL_VERTEX_ARRAY );
 	glDisableClientState( GL_COLOR_ARRAY );
@@ -715,11 +847,49 @@ __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] )
 	dest[15] = 1.0f;
 }
 
+int v_positionSizes[]	= { 0, 3, 6, 12 },				v_positionAlign[]	= { 0, 1, 2, 4 };
+int v_normalSizes[]		= { 0, 3, 6, 12 },				v_normalAlign[]		= { 0, 1, 2, 4 };
+int v_textureSizes[]	= { 0, 2, 4, 8 },				v_textureAlign[]	= { 0, 1, 2, 4 };
+int v_weightSizes[]		= { 0, 1, 2, 4 },				v_weightAlign[]		= { 0, 1, 2, 4 };
+int v_colorSizes[]		= { 0, 0, 0, 0, 2, 2, 2, 4 },	v_colorAlign[]		= { 0, 0, 0, 0, 2, 2, 2, 4 };
+
+#define GETCOMPONENTSIZE( sizes, aligns, type ) \
+{									\
+	size += sizes[ type ];			\
+	if( aligns[ type ] > biggest )	\
+		biggest = aligns[ type ];	\
+}
+
+// Kindly yoinked from ector's DaSh
+__inline int align( int n, int align )
+{
+	return ( n + ( align - 1 ) ) & ~( align - 1 );
+}
+
 int DetermineVertexSize( int vertexType )
 {
 	int size = 0;
+	int biggest = 0;
 
-	int positionMask = vertexType & VTPositionMask;
+	int positionType = ( vertexType & VTPositionMask ) >> 7;
+	int normalType = ( vertexType & VTNormalMask ) >> 5;
+	int textureType = ( vertexType & VTTextureMask );
+	int weightCount = ( vertexType & VTWeightCountMask ) >> 14;
+	int weightType = ( vertexType & VTWeightMask ) >> 9;
+	int colorType = ( vertexType & VTColorMask ) >> 2;
+	int morphCount = ( vertexType & VTMorphCountMask ) >> 18;
+
+	GETCOMPONENTSIZE( v_positionSizes,	v_positionAlign,	positionType	);
+	GETCOMPONENTSIZE( v_normalSizes,	v_normalAlign,		normalType		);
+	GETCOMPONENTSIZE( v_textureSizes,	v_textureAlign,		textureType		);
+	GETCOMPONENTSIZE( v_weightSizes,	v_weightAlign,		weightType		); // WRONG - count?
+	GETCOMPONENTSIZE( v_colorSizes,		v_colorAlign,		colorType		);
+
+	// do something with morph count?
+	
+	size = align( size, biggest );
+
+	/*int positionMask = vertexType & VTPositionMask;
 	if( positionMask == VTPositionFixed8 )
 		size += 1 + 1 + 1;
 	else if( positionMask == VTPositionFixed16 )
@@ -731,7 +901,7 @@ int DetermineVertexSize( int vertexType )
 	if( normalMask == VTNormalFixed8 )
 		size += 1 + 1 + 1;
 	else if( normalMask == VTNormalFixed16 )
-		size += 2 + 4 + 4;
+		size += 2 + 2 + 2;
 	else if( normalMask == VTNormalFloat )
 		size += 4 + 4 + 4;
 
@@ -762,7 +932,7 @@ int DetermineVertexSize( int vertexType )
 	else if( colorType == VTColorABGR8888 )
 		size += 4;
 
-	int morphCount = ( vertexType & VTMorphCountMask ) >> 18;
+	int morphCount = ( vertexType & VTMorphCountMask ) >> 18;*/
 
 	return size;
 }

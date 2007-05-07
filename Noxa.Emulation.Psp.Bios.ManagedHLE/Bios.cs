@@ -35,6 +35,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public GameInformation _game;
 		public Stream _bootStream;
 		public AutoResetEvent _gameSetEvent;
+		private bool _loaded;
 
 		#region Properties
 
@@ -205,7 +206,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				}
 				_game = value;
 				_kernel.StartGame();
-				_gameSetEvent.Set();
 			}
 		}
 
@@ -236,10 +236,29 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.GatherModulesAndFunctions();
 		}
 
-		public void Execute()
+		public LoadResults Load()
 		{
 			if( _game == null )
 				_gameSetEvent.WaitOne();
+			LoadResults results = _kernel.LoadGame();
+
+			_loaded = true;
+			_gameSetEvent.Set();
+
+			return results;
+		}
+
+		public void WaitUntilLoaded()
+		{
+			if( _loaded == true )
+				return;
+			_gameSetEvent.WaitOne();
+		}
+
+		public void Execute()
+		{
+			if( _loaded == false )
+				this.WaitUntilLoaded();
 			_kernel.Execute();
 		}
 

@@ -14,6 +14,7 @@ using namespace Noxa::Emulation::Psp::Video;
 uint _processedFrames;
 uint _skippedFrames;
 uint _displayListsProcessed;
+uint _abortedLists;
 
 uint _commandCounts[ 256 ];
 
@@ -22,6 +23,7 @@ void OglStatistics::GatherStats()
 	ProcessedFrames = _processedFrames;
 	SkippedFrames = _skippedFrames;
 	DisplayListsProcessed = _displayListsProcessed;
+	AbortedDisplayLists = _abortedLists;
 	CommandCounts = gcnew array<uint>( 256 );
 	for( int n = 0; n < 256; n++ )
 	{
@@ -32,4 +34,5 @@ void OglStatistics::GatherStats()
 	_processedFrames = 0;
 	_skippedFrames = 0;
 	_displayListsProcessed = 0;
+	_abortedLists = 0;
 }

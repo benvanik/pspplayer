@@ -17,6 +17,7 @@ using ComTypes = System.Runtime.InteropServices.ComTypes;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Games;
 using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE
@@ -161,6 +162,40 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			Bios.Game = null;
 			Bios.BootStream = null;
+		}
+
+		public LoadResults LoadGame()
+		{
+			// Clear everything (needed?)
+			Emulator.LightReset();
+
+			// Get bootstream
+			Debug.Assert( Bios.BootStream == null );
+			Bios.BootStream = GameLoader.FindBootStream( Bios.Game );
+			Debug.Assert( Bios.BootStream != null );
+
+			LoadParameters loadParams = new LoadParameters();
+			loadParams.Path = Bios.Game.Folder;
+			LoadResults results = Bios.Loader.LoadModule( ModuleType.Boot, Bios.BootStream, loadParams );
+
+			Debug.Assert( results.Successful == true );
+			if( results.Successful == false )
+			{
+				Debug.WriteLine( string.Format( "Kernel: load of game failed" ) );
+				Bios.Game = null;
+				return results;
+			}
+
+			this.CurrentPath = Bios.Game.Folder;
+			this.Cpu.SetupGame( Bios.Game, Bios.BootStream );
+
+			// Start modules
+			foreach( Module module in Bios._modules )
+				module.Start();
+
+			Debug.WriteLine( string.Format( "Kernel: game loaded" ) );
+
+			return results;
 		}
 
 		public KHandle AddHandle( KHandle handle )

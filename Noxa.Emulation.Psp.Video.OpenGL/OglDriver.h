@@ -141,12 +141,6 @@ namespace Noxa {
 
 					virtual void Cleanup();
 
-					virtual DisplayList^ FindDisplayList( int displayListId );
-					virtual bool Enqueue( DisplayList^ displayList, bool immediate );
-					virtual void Abort( int displayListId );
-					virtual void Sync( DisplayList^ displayList );
-					virtual void Sync();
-
 					virtual void PrintStatistics();
 
 				protected:

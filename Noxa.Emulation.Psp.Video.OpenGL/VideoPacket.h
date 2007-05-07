@@ -12,18 +12,16 @@ namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
 			namespace Video {
-				namespace Native {
 
-					#pragma pack(push)
-					#pragma pack(1)
-					typedef struct VideoPacket_t
-					{
-						uint		Argument : 24;
-						uint		Command : 8;
-					} VideoPacket;
-					#pragma pack(pop)
+				#pragma pack(push)
+				#pragma pack(1)
+				typedef struct VideoPacket_t
+				{
+					uint		Argument	: 24;
+					uint		Command		: 8;
+				} VideoPacket;
+				#pragma pack(pop)
 
-				}
 			}
 		}
 	}

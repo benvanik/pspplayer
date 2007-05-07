@@ -13,6 +13,7 @@ namespace Noxa {
 				namespace Native {
 
 					typedef void (*MarshalCompleteFunction)( int tcsId, int state );
+					typedef void (*CpuResumeFunction)( bool timedOut, void* state );
 
 					typedef struct CpuApi_t
 					{
@@ -23,6 +24,17 @@ namespace Noxa {
 						// Set an interrupt as pending
 						void (*SetPendingInterrupt)( int intNumber );
 
+						/*
+						// Resume execution from a break and wait
+						void Resume();
+						// Break execution until a resume is called
+						void BreakAndWait();
+						// Break execution until a resume is called or timeout elapses
+						void BreakAndWaitTimeout( int timeoutMs );
+						// Break execution until a resume is called or timeout elapses
+						// Callback is issued right before resuming
+						void BreakAndWaitTimeoutCallback( int timeoutMs, CpuResumeFunction callback, void* state );
+						*/
 					} CpuApi;
 
 				}

@@ -48,6 +48,9 @@ void TextureTransfer( OglContext* context )
 	//if( context->TextureTx.DestinationAddress != context->FrameBufferPointer )
 	//	return;
 
+	if( context->TextureTx.SourceAddress == 0 )
+		return;
+
 	byte* buffer = context->Memory->Translate( context->TextureTx.SourceAddress );
 
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -64,6 +67,7 @@ void TextureTransfer( OglContext* context )
     glDisable( GL_LIGHTING );
     glDisable( GL_LOGIC_OP );
     glDisable( GL_STENCIL_TEST );
+	glDisable( GL_CULL_FACE );
 	glDepthMask( GL_FALSE );
 	glDepthFunc( GL_ALWAYS );
 
@@ -132,8 +136,8 @@ void TextureTransfer( OglContext* context )
 	glMatrixMode( GL_PROJECTION );
 	glPopMatrix();
 
-	glDepthMask( GL_TRUE );
 	glPopAttrib();
+	//glDepthMask( GL_TRUE );
 }
 
 void SetTexture( OglContext* context, int stage )
@@ -148,14 +152,14 @@ void SetTexture( OglContext* context, int stage )
 	{
 		// Texture has been generated, so we just set
 		//glBindTexture( GL_TEXTURE_2D, texture->TextureID );
+
+		return;
 	}
-	else
+	
+	// Grab and decode texture, then create in OGL
+	if( GenerateTexture( context, texture ) == false )
 	{
-		// Grab and decode texture, then create in OGL
-		if( GenerateTexture( context, texture ) == false )
-		{
-			// Failed? Not much we can do...
-		}
+		// Failed? Not much we can do...
 	}
 }
 

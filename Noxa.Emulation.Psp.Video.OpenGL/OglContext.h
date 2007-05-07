@@ -13,6 +13,8 @@ namespace Noxa {
 		namespace Psp {
 			namespace Video {
 
+				#define CLUTSIZE	65536
+
 				typedef struct OglContext_t
 				{
 					// Memory from the CPU
@@ -36,6 +38,13 @@ namespace Noxa {
 					int				MipMapLevel;
 					int				TextureStorageMode;
 					OglTexture		Textures[ 8 ];
+
+					void*			ClutTable;		// Allocated to CLUTSIZE and pallettes are copied in
+					uint			ClutPointer;
+					int				ClutFormat;
+					int				ClutShift;
+					int				ClutMask;
+					int				ClutStart;
 
 					// Texture transmission (sceGuCopyImage...)
 					struct

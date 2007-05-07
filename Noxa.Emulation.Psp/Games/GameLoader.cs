@@ -23,7 +23,7 @@ namespace Noxa.Emulation.Psp.Games
 	/// <summary>
 	/// Utility class for finding and loading games.
 	/// </summary>
-	public class GameLoader
+	public static class GameLoader
 	{
 		#region Load Helpers
 
@@ -32,7 +32,7 @@ namespace Noxa.Emulation.Psp.Games
 		/// </summary>
 		/// <param name="game">Game to look for.</param>
 		/// <returns>The games boot stream (from BOOT.BIN, etc) or <c>null</c> if it could not be found.</returns>
-		public Stream FindBootStream( GameInformation game )
+		public static Stream FindBootStream( GameInformation game )
 		{
 			Debug.Assert( game != null );
 			if( game == null )
@@ -88,7 +88,8 @@ namespace Noxa.Emulation.Psp.Games
 		/// <param name="instance">The current emulation instance.</param>
 		/// <param name="game">The game being loaded.</param>
 		/// <param name="results">The results of the load.</param>
-		public void GenerateReport( IEmulationInstance instance, GameInformation game, LoadResults results )
+		/// <param name="outputPath">The path to write the result data to.</param>
+		public static void GenerateReport( IEmulationInstance instance, GameInformation game, LoadResults results, string outputPath )
 		{
 			Debug.Assert( game != null );
 			if( game == null )
@@ -144,7 +145,7 @@ namespace Noxa.Emulation.Psp.Games
 			foreach( StubImport import in results.Imports )
 			{
 				XmlElement importRoot = doc.CreateElement( "import" );
-				importRoot.SetAttribute( "type", import.Result.ToString() );
+				importRoot.SetAttribute( "result", import.Result.ToString() );
 				importRoot.SetAttribute( "module", import.ModuleName );
 				importRoot.SetAttribute( "nid", string.Format( "{0:X8}", import.NID ) );
 
@@ -153,7 +154,7 @@ namespace Noxa.Emulation.Psp.Games
 					XmlElement functionRoot = doc.CreateElement( "function" );
 					functionRoot.SetAttribute( "name", import.Function.Name );
 					functionRoot.SetAttribute( "isImplemented", import.Function.IsImplemented.ToString() );
-					functionRoot.SetAttribute( "hasNative", ( import.Function.NativeMethod != IntPtr.Zero ) ? true.ToString() : false.ToString() );
+					//functionRoot.SetAttribute( "hasNative", ( import.Function.NativeMethod != IntPtr.Zero ) ? true.ToString() : false.ToString() );
 					importRoot.AppendChild( functionRoot );
 				}
 
@@ -172,7 +173,7 @@ namespace Noxa.Emulation.Psp.Games
 			}
 			else
 				fileName = string.Format( "LoadResult-{0}.xml", game.Parameters.DiscID );
-			using( FileStream stream = File.Open( fileName, FileMode.Create ) )
+			using( FileStream stream = File.Open( Path.Combine( outputPath, fileName ), FileMode.Create ) )
 				doc.Save( stream );
 		}
 
@@ -190,7 +191,7 @@ namespace Noxa.Emulation.Psp.Games
 		/// </summary>
 		/// <param name="device">The Memory Stick to search.</param>
 		/// <returns>A list of games found.</returns>
-		public GameInformation[] FindGames( IMemoryStickDevice device )
+		public static GameInformation[] FindGames( IMemoryStickDevice device )
 		{
 			List<GameInformation> infos = new List<GameInformation>();
 
@@ -214,7 +215,7 @@ namespace Noxa.Emulation.Psp.Games
 					}
 					else if( folder.Name[ 0 ] == '%' )
 						continue;
-					GameInformation info = this.GetEbootGameInformation( realFolder );
+					GameInformation info = GameLoader.GetEbootGameInformation( realFolder );
 					if( wasExploited == true )
 						info.Folder = folder;
 					if( info != null )
@@ -230,13 +231,13 @@ namespace Noxa.Emulation.Psp.Games
 		/// </summary>
 		/// <param name="device">The UMD to search.</param>
 		/// <returns>The game found on the device, or <c>null</c> if none was found.</returns>
-		public GameInformation FindGame( IUmdDevice device )
+		public static GameInformation FindGame( IUmdDevice device )
 		{
 			Debug.Assert( device != null );
 			if( device == null )
 				return null;
 
-			GameInformation info = this.GetUmdGameInformation( device );
+			GameInformation info = GameLoader.GetUmdGameInformation( device );
 			Debug.Assert( info != null );
 
 			return info;
@@ -251,7 +252,7 @@ namespace Noxa.Emulation.Psp.Games
 		/// </summary>
 		/// <param name="folder">The folder containing the EBOOT.</param>
 		/// <returns>A <see cref="GameInformation"/> instance representing the game, or <c>null</c> if an error occurred.</returns>
-		public GameInformation GetEbootGameInformation( IMediaFolder folder )
+		public static GameInformation GetEbootGameInformation( IMediaFolder folder )
 		{
 			Debug.Assert( folder != null );
 			if( folder == null )
@@ -290,7 +291,7 @@ namespace Noxa.Emulation.Psp.Games
 		/// </summary>
 		/// <param name="device">The device containing the game.</param>
 		/// <returns>A <see cref="GameInformation"/> instance representing the game, or <c>null</c> if an error occurred.</returns>
-		public GameInformation GetUmdGameInformation( IMediaDevice device )
+		public static GameInformation GetUmdGameInformation( IMediaDevice device )
 		{
 			IMediaFolder folder = device.Root;
 			IMediaFile umdData = folder[ "UMD_DATA.BIN" ] as IMediaFile;
@@ -328,7 +329,7 @@ namespace Noxa.Emulation.Psp.Games
 			return new GameInformation( GameType.UmdGame, folder, gameParams, icon, background, uniqueId );
 		}
 
-		private GameParameters ReadSfo( Stream sfo )
+		private static GameParameters ReadSfo( Stream sfo )
 		{
 			GameParameters gp = new GameParameters();
 			SfoReader reader = new SfoReader( sfo );

@@ -77,6 +77,20 @@ namespace Noxa.Emulation.Psp.Bios
 		}
 
 		/// <summary>
+		/// Load the current game.
+		/// </summary>
+		/// <returns>The <see cref="LoadResults"/> of the loader.</returns>
+		/// <remarks>
+		/// If no game is currently set, this method will block until one is.
+		/// </remarks>
+		LoadResults Load();
+
+		/// <summary>
+		/// Wait until the game is loaded.
+		/// </summary>
+		void WaitUntilLoaded();
+
+		/// <summary>
 		/// Run the BIOS scheduler and execute code.
 		/// </summary>
 		void Execute();

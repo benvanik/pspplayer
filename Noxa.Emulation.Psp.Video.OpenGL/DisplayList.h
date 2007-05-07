@@ -13,31 +13,30 @@ namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
 			namespace Video {
-				namespace Native {
 
-					typedef struct VideoDisplayList_t
-					{
-						int				ID;
+				typedef struct DisplayList_t
+				{
+					int				ID;
 
-						Native::VideoPacket*	Packets;
-						int				PacketCount;
-						int				PacketCapacity;
+					VideoPacket*	Packets;
+					void*			StartAddress;
+					void*			StallAddress;
 
-						bool			Ready;
-						int				CallbackID;
-						int				Argument;
+					bool			Queued;
+					bool			Done;
+					bool			Stalled;
+					bool			Drawn;
+					bool			Cancelled;
 
-						int				StallAddress;
-						int				Base;
-					} VideoDisplayList;
+					int				CallbackID;
+					int				Argument;
 
-					typedef struct VdlRef_t
-					{
-						VideoDisplayList*	List;
-						VdlRef_t*			Next;
-					} VdlRef;
+					int				Base;
+					//void*			ReturnAddress;
+					void*			Stack[ 32 ];
+					int				StackIndex;
+				} DisplayList;
 
-				}
 			}
 		}
 	}

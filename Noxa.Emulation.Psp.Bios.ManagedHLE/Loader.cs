@@ -356,6 +356,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				//}
 
 				// s-hdrs
+				uint lextents = 0x08900000;
 				uint extents = 0;
 				for( int n = 0; n < header->e_shnum; n++ )
 				{
@@ -364,6 +365,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					if( ( shdr->sh_flags & ShFlags.Allocate ) == ShFlags.Allocate )
 					{
 						allocSections[ allocSectionsCount++ ] = shdr;
+						if( shdr->sh_addr < lextents )
+							lextents = shdr->sh_addr;
 						uint upperBound = shdr->sh_addr + shdr->sh_size;
 						if( upperBound > extents )
 							extents = upperBound;
@@ -400,7 +403,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				else
 				{
 					Debug.Assert( type == ModuleType.Boot );
-					results.LowerBounds = 0x08900000;
+					results.LowerBounds = lextents; //0x08900000;
 					results.UpperBounds = extents;
 				}
 
