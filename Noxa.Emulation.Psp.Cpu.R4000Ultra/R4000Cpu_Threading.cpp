@@ -60,7 +60,7 @@ public:
 	int				CallArgumentCount;
 
 	bool			ResultCallbackValid;
-	gcref<MarshalCompleteDelegate^>	ResultCallback;
+	gcref<MarshalCompleteDelegate^>*	ResultCallback;
 	int				CallbackState;
 } SwitchRequest;
 
@@ -75,6 +75,8 @@ enum SwitchType
 CRITICAL_SECTION _cs;
 #define LOCK EnterCriticalSection( &_cs )
 #define UNLOCK LeaveCriticalSection( &_cs )
+
+HANDLE					_waitHandle;
 
 R4000Ctx*				_cpuCtx;
 R4000Cache*				_cache;
@@ -100,10 +102,14 @@ void R4000Cpu::SetupThreading()
 	_currentTcs = NULL;
 
 	memset( &_switchRequest, 0, sizeof( SwitchRequest ) );
+	_switchRequest.ResultCallback = new gcref<MarshalCompleteDelegate^>();
 
 	InitializeCriticalSection( &_cs );
 
 	_threadContexts = gcnew List<IntPtr>( 128 );
+
+	_waitHandle = CreateEvent( NULL, FALSE, FALSE, NULL );
+	_timerQueue = gcnew TimerQueue();
 }
 
 void R4000Cpu::DestroyThreading()
@@ -112,6 +118,13 @@ void R4000Cpu::DestroyThreading()
 	_threadContexts = nullptr;
 
 	DeleteCriticalSection( &_cs );
+
+	SAFEDELETE( _switchRequest.ResultCallback );
+
+	delete _timerQueue;
+	_timerQueue = nullptr;
+	CloseHandle( _waitHandle );
+	_waitHandle = NULL;
 }
 
 int R4000Cpu::AllocateContextStorage( uint pc, array<uint>^ registers )
@@ -141,6 +154,8 @@ int R4000Cpu::AllocateContextStorage( uint pc, array<uint>^ registers )
 
 void R4000Cpu::ReleaseContextStorage( int tcsId )
 {
+	if( _threadContexts == nullptr )
+		return;
 	Debug::Assert( tcsId >= 0 );
 	Debug::Assert( tcsId < _threadContexts->Count );
 	Debug::Assert( _currentTcsId != tcsId );
@@ -223,7 +238,7 @@ void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, Mar
 		_switchRequest.CallArguments[ n ] = arguments[ n ];
 
 	_switchRequest.ResultCallbackValid = ( resultCallback != nullptr );
-	_switchRequest.ResultCallback = resultCallback;
+	( *_switchRequest.ResultCallback ) = resultCallback;
 	_switchRequest.CallbackState = state;
 
 	// Put the request in
@@ -251,7 +266,7 @@ void MakeSafetyCallback( int tcsId, ThreadContext* tcs )
 
 bool MakeResultCallback( int v0 )
 {
-	MarshalCompleteDelegate^ del = _switchRequest.ResultCallback;
+	MarshalCompleteDelegate^ del = ( *_switchRequest.ResultCallback );
 	return del( _currentTcsId, _switchRequest.CallbackState, v0 );
 }
 
@@ -463,6 +478,10 @@ executeStart:		// Arrived at from call/interrupt handling below
 			// An interrupt is pending and we need to redirect to the handler
 			PerformInterrupt();
 			break;
+		case CtxBreakAndWait:
+			// BreakAndWait request
+			WaitForSingleObject( _waitHandle, INFINITE );
+			break;
 		}
 	}
 
@@ -483,6 +502,65 @@ void R4000Cpu::Execute(
 void R4000Cpu::BreakExecution()
 {
 	_cpuCtx->StopFlag = CtxBreakRequest;
+}
+
+void R4000Cpu::Resume()
+{
+	this->ResumeInternal( false );
+}
+
+void R4000Cpu::BreakTimeout( Noxa::Timer^ timer )
+{
+	this->ResumeInternal( true );
+}
+
+void R4000Cpu::ResumeInternal( bool timedOut )
+{
+	// MAKE SURE TO UPDATE niResume!!
+
+	// May have been started already
+	if( _broken == false )
+		return;
+	_broken = false;
+
+	if( _resumeCallback != nullptr )
+		_resumeCallback( timedOut, _resumeState );
+	
+	PulseEvent( _waitHandle );
+}
+
+void R4000Cpu::BreakAndWait()
+{
+	Debug::Assert( _broken == false );
+	_broken = true;
+
+	_resumeCallback = nullptr;
+
+	_cpuCtx->StopFlag = CtxBreakAndWait;
+}
+
+void R4000Cpu::BreakAndWait( int timeoutMs )
+{
+	this->BreakAndWait( timeoutMs, nullptr, nullptr );
+}
+
+void R4000Cpu::BreakAndWait( int timeoutMs, CpuResumeCallback^ callback, Object^ state )
+{
+	Debug::Assert( _broken == false );
+	_broken = true;
+
+	_resumeCallback = callback;
+	_resumeState = state;
+
+	// Start timer if sane
+	if( ( timeoutMs > 0 ) &&
+		( timeoutMs < INFINITE ) )
+	{
+		TimerCallback^ cb = gcnew TimerCallback( this, &R4000Cpu::BreakTimeout );
+		_timerQueue->CreateOneShotTimer( cb, timeoutMs, TimerExecutionContext::TimerThread, false );
+	}
+
+	_cpuCtx->StopFlag = CtxBreakAndWait;
 }
 
 void R4000Cpu::Stop()

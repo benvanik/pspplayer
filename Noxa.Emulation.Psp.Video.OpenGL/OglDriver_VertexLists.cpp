@@ -90,10 +90,6 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 
 	bool transformed = ( vertexType & VTTransformedMask ) != 0;
 
-	// Must be word (4 byte) aligned - if it's not, there will be padding we need to skip
-	if( ( vertexSize & 0x3 ) != 0 )
-		vertexSize += 4 - ( vertexSize & 0x3 );
-
 	GLenum format = 0;
 
 	int careMasks = VTPositionMask | VTNormalMask | VTTextureMask | VTColorMask;
@@ -113,13 +109,13 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 	else if( careType == VTPositionFloat )
 		format = GL_V3F;
 
-	/*if( format != 0 )
+	// We can only support interleaved arrays if we are not transformed
+	if( ( format != 0 ) && ( transformed == false ) )
 	{
 		// Something we support - issue an interleaved array
 		glInterleavedArrays( format, vertexSize, ptr );
 	}
 	else
-	*/
 	{
 		// Interleaved unsupported - use separate arrays
 
