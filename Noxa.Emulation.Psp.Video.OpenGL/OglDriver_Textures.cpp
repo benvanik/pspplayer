@@ -144,8 +144,10 @@ void SetTextureModes( OglContext* context, int stage )
 {
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, context->TextureWrapS );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, context->TextureWrapT );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, context->TextureFilterMin );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, context->TextureFilterMag );
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, context->TextureFilterMin );
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, context->TextureFilterMag );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 }
 
 void SetTexture( OglContext* context, int stage )

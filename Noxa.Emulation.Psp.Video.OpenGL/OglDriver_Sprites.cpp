@@ -69,14 +69,12 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 		glPushMatrix();
 		glLoadIdentity();
 		glOrtho( 0.0f, 480.0f, 272.0f, 0.0f, -1.0f, 1.0f );
-
-		glMatrixMode( GL_MODELVIEW );
-		glPushMatrix();
-		glLoadIdentity();
 	}
 
 	glMatrixMode( GL_MODELVIEW );
 	glPushMatrix();
+	if( transformed == true )
+		glLoadIdentity();
 	//glLoadMatrixf( context->ViewMatrix );
 
 	glBegin( GL_QUADS );
@@ -216,8 +214,6 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 
 	if( transformed == true )
 	{
-		glPopMatrix();
-
 		glMatrixMode( GL_PROJECTION );
 		glPopMatrix();
 	}
