@@ -513,7 +513,8 @@ void ProcessList( OglContext* context, DisplayList* list )
 			}
 
 			{
-				SetTexture( context, 0 );
+				if( context->TexturesEnabled == true )
+					SetTexture( context, 0 );
 
 				int vertexSize = DetermineVertexSize( vertexType );
 				byte* ptr = context->Memory->Translate( vertexBufferAddress );
@@ -540,9 +541,15 @@ void ProcessList( OglContext* context, DisplayList* list )
 
 		case TME:
 			if( argi == 0 )
+			{
+				context->TexturesEnabled = false;
 				glDisable( GL_TEXTURE_2D );
+			}
 			else
+			{
+				context->TexturesEnabled = true;
 				glEnable( GL_TEXTURE_2D );
+			}
 			break;
 		case TSYNC:
 			//SetTexture( context, 0 );
@@ -562,67 +569,67 @@ void ProcessList( OglContext* context, DisplayList* list )
 				switch( argi & 0x7 )
 				{
 				case 0x0: // Nearest
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+					context->TextureFilterMin =  GL_NEAREST;
 					break;
 				case 0x1: // Linear
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+					context->TextureFilterMin =  GL_LINEAR;
 					break;
 				case 0x4: // Nearest; mipmap nearest
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST );
+					context->TextureFilterMin =  GL_NEAREST_MIPMAP_NEAREST;
 					break;
 				case 0x5: // Linear; mipmap nearest
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+					context->TextureFilterMin =  GL_LINEAR_MIPMAP_NEAREST;
 					break;
 				case 0x6: // Nearest; mipmap linear
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR );
+					context->TextureFilterMin =  GL_NEAREST_MIPMAP_LINEAR;
 					break;
 				case 0x7: // Linear; mipmap linear
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+					context->TextureFilterMin =  GL_LINEAR_MIPMAP_LINEAR;
 					break;
 				}
 				switch( ( argi >> 8 ) & 0x7 )
 				{
 				case 0x0: // Nearest
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+					context->TextureFilterMag = GL_NEAREST;
 					break;
 				case 0x1: // Linear
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+					context->TextureFilterMag = GL_LINEAR;
 					break;
 				case 0x4: // Nearest; mipmap nearest
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST );
+					context->TextureFilterMag = GL_NEAREST_MIPMAP_NEAREST;
 					break;
 				case 0x5: // Linear; mipmap nearest
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+					context->TextureFilterMag = GL_LINEAR_MIPMAP_NEAREST;
 					break;
 				case 0x6: // Nearest; mipmap linear
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR );
+					context->TextureFilterMag = GL_NEAREST_MIPMAP_LINEAR;
 					break;
 				case 0x7: // Linear; mipmap linear
-					glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+					context->TextureFilterMag = GL_LINEAR_MIPMAP_LINEAR;
 					break;
 				}
 			}
 			break;
-		//case TWRAP:
-		//	switch( argi & 0xFF )
-		//	{
-		//	case 0: // GU_REPEAT
-		//		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
-		//		break;
-		//	case 1:	// GU_CLAMP
-		//		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-		//		break;
-		//	}
-		//	switch( ( argi >> 8 ) & 0xFF )
-		//	{
-		//	case 0: // GU_REPEAT
-		//		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
-		//		break;
-		//	case 1:	// GU_CLAMP
-		//		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-		//		break;
-		//	}
-		//	break;
+		case TWRAP:
+			switch( argi & 0xFF )
+			{
+			case 0: // GU_REPEAT
+				context->TextureWrapS = GL_REPEAT;
+				break;
+			case 1:	// GU_CLAMP
+				context->TextureWrapS = GL_CLAMP;
+				break;
+			}
+			switch( ( argi >> 8 ) & 0xFF )
+			{
+			case 0: // GU_REPEAT
+				context->TextureWrapT = GL_REPEAT;
+				break;
+			case 1:	// GU_CLAMP
+				context->TextureWrapT = GL_CLAMP;
+				break;
+			}
+			break;
 		case TFUNC:
 			// texture function
 			/*
@@ -634,7 +641,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			  *
 			  * tcc is GU_TCC_RGB or GU_TCC_RGBA
 			  */
-			switch( argi & 0xFF )
+			switch( argi & 0x7 )
 			{
 			default:
 			case 0:
@@ -654,14 +661,14 @@ void ProcessList( OglContext* context, DisplayList* list )
 				temp = GL_ADD;
 				break;
 			}
-			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, temp );
+			//glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, temp );
 			break;
 		case TEC:
 			color4[ 0 ] = ( ( argi >> 16 ) & 0xFF ) / 255.0f;
 			color4[ 1 ] = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
 			color4[ 2 ] = ( argi & 0xFF ) / 255.0f;
 			color4[ 3 ] = 0;
-			glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color4 );
+			//glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color4 );
 			break;
 		case TFLUSH:
 			// texturesvalid = false
@@ -684,18 +691,42 @@ void ProcessList( OglContext* context, DisplayList* list )
 			//assert( argf == 0.0f );
 			break;
 		case TBP0:
-			context->Textures[ 0 ].Address = ( context->Textures[ 0 ].Address & 0xFF000000 ) | argi;
+		case TBP1:
+		case TBP2:
+		case TBP3:
+		case TBP4:
+		case TBP5:
+		case TBP6:
+		case TBP7:
+			temp = packet->Command - TBP0;
+			context->Textures[ temp ].Address = ( context->Textures[ temp ].Address & 0xFF000000 ) | argi;
 			break;
 		case TBW0:
-			context->Textures[ 0 ].Address = ( ( argi << 8 ) & 0xFF000000 ) | ( context->Textures[ 0 ].Address & 0x00FFFFFF );
-			context->Textures[ 0 ].LineWidth = argi & 0x0000FFFF;
-			context->Textures[ 0 ].TextureID = 0;
+		case TBW1:
+		case TBW2:
+		case TBW3:
+		case TBW4:
+		case TBW5:
+		case TBW6:
+		case TBW7:
+			temp = packet->Command - TBW0;
+			context->Textures[ temp ].Address = ( ( argi << 8 ) & 0xFF000000 ) | ( context->Textures[ temp ].Address & 0x00FFFFFF );
+			context->Textures[ temp ].LineWidth = argi & 0x0000FFFF;
+			context->Textures[ temp ].TextureID = 0;
 			break;
 		case TSIZE0:
-			context->Textures[ 0 ].Width = 1 << ( argi & 0x000000FF );
-			context->Textures[ 0 ].Height = 1 << ( ( argi >> 8 ) & 0x000000FF );
-			context->Textures[ 0 ].PixelStorage = context->TextureStorageMode;
-			context->Textures[ 0 ].TextureID = 0;
+		case TSIZE1:
+		case TSIZE2:
+		case TSIZE3:
+		case TSIZE4:
+		case TSIZE5:
+		case TSIZE6:
+		case TSIZE7:
+			temp = packet->Command - TSIZE0;
+			context->Textures[ temp ].Width = 1 << ( argi & 0x000000FF );
+			context->Textures[ temp ].Height = 1 << ( ( argi >> 8 ) & 0x000000FF );
+			context->Textures[ temp ].PixelStorage = context->TextureStorageMode;
+			context->Textures[ temp ].TextureID = 0;
 			break;
 
 		case CBP:

@@ -242,7 +242,7 @@ byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint 
 	// Tricky, as each byte contains 2 indices (4 bits each)
 	byte* input = ( byte* )in;
 	uint* output = ( uint* )out;
-	//int diff = ( lineWidth / 2 ) - ( width / 2 ); // difference in actual width and buffer width (pixels)
+	int diff = ( lineWidth / 2 ) - ( width / 2 );
 	for( uint y = 0; y < height; y++ )
 	{
 		for( uint x = 0; x < width; x++ )
@@ -255,9 +255,10 @@ byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint 
 			}
 			else
 				index &= 0x0F;
-			*( output++ ) = ClutLookup( context, index );
+			output[ x ]  = ClutLookup( context, index );
 		}
-		//input += diff;
+		input += diff;
+		output += width;
 	}
 	return out;
 }
@@ -266,15 +267,15 @@ byte* Decode8( const OglContext* context, const byte* in, byte* out, const uint 
 {
 	byte* input = ( byte* )in;
 	uint* output = ( uint* )out;
-	//int diff = lineWidth - width; // difference in actual width and buffer width (pixels)
 	for( uint y = 0; y < height; y++ )
 	{
 		for( uint x = 0; x < width; x++ )
 		{
-			byte index = *( input++ );
-			*( output++ ) = ClutLookup( context, index );
+			byte index = input[ x ];
+			output[ x ] = ClutLookup( context, index );
 		}
-		//input += diff;
+		input += lineWidth;
+		output += width;
 	}
 	return out;
 }
@@ -283,15 +284,15 @@ byte* Decode16( const OglContext* context, const byte* in, byte* out, const uint
 {
 	ushort* input = ( ushort* )in;
 	uint* output = ( uint* )out;
-	//int diff = lineWidth - width; // difference in actual width and buffer width (pixels)
 	for( uint y = 0; y < height; y++ )
 	{
 		for( uint x = 0; x < width; x++ )
 		{
-			ushort index = *( input++ );
-			*( output++ ) = ClutLookup( context, index );
+			ushort index = input[ x ];
+			output[ x ] = ClutLookup( context, index );
 		}
-		//input += diff;
+		input += lineWidth;
+		output += width;
 	}
 	return out;
 }
@@ -300,15 +301,15 @@ byte* Decode32( const OglContext* context, const byte* in, byte* out, const uint
 {
 	uint* input = ( uint* )in;
 	uint* output = ( uint* )out;
-	//int diff = lineWidth - width; // difference in actual width and buffer width (pixels)
 	for( uint y = 0; y < height; y++ )
 	{
 		for( uint x = 0; x < width; x++ )
 		{
-			uint index = *( input++ );
-			*( output++ ) = ClutLookup( context, index );
+			uint index = input[ x ];
+			output[ x ] = ClutLookup( context, index );
 		}
-		//input += diff;
+		input += lineWidth;
+		output += width;
 	}
 	return out;
 }
@@ -388,14 +389,21 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	}
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, format->Size );
-	glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
+	//glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
 
-	/*HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
-	int dummy1;
-	WriteFile( f, ( void* )buffer, size, ( LPDWORD )&dummy1, NULL );
-	CloseHandle( f );*/
+#ifdef _DEBUG
+	static bool write = false;
+	if( write == true )
+	{
+		size = texture->Width * texture->Height * format->Size;
+		HANDLE f = CreateFileA( "test.raw", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_TEMPORARY, NULL );
+		int dummy1;
+		WriteFile( f, ( void* )buffer, size, ( LPDWORD )&dummy1, NULL );
+		CloseHandle( f );
+	}
+#endif
 
-	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
+	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? 4 : 3,// GL_RGBA : GL_RGB,
 		texture->Width, texture->Height,
 		0,
 		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
