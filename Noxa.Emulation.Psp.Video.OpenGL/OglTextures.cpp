@@ -192,20 +192,13 @@ __inline uint ClutLookup( const OglContext* context, uint index )
 	{
 		// 32-bit ABGR 8888
 		uint entry = ( ( uint* )context->ClutTable )[ finalIndex ];
-		// Supposedly the intrinsic does the same thing
+		// Supposedly the intrinsic does BSWAP in release build
 		//return _byteswap_ulong( entry );
 		return entry;
-		/*__asm
-		{
-			; Swap bytes
-			MOV EAX, entry
-			BSWAP EAX
-			MOV entry, EAX
-		}
-		return entry;*/
 	}
 	else
 	{
+		// This may not need to swap!
 		ushort entry = ( ( ushort* )context->ClutTable )[ finalIndex ];
 		switch( context->ClutFormat )
 		{
@@ -247,7 +240,7 @@ byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint 
 	assert( diff >= 0 );
 	for( uint y = 0; y < height; y++ )
 	{
-		for( uint x = 0; x < lineWidth; x++ )
+		for( uint x = 0; x < width; x++ )
 		{
 			byte index = *input;
 			if( x & 0x1 )
@@ -259,8 +252,9 @@ byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint 
 				index &= 0x0F;
 			output[ x ] = ClutLookup( context, index );
 		}
-		input += diff;
-		output += lineWidth;
+		input -= width / 2;
+		input += lineWidth / 2;
+		output += width;
 	}
 	return out;
 }
@@ -372,7 +366,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	case TPSIndexed4:
 		buffer = Decode4( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
 		format = ( TextureFormat* )&__formats[ 3 ];
-		width = texture->LineWidth;
+		//width = texture->LineWidth;
 		break;
 	case TPSIndexed8:
 		buffer = Decode8( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );

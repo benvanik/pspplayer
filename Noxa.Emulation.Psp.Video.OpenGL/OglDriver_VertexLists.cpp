@@ -216,10 +216,12 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 			glColorPointer( 4, GL_UNSIGNED_BYTE, vertexSize, src );
 			src += 4;
 			break;
+		default:
+			glColor3f( 1.0f, 1.0f, 1.0f );
+			break;
 		}
 		//float f = ( float )rand() / RAND_MAX;
 		//glColor3f( f, f, f );
-		glColor3f( 1.0f, 1.0f, 1.0f );
 
 		switch( normalType )
 		{
