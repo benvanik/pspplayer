@@ -536,6 +536,44 @@ void ProcessList( OglContext* context, DisplayList* list )
 					// Sprite list
 					DrawSpriteList( context, vertexType, vertexCount, vertexSize, ptr );
 				}
+
+				// DUMMY TRI
+#if 0
+				glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
+				glPushAttrib( GL_ENABLE_BIT );
+				glDisable( GL_DEPTH_TEST );
+				glDepthMask( GL_FALSE );
+				glDisable( GL_CULL_FACE );
+				glMatrixMode( GL_PROJECTION );
+				glPushMatrix();
+				glLoadIdentity();
+				glOrtho( 0.0f, 480.0f, 272.0f, 0.0f, -1.0f, 1.0f );
+				glMatrixMode( GL_MODELVIEW );
+				glPushMatrix();
+				glLoadIdentity();
+				glBegin( GL_QUADS );
+
+				// 0 ---- 1
+				// |      |
+				// |      |
+				// 3 ---- 2
+				glTexCoord2f( 0, 0 );
+				glVertex3f( 0, 0, 0 );
+				glTexCoord2f( 1, 0 );
+				glVertex3f( 100, 0, 0 );
+				glTexCoord2f( 1, 1 );
+				glVertex3f( 100, 100, 0 );
+				glTexCoord2f( 0, 1 );
+				glVertex3f( 0, 100, 0 );
+
+				glEnd();
+				glPopMatrix();
+				glMatrixMode( GL_PROJECTION );
+				glPopMatrix();
+				glDepthMask( GL_TRUE );
+				glPopAttrib();
+				glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
+#endif
 			}
 			break;
 
@@ -661,14 +699,14 @@ void ProcessList( OglContext* context, DisplayList* list )
 				temp = GL_ADD;
 				break;
 			}
-			//glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, temp );
+			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, temp );
 			break;
 		case TEC:
 			color4[ 0 ] = ( ( argi >> 16 ) & 0xFF ) / 255.0f;
 			color4[ 1 ] = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
 			color4[ 2 ] = ( argi & 0xFF ) / 255.0f;
 			color4[ 3 ] = 0;
-			//glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color4 );
+			glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color4 );
 			break;
 		case TFLUSH:
 			// texturesvalid = false

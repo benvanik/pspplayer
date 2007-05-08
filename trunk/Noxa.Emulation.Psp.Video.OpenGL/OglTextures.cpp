@@ -193,7 +193,8 @@ __inline uint ClutLookup( const OglContext* context, uint index )
 		// 32-bit ABGR 8888
 		uint entry = ( ( uint* )context->ClutTable )[ finalIndex ];
 		// Supposedly the intrinsic does the same thing
-		return _byteswap_ulong( entry );
+		//return _byteswap_ulong( entry );
+		return entry;
 		/*__asm
 		{
 			; Swap bytes
@@ -242,10 +243,11 @@ byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint 
 	// Tricky, as each byte contains 2 indices (4 bits each)
 	byte* input = ( byte* )in;
 	uint* output = ( uint* )out;
-	int diff = ( lineWidth / 2 ) - ( width / 2 );
+	int diff = ( width - lineWidth ) / 2;
+	assert( diff >= 0 );
 	for( uint y = 0; y < height; y++ )
 	{
-		for( uint x = 0; x < width; x++ )
+		for( uint x = 0; x < lineWidth; x++ )
 		{
 			byte index = *input;
 			if( x & 0x1 )
@@ -255,10 +257,10 @@ byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint 
 			}
 			else
 				index &= 0x0F;
-			output[ x ]  = ClutLookup( context, index );
+			output[ x ] = ClutLookup( context, index );
 		}
 		input += diff;
-		output += width;
+		output += lineWidth;
 	}
 	return out;
 }
@@ -348,6 +350,8 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 
 	// buffer now contains an unswizzled texture - may need to un-CLUT it, or convert colors
 
+	int width = texture->Width;
+
 	switch( format->Format )
 	{
 	case TPSBGR5650:
@@ -368,10 +372,12 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	case TPSIndexed4:
 		buffer = Decode4( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
 		format = ( TextureFormat* )&__formats[ 3 ];
+		width = texture->LineWidth;
 		break;
 	case TPSIndexed8:
 		buffer = Decode8( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
 		format = ( TextureFormat* )&__formats[ 3 ];
+		//width = texture->LineWidth;
 		break;
 	case TPSIndexed16:
 		buffer = Decode16( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
@@ -403,8 +409,8 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	}
 #endif
 
-	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? 4 : 3,// GL_RGBA : GL_RGB,
-		texture->Width, texture->Height,
+	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
+		width, texture->Height,
 		0,
 		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
 		format->GLFormat,
