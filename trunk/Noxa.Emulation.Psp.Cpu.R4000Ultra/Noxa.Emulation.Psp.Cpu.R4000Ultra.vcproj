@@ -469,18 +469,6 @@
 					RelativePath="..\Shared\Include\VideoApi.h"
 					>
 				</File>
-				<File
-					RelativePath="..\Shared\Include\VideoCommands.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Shared\Include\VideoDisplayList.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Shared\Include\VideoPacket.h"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter

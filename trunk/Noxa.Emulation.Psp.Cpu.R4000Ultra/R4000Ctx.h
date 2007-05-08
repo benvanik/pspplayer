@@ -48,6 +48,8 @@ namespace Noxa {
 					CtxMarshal			= 3,
 					// Interrupt pending
 					CtxInterruptPending	= 4,
+					// BreakAndWait request
+					CtxBreakAndWait		= 5,
 				};
 
 				// Note: for perf, everything should be 32 bit ints

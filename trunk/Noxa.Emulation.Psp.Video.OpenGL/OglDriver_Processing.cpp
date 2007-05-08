@@ -847,6 +847,8 @@ __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] )
 	dest[15] = 1.0f;
 }
 
+// Kindly yoinked (with permission) from ector's DaSh
+
 int v_positionSizes[]	= { 0, 3, 6, 12 },				v_positionAlign[]	= { 0, 1, 2, 4 };
 int v_normalSizes[]		= { 0, 3, 6, 12 },				v_normalAlign[]		= { 0, 1, 2, 4 };
 int v_textureSizes[]	= { 0, 2, 4, 8 },				v_textureAlign[]	= { 0, 1, 2, 4 };
@@ -854,13 +856,15 @@ int v_weightSizes[]		= { 0, 1, 2, 4 },				v_weightAlign[]		= { 0, 1, 2, 4 };
 int v_colorSizes[]		= { 0, 0, 0, 0, 2, 2, 2, 4 },	v_colorAlign[]		= { 0, 0, 0, 0, 2, 2, 2, 4 };
 
 #define GETCOMPONENTSIZE( sizes, aligns, type ) \
-{									\
-	size += sizes[ type ];			\
-	if( aligns[ type ] > biggest )	\
-		biggest = aligns[ type ];	\
+{												\
+	if( sizes[ type ] != 0 ) {					\
+		size = align( size, aligns[ type ] );	\
+		size += sizes[ type ];					\
+		if( aligns[ type ] > biggest )			\
+			biggest = aligns[ type ];			\
+	}											\
 }
 
-// Kindly yoinked from ector's DaSh
 __inline int align( int n, int align )
 {
 	return ( n + ( align - 1 ) ) & ~( align - 1 );
@@ -879,61 +883,15 @@ int DetermineVertexSize( int vertexType )
 	int colorType = ( vertexType & VTColorMask ) >> 2;
 	int morphCount = ( vertexType & VTMorphCountMask ) >> 18;
 
-	GETCOMPONENTSIZE( v_positionSizes,	v_positionAlign,	positionType	);
-	GETCOMPONENTSIZE( v_normalSizes,	v_normalAlign,		normalType		);
-	GETCOMPONENTSIZE( v_textureSizes,	v_textureAlign,		textureType		);
 	GETCOMPONENTSIZE( v_weightSizes,	v_weightAlign,		weightType		); // WRONG - count?
+	GETCOMPONENTSIZE( v_textureSizes,	v_textureAlign,		textureType		);
 	GETCOMPONENTSIZE( v_colorSizes,		v_colorAlign,		colorType		);
+	GETCOMPONENTSIZE( v_normalSizes,	v_normalAlign,		normalType		);
+	GETCOMPONENTSIZE( v_positionSizes,	v_positionAlign,	positionType	);
 
 	// do something with morph count?
 	
 	size = align( size, biggest );
-
-	/*int positionMask = vertexType & VTPositionMask;
-	if( positionMask == VTPositionFixed8 )
-		size += 1 + 1 + 1;
-	else if( positionMask == VTPositionFixed16 )
-		size += 2 + 2 + 2;
-	else if( positionMask == VTPositionFloat )
-		size += 4 + 4 + 4;
-
-	int normalMask = vertexType & VTNormalMask;
-	if( normalMask == VTNormalFixed8 )
-		size += 1 + 1 + 1;
-	else if( normalMask == VTNormalFixed16 )
-		size += 2 + 2 + 2;
-	else if( normalMask == VTNormalFloat )
-		size += 4 + 4 + 4;
-
-	int textureType = vertexType & VTTextureMask;
-	if( textureType == VTTextureFixed8 )
-		size += 1 + 1;
-	else if( textureType == VTTextureFixed16 )
-		size += 2 + 2;
-	else if( textureType == VTTextureFloat )
-		size += 4 + 4;
-
-	int weightCount = ( vertexType & VTWeightCountMask ) >> 14;
-	int weightType = vertexType & VTWeightMask;
-	if( weightType == VTWeightFixed8 )
-		size += 1;
-	else if( weightType == VTWeightFixed16 )
-		size += 2;
-	else if( weightType == VTWeightFloat )
-		size += 4;
-
-	int colorType = vertexType & VTColorMask;
-	if( colorType == VTColorBGR5650 )
-		size += 2;
-	else if( colorType == VTColorABGR4444 )
-		size += 2;
-	else if( colorType == VTColorABGR5551 )
-		size += 2;
-	else if( colorType == VTColorABGR8888 )
-		size += 4;
-
-	int morphCount = ( vertexType & VTMorphCountMask ) >> 18;*/
-
 	return size;
 }
 

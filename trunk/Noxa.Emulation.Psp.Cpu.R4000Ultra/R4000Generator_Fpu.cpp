@@ -78,8 +78,8 @@ void assertXmm0( int address )
 	// Check XMM0
 	float x;
 	uint y;
-	__asm movd [x], xmm0;
-	__asm movd [y], xmm0;
+	__asm movss [x], xmm0;
+	__asm movss [y], xmm0;
 	assert( _finite( x ) != 0 );
 	//assert( y != 0x80000000 );
 	//assert( x < 1003741824 );
@@ -120,10 +120,10 @@ GenerationResult FADD( R4000GenContext^ context, int pass, int address, uint cod
 	else if( pass == 1 )
 	{
 #ifdef SSE
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->addss( XMM0, MCP1REG( CTX, ft, fmt ) );
 		ASSERTXMM0VALID();
-		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 #else
 		g->mov( EAX, MCP1REG( CTX, fs, fmt ) );
 		g->mov( EBX, MCP1REG( CTX, ft, fmt ) );
@@ -142,10 +142,10 @@ GenerationResult FSUB( R4000GenContext^ context, int pass, int address, uint cod
 	else if( pass == 1 )
 	{
 #ifdef SSE
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->subss( XMM0, MCP1REG( CTX, ft, fmt ) );
 		ASSERTXMM0VALID();
-		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 #else
 		g->mov( EAX, MCP1REG( CTX, fs, fmt ) );
 		g->mov( EBX, MCP1REG( CTX, ft, fmt ) );
@@ -166,18 +166,18 @@ GenerationResult FMUL( R4000GenContext^ context, int pass, int address, uint cod
 #ifdef SSE
 #if 0
 		// ultra super debug version
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->mulss( XMM0, MCP1REG( CTX, ft, fmt ) );
 		//ASSERTXMM0VALID();
-		g->movd( EAX, XMM0 );
+		g->movss( EAX, XMM0 );
 		//PRINTEAX();
 		g->cmp( EAX, 0x80000000 );
 		char xx[40];
 		sprintf_s( xx, 40, "fmul%0X", address );
 		g->jne( xx );
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		ASSERTXMM0VALID();
-		g->movd( XMM0, MCP1REG( CTX, ft, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, ft, fmt ) );
 		ASSERTXMM0VALID();
 		//g->int3();
 		g->mov( EAX, 0 );
@@ -185,11 +185,11 @@ GenerationResult FMUL( R4000GenContext^ context, int pass, int address, uint cod
 		PRINTEAX();
 		g->mov( MCP1REG( CTX, fd, fmt ), EAX );
 #else
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->mulss( XMM0, MCP1REG( CTX, ft, fmt ) );
 #ifdef CAUTIOUSFPU
 		// This extra code is for handling -0.0 cases
-		g->movd( EAX, XMM0 );
+		g->movss( EAX, XMM0 );
 		g->mov( EBX, 0 );
 		g->cmp( EAX, 0x80000000 );
 		g->cmove( EAX, EBX );
@@ -197,7 +197,7 @@ GenerationResult FMUL( R4000GenContext^ context, int pass, int address, uint cod
 		g->mov( MCP1REG( CTX, fd, fmt ), EAX );
 #else
 		ASSERTXMM0VALID();
-		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 #endif
 #endif
 #else
@@ -219,16 +219,16 @@ GenerationResult FDIV( R4000GenContext^ context, int pass, int address, uint cod
 	{
 #ifdef SSE
 #ifdef DEBUGFPU
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		ASSERTXMM0VALID();
-		g->movd( XMM0, MCP1REG( CTX, ft, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, ft, fmt ) );
 		ASSERTXMM0VALID();
 #endif
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->divss( XMM0, MCP1REG( CTX, ft, fmt ) );
 #ifdef CAUTIOUSFPU
 		// This extra code is for handling -0.0 cases
-		g->movd( EAX, XMM0 );
+		g->movss( EAX, XMM0 );
 		g->mov( EBX, 0 );
 		g->cmp( EAX, 0x80000000 );
 		g->cmove( EAX, EBX );
@@ -236,7 +236,7 @@ GenerationResult FDIV( R4000GenContext^ context, int pass, int address, uint cod
 		g->mov( MCP1REG( CTX, fd, fmt ), EAX );
 #else
 		ASSERTXMM0VALID();
-		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 #endif
 #else
 		g->mov( EAX, MCP1REG( CTX, fs, fmt ) );
@@ -258,7 +258,7 @@ GenerationResult FSQRT( R4000GenContext^ context, int pass, int address, uint co
 #ifdef SSE
 		g->sqrtss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		ASSERTXMM0VALID();
-		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 #else
 		g->mov( EAX, MCP1REG( CTX, fs, fmt ) );
 		// EAX = sqrt( EAX )
@@ -284,12 +284,12 @@ GenerationResult FABS( R4000GenContext^ context, int pass, int address, uint cod
 		//*(((int *) &x) + 1) &= 0x7fffffff;
 
 //#ifdef SSE
-//		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
-//		g->movd( XMM1, 0 );
+//		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
+//		g->movss( XMM1, 0 );
 //		g->cmpltss( XMM0, XMM1 );
 //		// XMM0 = FFFFFFFF iff XMM0 < 0
 //		//??
-//		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+//		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 //#else
 //		g->mov( EAX, MCP1REG( CTX, fs, fmt ) );
 //		// EAX = abs( EAX )
@@ -328,22 +328,22 @@ GenerationResult FNEG( R4000GenContext^ context, int pass, int address, uint cod
 		char skip[20];
 		sprintf_s( skip, 20, "neg%0X", address );
 		g->mov( EAX, MCP1REG( CTX, fs, fmt ) );
-		g->movd( XMM0, EAX );
+		g->movss( XMM0, EAX );
 		g->mov( EBX, 0 );
 		g->cmp( EAX, EBX );
 		g->je( skip );
-		g->movd( XMM1, g->dword_ptr[ &_negative1 ] );
+		g->movss( XMM1, g->dword_ptr[ &_negative1 ] );
 		g->mulss( XMM0, XMM1 );
 		ASSERTXMM0VALID();
 		g->label( skip );
-		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 #else
 		// Fast way
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
-		g->movd( XMM1, g->dword_ptr[ &_negative1 ] );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM1, g->dword_ptr[ &_negative1 ] );
 		g->mulss( XMM0, XMM1 );
 		ASSERTXMM0VALID();
-		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 #endif
 #else
 		g->fld( MCP1REG( CTX, fs, fmt ) );
@@ -377,7 +377,7 @@ GenerationResult ROUNDW( R4000GenContext^ context, int pass, int address, uint c
 		g->ldmxcsr( dword_ptr[ ESP + 4 ] );
 #endif
 
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		g->mov( EBX, 0x3f000000 );
 		g->movd( XMM1, EBX ); // 0.5f
 		g->addss( XMM0, XMM1 );
@@ -386,12 +386,12 @@ GenerationResult ROUNDW( R4000GenContext^ context, int pass, int address, uint c
 		PRINTEAX();
 		g->mov( MCP1REG( CTX, fd, fmt ), EAX );
 
-		//g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		//g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		//// round even via MXCSR
 		//g->cvtss2si( EAX, XMM0 );
 		//g->cvtsi2ss( XMM0, EAX );
 		//ASSERTXMM0VALID();
-		//g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+		//g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 
 		// Restore rounding mode
 #ifdef SSE_ENSURERC
@@ -415,7 +415,7 @@ GenerationResult TRUNCW( R4000GenContext^ context, int pass, int address, uint c
 	else if( pass == 1 )
 	{
 #ifdef SSE
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		// round towards zero
 		ASSERTXMM0VALID();
 		g->cvttss2si( EAX, XMM0 );
@@ -438,10 +438,10 @@ GenerationResult CEILW( R4000GenContext^ context, int pass, int address, uint co
 	else if( pass == 1 )
 	{
 //#ifdef SSE
-//		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+//		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 //		g->cvtss2si( EAX, XMM0 );
 //		g->cvtsi2ss( XMM0, EAX );
-//		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+//		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 //#else
 		g->push( MCP1REG( CTX, fs, fmt ) );
 		g->call( (int)ceilf );
@@ -461,10 +461,10 @@ GenerationResult FLOORW( R4000GenContext^ context, int pass, int address, uint c
 	else if( pass == 1 )
 	{
 //#ifdef SSE
-//		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+//		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 //		g->cvttss2si( EAX, XMM0 );
 //		g->cvtsi2ss( XMM0, EAX );
-//		g->movd( MCP1REG( CTX, fd, fmt ), XMM0 );
+//		g->movss( MCP1REG( CTX, fd, fmt ), XMM0 );
 //#else
 		g->push( MCP1REG( CTX, fs, fmt ) );
 		g->call( (int)floorf );
@@ -486,7 +486,7 @@ GenerationResult CVTS( R4000GenContext^ context, int pass, int address, uint cod
 #ifdef SSE
 		g->cvtsi2ss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		ASSERTXMM0VALID();
-		g->movd( MCP1REG( CTX, fd, 0 ), XMM0 );
+		g->movss( MCP1REG( CTX, fd, 0 ), XMM0 );
 #else
 		g->fild( MCP1REG( CTX, fs, fmt ) );
 		ASSERTX87VALID();
@@ -537,7 +537,7 @@ GenerationResult FCOMPARE( R4000GenContext^ context, int pass, int address, uint
 #ifdef SSE
 		// TODO: support all FPU compare ops (ordered, etc)
 		// NOTE: could do this with COMISS and SETcc instead!
-		g->movd( XMM0, MCP1REG( CTX, fs, fmt ) );
+		g->movss( XMM0, MCP1REG( CTX, fs, fmt ) );
 		if( un == true )
 		{
 			g->cmpunordss( XMM0, MCP1REG( CTX, ft, fmt ) );

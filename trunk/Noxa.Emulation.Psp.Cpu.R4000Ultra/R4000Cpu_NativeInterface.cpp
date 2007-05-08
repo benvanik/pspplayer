@@ -60,6 +60,22 @@ void niSetPendingInterrupt( int intNumber )
 	_cpuCtx->StopFlag = CtxInterruptPending;
 }
 
+void niResume()
+{
+}
+
+void niBreakAndWait()
+{
+}
+
+void niBreakAndWaitTimeout( int timeoutMs )
+{
+}
+
+void niBreakAndWaitTimeoutCallback( int timeoutMs, CpuResumeFunction callback, void* state )
+{
+}
+
 #pragma managed
 
 void R4000Cpu::SetupNativeInterface()
@@ -70,6 +86,11 @@ void R4000Cpu::SetupNativeInterface()
 	ni->GetInterruptState = &niGetInterruptState;
 	ni->SetInterruptState = &niSetInterruptState;
 	ni->SetPendingInterrupt = &niSetPendingInterrupt;
+
+	/*ni->Resume = &niResume;
+	ni->BreakAndWait = &niBreakAndWait;
+	ni->BreakAndWaitTimeout = &niBreakAndWaitTimeout;
+	ni->BreakAndWaitTimeoutCallback = &niBreakAndWaitTimeoutCallback;*/
 }
 
 void R4000Cpu::DestroyNativeInterface()

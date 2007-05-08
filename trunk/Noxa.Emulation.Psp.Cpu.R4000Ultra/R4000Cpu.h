@@ -57,6 +57,7 @@ namespace Noxa {
 					PerformanceTimer^			_timer;
 					double						_timeSinceLastIpsPrint;
 #endif
+					TimerQueue^					_timerQueue;
 
 				internal:
 					IDebugger^					_debugger;
@@ -75,6 +76,10 @@ namespace Noxa {
 
 					CpuApi*						_nativeInterface;
 					List<IntPtr>^				_threadContexts;
+
+					bool						_broken;
+					CpuResumeCallback^			_resumeCallback;
+					Object^						_resumeState;
 
 				internal:
 					int							_lastSyscall;
@@ -251,6 +256,14 @@ namespace Noxa {
 						[System::Runtime::InteropServices::Out] bool% breakFlag,
 						[System::Runtime::InteropServices::Out] uint% instructionsExecuted );
 					virtual void BreakExecution();
+
+					// -- Execution Control
+					virtual void Resume();
+					void ResumeInternal( bool timedOut );
+					void BreakTimeout( Timer^ timer );
+					virtual void BreakAndWait();
+					virtual void BreakAndWait( int timeoutMs );
+					virtual void BreakAndWait( int timeoutMs, CpuResumeCallback^ callback, Object^ state );
 
 					virtual void Stop();
 

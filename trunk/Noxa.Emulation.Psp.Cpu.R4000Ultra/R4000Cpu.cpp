@@ -78,16 +78,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 
 R4000Cpu::~R4000Cpu()
 {
-	this->DestroyThreading();
-
-	this->DestroyNativeInterface();
-	SAFEFREE( _nativeInterface );
-
-	if( _ctx != NULL )
-		_aligned_free( _ctx );
-	_ctx = NULL;
-	SAFEFREE( _bounce );
-	SAFEDELETE( _codeCache );
+	this->Cleanup();
 }
 
 uint R4000Cpu::RegisterSyscall( unsigned int nid )
@@ -133,7 +124,18 @@ uint R4000Cpu::LookupUserExport( uint nid )
 
 void R4000Cpu::Cleanup()
 {
+	this->DestroyThreading();
+
+	this->DestroyNativeInterface();
+	SAFEFREE( _nativeInterface );
+
 	_memory->Clear();
+
+	if( _ctx != NULL )
+		_aligned_free( _ctx );
+	_ctx = NULL;
+	//SAFEFREE( _bounce );
+	SAFEDELETE( _codeCache );
 }
 
 void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
