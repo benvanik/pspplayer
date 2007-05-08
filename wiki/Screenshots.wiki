@@ -4,7 +4,13 @@
 = Screenshots and Movies =
 Although the emulator is pretty advanced, it is also in its early stages. This means that the screenshots you see here aren't that pretty yet. Newer images are at the top because I expect them to be cooler.
 
-=== 2007-05-07 - Trigonometry Wars ==
+=== 2007-05-07 - Puzzle Bobble ===
+First commercial game :)
+It runs fairly slow due to the lack of texture caching (all time is spent waiting on the GPU - my CPUs sit relatively idle at around 10-20% while running), but works. There are a few things missing, like the guide lines while playing, but other than that it works!
+
+[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2007.05.07.04-PuzzleBobble.png?format=raw]
+
+=== 2007-05-07 - Trigonometry Wars ===
 Fixed textures up and now trigwars runs. In fact, it runs REALLY well, and is fully playable. Cool!
 
 [http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2007.05.07.01-TrigWars.png?format=raw]
