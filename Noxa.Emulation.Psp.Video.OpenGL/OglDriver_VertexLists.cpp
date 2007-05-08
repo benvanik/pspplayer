@@ -217,6 +217,8 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 			src += 4;
 			break;
 		}
+		float f = ( float )rand() / RAND_MAX;
+		glColor3f( f, f, f );
 
 		switch( normalType )
 		{
