@@ -140,6 +140,14 @@ void TextureTransfer( OglContext* context )
 	//glDepthMask( GL_TRUE );
 }
 
+void SetTextureModes( OglContext* context, int stage )
+{
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, context->TextureWrapS );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, context->TextureWrapT );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, context->TextureFilterMin );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, context->TextureFilterMag );
+}
+
 void SetTexture( OglContext* context, int stage )
 {
 	OglTexture* texture = &context->Textures[ stage ];
@@ -147,6 +155,9 @@ void SetTexture( OglContext* context, int stage )
 	bool textureValid = IsTextureValid( texture );
 	if( textureValid == false )
 		return;
+
+	//return;
+	SetTextureModes( context, stage );
 
 	if( texture->TextureID > 0 )
 	{

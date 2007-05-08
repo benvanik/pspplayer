@@ -34,10 +34,15 @@ namespace Noxa {
 					float			TextureMatrix[ 16 ];
 
 					// Textures
+					bool			TexturesEnabled;
 					bool			TexturesSwizzled;
 					int				MipMapLevel;
 					int				TextureStorageMode;
 					OglTexture		Textures[ 8 ];
+					ushort			TextureFilterMin;
+					ushort			TextureFilterMag;
+					ushort			TextureWrapS;
+					ushort			TextureWrapT;
 
 					void*			ClutTable;		// Allocated to CLUTSIZE and pallettes are copied in
 					uint			ClutPointer;
