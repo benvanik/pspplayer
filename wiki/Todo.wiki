@@ -8,7 +8,6 @@ The following are items on my TODO list. Just because something isn't on here do
  * VFPU support in the Ultra CPU
  * Fix cleanup code so no need for a reset between runs (and it doesn't crash :)
  * Debug console (instead of outputting debug with Debug.WriteLine/etc)
- * Texture caching (in progress)
  * Figure out why the emulator sits idle so much
  * "New User Experience" - automatically pick the best plugins and set them up
 
