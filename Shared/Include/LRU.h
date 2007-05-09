@@ -72,7 +72,7 @@ namespace Noxa {
 					_lookup.erase( oldKey );
 					_keyLookup.erase( dead );
 
-					_list.Remove( dead );
+					//_list.Remove( dead );
 					_count--;
 				}
 
