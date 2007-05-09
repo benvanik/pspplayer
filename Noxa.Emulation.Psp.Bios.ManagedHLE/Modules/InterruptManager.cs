@@ -193,6 +193,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			return 0;
 		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xFC4374B8, "sceKernelIsSubInterruptOccurred" )]
+		public int sceKernelIsSubInterruptOccurred()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xEEE43F47, "sceKernelRegisterUserSpaceIntrStack" )]
+		public int sceKernelRegisterUserSpaceIntrStack()
+		{
+			return Module.NotImplementedReturn;
+		}
 	}
 }
 

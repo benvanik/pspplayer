@@ -192,8 +192,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			return 0;
 		}
-
 	}
 }
 
-/* GenerateStubsV2: auto-generated - D87462A2 */
+/* GenerateStubsV2: auto-generated - 5E619990 */

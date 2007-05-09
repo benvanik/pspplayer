@@ -102,7 +102,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK location: /user/pspthreadman.h:1688
 		// SDK declaration: enum SceKernelIdListType sceKernelGetThreadmanIdType(SceUID uid);
 		public int sceKernelGetThreadmanIdType( int uid ){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x64D4540E, "sceKernelReferThreadProfiler" )]
+		public int sceKernelReferThreadProfiler(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x8218B4DD, "sceKernelReferGlobalProfiler" )]
+		public int sceKernelReferGlobalProfiler(){ return Module.NotImplementedReturn; }
 	}
 }
 
-/* GenerateStubsV2: auto-generated - D8829FE8 */
+/* GenerateStubsV2: auto-generated - B40C8E82 */

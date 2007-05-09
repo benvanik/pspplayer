@@ -62,6 +62,7 @@
     <Compile Include="Modules\IoFileMgrForUser.Devices.cs" />
     <Compile Include="Modules\IoFileMgrForUser.Directories.cs" />
     <Compile Include="Modules\IoFileMgrForUser.Files.cs" />
+    <Compile Include="Modules\KDebugForKernel.cs" />
     <Compile Include="Modules\Kernel_Library.cs" />
     <Compile Include="Modules\LoadExecForUser.cs" />
     <Compile Include="Modules\ModuleMgrForUser.cs" />
@@ -75,6 +76,10 @@
     <Compile Include="Modules\sceGe_user.cs" />
     <Compile Include="Modules\sceHprm.cs" />
     <Compile Include="Modules\sceImpose.cs" />
+    <Compile Include="Modules\sceNet.cs" />
+    <Compile Include="Modules\sceNetApctl.cs" />
+    <Compile Include="Modules\sceNetInet.cs" />
+    <Compile Include="Modules\sceNetResolver.cs" />
     <Compile Include="Modules\scePower.cs" />
     <Compile Include="Modules\sceReg.cs" />
     <Compile Include="Modules\sceRtc.cs" />

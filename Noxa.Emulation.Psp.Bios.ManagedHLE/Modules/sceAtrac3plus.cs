@@ -67,9 +67,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// Not sure if any of these are actually used
 
 		[NotImplemented]
-		[BiosFunction( 0x780F88D1, "sceAtracGetAtracID" )] [Stateless]
-		// manual add
-		public int sceAtracGetAtracID( int codec ){ return Module.NotImplementedReturn; }
+		[Stateless]
+		[BiosFunction( 0xD1F59FDB, "sceAtracStartEntry" )]
+		public int sceAtracStartEntry(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xD5C28CC0, "sceAtracEndEntry" )]
+		public int sceAtracEndEntry(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x780F88D1, "sceAtracGetAtracID" )]
+		public int sceAtracGetAtracID(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
@@ -77,6 +87,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK location: /atrac3/pspatrac3.h:87
 		// SDK declaration: int sceAtracReleaseAtracID(int atracID);
 		public int sceAtracReleaseAtracID( int atracID ){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x3F6E26B5, "sceAtracSetHalfwayBuffer" )]
+		public int sceAtracSetHalfwayBuffer(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[BiosFunction( 0x0E2A73AB, "sceAtracSetData" )] [Stateless]
@@ -92,6 +107,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
+		[BiosFunction( 0x0FAE370E, "sceAtracSetHalfwayBufferAndGetID" )]
+		public int sceAtracSetHalfwayBufferAndGetID(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
 		[BiosFunction( 0x6A8C3CD5, "sceAtracDecodeData" )]
 		// SDK location: /atrac3/pspatrac3.h:43
 		// SDK declaration: int sceAtracDecodeData(int atracID, u16 *outSamples, int *outN, int *outEnd, int *outRemainFrame);
@@ -103,6 +123,41 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK location: /atrac3/pspatrac3.h:55
 		// SDK declaration: int sceAtracGetRemainFrame(int atracID, int *outRemainFrame);
 		public int sceAtracGetRemainFrame( int atracID, int outRemainFrame ){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x5D268707, "sceAtracGetStreamDataInfo" )]
+		public int sceAtracGetStreamDataInfo(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x7DB31251, "sceAtracAddStreamData" )]
+		public int sceAtracAddStreamData(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x83E85EA0, "sceAtracGetSecondBufferInfo" )]
+		public int sceAtracGetSecondBufferInfo(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x83BF7AFD, "sceAtracSetSecondBuffer" )]
+		public int sceAtracSetSecondBuffer(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xE23E3A35, "sceAtracGetNextDecodePosition" )]
+		public int sceAtracGetNextDecodePosition(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xA2BBA8BE, "sceAtracGetSoundSample" )]
+		public int sceAtracGetSoundSample(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x31668BAA, "sceAtracGetChannel" )]
+		public int sceAtracGetChannel(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
@@ -127,17 +182,31 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
+		[BiosFunction( 0xFAA4F89B, "sceAtracGetLoopStatus" )]
+		public int sceAtracGetLoopStatus(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
 		[BiosFunction( 0x868120B5, "sceAtracSetLoopNum" )]
 		// SDK location: /atrac3/pspatrac3.h:77
 		// SDK declaration: int sceAtracSetLoopNum(int atracID, int nloops);
 		public int sceAtracSetLoopNum( int atracID, int nloops ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
-		[BiosFunction( 0xE88F759B, "sceAtracGetInternalErrorInfo" )] [Stateless]
-		// manual add
-		public int sceAtracGetInternalErrorInfo(){ return Module.NotImplementedReturn; }
+		[Stateless]
+		[BiosFunction( 0xCA3CA3D2, "sceAtracGetBufferInfoForReseting" )]
+		public int sceAtracGetBufferInfoForReseting(){ return Module.NotImplementedReturn; }
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x644E5607, "sceAtracResetPlayPosition" )]
+		public int sceAtracResetPlayPosition(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xE88F759B, "sceAtracGetInternalErrorInfo" )]
+		public int sceAtracGetInternalErrorInfo(){ return Module.NotImplementedReturn; }
 	}
 }
 
-/* GenerateStubsV2: auto-generated - C946853E */
+/* GenerateStubsV2: auto-generated - 99D6BDB1 */

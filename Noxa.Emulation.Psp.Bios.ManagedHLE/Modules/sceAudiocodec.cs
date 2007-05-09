@@ -122,6 +122,21 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x8ACA11D5, "sceAudiocodecGetInfo" )]
+		public int sceAudiocodecGetInfo(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x6CD2A861, "sceAudiocodec_6CD2A861" )]
+		public int sceAudiocodec_6CD2A861(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x59176A0F, "sceAudiocodec_59176A0F" )]
+		public int sceAudiocodec_59176A0F(){ return Module.NotImplementedReturn; }
+
 		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x3A20A200, "sceAudiocodecGetEDRAM" )]
@@ -144,4 +159,4 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 8E961E73 */
+/* GenerateStubsV2: auto-generated - ACF8B420 */

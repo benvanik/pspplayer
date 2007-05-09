@@ -83,6 +83,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xE0887BC8, "sceRegOpenRegistry" )]
 		// manual add
 		public int sceImposeGetUMDPopup(){ return Module.NotImplementedReturn; }
-
 	}
 }
+
+/* GenerateStubsV2: auto-generated - 1E486ACC */

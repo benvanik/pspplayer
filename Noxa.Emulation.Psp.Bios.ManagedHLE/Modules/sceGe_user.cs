@@ -198,8 +198,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Let GE continue pulling lists?
 			return 0;
 		}
-
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 4D5DD3D5 */
+/* GenerateStubsV2: auto-generated - 0E093B7A */

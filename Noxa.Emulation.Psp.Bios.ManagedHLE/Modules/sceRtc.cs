@@ -387,12 +387,51 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
+		[BiosFunction( 0xC663B3B9, "sceRtcFormatRFC2822" )]
+		public int sceRtcFormatRFC2822()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x7DE6711B, "sceRtcFormatRFC2822LocalTime" )]
+		public int sceRtcFormatRFC2822LocalTime()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x0498FB3C, "sceRtcFormatRFC3339" )]
+		public int sceRtcFormatRFC3339()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x27F98543, "sceRtcFormatRFC3339LocalTime" )]
+		public int sceRtcFormatRFC3339LocalTime()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
 		[BiosFunction( 0xDFBC5F16, "sceRtcParseDateTime" )]
 		// SDK location: /rtc/psprtc.h:251
 		// SDK declaration: int sceRtcParseDateTime(u64 *destTick, const char *dateString);
 		public int sceRtcParseDateTime( int destTick, int dateString ){ return Module.NotImplementedReturn; }
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x28E1E988, "sceRtcParseRFC3339" )]
+		public int sceRtcParseRFC3339()
+		{
+			return Module.NotImplementedReturn;
+		}
 	}
 }
 
-/* GenerateStubsV2: auto-generated - D5F1F444 */
+/* GenerateStubsV2: auto-generated - 1E7339CE */
