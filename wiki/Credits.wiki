@@ -2,4 +2,8 @@
 
 = Credits =
 
-[http://www.noxa.org Me] :)
+Almost everything: [http://www.noxa.org Me] :)
+
+Some bits about CLUT's and vertex alignment: ector
+
+BIOS stubs: [http://ps2dev.org pspsdk]
