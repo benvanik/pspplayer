@@ -16,10 +16,11 @@ Everything has been designed and developed under Windows, with an aim towards ke
 == Getting the Code ==
 The SVN repository is publicy accessible for read-only access. You'll need everything in {{{trunk/}}} to compile, so make sure you grab it all.
 {{{
-svn://svn.ixtli.com/pspdev
+svn://svn.ixtli.com/pspdev/trunk/
 }}}
 
 If you haven't used SVN before, I recommend checking out the [http://www.tortoisesvn.net/support manual]. I won't help you with it, unless there is a problem with the server.
+Drop the {{{trunk/}}} to get the milestone branches.
 
 == Compiling ==
 Opening {{{Noxa.Emulation.sln}}} in Visual Studio should be enough. Just make sure you are set to {{{Release}}} and build. If you run in {{{Debug}}}, things will be slow. I recommend running with Ctrl-F5 and attaching the debugger when a crash occurs. Some of this slowness will be fixed in an upcoming patch.
