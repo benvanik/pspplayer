@@ -39,6 +39,7 @@ namespace Noxa.Emulation.Psp.Player
 
 			_debugger = null;
 			_logger = new LogViewer();
+			_logger.Show();
 			_player = new Player( this );
 
 			this.Load();
