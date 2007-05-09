@@ -89,6 +89,8 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 		int m = 0;
 		do
 		{
+			byte* pstart = src;
+
 			switch( textureType )
 			{
 			case VTTextureFixed8:
@@ -155,9 +157,8 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 				break;
 			}
 
-			// Must be word (4 byte) aligned
-			if( ( vertexSize & 0x3 ) != 0 )
-				src += 4 - ( vertexSize & 0x3 );
+			// Pad out the rest
+			src += vertexSize - ( src - pstart );
 
 			m += 2;
 		} while( m <= 2 );

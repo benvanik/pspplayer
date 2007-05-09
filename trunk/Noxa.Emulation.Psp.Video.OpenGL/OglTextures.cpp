@@ -355,6 +355,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	// buffer now contains an unswizzled texture - may need to un-CLUT it, or convert colors
 
 	int width = texture->Width;
+	bool needRowLength = false;
 
 	switch( format->Format )
 	{
@@ -372,16 +373,15 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 		break;
 	case TPSABGR8888:
 		// Pass through
+		needRowLength = true;
 		break;
 	case TPSIndexed4:
 		buffer = Decode4( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
 		format = ( TextureFormat* )&__formats[ 3 ];
-		//width = texture->LineWidth;
 		break;
 	case TPSIndexed8:
 		buffer = Decode8( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
 		format = ( TextureFormat* )&__formats[ 3 ];
-		//width = texture->LineWidth;
 		break;
 	case TPSIndexed16:
 		buffer = Decode16( context, buffer, _decodeBuffer, texture->Width, texture->Height, texture->LineWidth );
@@ -399,7 +399,8 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	}
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, format->Size );
-	//glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
+	if( needRowLength == true )
+		glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
 
 #ifdef _DEBUG
 	static bool write = false;
