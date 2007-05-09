@@ -324,10 +324,6 @@
 				Name="Shared"
 				>
 				<File
-					RelativePath="..\Shared\Source\HashTable.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\Shared\Source\Tracer.cpp"
 					>
 				</File>
@@ -439,10 +435,6 @@
 				</File>
 				<File
 					RelativePath="..\Shared\Include\CpuApi.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Shared\Include\HashTable.h"
 					>
 				</File>
 				<File

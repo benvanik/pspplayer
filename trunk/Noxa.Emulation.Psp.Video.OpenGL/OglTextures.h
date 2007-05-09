@@ -18,7 +18,6 @@ namespace Noxa {
 					int				LineWidth;
 					int				Width;
 					int				Height;
-					int				TextureID;
 				} OglTexture;
 
 				typedef struct TextureFormat_t

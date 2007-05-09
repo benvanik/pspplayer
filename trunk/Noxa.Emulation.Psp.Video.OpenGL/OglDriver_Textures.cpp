@@ -144,30 +144,53 @@ void SetTextureModes( OglContext* context, int stage )
 {
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, context->TextureWrapS );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, context->TextureWrapT );
-	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, context->TextureFilterMin );
-	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, context->TextureFilterMag );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, context->TextureFilterMin );
+	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, context->TextureFilterMag );
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 }
 
 void SetTexture( OglContext* context, int stage )
 {
 	OglTexture* texture = &context->Textures[ stage ];
 
-	bool textureValid = IsTextureValid( texture );
-	if( textureValid == false )
+	if( texture->Address == 0 )
 		return;
 
-	//return;
+	// Check texture cache
+	TextureEntry* entry = context->TextureCache->Find( texture->Address );
+	if( entry != NULL )
+	{
+		uint* texturePointer = ( uint* )context->Memory->Translate( texture->Address );
+		if( ( entry->Checksum != *texturePointer ) ||
+			( entry->Width != texture->Width ) ||
+			( entry->Height != texture->Height ) ||
+			( entry->LineWidth != texture->LineWidth ) ||
+			( entry->PixelStorage != texture->PixelStorage ) )
+		{
+			// Mismatch - free
+			context->TextureCache->Remove( texture->Address );
+			GLuint freeIds[] = { entry->TextureID };
+			glDeleteTextures( 1, freeIds );
+			entry = NULL;
+		}
+	}
+
+	// Must be done for every texture
 	SetTextureModes( context, stage );
 
-	if( texture->TextureID > 0 )
+	if( entry != NULL )
 	{
 		// Texture has been generated, so we just set
-		//glBindTexture( GL_TEXTURE_2D, texture->TextureID );
+		glBindTexture( GL_TEXTURE_2D, entry->TextureID );
 
 		return;
 	}
+
+	// Ensure valid
+	bool textureValid = IsTextureValid( texture );
+	if( textureValid == false )
+		return;
 	
 	// Grab and decode texture, then create in OGL
 	if( GenerateTexture( context, texture ) == false )

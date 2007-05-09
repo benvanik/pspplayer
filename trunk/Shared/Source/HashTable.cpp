@@ -395,6 +395,8 @@ function does nothing.  */
 void Noxa::Emulation::Psp::HTRemove( HashTable htab, PTR key )
 {
 	PTR* slot = HTFindSlot( htab, key, false );
+	if( slot == NULL )
+		return;
 	if( *slot == EMPTY_ENTRY )
 		return;
 
