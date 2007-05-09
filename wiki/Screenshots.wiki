@@ -6,7 +6,7 @@ Although the emulator is pretty advanced, it is also in its early stages. This m
 
 === 2007-05-07 - Puzzle Bobble ===
 First commercial game :)
-It runs fairly slow due to the lack of texture caching (all time is spent waiting on the GPU - my CPUs sit relatively idle at around 10-20% while running), but works. There are a few things missing, like the guide lines while playing, but other than that it works!
+There are a few things missing, like the guide lines while playing, but other than that it works! Speed is pretty good, but is being held back by some bad OpenGL code and probably some game-instructed waits that are taking too long. I actually listen when the game says 'pause for this amount of time' - maybe I should only wait for half the time requested or something. My CPU sits almost idle while playing.
 
 [http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.05.07.04-PuzzleBobble.png]
 
