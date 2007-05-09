@@ -633,19 +633,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						}
 						else if( function == null )
 						{
-							Debug.WriteLine( string.Format( "LoadModule: {0} 0x{1:X8} not found (NID not present)", name, nid ) );
+							Log.WriteLine( Verbosity.Normal, Feature.Loader, "{0} 0x{1:X8} not found (NID not present)", name, nid );
 							stubImport.Result = StubReferenceResult.NidNotFound;
 							nidNotFoundCount++;
 						}
 						else if( function.IsImplemented == false )
 						{
-							Debug.WriteLine( string.Format( "LoadModule: 0x{1:X8} found and patched at 0x{2:X8} -> {0}::{3} (NI)", name, nid, ( uint )pcode, function.Name ) );
+							Log.WriteLine( Verbosity.Normal, Feature.Loader, "0x{1:X8} found and patched at 0x{2:X8} -> {0}::{3} (NI)", name, nid, ( uint )pcode, function.Name );
 							stubImport.Result = StubReferenceResult.NidNotImplemented;
 							nidNotImplementedCount++;
 						}
 						else
 						{
-							//Debug.WriteLine( string.Format( "LoadModule: 0x{1:X8} found and patched at 0x{2:X8} -> {0}::{3}", name, nid, ( uint )pcode, function->Name ) );
+							Log.WriteLine( Verbosity.Verbose, Feature.Loader, "0x{1:X8} found and patched at 0x{2:X8} -> {0}::{3}", name, nid, ( uint )pcode, function.Name );
 							stubImport.Result = StubReferenceResult.Success;
 							nidGoodCount++;
 						}
@@ -670,12 +670,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 #if DEBUG
 				// Print stats
-				Debug.WriteLine( string.Format( "LoadModule: {0}/{1} ({2}%) NIDs good; {3} not implemented, {4} not found, {5} in missing modules = {6} total", nidGoodCount, results.Imports.Count - moduleNotFoundCount, ( nidGoodCount / ( float )( results.Imports.Count - moduleNotFoundCount ) ) * 100.0f, nidNotImplementedCount, nidNotFoundCount, moduleNotFoundCount, results.Imports.Count ) );
+				Log.WriteLine( Verbosity.Critical, Feature.Loader, "Load complete: {0}/{1} ({2}%) NIDs good; {3} not implemented, {4} not found, {5} in missing modules = {6} total", nidGoodCount, results.Imports.Count - moduleNotFoundCount, ( nidGoodCount / ( float )( results.Imports.Count - moduleNotFoundCount ) ) * 100.0f, nidNotImplementedCount, nidNotFoundCount, moduleNotFoundCount, results.Imports.Count );
 				if( missingModules.Count > 0 )
 				{
-					Debug.WriteLine( string.Format( "LoadModule: {0} missing modules (contain {1} NIDs ({2}% of total)):", missingModules.Count, moduleNotFoundCount, ( moduleNotFoundCount / ( float )results.Imports.Count ) * 100.0f ) );
+					Log.WriteLine( Verbosity.Normal, Feature.Loader, "{0} missing modules (contain {1} NIDs ({2}% of total)):", missingModules.Count, moduleNotFoundCount, ( moduleNotFoundCount / ( float )results.Imports.Count ) * 100.0f );
 					foreach( string moduleName in missingModules )
-						Debug.WriteLine( string.Format( "\t\t{0}", moduleName ) );
+						Log.WriteLine( Verbosity.Normal, Feature.Loader, "\t\t{0}", moduleName );
 				}
 #endif
 
@@ -718,7 +718,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						// Setup handler so that we get the callback when the thread ends and we can kill it
 						cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleThreadEnd ), ( int )thread.UID );
 
-						Debug.WriteLine( string.Format( "Loader: starting kmodule loading thread with UID {0}", thread.UID ) );
+						Log.WriteLine( Verbosity.Verbose, Feature.Loader, "starting kmodule loading thread with UID {0}", thread.UID );
 
 						// Schedule so that our thread runs
 						kernel.Schedule();
@@ -742,7 +742,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Debug.Assert( thread != null );
 			if( thread != null )
 			{
-				Debug.WriteLine( string.Format( "Loader: killing kmodule loading thread with UID {0}", thread.UID ) );
+				Log.WriteLine( Verbosity.Verbose, Feature.Loader, "killing kmodule loading thread with UID {0}", thread.UID );
 
 				thread.Exit( 0 );
 				kernel.RemoveHandle( thread.UID );

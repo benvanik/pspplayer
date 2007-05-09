@@ -61,7 +61,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( results.Successful == true );
 			if( results.Successful == false )
 			{
-				Debug.WriteLine( "LoadModule: loader failed" );
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "LoadModule: loader failed" );
 				return -1;
 			}
 
@@ -85,7 +85,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( module.ModuleStart == 0 )
 			{
 				// Probably a fake load
-				Debug.WriteLine( string.Format( "ModuleMgrForUser: not starting module {0} - no ModuleStart defined - probably faked", module.Name ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "ModuleMgrForUser: not starting module {0} - no ModuleStart defined - probably faked", module.Name );
 				return;
 			}
 
@@ -97,7 +97,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Setup handler so that we get the callback when the thread ends and we can kill it
 			_kernel.Cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleStartThreadEnd ), ( int )thread.UID );
 
-			Debug.WriteLine( string.Format( "ModuleMgrForUser: starting module_start thread with UID {0} for module {1}", thread.UID, module.Name ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: starting module_start thread with UID {0} for module {1}", thread.UID, module.Name );
 
 			// Schedule so that our thread runs
 			_kernel.Schedule();
@@ -110,7 +110,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( thread != null );
 			if( thread != null )
 			{
-				Debug.WriteLine( string.Format( "ModuleMgrForUser: killing module_start thread with UID {0}", thread.UID ) );
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: killing module_start thread with UID {0}", thread.UID );
 
 				thread.Exit( 0 );
 				_kernel.RemoveHandle( thread.UID );
@@ -134,7 +134,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Setup handler so that we get the callback when the thread ends and we can kill it
 			_kernel.Cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleStopThreadEnd ), ( int )thread.UID );
 
-			Debug.WriteLine( string.Format( "ModuleMgrForUser: starting module_stop thread with UID {0} for module {1}", thread.UID, module.Name ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: starting module_stop thread with UID {0} for module {1}", thread.UID, module.Name );
 
 			// Schedule so that our thread runs
 			_kernel.Schedule();
@@ -147,7 +147,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( thread != null );
 			if( thread != null )
 			{
-				Debug.WriteLine( string.Format( "ModuleMgrForUser: killing module_stop thread with UID {0}", thread.UID ) );
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: killing module_stop thread with UID {0}", thread.UID );
 
 				thread.Exit( 0 );
 				_kernel.RemoveHandle( thread.UID );
@@ -167,16 +167,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fid );
 			if( handle == null )
 			{
-				Debug.WriteLine( string.Format( "sceKernelLoadModuleByID: file handle {0} not found", fid ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelLoadModuleByID: file handle {0} not found", fid );
 				return -1;
 			}
 
 			Debug.Assert( handle.IsOpen == true );
 
 			if( handle.Item != null )
-				Debug.WriteLine( string.Format( "sceKernelLoadModuleByID: loading module with file handle {0} (source: {1})", fid, handle.Item.AbsolutePath ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelLoadModuleByID: loading module with file handle {0} (source: {1})", fid, handle.Item.AbsolutePath );
 			else
-				Debug.WriteLine( string.Format( "sceKernelLoadModuleByID: loading module with file handle {0}", fid ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelLoadModuleByID: loading module with file handle {0}", fid );
 
 			return this.LoadModule( ( IMediaFile )handle.Item, handle.Stream, flags, option );
 		}
@@ -191,11 +191,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			IMediaFile file = ( IMediaFile )_kernel.FindPath( modulePath );
 			if( file == null )
 			{
-				Debug.WriteLine( string.Format( "sceKernelLoadModule: module not found: {0}", modulePath ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelLoadModule: module not found: {0}", modulePath );
 				return -1;
 			}
 
-			Debug.WriteLine( string.Format( "sceKernelLoadModule: loading module {0}", modulePath ) );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelLoadModule: loading module {0}", modulePath );
 
 			Stream stream = null;
 
@@ -206,7 +206,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( File.Exists( lookasidePrx ) == true )
 			{
 				// Load ours instead
-				Debug.WriteLine( string.Format( "sceKernelLoadModule: lookaside prx found at {0}", lookasidePrx ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelLoadModule: lookaside prx found at {0}", lookasidePrx );
 				stream = File.OpenRead( lookasidePrx );
 			}
 			else
@@ -218,7 +218,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( stream != null );
 			if( stream == null )
 			{
-				Debug.WriteLine( "sceKernelLoadModule: unable to load module" );
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelLoadModule: unable to load module {0}", modulePath );
 				return -1;
 			}
 
@@ -235,7 +235,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			//Debug::Assert( encrypted == false );
 			if( encrypted == true )
 			{
-				Debug.WriteLine( "sceKernelLoadModule: module is encrypted - unable to load" );
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelLoadModule: module {0} is encrypted - unable to load", modulePath );
 
 				// We spoof the caller in to thinking we worked right... by just returning 0 ^_^
 				KModule kmod = new KModule( _kernel, null );

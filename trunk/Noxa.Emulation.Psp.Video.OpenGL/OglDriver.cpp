@@ -60,7 +60,7 @@ bool OglDriver::Resume()
 	if( _props->HasChanged == false )
 		return true;
 
-	Debug::WriteLine( "OglDriver: video mode change" );
+	Log::WriteLine( Verbosity::Normal, Feature::Video, "video mode change" );
 
 	_currentProps = ( DisplayProperties^ )_props->Clone();
 	_props->HasChanged = false;
@@ -89,26 +89,21 @@ void OglDriver::PrintStatistics()
 		TimeSpan elapsed = DateTime::Now - _startTime;
 		_stats->FPS = _stats->ProcessedFrames / ( float )elapsed.TotalSeconds;
 		_stats->AttemptedFPS = ( _stats->ProcessedFrames + _stats->SkippedFrames ) / ( float )elapsed.TotalSeconds;
-		StringBuilder^ sb = gcnew StringBuilder();
+
+		Log::WriteLine( Verbosity::Normal, Feature::Statistics, "OpenGL Video Driver Statistics: -----------------------------" );
 		array<FieldInfo^>^ fields = ( OglStatistics::typeid )->GetFields();
 		for( int n = 0; n < fields->Length; n++ )
 		{
 			Object^ value = fields[ n ]->GetValue( _stats );
-			sb->AppendFormat( "{0}: {1}\n", fields[ n ]->Name, value );
+			Log::WriteLine( Verbosity::Normal, Feature::Statistics, "{0}: {1}\n", fields[ n ]->Name, value );
 		}
-		Debug::WriteLine( "OpenGL Video Driver Statistics: -----------------------------" );
-		Debug::WriteLine( sb->ToString() );
-		Debug::WriteLine( "" );
 
-		sb = gcnew StringBuilder( 10000 );
+		Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "Video Command Usage Count: ----------------------------------" );
 		for( int n = 0; n < _stats->CommandCounts->Length; n++ )
 		{
 			if( _stats->CommandCounts[ n ] == 0 )
 				continue;
-			sb->AppendFormat( "{0:X2}: {1}\n", n, _stats->CommandCounts[ n ] );
+			Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "{0:X2}: {1}\n", n, _stats->CommandCounts[ n ] );
 		}
-		Debug::WriteLine( "Video Command Usage Count: ----------------------------------" );
-		Debug::WriteLine( sb->ToString() );
-		Debug::WriteLine( "" );
 #endif
 }

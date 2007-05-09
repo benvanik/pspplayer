@@ -29,7 +29,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoClose: kernel file handle not found: {0}", fd ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoClose: kernel file handle not found: {0}", fd );
 				return -1;
 			}
 
@@ -71,14 +71,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					IMediaFolder parent = ( IMediaFolder )_kernel.FindPath( parentPath );
 					if( parent == null )
 					{
-						Debug.WriteLine( string.Format( "sceIoOpen: could not find parent to create file '{0}' in on open", path ) );
+						Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find parent to create file '{0}' in on open", path );
 						return -1;
 					}
 					file = parent.CreateFile( newName );
 				}
 				else
 				{
-					Debug.WriteLine( string.Format( "sceIoOpen: could not find path '{0}'", path ) );
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find path '{0}'", path );
 					return -1;
 				}
 			}
@@ -125,7 +125,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Stream stream = file.Open( fileMode, fileAccess );
 			if( stream == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoOpen: could not open stream on file '{0}' for mode {1} access {2}", path, fileMode, fileAccess ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not open stream on file '{0}' for mode {1} access {2}", path, fileMode, fileAccess );
 				return -1;
 			}
 
@@ -136,7 +136,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = new KFile( _kernel, dev, file, stream );
 			_kernel.AddHandle( handle );
 
-			Debug.WriteLine( string.Format( "sceIoOpen: opened file {0} with ID {1}", path, handle.UID ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened file {0} with ID {1}", path, handle.UID );
 			
 			return ( int )handle.UID;
 		}
@@ -161,7 +161,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoRead: kernel file handle not found: {0}", fd ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoRead: kernel file handle not found: {0}", fd );
 				return -1;
 			}
 
@@ -199,7 +199,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoWrite: kernel file handle not found: {0}", fd ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoWrite: kernel file handle not found: {0}", fd );
 				return -1;
 			}
 
@@ -237,7 +237,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoLseek: kernel file handle not found: {0}", fd ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoLseek: kernel file handle not found: {0}", fd );
 				return -1;
 			}
 
@@ -283,7 +283,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoLseek32: kernel file handle not found: {0}", fd ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoLseek32: kernel file handle not found: {0}", fd );
 				return -1;
 			}
 

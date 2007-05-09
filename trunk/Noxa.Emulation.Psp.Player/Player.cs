@@ -180,7 +180,7 @@ namespace Noxa.Emulation.Psp.Player
 			{
 				if( File.Exists( path ) == false )
 				{
-					Debug.WriteLine( string.Format( "Unable to direct start UMD {0} - path not found", path ) );
+					Log.WriteLine( Verbosity.Critical, Feature.General, "Unable to direct start UMD {0} - path not found", path );
 					return;
 				}
 
@@ -188,11 +188,11 @@ namespace Noxa.Emulation.Psp.Player
 				game = Games.GameLoader.FindGame( _host.CurrentInstance.Umd );
 				if( game == null )
 				{
-					Debug.WriteLine( string.Format( "Unable to find game in UMD ISO {0}", path ) );
+					Log.WriteLine( Verbosity.Critical, Feature.General, "Unable to find game in UMD ISO {0}", path );
 					return;
 				}
 
-				Debug.WriteLine( string.Format( "Direct starting UMD '{0}' from {1}", game.Parameters.Title, path ) );
+				Log.WriteLine( Verbosity.Critical, Feature.General, "Direct starting UMD '{0}' from {1}", game.Parameters.Title, path );
 			}
 			else
 			{
@@ -200,17 +200,17 @@ namespace Noxa.Emulation.Psp.Player
 				IMediaFolder folder = _host.CurrentInstance.MemoryStick.Root.FindFolder( path );
 				if( folder == null )
 				{
-					Debug.WriteLine( string.Format( "Unable to find path {0}", path ) );
+					Log.WriteLine( Verbosity.Critical, Feature.General, "Unable to find path {0}", path );
 					return;
 				}
 				game = Games.GameLoader.GetEbootGameInformation( folder );
 				if( game == null )
 				{
-					Debug.WriteLine( string.Format( "Unable to find eboot at path {0}", path ) );
+					Log.WriteLine( Verbosity.Critical, Feature.General, "Unable to find eboot at path {0}", path );
 					return;
 				}
 
-				Debug.WriteLine( string.Format( "Direct starting eboot '{0}' from {1}", game.Parameters.Title, path ) );
+				Log.WriteLine( Verbosity.Critical, Feature.General, "Direct starting eboot '{0}' from {1}", game.Parameters.Title, path );
 			}
 			Debug.Assert( game != null );
 			if( game == null )

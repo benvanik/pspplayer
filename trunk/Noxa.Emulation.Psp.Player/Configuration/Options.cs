@@ -275,7 +275,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 					catch
 					{
 						// Failed, ignore
-						Debug.WriteLine( "FindComponents: Failed to load assembly " + assemblyPath + ", probably not .NET" );
+						Log.WriteLine( Verbosity.Critical, Feature.General, "FindComponents: Failed to load assembly " + assemblyPath + ", probably not .NET" );
 						continue;
 					}
 
@@ -284,7 +284,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 						Type component = type.GetInterface( "Noxa.Emulation.Psp.IComponent", false );
 						if( component != null )
 						{
-							Debug.WriteLine( "FindComponents: Found component " + type.FullName + " in " + assemblyPath );
+							Log.WriteLine( Verbosity.Verbose, Feature.General, "FindComponents: Found component " + type.FullName + " in " + assemblyPath );
 							components.Add( type );
 						}
 					}

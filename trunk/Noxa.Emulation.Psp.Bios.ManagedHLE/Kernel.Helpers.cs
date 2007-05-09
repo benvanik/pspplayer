@@ -58,7 +58,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				}
 				else
 				{
-					Debug.WriteLine( string.Format( "Kernel::FindPath: device {0} is ejected, cannot access {1}", device.Description, path ) );
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "FindPath: device {0} is ejected, cannot access {1}", device.Description, path );
 					return null;
 				}
 			}

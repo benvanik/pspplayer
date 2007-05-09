@@ -30,7 +30,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			IMediaFolder folder = ( IMediaFolder )_kernel.FindPath( path );
 			if( folder == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoDopen: could not find path {0}", path ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDopen: could not find path {0}", path );
 				return -1;
 			}
 
@@ -40,7 +40,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			handle.FolderOffset = -2;
 			_kernel.AddHandle( handle );
 
-			Debug.WriteLine( string.Format( "sceIoDopen: opened {0} with ID {1}", path, handle.UID ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoDopen: opened {0} with ID {1}", path, handle.UID );
 
 			return ( int )handle.UID;
 		}
@@ -54,7 +54,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoDread: kernel dir handle {0} not found", fd ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDread: kernel dir handle {0} not found", fd );
 				return -1;
 			}
 
@@ -172,7 +172,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoDclose: kernel dir handle {0} not found", fd ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDclose: kernel dir handle {0} not found", fd );
 				return -1;
 			}
 
@@ -192,7 +192,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			IMediaItem item = _kernel.FindPath( path );
 			if( item == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoRemove: could not find path {0}", path ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoRemove: could not find path {0}", path );
 				return -1;
 			}
 
@@ -221,7 +221,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			IMediaItem item = _kernel.FindPath( path );
 			if( item == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoRmdir: could not find path {0}", path ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoRmdir: could not find path {0}", path );
 				return -1;
 			}
 
@@ -240,7 +240,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			IMediaFolder folder = ( IMediaFolder )_kernel.FindPath( path );
 			if( folder == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoChdir: could not find path {0}", path ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoChdir: could not find path {0}", path );
 				return -1;
 			}
 
@@ -269,7 +269,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			IMediaItem item = _kernel.FindPath( path );
 			if( item == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoGetstat: could not find path {0}", path ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoGetstat: could not find path {0}", path );
 				return -1;
 			}
 
@@ -346,7 +346,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			IMediaItem item = _kernel.FindPath( path );
 			if( item == null )
 			{
-				Debug.WriteLine( string.Format( "sceIoRename: could not find path {0}", path ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoRename: could not find path {0}", path );
 				return -1;
 			}
 

@@ -159,8 +159,8 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 				// User gave a capacity that is too small for the size, fix it up
 				while( _capacity < used )
 					_capacity *= 2;
-				Debug.WriteLine( string.Format( "UmdDevice: user gave capacity {0} but {1} is used; changing capacity to {2}",
-					_capacity, used, _capacity ) );
+				Log.WriteLine( Verbosity.Critical, Feature.Media, "UmdDevice: user gave capacity {0} but {1} is used; changing capacity to {2}",
+					_capacity, used, _capacity );
 			}
 
 			// Would be nice to do something with this that was official-like (serial number?)

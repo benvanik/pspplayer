@@ -152,7 +152,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// 0x01000300 on v1.00 unit
 			// 0x01050001 on v1.50 unit
-			Debug.WriteLine( "sceKernelDevkitVersion: game requested devkit version - make sure it isn't doing something tricky!" );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceKernelDevkitVersion: game requested devkit version - make sure it isn't doing something tricky!" );
 			return 0x01050001;
 		}
 
@@ -167,7 +167,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				( version >> 16 ) & 0xFF,
 				( version >> 8 ) & 0xFF,
 				version & 0xFF );
-			Debug.WriteLine( string.Format( "sceKernelSetCompilerVersion: set to version {0:X8} ({1})", version, v.ToString() ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceKernelSetCompilerVersion: set to version {0:X8} ({1})", version, v.ToString() );
 			return 0;
 		}
 
@@ -181,7 +181,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				( version >> 16 ) & 0xFF,
 				( version >> 8 ) & 0xFF,
 				version & 0xFF );
-			Debug.WriteLine( string.Format( "sceKernelSetCompiledSdkVersion: set to version {0:X8} ({1})", version, v.ToString() ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceKernelSetCompiledSdkVersion: set to version {0:X8} ({1})", version, v.ToString() );
 			return 0;
 		}
 

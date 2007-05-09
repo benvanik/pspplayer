@@ -89,7 +89,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Option unused?
 			Debug.Assert( option == 0 );
 
-			Debug.WriteLine( string.Format( "sceKernelCreateThread: created thread {0} {1} with entry {2:X8}", thread.UID, thread.Name, thread.EntryAddress ) );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelCreateThread: created thread {0} {1} with entry {2:X8}", thread.UID, thread.Name, thread.EntryAddress );
 
 			return ( int )thread.UID;
 		}
@@ -108,7 +108,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( _kernel.ActiveThread != thread );
 			Debug.Assert( thread.State == KThreadState.Dead );
 
-			Debug.WriteLine( string.Format( "sceKernelDeleteThread: deleting thread {0} {1}", thread.UID, thread.Name ) );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelDeleteThread: deleting thread {0} {1}", thread.UID, thread.Name );
 
 			thread.Delete();
 			_kernel.RemoveHandle( thread.UID );
@@ -125,7 +125,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( thread == null )
 				return -1;
 
-			Debug.WriteLine( string.Format( "sceKernelStartThread: starting thread {0} {1}", thread.UID, thread.Name ) );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelStartThread: starting thread {0} {1}", thread.UID, thread.Name );
 
 			thread.Start( ( uint )arglen, ( uint )argp );
 			_kernel.Schedule();

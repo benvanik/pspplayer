@@ -105,8 +105,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			_sb.Append( s );
 			if( _sb[ _sb.Length - 1 ] == '\n' )
 			{
-				string line = _sb.ToString();
-				Debug.WriteLine( string.Format( "{0}: {1}", _name, line ) );
+				string line = _sb.ToString().Trim();
+				if( _name == "stdout" )
+					Log.WriteLine( Verbosity.Normal, Feature.Stdout, line );
+				else
+					Log.WriteLine( Verbosity.Critical, Feature.Stdout, line );
 				_sb.Remove( 0, _sb.Length );
 			}
 		}

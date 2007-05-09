@@ -36,7 +36,7 @@ namespace Noxa.Emulation.Psp.Games
 			if( Parse( reader ) == false )
 			{
 				// Uh ohes
-				Debug.WriteLine( "SfoReader could not parse SFO" );
+				Log.WriteLine( Feature.Loader, "SfoReader could not parse SFO" );
 			}
 		}
 

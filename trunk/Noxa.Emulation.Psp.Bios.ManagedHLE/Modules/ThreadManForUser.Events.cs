@@ -252,7 +252,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				}
 				else
 				{
-					Debug.WriteLine( string.Format( "sceKernelReferEventFlagStatus: app passed in SceKernelEventFlagInfo of size {0}; expected size 52", size ) );
+					Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelReferEventFlagStatus: app passed in SceKernelEventFlagInfo of size {0}; expected size 52", size );
 					return -1;
 				}
 			}

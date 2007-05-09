@@ -67,7 +67,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// manual add
 		public void sceKernelExitGameWithStatus( int status )
 		{
-			Debug.WriteLine( string.Format( "sceKernelExitGameWithStatus: exiting with status code {0}", status ) );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelExitGameWithStatus: exiting with status code {0}", status );
 
 			// Call exit callbacks
 			FastLinkedList<KCallback> cbll = _kernel.Callbacks[ Kernel.CallbackTypes.Exit ];
@@ -96,7 +96,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KCallback cb = _kernel.GetHandle<KCallback>( cbid );
 			if( cb == null )
 			{
-				Debug.WriteLine( string.Format( "sceKernelRegisterExitCallback: callback ID {0} not found", cbid ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelRegisterExitCallback: callback ID {0} not found", cbid );
 				return -1;
 			}
 

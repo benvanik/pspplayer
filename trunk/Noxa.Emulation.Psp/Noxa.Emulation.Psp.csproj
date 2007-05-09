@@ -90,8 +90,10 @@
     <Compile Include="IComponentInstance.cs" />
     <Compile Include="IEmulationHost.cs" />
     <Compile Include="IEmulationInstance.cs" />
+    <Compile Include="ILogger.cs" />
     <Compile Include="IO\IIODriver.cs" />
     <Compile Include="Input\IInputDevice.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Media\IMediaDevice.cs" />
     <Compile Include="Media\IMediaFolder.cs" />
     <Compile Include="Media\IMediaFile.cs" />

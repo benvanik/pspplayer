@@ -178,16 +178,15 @@ void R4000Cpu::PrintStatistics()
 	_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
 	_stats->RunTime = _timer->Elapsed - _stats->RunTime;
 	_stats->IPS = _stats->InstructionsExecuted / _stats->RunTime;
-	StringBuilder^ sb = gcnew StringBuilder();
+
+	Log::WriteLine( Verbosity::Normal, Feature::Statistics, "Ultra CPU Statistics: ---------------------------------------" );
 	array<FieldInfo^>^ fields = ( R4000Statistics::typeid )->GetFields();
 	for( int n = 0; n < fields->Length; n++ )
 	{
 		Object^ value = fields[ n ]->GetValue( _stats );
-		sb->AppendFormat( "{0}: {1}\n", fields[ n ]->Name, value );
+		Log::WriteLine( Verbosity::Normal, Feature::Statistics, "{0}: {1}", fields[ n ]->Name, value );
 	}
-	Debug::WriteLine( "Ultra CPU Statistics: ---------------------------------------" );
-	Debug::WriteLine( sb->ToString() );
-
+	
 #ifdef SYSCALLSTATS
 	// Syscall stats
 	int callCount = 0;
@@ -197,7 +196,7 @@ void R4000Cpu::PrintStatistics()
 		callCount += value;
 	}
 
-	Debug::WriteLine( "Syscall statistics (in percent of all calls):" );
+	Log::WriteLine( Verbosity::Normal, Feature::Statistics, "Syscall statistics (in percent of all calls):" );
 	for( int n = 0; n < _syscallCounts->Length; n++ )
 	{
 		int value = _syscallCounts[ n ];
@@ -206,10 +205,9 @@ void R4000Cpu::PrintStatistics()
 		BiosFunction^ func = _syscalls[ n ];
 		float p = value / ( float )callCount;
 		p *= 100.0f;
-		Debug::WriteLine( String::Format( "{0,-50} {1,10}x, {2,3}%\t{3}",
-			String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p, func->IsImplemented ? "" : "(NI)" ) );
+		Log::WriteLine( Verbosity::Normal, Feature::Statistics, "{0,-50} {1,10}x, {2,3}%\t{3}",
+			String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p, func->IsImplemented ? "" : "(NI)" );
 	}
 #endif
-	Debug::WriteLine( "" );
 #endif
 }

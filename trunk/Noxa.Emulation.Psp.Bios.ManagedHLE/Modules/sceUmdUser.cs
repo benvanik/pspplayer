@@ -86,7 +86,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUmdActivate(int unit, const char *drive);
 		public int sceUmdActivate( int unit, int drive )
 		{
-			Debug.WriteLine( string.Format( "sceUmdActivate: activating unit {0} / drive {1}", unit, _kernel.ReadString( ( uint )drive ) ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdActivate: activating unit {0} / drive {1}", unit, _kernel.ReadString( ( uint )drive ) );
 			return 0;
 		}
 
@@ -95,7 +95,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// manual add
 		public int sceUmdDeactivate( int unit, int drive )
 		{
-			Debug.WriteLine( string.Format( "sceUmdDeactivate: deactivating unit {0} / drive {1}", unit, _kernel.ReadString( ( uint )drive ) ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdDeactivate: deactivating unit {0} / drive {1}", unit, _kernel.ReadString( ( uint )drive ) );
 			return 0;
 		}
 
@@ -123,7 +123,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceUmdWaitDriveStat( int stat )
 		{
 			// Just hope we never get here
-			Debug.WriteLine( string.Format( "sceUmdWaitDriveStat: waiting on status {0}", stat ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdWaitDriveStat: waiting on status {0}", stat );
 			return 0;
 		}
 
@@ -132,7 +132,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceUmdWaitDriveStatWithTimer( int stat, int timeout )
 		{
 			// Just hope we never get here
-			Debug.WriteLine( string.Format( "sceUmdWaitDriveStatWithTimer: waiting on status {0}", stat ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdWaitDriveStatWithTimer: waiting on status {0}", stat );
 			return 0;
 		}
 
@@ -141,7 +141,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceUmdWaitDriveStatCB( int stat, int timeout )
 		{
 			// Just hope we never get here
-			Debug.WriteLine( string.Format( "sceUmdWaitDriveStatCB: waiting on status {0}", stat ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdWaitDriveStatCB: waiting on status {0}", stat );
 			return 0;
 		}
 
