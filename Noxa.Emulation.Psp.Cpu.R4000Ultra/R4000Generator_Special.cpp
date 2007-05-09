@@ -85,12 +85,12 @@ void __logSyscall( int syscallId, int address )
 		}
 		String^ log = String::Format( "{0}::{1}({2}) from 0x{3:X8}{4}",
 			function->Module->Name, function->Name, args, address - 4, function->IsImplemented ? "" : " (NI)" );
-		Log::WriteLine( Verbosity::Normal, Feature::SyscallTrace, log );
+		Log::WriteLine( Verbosity::Verbose, Feature::Syscall, log );
 	}
 	else
 	{
 		String^ log = String::Format( "Syscall attempt to undefined syscall {0} (0x{0:X8}) from 0x{1:X8}", syscallId, address - 4 );
-		Log::WriteLine( Verbosity::Normal, Feature::SyscallTrace, log );
+		Log::WriteLine( Verbosity::Normal, Feature::Syscall, log );
 		Debugger::Break();
 	}
 }

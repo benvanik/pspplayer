@@ -81,7 +81,7 @@ namespace Noxa.Emulation.Psp
 		/// <summary>
 		/// Trace of syscalls and their parameters.
 		/// </summary>
-		SyscallTrace,
+		Syscall,
 	}
 
 	/// <summary>

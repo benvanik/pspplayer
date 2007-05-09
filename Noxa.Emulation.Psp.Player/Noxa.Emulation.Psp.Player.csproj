@@ -235,6 +235,7 @@
     <Content Include="Resources\AeroWait.gif" />
     <Content Include="Resources\ClearIcon.png" />
     <None Include="Resources\ErrorIcon.png" />
+    <None Include="Resources\CopyIcon.png" />
     <Content Include="Resources\Google.png" />
     <Content Include="Resources\IconBackground.png" />
     <None Include="Resources\InfoIcon.png" />
@@ -244,6 +245,7 @@
     <None Include="Resources\PspShake.png" />
     <None Include="Resources\RemoveIcon.png" />
     <Content Include="Resources\ResizeIcon.png" />
+    <None Include="Resources\SaveIcon.png" />
     <Content Include="Resources\SelectedMemoryStickIcon.png" />
     <Content Include="Resources\SelectedUmdIcon.png" />
     <None Include="Resources\SmallUmdIcon.png" />
