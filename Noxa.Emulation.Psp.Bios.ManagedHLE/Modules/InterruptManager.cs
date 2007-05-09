@@ -99,7 +99,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( _kernel.Interrupts[ intno ][ no ] == null );
 			_kernel.Interrupts[ intno ][ no ] = handler;
 
-			Debug.WriteLine( string.Format( "sceKernelRegisterSubIntrHandler: registered handler for interrupt {0} (slot {1}), calling code at {2:X8}", intno, no, address ) );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceKernelRegisterSubIntrHandler: registered handler for interrupt {0} (slot {1}), calling code at {2:X8}", intno, no, address );
 
 			// Are handlers enabled by default?
 
@@ -189,7 +189,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				*( ( uint* )( p + 0x34 ) ) = 0; // max clock hi
 			}
 
-			Debug.WriteLine( "QueryIntrHandlerInfo: called, but a lot of it isn't implemented - make sure nothing is used!" );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "QueryIntrHandlerInfo: called, but a lot of it isn't implemented - make sure nothing is used!" );
 
 			return 0;
 		}

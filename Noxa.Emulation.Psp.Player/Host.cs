@@ -21,6 +21,7 @@ namespace Noxa.Emulation.Psp.Player
 		protected Instance _instance;
 		protected IDebugger _debugger;
 		protected Settings _componentSettings;
+		protected LogViewer _logger;
 
 		public Host( string[] args )
 		{
@@ -37,6 +38,7 @@ namespace Noxa.Emulation.Psp.Player
 			Properties.Settings.Default.Save();
 
 			_debugger = null;
+			_logger = new LogViewer();
 			_player = new Player( this );
 
 			this.Load();
@@ -138,13 +140,13 @@ namespace Noxa.Emulation.Psp.Player
 					}
 					catch
 					{
-						Debug.WriteLine( string.Format( "CreateInstance: assembly not found or not loadable: {0}", componentPath ) );
+						Log.WriteLine( Verbosity.Critical, Feature.General, "CreateInstance: assembly not found or not loadable: {0}", componentPath );
 						continue;
 					}
 					Type type = assembly.GetType( componentName, false );
 					if( type == null )
 					{
-						Debug.WriteLine( string.Format( "CreateInstance: component not found or not loadable: {0} in {1}", componentName, componentPath ) );
+						Log.WriteLine( Verbosity.Critical, Feature.General, "CreateInstance: component not found or not loadable: {0} in {1}", componentName, componentPath );
 						continue;
 					}
 					IComponent component;
@@ -154,7 +156,7 @@ namespace Noxa.Emulation.Psp.Player
 					}
 					catch
 					{
-						Debug.WriteLine( string.Format( "CreateInstance: component could not be instantiated: {0} in {1}", componentName, componentPath ) );
+						Log.WriteLine( Verbosity.Critical, Feature.General, "CreateInstance: component could not be instantiated: {0} in {1}", componentName, componentPath );
 						continue;
 					}
 
@@ -186,7 +188,7 @@ namespace Noxa.Emulation.Psp.Player
 							break;
 						case ComponentType.Other:
 						default:
-							Debug.WriteLine( string.Format( "CreateInstance: unknown component type for {0} in {1}", componentName, componentPath ) );
+							Log.WriteLine( Verbosity.Critical, Feature.General, "CreateInstance: unknown component type for {0} in {1}", componentName, componentPath );
 							continue;
 					}
 

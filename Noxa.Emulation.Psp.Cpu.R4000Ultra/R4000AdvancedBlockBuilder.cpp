@@ -340,6 +340,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 							}
 							else
 							{
+								Log::WriteLine( Verbosity::Critical, Feature::Cpu, "InternalBuild(0x{2:X8}): attempted COP{0} function {1:X8}", cop, cofun, address );
 								Debug::WriteLine( String::Format( "InternalBuild(0x{2:X8}): attempted COP{0} function {1:X8}", cop, cofun, address ) );
 								result =  GenerationResult::Invalid;
 							}
@@ -392,6 +393,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 
 			if( result == GenerationResult::Invalid )
 			{
+				Log::WriteLine( Verbosity::Critical, Feature::Cpu, "InternalBuild(0x{0:X8}): failed to generate code for [0x{1:X8}] {2:X8}", startAddress, address, code );
 				Debug::WriteLine( String::Format( "InternalBuild(0x{0:X8}): failed to generate code for [0x{1:X8}] {2:X8}", startAddress, address, code ) );
 				Debugger::Break();
 				break;

@@ -85,12 +85,12 @@ void __logSyscall( int syscallId, int address )
 		}
 		String^ log = String::Format( "{0}::{1}({2}) from 0x{3:X8}{4}",
 			function->Module->Name, function->Name, args, address - 4, function->IsImplemented ? "" : " (NI)" );
-		Debug::WriteLine( log );
+		Log::WriteLine( Verbosity::Normal, Feature::SyscallTrace, log );
 	}
 	else
 	{
 		String^ log = String::Format( "Syscall attempt to undefined syscall {0} (0x{0:X8}) from 0x{1:X8}", syscallId, address - 4 );
-		Debug::WriteLine( log );
+		Log::WriteLine( Verbosity::Normal, Feature::SyscallTrace, log );
 		Debugger::Break();
 	}
 }
@@ -181,8 +181,8 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 
 			if( pass == 0 )
 			{
-				Debug::WriteLine( String::Format( "R4000Generator: NID 0x{0:X8} {1} is not implemented",
-					function->NID, function->Name ) );
+				Log::WriteLine( Verbosity::Normal, Feature::Cpu, "R4000Generator: NID 0x{0:X8} {1} is not implemented",
+					function->NID, function->Name );
 			}
 		}
 	}
@@ -198,7 +198,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		wideReturn = false;
 
 		if( pass == 0 )
-			Debug::WriteLine( String::Format( "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address ) );
+			Log::WriteLine( Verbosity::Normal, Feature::Cpu, "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address );
 	}
 
 	context->UseSyscalls = true;
@@ -229,9 +229,9 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				// If we emitted then we must be stateless
 				context->LastSyscallStateless = true;
 
-#ifdef GENDEBUG
-				Debug::WriteLine( String::Format( "Overrode {0} with native method", function->Name ) );
-#endif
+//#ifdef GENDEBUG
+				Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "Overrode {0} with native method", function->Name );
+//#endif
 
 				// Everything handled for us by our overrides
 				if( hasReturn == true )
@@ -340,7 +340,7 @@ GenerationResult SYNC( R4000GenContext^ context, int pass, int address, uint cod
 	// pg 629 - not needed?
 	if( pass == 0 )
 	{
-		Debug::WriteLine( String::Format( "R4000Generator: SYNC not implemented (at 0x{0:X8})", address ) );
+		Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "R4000Generator: SYNC not implemented (at 0x{0:X8})", address );
 	}
 	else if( pass == 1 )
 	{
@@ -374,7 +374,7 @@ GenerationResult HALT( R4000GenContext^ context, int pass, int address, uint cod
 {
 	if( pass == 0 )
 	{
-		Debug::WriteLine( String::Format( "R4000Generator: HALT not implemented (at 0x{0:X8})", address ) );
+		Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "R4000Generator: HALT not implemented (at 0x{0:X8})", address );
 	}
 	else if( pass == 1 )
 	{

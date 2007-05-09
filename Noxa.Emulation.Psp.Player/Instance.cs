@@ -401,7 +401,7 @@ namespace Noxa.Emulation.Psp.Player
 
 		public void SwitchToXmb()
 		{
-			Debug.WriteLine( "Instance: switching to XMB" );
+			Log.WriteLine( Verbosity.Normal, Feature.General, "Instance: switching to game picker" );
 			_video.Cleanup();
 #if XMB
 			_xmb.Enable();
@@ -429,7 +429,7 @@ namespace Noxa.Emulation.Psp.Player
 
 		public void SwitchToGame( Games.GameInformation game )
 		{
-			Debug.WriteLine( "Instance: switching to game " + game.Parameters.Title );
+			Log.WriteLine( Verbosity.Critical, Feature.General, "Instance: switching to game " + game.Parameters.Title );
 #if XMB
 			_xmb.Disable();
 #else

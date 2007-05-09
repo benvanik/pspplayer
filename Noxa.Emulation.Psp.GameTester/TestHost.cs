@@ -18,9 +18,11 @@ namespace Noxa.Emulation.Psp.GameTester
 	class TestHost : IEmulationHost
 	{
 		protected TestInstance _instance;
+		protected Logger _logger;
 
 		public TestHost()
 		{
+			_logger = new Logger();
 		}
 
 		public IEmulationInstance CurrentInstance

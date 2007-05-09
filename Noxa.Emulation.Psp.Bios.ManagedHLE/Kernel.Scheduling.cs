@@ -44,7 +44,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				}
 				else
 				{
-					Debug.WriteLine( "Kernel::Schedule: ran out of threads to run - ending sim" );
+					Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Schedule: ran out of threads to run" );
 					return false;
 				}
 			}
@@ -78,7 +78,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			else
 			{
 				// Only if not broken by choice
-				Debug.WriteLine( string.Format( "Kernel: CPU returned to us after {0} instructions", instructionsExecuted ) );
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "CPU returned to us after {0} instructions", instructionsExecuted );
 			}
 		}
 

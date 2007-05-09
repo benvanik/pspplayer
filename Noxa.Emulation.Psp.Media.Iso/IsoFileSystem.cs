@@ -116,7 +116,7 @@ namespace Noxa.Emulation.Psp.Media.Iso
 				// Path not found - this is just a generic UMD
 				if( ( path != null ) &&
 					( path.Length > 0 ) )
-					Debug.WriteLine( string.Format( "IsoFileSystem: unable to create instance, path {0} not found", path ) );
+					Log.WriteLine( Verbosity.Critical, Feature.Media, "IsoFileSystem: unable to create instance, path {0} not found", path );
 				return new UmdDevice( emulator, parameters );
 			}
 

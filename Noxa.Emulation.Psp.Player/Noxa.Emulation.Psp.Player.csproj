@@ -85,6 +85,12 @@
     <Compile Include="IssueReport.Designer.cs">
       <DependentUpon>IssueReport.cs</DependentUpon>
     </Compile>
+    <Compile Include="LogViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogViewer.Designer.cs">
+      <DependentUpon>LogViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Player.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,6 +125,10 @@
     <EmbeddedResource Include="IssueReport.resx">
       <SubType>Designer</SubType>
       <DependentUpon>IssueReport.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LogViewer.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>LogViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Player.resx">
       <SubType>Designer</SubType>

@@ -181,7 +181,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Debug.Assert( results.Successful == true );
 			if( results.Successful == false )
 			{
-				Debug.WriteLine( string.Format( "Kernel: load of game failed" ) );
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "load of game failed" );
 				Bios.Game = null;
 				return results;
 			}
@@ -193,7 +193,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			foreach( Module module in Bios._modules )
 				module.Start();
 
-			Debug.WriteLine( string.Format( "Kernel: game loaded" ) );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "game loaded" );
 
 			return results;
 		}

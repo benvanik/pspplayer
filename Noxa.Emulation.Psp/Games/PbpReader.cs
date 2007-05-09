@@ -44,7 +44,7 @@ namespace Noxa.Emulation.Psp.Games
 			if( Parse( reader ) == false )
 			{
 				// Uh ohes
-				Debug.WriteLine( "PbpReader: could not parse PBP" );
+				Log.WriteLine( Feature.Loader, "PbpReader: could not parse PBP" );
 			}
 		}
 

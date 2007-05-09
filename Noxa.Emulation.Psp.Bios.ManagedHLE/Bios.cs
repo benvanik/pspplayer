@@ -173,7 +173,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				}
 			}
 
-			Debug.WriteLine( String.Format( "Bios: found {0} functions in {1} modules. {2} ({3}%) implemented", functionCount, moduleCount, implementedCount, ( implementedCount / ( float )functionCount ) * 100.0f ) );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "found {0} functions in {1} modules. {2} ({3}%) implemented", functionCount, moduleCount, implementedCount, ( implementedCount / ( float )functionCount ) * 100.0f );
 		}
 
 		private void RegisterFunction( BiosFunction function )
@@ -181,7 +181,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Debug.Assert( function != null );
 			if( _functionLookup.ContainsKey( function.NID ) == true )
 			{
-				Debug.WriteLine( String.Format( "Bios::RegisterFunction: NID 0x{0:X8} already registered", function.NID ) );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "RegisterFunction: NID 0x{0:X8} already registered", function.NID );
 				return;
 			}
 			_functionLookup.Add( function.NID, function );
