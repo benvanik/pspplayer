@@ -8,39 +8,39 @@ Although the emulator is pretty advanced, it is also in its early stages. This m
 First commercial game :)
 It runs fairly slow due to the lack of texture caching (all time is spent waiting on the GPU - my CPUs sit relatively idle at around 10-20% while running), but works. There are a few things missing, like the guide lines while playing, but other than that it works!
 
-[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2007.05.07.04-PuzzleBobble.png?format=raw]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.05.07.04-PuzzleBobble.png]
 
 === 2007-05-07 - Trigonometry Wars ===
 Fixed textures up and now trigwars runs. In fact, it runs REALLY well, and is fully playable. Cool!
 
-[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2007.05.07.01-TrigWars.png?format=raw]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.05.07.01-TrigWars.png]
 
 === 2007-03-24 - PSPTris (game) ===
 Whoa! By some form of black magic, PSPTris now runs in game! Sometimes control input is missed, and there is a random flicker here or there but other than that the game runs PERFECTLY. I have two or three things to fix (the OSK doesn't work because it does something weird, and I need to implement clipping in the video driver), but after that I can say that it works! Well, classic and original modes do, anyway. The color mode runs really slow, and I'm not sure why.
 
-[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2007.03.24.01-PSPTris.png?format=raw]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.03.24.01-PSPTris.png]
 
 === 2007-03-17 - PSPTris (intro) ===
 With a lot of fixes and some reworking, I was able to get PSPTris to run to the startup screen! It's not yet complete (background color thing is missing), but it runs fast (like 150-200FPS)!
 
-[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2007.03.17.01-PSPTris.png?format=raw]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.03.17.01-PSPTris.png]
 
 === 2007-02-27 - NeHe Lesson 6 ===
 After a long break and a lot of work, I present to you !NeHe lesson 6. You can rotate the cube with the controller and it shows a texture (that was swizzled - tricky!). It may seem like there hasn't been much progress since the last update, however this screenshot shows the emulator running with the new Ultra CPU and OpenGL video driver, and running at an impressive 197 million instructions per second. That is faster than a real PSP can run!
 
-[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2007.02.27.01-NeHeSample8.png?format=raw]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.02.27.01-NeHeSample8.png]
 
 === 2006-07-31 - NeHe Lesson 1 mod ===
 Here is PSP Player and a real PSP running the ported lesson 1 from [http://www.psp-programming.com/code/index.php?id=c:pspgu-neheport-lesson1 psp-programming.com].
 
-[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2006.07.31.01-Nehe1-Small.jpg?format=raw]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2006.07.31.01-Nehe1-Small.jpg]
 
 === 2006-07-30 - The first triangle ===
 Here for posterity is the first thing, besides text, I ever got drawing. A pretty triangle. And a dot. {{{^_^}}}
 
-[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2006.07.30.01-FirstTri.png?format=raw]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2006.07.30.01-FirstTri.png]
 
 === 2006-07-10 - One of the first applications ===
 The real first application was my own empty app, but this is one of the first interesting ones: the basic controller sample from the pspsdk. I'm actually controlling it with my Xbox 360 controller!
 
-[http://dev.ixtli.com/pspdev/attachment/wiki/Screenshots/PspPlayer-2006.07.10.01-ControllerSample.png?format=raw]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2006.07.10.01-ControllerSample.png]
