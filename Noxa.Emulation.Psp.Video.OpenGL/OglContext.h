@@ -7,6 +7,9 @@
 #pragma once
 
 #include "OglTextures.h"
+#pragma unmanaged
+#include "LRU.h"
+#pragma managed
 
 namespace Noxa {
 	namespace Emulation {
@@ -14,6 +17,17 @@ namespace Noxa {
 			namespace Video {
 
 				#define CLUTSIZE	65536
+
+				typedef struct TextureEntry_t
+				{
+					int				PixelStorage;
+					int				Address;
+					int				LineWidth;
+					int				Width;
+					int				Height;
+					uint			Checksum;
+					int				TextureID;
+				} TextureEntry;
 
 				typedef struct OglContext_t
 				{
@@ -43,6 +57,8 @@ namespace Noxa {
 					ushort			TextureFilterMag;
 					ushort			TextureWrapS;
 					ushort			TextureWrapT;
+					
+					LRU<TextureEntry*>*	TextureCache;
 
 					void*			ClutTable;		// Allocated to CLUTSIZE and pallettes are copied in
 					uint			ClutPointer;

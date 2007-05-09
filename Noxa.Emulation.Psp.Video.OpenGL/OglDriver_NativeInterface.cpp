@@ -326,7 +326,7 @@ void niSync( VideoSyncType syncType )
 		break;
 	}
 
-	//_vsyncWaiting = true;
+	_vsyncWaiting = true;
 }
 
 void niWaitForVsync()

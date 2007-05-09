@@ -262,6 +262,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<Filter
+				Name="Shared"
+				>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -323,6 +327,14 @@
 			<Filter
 				Name="Shared"
 				>
+				<File
+					RelativePath="..\Shared\Include\LL.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Shared\Include\LRU.h"
+					>
+				</File>
 				<File
 					RelativePath="..\Shared\Include\MemoryPool.h"
 					>

@@ -319,8 +319,16 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 {
 	uint textureId;
 	glGenTextures( 1, &textureId );
-	//glBindTexture( GL_TEXTURE_2D, textureId );
-	texture->TextureID = textureId;
+	glBindTexture( GL_TEXTURE_2D, textureId );
+
+	TextureEntry* entry = new TextureEntry();
+	entry->Address = texture->Address;
+	entry->Width = texture->Width;
+	entry->Height = texture->Height;
+	entry->LineWidth = texture->LineWidth;
+	entry->PixelStorage = texture->PixelStorage;
+	entry->TextureID = textureId;
+	context->TextureCache->Add( texture->Address, entry );
 
 	/*static bool stop = true;
 	if( stop == true )
@@ -337,6 +345,8 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	byte* address = context->Memory->Translate( texture->Address );
 	TextureFormat* format = ( TextureFormat* )&__formats[ texture->PixelStorage ];
 	int size = texture->LineWidth * texture->Height * format->Size;
+
+	entry->Checksum = *( ( uint* )address );
 
 	byte* buffer = address;
 	if( context->TexturesSwizzled == true )
@@ -403,7 +413,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	}
 #endif
 
-	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
+	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? 4 : 3,
 		width, texture->Height,
 		0,
 		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,

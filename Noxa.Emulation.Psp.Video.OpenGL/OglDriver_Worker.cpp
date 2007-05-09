@@ -61,6 +61,7 @@ void OglDriver::StartThread()
 	_context->TextureFilterMag = GL_LINEAR;
 	_context->TextureWrapS = GL_REPEAT;
 	_context->TextureWrapT = GL_REPEAT;
+	_context->TextureCache = new LRU<TextureEntry*>( 256 );
 
 	_thread = gcnew Thread( gcnew ParameterizedThreadStart( &WorkerThreadThunk ) );
 	_thread->Name = "Video worker";
@@ -149,7 +150,7 @@ listAbort:
 
 				listsDone++;
 
-				//if( _vsyncWaiting == true )
+				if( _vsyncWaiting == true )
 					break;
 			}
 		}
@@ -157,6 +158,8 @@ listAbort:
 		if( listsDone > 0 )
 		{
 			_processedFrames++;
+
+			glBindTexture( GL_TEXTURE_2D, 0 );
 
 			// THIS IS WRONG
 			_vcount++;
@@ -215,9 +218,9 @@ void OglDriver::SetupOpenGL()
 
 	SetupExtensions();
 
-#ifndef VSYNC
+//#ifndef VSYNC
 	wglSwapIntervalEXT( 0 );
-#endif
+//#endif
 
 	_context->ClutTable = calloc( 1, CLUTSIZE );
 }

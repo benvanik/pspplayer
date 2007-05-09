@@ -604,7 +604,10 @@ void ProcessList( OglContext* context, DisplayList* list )
 			{
 				// bits 0-2 have minifying filter
 				// bits 8-10 have magnifying filter
-				switch( argi & 0x7 )
+				// TODO: Support MIPMAPS
+				// right now we just lop off all but the bottom bit!!!!!!!!
+				//switch( argi & 0x7 )
+				switch( ( argi & 0x7 ) & 0x1 )
 				{
 				case 0x0: // Nearest
 					context->TextureFilterMin =  GL_NEAREST;
@@ -625,7 +628,8 @@ void ProcessList( OglContext* context, DisplayList* list )
 					context->TextureFilterMin =  GL_LINEAR_MIPMAP_LINEAR;
 					break;
 				}
-				switch( ( argi >> 8 ) & 0x7 )
+				//switch( ( argi >> 8 ) & 0x7 )
+				switch( ( ( argi >> 8 ) & 0x7 ) & 0x1 )
 				{
 				case 0x0: // Nearest
 					context->TextureFilterMag = GL_NEAREST;
@@ -710,7 +714,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			break;
 		case TFLUSH:
 			// texturesvalid = false
-			context->Textures[ 0 ].TextureID = 0;
+			//context->Textures[ 0 ].TextureID = 0;
 			break;
 		case USCALE:
 			// (float) should be 1
@@ -750,7 +754,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			temp = packet->Command - TBW0;
 			context->Textures[ temp ].Address = ( ( argi << 8 ) & 0xFF000000 ) | ( context->Textures[ temp ].Address & 0x00FFFFFF );
 			context->Textures[ temp ].LineWidth = argi & 0x0000FFFF;
-			context->Textures[ temp ].TextureID = 0;
+			//context->Textures[ temp ].TextureID = 0;
 			break;
 		case TSIZE0:
 		case TSIZE1:
@@ -764,7 +768,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			context->Textures[ temp ].Width = 1 << ( argi & 0x000000FF );
 			context->Textures[ temp ].Height = 1 << ( ( argi >> 8 ) & 0x000000FF );
 			context->Textures[ temp ].PixelStorage = context->TextureStorageMode;
-			context->Textures[ temp ].TextureID = 0;
+			//context->Textures[ temp ].TextureID = 0;
 			break;
 
 		case CBP:
