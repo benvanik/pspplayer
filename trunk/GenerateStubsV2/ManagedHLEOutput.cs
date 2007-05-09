@@ -132,7 +132,7 @@ namespace GenerateStubsV2
 				}
 				else
 				{
-					string newFileName = Path.Combine( _outputPath, string.Format( "{0}-{1}.h", Path.GetFileNameWithoutExtension( fileName ), crcString ) );
+					string newFileName = Path.Combine( _outputPath, string.Format( "{0}-{1}.cs", Path.GetFileNameWithoutExtension( fileName ), crcString ) );
 					File.Move( _tempFile, newFileName );
 					Console.WriteLine( " > WARNING: file exists, library {0} written to {1} instead - but diffs exist!", _library.Name, Path.GetFileName( newFileName ) );
 				}
@@ -230,17 +230,23 @@ namespace GenerateStubsV2
 			//if( function.Source.CommentBlock != null )
 			//	_writer.WriteLine( "{0}{1}", _indent, function.Source.CommentBlock );
 
-			// We trim out the nasty source file path
-			string sourceFile = function.Source.FileName;
-			foreach( string path in _searchPaths )
+			// We may not have Source! If we don't, just write as much as we can!
+
+			string sourceFile = "Not found";
+			if( function.Source != null )
 			{
-				if( sourceFile.StartsWith( path ) == true )
+				// We trim out the nasty source file path
+				sourceFile = function.Source.FileName;
+				foreach( string path in _searchPaths )
 				{
-					sourceFile = sourceFile.Replace( path, "" );
-					break;
+					if( sourceFile.StartsWith( path ) == true )
+					{
+						sourceFile = sourceFile.Replace( path, "" );
+						break;
+					}
 				}
+				sourceFile = sourceFile.Replace( '\\', '/' );
 			}
-			sourceFile = sourceFile.Replace( '\\', '/' );
 
 			// Attributes
 			_writer.WriteLine( "{0}[NotImplemented]", _indent );
@@ -248,11 +254,18 @@ namespace GenerateStubsV2
 			_writer.WriteLine( "{0}[BiosFunction( 0x{1:X8}, \"{2}\" )]", _indent, function.NID, function.Name );
 
 			// Original decl & source
-			_writer.WriteLine( "{0}// SDK location: {1}:{2}", _indent, sourceFile, function.Source.LineNumber );
-			_writer.WriteLine( "{0}// SDK declaration: {1}", _indent, function.Source.DeclarationBlock );
+			if( function.Source != null )
+			{
+				_writer.WriteLine( "{0}// SDK location: {1}:{2}", _indent, sourceFile, function.Source.LineNumber );
+				_writer.WriteLine( "{0}// SDK declaration: {1}", _indent, function.Source.DeclarationBlock );
+			}
 
-			bool hasReturn;
-			string transformed = TransformDeclaration( function.Name, function.Source.DeclarationBlock, out hasReturn );
+			bool hasReturn = true;
+			string transformed;
+			if( function.Source != null )
+				transformed = TransformDeclaration( function.Name, function.Source.DeclarationBlock, out hasReturn );
+			else
+				transformed = string.Format( "int {0}()", function.Name );
 
 			// Function body
 			_writer.Write( "{0}{1}", _indent, transformed );

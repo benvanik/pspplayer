@@ -83,7 +83,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceWlanDevDetach();
 		public int sceWlanDevDetach(){ return Module.NotImplementedReturn; }
 
+		[Stateless]
+		[BiosFunction( 0x5E7C8D94, "sceWlanDevIsGameMode" )]
+		public int sceWlanDevIsGameMode()
+		{
+			// ??
+			return 1;
+		}
 	}
 }
 
-/* GenerateStubsV2: auto-generated - CCF4999B */
+/* GenerateStubsV2: auto-generated - 2C57E0BD */

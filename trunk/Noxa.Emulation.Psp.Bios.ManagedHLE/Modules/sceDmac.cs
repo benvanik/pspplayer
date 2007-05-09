@@ -63,5 +63,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xD97F94D8, "sceDmacTryMemcpy" )]
+		public int sceDmacTryMemcpy(){ return Module.NotImplementedReturn; }
 	}
 }
+
+/* GenerateStubsV2: auto-generated - 2C4C5E6F */

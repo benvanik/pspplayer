@@ -50,6 +50,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
+		[BiosFunction( 0x9B25EDF1, "sceRegExit" )]
+		public int sceRegExit(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
 		[BiosFunction( 0x92E41280, "sceRegOpenRegistry" )]
 		// SDK location: /registry/pspreg.h:68
 		// SDK declaration: int sceRegOpenRegistry(struct RegParam *reg, int mode, REGHANDLE *h);
@@ -148,6 +153,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
+		[BiosFunction( 0x3615BC87, "sceRegRemoveKey" )]
+		public int sceRegRemoveKey(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
 		[BiosFunction( 0xC5768D02, "sceRegGetKeyInfoByName" )]
 		// SDK location: /registry/pspreg.h:151
 		// SDK declaration: int sceRegGetKeyInfoByName(REGHANDLE hd, const char *name, unsigned int *type, SceSize *size);
@@ -163,4 +173,4 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 	}
 }
 
-/* GenerateStubsV2: auto-generated - F5B7AB2E */
+/* GenerateStubsV2: auto-generated - 6187A697 */

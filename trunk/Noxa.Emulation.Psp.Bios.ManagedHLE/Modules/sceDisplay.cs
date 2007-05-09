@@ -76,6 +76,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 30;
 		}
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x7ED59BC4, "sceDisplaySetHoldMode" )]
+		public int sceDisplaySetHoldMode(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xA544C486, "sceDisplaySetResumeMode" )]
+		public int sceDisplaySetResumeMode(){ return Module.NotImplementedReturn; }
+
 		[Stateless]
 		[BiosFunction( 0x0E20F177, "sceDisplaySetMode" )]
 		// SDK location: /display/pspdisplay.h:53
@@ -151,6 +161,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				_memory.WriteWord( sync, 4, ( int )props.SyncMode );
 			return 0;
 		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xB4F378FA, "sceDisplayIsForeground" )]
+		public int sceDisplayIsForeground(){ return Module.NotImplementedReturn; }
 
 		[SuggestNative]
 		[Stateless]
@@ -241,4 +256,4 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 	}
 }
 
-/* GenerateStubsV2: auto-generated - B169BC61 */
+/* GenerateStubsV2: auto-generated - 94D9F6B7 */

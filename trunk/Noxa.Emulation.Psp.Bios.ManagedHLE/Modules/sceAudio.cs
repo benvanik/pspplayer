@@ -159,6 +159,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x41EFADE7, "sceAudioOneshotOutput" )]
+		public int sceAudioOneshotOutput(){ return Module.NotImplementedReturn; }
+
 		[Stateless]
 		[BiosFunction( 0x5EC81C55, "sceAudioChReserve" )]
 		// SDK location: /audio/pspaudio.h:61
@@ -224,7 +229,75 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			return 0;
 		}
+
+		#region Input ?
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x38553111, "sceAudio_38553111" )]
+		public int sceAudio_38553111()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x5C37C0AE, "sceAudio_5C37C0AE" )]
+		public int sceAudio_5C37C0AE()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xE0727056, "sceAudio_E0727056" )]
+		public int sceAudio_E0727056()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x086E5895, "sceAudioInputBlocking" )]
+		public int sceAudioInputBlocking()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x6D4BEC68, "sceAudioInput" )]
+		public int sceAudioInput()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xA708C6A6, "sceAudioGetInputLength" )]
+		public int sceAudioGetInputLength()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x87B2E651, "sceAudioWaitInputEnd" )]
+		public int sceAudioWaitInputEnd()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x7DE61688, "sceAudioInputInit" )]
+		public int sceAudioInputInit()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		#endregion
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 7837FF0F */
+/* GenerateStubsV2: auto-generated - 9A04934B */

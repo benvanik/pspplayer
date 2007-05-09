@@ -48,6 +48,54 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x3054D478, "sceKernelStdioRead" )]
+		public int sceKernelStdioRead()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x0CBB0571, "sceKernelStdioLseek" )]
+		public int sceKernelStdioLseek()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xA46785C9, "sceKernelStdioSendChar" )]
+		public int sceKernelStdioSendChar()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xA3B931DB, "sceKernelStdioWrite" )]
+		public int sceKernelStdioWrite()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x9D061C19, "sceKernelStdioClose" )]
+		public int sceKernelStdioClose()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x924ABA61, "sceKernelStdioOpen" )]
+		public int sceKernelStdioOpen()
+		{
+			return Module.NotImplementedReturn;
+		}
+
 		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x172D316E, "sceKernelStdin" )]
@@ -80,4 +128,4 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 441D2B42 */
+/* GenerateStubsV2: auto-generated - 7E4C9372 */

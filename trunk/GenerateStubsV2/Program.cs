@@ -62,11 +62,18 @@ namespace GenerateStubsV2
 			List<string> prxForces = new List<string>();
 			prxForces.Add( "kd/usersystemlib.prx" ); // Kernel_Library
 			prxForces.Add( "kd/libatrac3plus.prx" ); // sceAtrac3plus
+			prxForces.Add( "kd/pspnet.prx" );
+			prxForces.Add( "kd/pspnet_inet.prx" );
+			prxForces.Add( "kd/pspnet_resolver.prx" );
+			prxForces.Add( "kd/pspnet_apctl.prx" );
 
 			// Libraries that will be merged (in the form of source -> target
 			Dictionary<string, string> libraryMerges = new Dictionary<string, string>();
 			libraryMerges.Add( "sceUtility_netparam_internal", "sceUtility" );
 			libraryMerges.Add( "sceWlanDrv_lib", "sceWlanDrv" );
+			libraryMerges.Add( "sceNetIfhandle_lib", "sceNetIfhandle" );
+			libraryMerges.Add( "sceNetApctl_lib", "sceNetApctl" );
+			libraryMerges.Add( "sceNetAdhocAuth_lib", "sceNetAdhocAuth" );
 
 			Dictionary<string, PrxLibrary> dupeList = new Dictionary<string, PrxLibrary>( 10000 );
 
@@ -152,13 +159,11 @@ namespace GenerateStubsV2
 
 					foreach( PrxFunction function in library.Functions )
 					{
-						if( function.Source != null )
-						{
-							if( hasBegun == false )
-								output.BeginLibrary( library );
-							hasBegun = true;
-							output.WriteFunction( function );
-						}
+						if( hasBegun == false )
+							output.BeginLibrary( library );
+						hasBegun = true;
+
+						output.WriteFunction( function );
 					}
 
 					// Repeat for merged
@@ -166,13 +171,11 @@ namespace GenerateStubsV2
 					{
 						foreach( PrxFunction function in library.Merged.Functions )
 						{
-							if( function.Source != null )
-							{
-								if( hasBegun == false )
-									output.BeginLibrary( library );
-								hasBegun = true;
-								output.WriteFunction( function );
-							}
+							if( hasBegun == false )
+								output.BeginLibrary( library );
+							hasBegun = true;
+
+							output.WriteFunction( function );
 						}
 					}
 

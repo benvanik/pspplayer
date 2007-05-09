@@ -50,6 +50,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
+		[BiosFunction( 0xC7154136, "sceHprmRegisterCallback" )]
+		public int sceHprmRegisterCallback(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x444ED0B7, "sceHprmUnregisterCallback" )]
+		public int sceHprmUnregisterCallback(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
 		[BiosFunction( 0x208DB1BD, "sceHprmIsRemoteExist" )]
 		// SDK location: /hprm/psphprm.h:78
 		// SDK declaration: int sceHprmIsRemoteExist();
@@ -93,4 +103,4 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 	}
 }
 
-/* GenerateStubsV2: auto-generated - CFD8EAF0 */
+/* GenerateStubsV2: auto-generated - 79ED978B */

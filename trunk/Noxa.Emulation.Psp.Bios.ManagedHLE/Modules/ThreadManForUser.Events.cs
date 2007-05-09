@@ -219,6 +219,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return -1;
 		}
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xCD203292, "sceKernelCancelEventFlag" )]
+		// manual add
+		public int sceKernelCancelEventFlag( int evid ){ return Module.NotImplementedReturn; }
+
 		[Stateless]
 		[BiosFunction( 0xA66B0120, "sceKernelReferEventFlagStatus" )]
 		// SDK location: /user/pspthreadman.h:719

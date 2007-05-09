@@ -48,6 +48,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x37FB5C42, "sceKernelGetGPI" )]
+		public int sceKernelGetGPI(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x6AD345D7, "sceKernelSetGPO" )]
+		public int sceKernelSetGPO(){ return Module.NotImplementedReturn; }
+
 		#region Clock
 
 		[Stateless]
@@ -174,13 +184,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
+		[BiosFunction( 0x16641D70, "sceKernelDcacheReadTag" )]
+		public int sceKernelDcacheReadTag(){ return Module.NotImplementedReturn; }
+
+		[NotImplemented]
+		[Stateless]
 		[BiosFunction( 0x4FD31C9D, "sceKernelIcacheProbe" )]
 		// SDK location: /kernel/psputilsforkernel.h:63
 		// SDK declaration: int sceKernelIcacheProbe(const void *addr);
 		public int sceKernelIcacheProbe( int addr ){ return Module.NotImplementedReturn; }
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xFB05FAD0, "sceKernelIcacheReadTag" )]
+		public int sceKernelIcacheReadTag(){ return Module.NotImplementedReturn; }
+
 		#endregion
 	}
 }
 
-/* GenerateStubsV2: auto-generated - F3D204AF */
+/* GenerateStubsV2: auto-generated - 4BAFF473 */

@@ -70,7 +70,7 @@ namespace Noxa.Emulation.Psp.Player
 
 		private void AddLine( Verbosity verbosity, FeatureInfo feature, ListViewItem item )
 		{
-			//Debug.WriteLine( string.Format( "{0}: {1}", feature, value ) );
+			Debug.WriteLine( string.Format( "{0}: {1}", feature.Name, item.SubItems[ 1 ].Text ) );
 			try
 			{
 

@@ -48,6 +48,116 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
+		#region Game Sharing
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xC492F751, "sceUtilityGameSharingInitStart" )]
+		public int sceUtilityGameSharingInitStart()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xEFC6F80F, "sceUtilityGameSharingShutdownStart" )]
+		public int sceUtilityGameSharingShutdownStart()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x7853182D, "sceUtilityGameSharingUpdate" )]
+		public int sceUtilityGameSharingUpdate()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x946963F3, "sceUtilityGameSharingGetStatus" )]
+		public int sceUtilityGameSharingGetStatus()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		#endregion
+
+		#region Netplay
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x3AD50AE7, "sceNetplayDialogInitStart" )]
+		public int sceNetplayDialogInitStart()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xBC6B6296, "sceNetplayDialogShutdownStart" )]
+		public int sceNetplayDialogShutdownStart()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x417BED54, "sceNetplayDialogUpdate" )]
+		public int sceNetplayDialogUpdate()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xB6CEE597, "sceNetplayDialogGetStatus" )]
+		public int sceNetplayDialogGetStatus()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		#endregion
+
+		#region Netconf
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x4DB1E739, "sceUtilityNetconfInitStart" )]
+		public int sceUtilityNetconfInitStart()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xF88155F6, "sceUtilityNetconfShutdownStart" )]
+		public int sceUtilityNetconfShutdownStart()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x91E70E35, "sceUtilityNetconfUpdate" )]
+		public int sceUtilityNetconfUpdate()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x6332AA39, "sceUtilityNetconfGetStatus" )]
+		public int sceUtilityNetconfGetStatus()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		#endregion
+
+		#region Savedata
+
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x50C4CD57, "sceUtilitySavedataInitStart" )]
@@ -75,6 +185,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK location: /utility/psputility_savedata.h:107
 		// SDK declaration: int sceUtilitySavedataGetStatus();
 		public int sceUtilitySavedataGetStatus(){ return Module.NotImplementedReturn; }
+
+		#endregion
+
+		#region MsgDialog
 
 		[NotImplemented]
 		[Stateless]
@@ -112,6 +226,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilityMsgDialogGetStatus();
 		public int sceUtilityMsgDialogGetStatus(){ return Module.NotImplementedReturn; }
 
+		#endregion
+
+		#region Osk
+
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xF6269B82, "sceUtilityOskInitStart" )]
@@ -140,6 +258,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilityOskGetStatus();
 		public int sceUtilityOskGetStatus(){ return Module.NotImplementedReturn; }
 
+		#endregion
+
+		#region SystemParam
+
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x45C18506, "sceUtilitySetSystemParamInt" )]
@@ -167,6 +289,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK location: /utility/psputility_sysparam.h:132
 		// SDK declaration: int sceUtilityGetSystemParamString(int id, char *str, int len);
 		public int sceUtilityGetSystemParamString( int id, int str, int len ){ return Module.NotImplementedReturn; }
+
+		#endregion
+
+		#region NetParam
 
 		[NotImplemented]
 		[Stateless]
@@ -210,7 +336,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilitySetNetParam(int param, const void *val);
 		public int sceUtilitySetNetParam( int param, int val ){ return Module.NotImplementedReturn; }
 
+		#endregion
 	}
 }
 
-/* GenerateStubsV2: auto-generated - 697E771E */
+/* GenerateStubsV2: auto-generated - A0F86C34 */
