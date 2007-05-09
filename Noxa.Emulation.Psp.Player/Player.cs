@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using Noxa.Emulation.Psp.Player.Configuration;
 using System.Diagnostics;
 using Noxa.Emulation.Psp.Media;
+using System.IO;
 //using Noxa.Emulation.Psp.Player.Development;
 
 namespace Noxa.Emulation.Psp.Player
@@ -173,21 +174,47 @@ namespace Noxa.Emulation.Psp.Player
 
 			this.StartInstance( false, false );
 
-			// We need to get the folder on the memory stick device of this path
-			IMediaFolder folder = _host.CurrentInstance.MemoryStick.Root.FindFolder( path );
-			if( folder == null )
+			// If the path contains 'iso', we assume it's an iso and load it via the UMD driver
+			Games.GameInformation game = null;
+			if( path.Contains( "iso" ) == true )
 			{
-				Debug.WriteLine( string.Format( "Unable to find path {0}", path ) );
-				return;
-			}
-			Games.GameInformation game = Games.GameLoader.GetEbootGameInformation( folder );
-			if( game == null )
-			{
-				Debug.WriteLine( string.Format( "Unable to find eboot at path {0}", path ) );
-				return;
-			}
+				if( File.Exists( path ) == false )
+				{
+					Debug.WriteLine( string.Format( "Unable to direct start UMD {0} - path not found", path ) );
+					return;
+				}
 
-			Debug.WriteLine( string.Format( "Direct starting eboot '{0}' from {1}", game.Parameters.Title, path ) );
+				_host.CurrentInstance.Umd.Load( path, false );
+				game = Games.GameLoader.FindGame( _host.CurrentInstance.Umd );
+				if( game == null )
+				{
+					Debug.WriteLine( string.Format( "Unable to find game in UMD ISO {0}", path ) );
+					return;
+				}
+
+				Debug.WriteLine( string.Format( "Direct starting UMD '{0}' from {1}", game.Parameters.Title, path ) );
+			}
+			else
+			{
+				// We need to get the folder on the memory stick device of this path
+				IMediaFolder folder = _host.CurrentInstance.MemoryStick.Root.FindFolder( path );
+				if( folder == null )
+				{
+					Debug.WriteLine( string.Format( "Unable to find path {0}", path ) );
+					return;
+				}
+				game = Games.GameLoader.GetEbootGameInformation( folder );
+				if( game == null )
+				{
+					Debug.WriteLine( string.Format( "Unable to find eboot at path {0}", path ) );
+					return;
+				}
+
+				Debug.WriteLine( string.Format( "Direct starting eboot '{0}' from {1}", game.Parameters.Title, path ) );
+			}
+			Debug.Assert( game != null );
+			if( game == null )
+				return;
 
 			( _host.CurrentInstance as Instance ).SwitchToGame( game );
 		}
