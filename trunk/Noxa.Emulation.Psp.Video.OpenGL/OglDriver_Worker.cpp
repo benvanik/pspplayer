@@ -192,7 +192,7 @@ void OglDriver::SetupOpenGL()
 		;
 	pfd.iPixelType = PFD_TYPE_RGBA;
 	pfd.cColorBits = 24;
-	pfd.cDepthBits = 16;
+	pfd.cDepthBits = 32;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 	int iFormat = ChoosePixelFormat( hDC, &pfd );
 	SetPixelFormat( hDC, iFormat, &pfd );
@@ -235,6 +235,11 @@ void OglDriver::DestroyOpenGL()
 		ReleaseDC( ( HWND )_handle, ( HDC )_hDC );
 
 	SAFEFREE( _context->ClutTable );
+}
+
+void OglDriver::Resize( int width, int height )
+{
+	glViewport( 0, height, width, height );
 }
 
 void OglDriver::WorkerThread()

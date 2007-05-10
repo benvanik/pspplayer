@@ -487,10 +487,8 @@ namespace Noxa.Emulation.Psp.Player
 			NativeHelpers.DwmExtendFrameIntoClientArea( this.Handle, ref _glassMargins );
 		}
 
-		protected override void OnResize( EventArgs e )
+		private void GlassResize()
 		{
-			base.OnResize( e );
-
 			if( _glassBounds != null )
 				_glassBounds.Invalidate( this.ClientRectangle, _glassMargins );
 
@@ -499,8 +497,6 @@ namespace Noxa.Emulation.Psp.Player
 				_glassBuffer.Dispose();
 				_glassBuffer = null;
 			}
-
-			this.Invalidate( false );
 		}
 
 		private void RenderGlassText( Graphics peg, Rectangle statusBounds, string statusText )

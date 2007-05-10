@@ -414,12 +414,15 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	}
 #endif
 
-	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? 4 : 3,
+	glTexImage2D( GL_TEXTURE_2D, 0, ( format->Flags & TFAlpha ) ? GL_RGBA8 : GL_RGB8,
 		width, texture->Height,
 		0,
 		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
 		format->GLFormat,
 		( void* )buffer );
+
+	//glBindTexture( GL_TEXTURE_2D, 0 );
+	//glBindTexture( GL_TEXTURE_2D, textureId );
 
 	return true;
 }

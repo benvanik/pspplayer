@@ -4,6 +4,8 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
+#define LOG
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,6 +28,7 @@ namespace Noxa.Emulation.Psp
 		/// </summary>
 		/// <param name="feature">The feature the line is associated with.</param>
 		/// <param name="value">The line to write.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Feature feature, string value )
 		{
 			Debug.Assert( Instance != null );
@@ -38,6 +41,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="feature">The feature the line is associated with.</param>
 		/// <param name="format">A <see cref="String"/> containg one or more format items.</param>
 		/// <param name="arg0">The first object to format.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Feature feature, string format, object arg0 )
 		{
 			Debug.Assert( Instance != null );
@@ -51,6 +55,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="format">A <see cref="String"/> containg one or more format items.</param>
 		/// <param name="arg0">The first object to format.</param>
 		/// <param name="arg1">The second object to format.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Feature feature, string format, object arg0, object arg1 )
 		{
 			Debug.Assert( Instance != null );
@@ -65,6 +70,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="arg0">The first object to format.</param>
 		/// <param name="arg1">The second object to format.</param>
 		/// <param name="arg2">The third object to format.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Feature feature, string format, object arg0, object arg1, object arg2 )
 		{
 			Debug.Assert( Instance != null );
@@ -77,6 +83,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="feature">The feature the line is associated with.</param>
 		/// <param name="format">A <see cref="String"/> containg one or more format items.</param>
 		/// <param name="args">An object array containing items to format.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Feature feature, string format, params object[] args )
 		{
 			Debug.Assert( Instance != null );
@@ -89,6 +96,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="verbosity">The verbosity level to log the line with.</param>
 		/// <param name="feature">The feature the line is associated with.</param>
 		/// <param name="value">The line to write.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Verbosity verbosity, Feature feature, string value )
 		{
 			Debug.Assert( Instance != null );
@@ -102,6 +110,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="feature">The feature the line is associated with.</param>
 		/// <param name="format">A <see cref="String"/> containg one or more format items.</param>
 		/// <param name="arg0">The first object to format.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Verbosity verbosity, Feature feature, string format, object arg0 )
 		{
 			Debug.Assert( Instance != null );
@@ -116,6 +125,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="format">A <see cref="String"/> containg one or more format items.</param>
 		/// <param name="arg0">The first object to format.</param>
 		/// <param name="arg1">The second object to format.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Verbosity verbosity, Feature feature, string format, object arg0, object arg1 )
 		{
 			Debug.Assert( Instance != null );
@@ -131,6 +141,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="arg0">The first object to format.</param>
 		/// <param name="arg1">The second object to format.</param>
 		/// <param name="arg2">The third object to format.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Verbosity verbosity, Feature feature, string format, object arg0, object arg1, object arg2 )
 		{
 			Debug.Assert( Instance != null );
@@ -144,6 +155,7 @@ namespace Noxa.Emulation.Psp
 		/// <param name="feature">The feature the line is associated with.</param>
 		/// <param name="format">A <see cref="String"/> containg one or more format items.</param>
 		/// <param name="args">An object array containing items to format.</param>
+		[Conditional( "LOG" )]
 		public static void WriteLine( Verbosity verbosity, Feature feature, string format, params object[] args )
 		{
 			Debug.Assert( Instance != null );

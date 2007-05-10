@@ -24,7 +24,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>..\debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DONTUSEVIDEO</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;DONTUSEVIDEO;LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -240,6 +240,7 @@
     <Content Include="Resources\IconBackground.png" />
     <None Include="Resources\InfoIcon.png" />
     <Content Include="Resources\MemoryStickIcon.png" />
+    <None Include="Resources\OutputIcon.png" />
     <Content Include="Resources\ReportIcon.png" />
     <Content Include="Resources\psp.ico" />
     <None Include="Resources\PspShake.png" />

@@ -67,6 +67,13 @@ namespace Noxa.Emulation.Psp.Video
 		}
 
 		/// <summary>
+		/// Resize the video context.
+		/// </summary>
+		/// <param name="width">The new width of the client area.</param>
+		/// <param name="height">The new height of the client area.</param>
+		void Resize( int width, int height );
+
+		/// <summary>
 		/// Suspend the video driver.
 		/// </summary>
 		void Suspend();

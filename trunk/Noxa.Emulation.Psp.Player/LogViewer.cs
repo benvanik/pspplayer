@@ -22,6 +22,8 @@ namespace Noxa.Emulation.Psp.Player
 		private FeatureInfo[] _features;
 
 		private Verbosity _globalVerbosity;
+		private bool _debugWrite;
+		private bool _debugEnabled;
 
 		private List<ListViewItem> _lines;
 
@@ -49,14 +51,29 @@ namespace Noxa.Emulation.Psp.Player
 
 			_lines = new List<ListViewItem>( 10000 );
 
+			if( ( Debugger.IsAttached == true ) &&
+				( Debugger.IsLogging() == true ) )
+			{
+				_debugEnabled = true;
+			}
+			else
+			{
+				_debugEnabled = false;
+			}
+			debugWriteToolStripButton.Visible = _debugEnabled;
+			toolStripSeparator3.Visible = _debugEnabled;
+
 			this.LoadSettings();
 		}
 
 		private void LoadSettings()
 		{
 			_globalVerbosity = Verbosity.Everything;
+			_debugWrite = true;
 
 			this.UpdateGlobalVerbosity();
+			debugWriteToolStripButton.Checked = _debugWrite;
+			debugWriteToolStripButton.Invalidate();
 		}
 
 		private void SaveSettings()
@@ -70,7 +87,9 @@ namespace Noxa.Emulation.Psp.Player
 
 		private void AddLine( Verbosity verbosity, FeatureInfo feature, ListViewItem item )
 		{
-			Debug.WriteLine( string.Format( "{0}: {1}", feature.Name, item.SubItems[ 1 ].Text ) );
+			if( ( _debugEnabled == true ) &&
+				( _debugWrite == true ) )
+				Debug.WriteLine( string.Format( "{0}: {1}", feature.Name, item.SubItems[ 1 ].Text ) );
 			try
 			{
 
@@ -263,6 +282,12 @@ namespace Noxa.Emulation.Psp.Player
 			saveFileDialog.Filter = "XML Files|*.xml|All Files|*.*";
 			if( saveFileDialog.ShowDialog() != DialogResult.OK )
 				return;
+		}
+
+		private void debugWriteToolStripButton_Click( object sender, EventArgs e )
+		{
+			debugWriteToolStripButton.Checked = !debugWriteToolStripButton.Checked;
+			_debugWrite = debugWriteToolStripButton.Checked;
 		}		
 	}
 

@@ -100,6 +100,7 @@ void TextureTransfer( OglContext* context )
 	//uint texId;
 	//glGenTextures( 1, &texId );
 	//glBindTexture( GL_TEXTURE_2D, texId );
+	glBindTexture( GL_TEXTURE_2D, 0 );
 	if( bpp == 4 )
 	{
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA,
