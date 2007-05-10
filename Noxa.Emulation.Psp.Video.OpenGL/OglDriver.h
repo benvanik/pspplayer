@@ -136,6 +136,8 @@ namespace Noxa {
 					OglDriver( IEmulationInstance^ emulator, ComponentParameters^ parameters );
 					~OglDriver();
 
+					virtual void Resize( int width, int height );
+
 					virtual void Suspend();
 					virtual bool Resume();
 

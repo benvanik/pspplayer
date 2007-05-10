@@ -55,6 +55,8 @@ namespace Noxa.Emulation.Psp.Player
 			this.columnFeature = new System.Windows.Forms.ColumnHeader();
 			this.columnValue = new System.Windows.Forms.ColumnHeader();
 			this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+			this.debugWriteToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.toolStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -69,7 +71,9 @@ namespace Noxa.Emulation.Psp.Player
             this.toolStripSeparator2,
             this.copyToolStripButton,
             this.saveToolStripButton,
-            this.clearToolStripButton} );
+            this.clearToolStripButton,
+            this.toolStripSeparator3,
+            this.debugWriteToolStripButton} );
 			this.toolStrip1.Location = new System.Drawing.Point( 0, 0 );
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Size = new System.Drawing.Size( 977, 25 );
@@ -81,6 +85,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.toolStripLabel2.Name = "toolStripLabel2";
 			this.toolStripLabel2.Size = new System.Drawing.Size( 101, 22 );
 			this.toolStripLabel2.Text = "Selected Features:";
+			this.toolStripLabel2.Visible = false;
 			// 
 			// toolStripDropDownButton1
 			// 
@@ -89,11 +94,13 @@ namespace Noxa.Emulation.Psp.Player
 			this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
 			this.toolStripDropDownButton1.Size = new System.Drawing.Size( 164, 22 );
 			this.toolStripDropDownButton1.Text = "toolStripDropDownButton1";
+			this.toolStripDropDownButton1.Visible = false;
 			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
 			this.toolStripSeparator1.Size = new System.Drawing.Size( 6, 25 );
+			this.toolStripSeparator1.Visible = false;
 			// 
 			// toolStripLabel1
 			// 
@@ -171,7 +178,7 @@ namespace Noxa.Emulation.Psp.Player
 			// saveAsTextToolStripMenuItem
 			// 
 			this.saveAsTextToolStripMenuItem.Name = "saveAsTextToolStripMenuItem";
-			this.saveAsTextToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.saveAsTextToolStripMenuItem.Size = new System.Drawing.Size( 148, 22 );
 			this.saveAsTextToolStripMenuItem.Text = "Save as &Text";
 			this.saveAsTextToolStripMenuItem.Click += new System.EventHandler( this.saveAsTextToolStripMenuItem_Click );
 			// 
@@ -179,7 +186,7 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.saveAsHtmlToolStripMenuItem.Enabled = false;
 			this.saveAsHtmlToolStripMenuItem.Name = "saveAsHtmlToolStripMenuItem";
-			this.saveAsHtmlToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.saveAsHtmlToolStripMenuItem.Size = new System.Drawing.Size( 148, 22 );
 			this.saveAsHtmlToolStripMenuItem.Text = "Save as &HTML";
 			this.saveAsHtmlToolStripMenuItem.Click += new System.EventHandler( this.saveAsHtmlToolStripMenuItem_Click );
 			// 
@@ -187,7 +194,7 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.saveAsXmlToolStripMenuItem.Enabled = false;
 			this.saveAsXmlToolStripMenuItem.Name = "saveAsXmlToolStripMenuItem";
-			this.saveAsXmlToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.saveAsXmlToolStripMenuItem.Size = new System.Drawing.Size( 148, 22 );
 			this.saveAsXmlToolStripMenuItem.Text = "Save as &XML";
 			this.saveAsXmlToolStripMenuItem.Click += new System.EventHandler( this.saveAsXmlToolStripMenuItem_Click );
 			// 
@@ -233,6 +240,19 @@ namespace Noxa.Emulation.Psp.Player
 			// 
 			this.saveFileDialog.Title = "Save Log";
 			// 
+			// toolStripSeparator3
+			// 
+			this.toolStripSeparator3.Name = "toolStripSeparator3";
+			this.toolStripSeparator3.Size = new System.Drawing.Size( 6, 25 );
+			// 
+			// debugWriteToolStripButton
+			// 
+			this.debugWriteToolStripButton.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.OutputIcon;
+			this.debugWriteToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.debugWriteToolStripButton.Name = "debugWriteToolStripButton";
+			this.debugWriteToolStripButton.Size = new System.Drawing.Size( 115, 22 );
+			this.debugWriteToolStripButton.Text = "Debug.WriteLine";
+			// 
 			// LogViewer
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
@@ -276,5 +296,7 @@ namespace Noxa.Emulation.Psp.Player
 		private System.Windows.Forms.ToolStripMenuItem saveAsTextToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem saveAsHtmlToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem saveAsXmlToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+		private System.Windows.Forms.ToolStripButton debugWriteToolStripButton;
 	}
 }

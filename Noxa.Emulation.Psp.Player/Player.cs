@@ -396,5 +396,21 @@ namespace Noxa.Emulation.Psp.Player
 		}
 
 		#endregion
+
+		protected override void OnResize( EventArgs e )
+		{
+			base.OnResize( e );
+
+			if( ( _host != null ) &&
+				( _host.CurrentInstance != null ) &&
+				( _host.CurrentInstance.Video != null ) )
+			{
+				_host.CurrentInstance.Video.Resize( renderSurface.ClientSize.Width, renderSurface.ClientSize.Height );
+			}
+
+			this.GlassResize();
+
+			this.Invalidate( false );
+		}
 	}
 }
