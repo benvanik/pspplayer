@@ -86,9 +86,7 @@ namespace Noxa {
 					array<BiosFunction^>^		_syscalls;
 					array<BiosShim^>^			_syscallShims;
 					array<IntPtr>^				_syscallShimsN;
-#ifdef SYSCALLSTATS
-					array<int>^					_syscallCounts;
-#endif
+
 					array<IModule^>^			_moduleInstances;
 					Dictionary<uint, uint>^		_userExports;		// NID -> address
 

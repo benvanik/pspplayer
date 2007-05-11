@@ -20,7 +20,14 @@ using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
 
+extern uint _managedSyscallCount;
 extern uint _nativeSyscallCount;
+extern uint _cpuSyscallCount;
+extern uint _unimplementedSyscallCount;
+
+#ifdef SYSCALLSTATS
+extern uint _syscallCounts[ 1024 ];
+#endif
 
 #define LOGSYSCALLS
 #define NIRETURN		0
@@ -102,16 +109,6 @@ void __unimplementedSyscall( int syscallId, int address )
 #ifdef LOGSYSCALLS
 	__logSyscall( syscallId, address );
 #endif
-
-#ifdef STATISTICS
-	cpu->_stats->UnimplementedSyscallCount++;
-#endif
-
-#ifdef SYSCALLSTATS
-	//int currentStat = cpu->_syscallCounts[ syscallId ];
-	//cpu->_syscallCounts[ syscallId ] = currentStat + 1;
-	cpu->_syscallCounts[ syscallId ]++;
-#endif
 }
 
 void __syscallBounce( int syscallId, int address )
@@ -122,20 +119,10 @@ void __syscallBounce( int syscallId, int address )
 	__logSyscall( syscallId, address );
 #endif
 
-#ifdef STATISTICS
-	cpu->_stats->ManagedSyscallCount++;
-#endif
-
 	BiosShim^ shim = cpu->_syscallShims[ syscallId ];
 	Debug::Assert( shim != nullptr );
 	if( shim == nullptr )
 		return;
-
-#ifdef SYSCALLSTATS
-	//int currentStat = cpu->_syscallCounts[ syscallId ];
-	//cpu->_syscallCounts[ syscallId ] = currentStat + 1;
-	cpu->_syscallCounts[ syscallId ]++;
-#endif
 
 	shim( cpu );
 }
@@ -149,6 +136,10 @@ void EmitNativeCall( R4000GenContext^ context, BiosFunction^ function, int sid )
 GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte _function )
 {
 	int syscall = ( int )( ( code >> 6 ) & 0xFFFFF );
+
+#ifdef SYSCALLSTATS
+	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
+#endif
 
 	BiosFunction^ function = R4000Cpu::GlobalCpu->_syscalls[ syscall ];
 	bool willCall;
@@ -226,6 +217,8 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 			bool emitted = R4000Cpu::GlobalCpu->_biosStubs->EmitCall( context, g, address, function->NID );
 			if( emitted == true  )
 			{
+				function->HasCpuImplementation = true;
+
 				// If we emitted then we must be stateless
 				context->LastSyscallStateless = true;
 
@@ -242,9 +235,11 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				}
 
 #ifdef STATISTICS
-				g->add( g->dword_ptr[ &_nativeSyscallCount ], 1 );
+				g->inc( g->dword_ptr[ &_cpuSyscallCount ] );
 #endif
-
+#ifdef SYSCALLSTATS
+				g->inc( g->dword_ptr[ &_syscallCounts[ syscall ] ] );
+#endif
 				return GenerationResult::Syscall;
 			}
 		}
@@ -257,6 +252,10 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 			if( function->NativeMethod != IntPtr::Zero )
 			{
 				EmitNativeCall( context, function, syscall );
+
+#ifdef STATISTICS
+				g->inc( g->dword_ptr[ &_nativeSyscallCount ] );
+#endif
 			}
 			else
 			{
@@ -265,6 +264,10 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				g->push( ( uint )syscall );
 				g->call( ( uint )&__syscallBounce );
 				g->add( ESP, 8 );
+
+#ifdef STATISTICS
+				g->inc( g->dword_ptr[ &_managedSyscallCount ] );
+#endif
 			}
 		}
 		else
@@ -290,7 +293,15 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 				// We don't even have a freaking function - just put -1 in $v0 and call it a day
 				g->mov( MREG( CTX, 2 ), ( int )NIRETURN );
 			}
+
+#ifdef STATISTICS
+			g->inc( g->dword_ptr[ &_unimplementedSyscallCount ] );
+#endif
 		}
+
+#ifdef SYSCALLSTATS
+		g->inc( g->dword_ptr[ &_syscallCounts[ syscall ] ] );
+#endif
 
 		// Emit stop flag check - if the flag is set we return
 		Label* skipStopLabel = g->DefineLabel();

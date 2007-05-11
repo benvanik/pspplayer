@@ -40,11 +40,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				{
 					// Wait on it
 					while( earliest.State == KThreadState.Waiting )
-						System.Threading.Thread.Sleep( 1 );
+					{
+						// This happens A LOT - it'd be best if we just spun, but by sleeping we save some time
+						System.Threading.Thread.Sleep( 0 );
+					}
 				}
 				else
 				{
-					Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Schedule: ran out of threads to run" );
+					//Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Schedule: ran out of threads to run" );
 					return false;
 				}
 			}

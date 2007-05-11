@@ -161,6 +161,11 @@ namespace Noxa.Emulation.Psp.Bios
 		public readonly bool UsesMemorySystem;
 
 		/// <summary>
+		/// <c>true</c> if the CPU has an inlined implementation.
+		/// </summary>
+		public bool HasCpuImplementation;
+
+		/// <summary>
 		/// Initializes a new <see cref="BiosFunction"/> instance with the given parameters.
 		/// </summary>
 		/// <param name="module">Module containing the function.</param>

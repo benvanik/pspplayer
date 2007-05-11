@@ -191,74 +191,73 @@ void PollDirectInput( int* buttons, short* analogX, short* analogY )
 // ---- XInput ----
 #pragma unmanaged
 DWORD _lastPacket = 0;
+XINPUT_STATE _xstate;
 void PollXInput( int padIndex, bool* connected, int* buttons, short* analogX, short* analogY )
 {
-	XINPUT_STATE state;
-	do
+	DWORD ret = XInputGetState( padIndex, &_xstate );
+	*connected = ( ret != ERROR_DEVICE_NOT_CONNECTED );
+	if( *connected == false )
 	{
-		DWORD ret = XInputGetState( padIndex, &state );
-		*connected = ( ret != ERROR_DEVICE_NOT_CONNECTED );
-		if( *connected == false )
-		{
-			*buttons = 0;
-			*analogX = 0;
-			*analogY = 0;
-			return;
-		}
+		*buttons = 0;
+		*analogX = 0;
+		*analogY = 0;
+		return;
+	}
 
-		if( ret == ERROR_SUCCESS )
-		{
-			// Loop until we get the next packet
-			//if( state.dwPacketNumber <= _lastPacket )
-			//	continue;
-			_lastPacket = state.dwPacketNumber;
+	if( ret == ERROR_SUCCESS )
+	{
+		// Loop until we get the next packet
+		//if( _xstate.dwPacketNumber <= _lastPacket )
+		//	continue;
+		_lastPacket = _xstate.dwPacketNumber;
 
-			int btns = PADNone;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_A ) == XINPUT_GAMEPAD_A )
-				btns |= PADCross;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_B ) == XINPUT_GAMEPAD_B )
-				btns |= PADCircle;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_X ) == XINPUT_GAMEPAD_X )
-				btns |= PADSquare;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_Y ) == XINPUT_GAMEPAD_Y )
-				btns |= PADTriangle;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_START ) == XINPUT_GAMEPAD_START )
-				btns |= PADStart;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK ) == XINPUT_GAMEPAD_BACK )
-				btns |= PADSelect;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP ) == XINPUT_GAMEPAD_DPAD_UP )
-				btns |= PADDigitalUp;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN ) == XINPUT_GAMEPAD_DPAD_DOWN )
-				btns |= PADDigitalDown;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT ) == XINPUT_GAMEPAD_DPAD_LEFT )
-				btns |= PADDigitalLeft;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ) == XINPUT_GAMEPAD_DPAD_RIGHT )
-				btns |= PADDigitalRight;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER ) == XINPUT_GAMEPAD_LEFT_SHOULDER )
-				btns |= PADLeftTrigger;
-			if( ( state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ) == XINPUT_GAMEPAD_RIGHT_SHOULDER )
-				btns |= PADRightTrigger;
-			*buttons = btns;
+		int btns = PADNone;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_A ) == XINPUT_GAMEPAD_A )
+			btns |= PADCross;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_B ) == XINPUT_GAMEPAD_B )
+			btns |= PADCircle;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_X ) == XINPUT_GAMEPAD_X )
+			btns |= PADSquare;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_Y ) == XINPUT_GAMEPAD_Y )
+			btns |= PADTriangle;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_START ) == XINPUT_GAMEPAD_START )
+			btns |= PADStart;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_BACK ) == XINPUT_GAMEPAD_BACK )
+			btns |= PADSelect;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP ) == XINPUT_GAMEPAD_DPAD_UP )
+			btns |= PADDigitalUp;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN ) == XINPUT_GAMEPAD_DPAD_DOWN )
+			btns |= PADDigitalDown;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT ) == XINPUT_GAMEPAD_DPAD_LEFT )
+			btns |= PADDigitalLeft;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT ) == XINPUT_GAMEPAD_DPAD_RIGHT )
+			btns |= PADDigitalRight;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER ) == XINPUT_GAMEPAD_LEFT_SHOULDER )
+			btns |= PADLeftTrigger;
+		if( ( _xstate.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER ) == XINPUT_GAMEPAD_RIGHT_SHOULDER )
+			btns |= PADRightTrigger;
+		*buttons = btns;
 
-			short ax = -state.Gamepad.sThumbLY;
-			short ay = state.Gamepad.sThumbLX;
+		short ax = -_xstate.Gamepad.sThumbLY;
+		short ay = _xstate.Gamepad.sThumbLX;
 
-			/*if( ( ax < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) &&
-				( ax > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) )
-				ax = 0;
-			if( ( ay < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) &&
-				( ay > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) )
-				ay = 0;*/
+		/*if( ( ax < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) &&
+			( ax > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) )
+			ax = 0;
+		if( ( ay < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) &&
+			( ay > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ) )
+			ay = 0;*/
 
-			*analogX = ax;
-			*analogY = ay;
-
-			// Done!
-			break;
-		}
-	} while( true );
+		*analogX = ax;
+		*analogY = ay;
+	}
 }
 #pragma managed
+
+// If we are not connected, we only retry every 500 polls (60/sec, so 8.3s)
+bool _xinputConnected = true;
+int _xinputPollCycle = 0;
+#define XINPUTPOLLCYCLES	500
 
 void InputDriver::Poll()
 {
@@ -268,14 +267,28 @@ void InputDriver::Poll()
 		_dinputSetup = true;
 	}
 
-	bool connected;
-	int buttons;
-	short analogX;
-	short analogY;
-	PollXInput( _padIndex, &connected, &buttons, &analogX, &analogY );
-	_isConnected = connected;
-	_analogX = analogX;
-	_analogY = analogY;
+	int buttons = 0;
+	short analogX = 0;
+	short analogY = 0;
+
+	if( ( _xinputConnected == true ) ||
+		( _xinputPollCycle == 0 ) )
+	{
+		bool connected;
+		PollXInput( _padIndex, &connected, &buttons, &analogX, &analogY );
+		_analogX = analogX;
+		_analogY = analogY;
+		_xinputConnected = connected;
+		if( connected == false )
+			_xinputPollCycle++;
+	}
+	else
+	{
+		_xinputPollCycle++;
+		if( _xinputPollCycle == XINPUTPOLLCYCLES )
+			_xinputPollCycle = 0;
+	}
+	_isConnected = _xinputConnected;
 
 	if( g_pKeyboard != NULL )
 		PollDirectInput( &buttons, &analogX, &analogY );

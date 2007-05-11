@@ -54,6 +54,7 @@ namespace Noxa {
 
 					uint ManagedSyscallCount;					// # of syscalls that go to the BIOS (managed)
 					uint NativeSyscallCount;					// # of syscalls that use overriden stubs (native)
+					uint CpuSyscallCount;						// # of syscalls to CPU-implemented routines
 					uint UnimplementedSyscallCount;				// # of syscalls attempted against unimplemented calls
 
 					double AverageCodeSizeRatio;				// Ratio of MIPS code size to x86 code size

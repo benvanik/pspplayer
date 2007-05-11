@@ -68,7 +68,7 @@ namespace Noxa.Emulation.Psp.Player
 
 		private void LoadSettings()
 		{
-			_globalVerbosity = Verbosity.Everything;
+			_globalVerbosity = Verbosity.Normal;
 			_debugWrite = true;
 
 			this.UpdateGlobalVerbosity();

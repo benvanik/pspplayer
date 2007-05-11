@@ -26,6 +26,10 @@ using namespace Noxa::Emulation::Psp::Debugging::DebugData;
 
 extern uint _instructionsExecuted;
 
+#ifdef SYSCALLSTATS
+uint _syscallCounts[ 1024 ];
+#endif
+
 R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 {
 	GlobalCpu = this;
@@ -51,9 +55,6 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_syscalls = gcnew array<BiosFunction^>( 1024 );
 	_syscallShims = gcnew array<BiosShim^>( 1024 );
 	_syscallShimsN = gcnew array<IntPtr>( 1024 );
-#ifdef SYSCALLSTATS
-	_syscallCounts = gcnew array<int>( 1024 );
-#endif
 	_moduleInstances = gcnew array<IModule^>( 64 );
 	_userExports = gcnew Dictionary<uint, uint>( 1024 );
 
@@ -189,15 +190,16 @@ void R4000Cpu::PrintStatistics()
 	
 #ifdef SYSCALLSTATS
 	// Syscall stats
+	int syscallCount = sizeof( _syscallCounts ) / sizeof( uint );
 	int callCount = 0;
-	for( int n = 0; n < _syscallCounts->Length; n++ )
+	for( int n = 0; n < syscallCount; n++ )
 	{
 		int value = _syscallCounts[ n ];
 		callCount += value;
 	}
 
 	Log::WriteLine( Verbosity::Normal, Feature::Statistics, "Syscall statistics (in percent of all calls):" );
-	for( int n = 0; n < _syscallCounts->Length; n++ )
+	for( int n = 0; n < syscallCount; n++ )
 	{
 		int value = _syscallCounts[ n ];
 		if( value == 0 )
@@ -205,8 +207,14 @@ void R4000Cpu::PrintStatistics()
 		BiosFunction^ func = _syscalls[ n ];
 		float p = value / ( float )callCount;
 		p *= 100.0f;
+		String^ type = String::Format( "{0}{1}{2}{3}{4}",
+			func->IsImplemented ? "" : "(NI)",
+			func->HasCpuImplementation ? "(CPU)" : "",
+			func->NativeMethod == IntPtr::Zero ? "" : "(Native)",
+			func->NativeImplementationSuggested ? "(NativeSugg)" : "",
+			func->IsStateless ? "(Stateless)" : "" );
 		Log::WriteLine( Verbosity::Normal, Feature::Statistics, "{0,-50} {1,10}x, {2,3}%\t{3}",
-			String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p, func->IsImplemented ? "" : "(NI)" );
+			String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p, type );
 	}
 #endif
 #endif
