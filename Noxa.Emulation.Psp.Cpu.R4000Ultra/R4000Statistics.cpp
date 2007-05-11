@@ -25,7 +25,10 @@ uint _codeCacheMisses;
 uint _managedMemoryReadCount;
 uint _managedMemoryWriteCount;
 
+uint _managedSyscallCount;
 uint _nativeSyscallCount;
+uint _cpuSyscallCount;
+uint _unimplementedSyscallCount;
 #endif
 
 void R4000Statistics::GatherStats()
@@ -44,7 +47,10 @@ void R4000Statistics::GatherStats()
 	ManagedMemoryReadCount = _managedMemoryReadCount;
 	ManagedMemoryWriteCount = _managedMemoryWriteCount;
 
+	ManagedSyscallCount = _managedSyscallCount;
 	NativeSyscallCount = _nativeSyscallCount;
+	CpuSyscallCount = _cpuSyscallCount;
+	UnimplementedSyscallCount = _unimplementedSyscallCount;
 
 	_instructionsExecuted = 0;
 	_codeBlocksExecuted = 0;
@@ -59,6 +65,9 @@ void R4000Statistics::GatherStats()
 	_managedMemoryReadCount = 0;
 	_managedMemoryWriteCount = 0;
 
+	_managedSyscallCount = 0;
 	_nativeSyscallCount = 0;
+	_cpuSyscallCount = 0;
+	_unimplementedSyscallCount = 0;
 #endif
 }

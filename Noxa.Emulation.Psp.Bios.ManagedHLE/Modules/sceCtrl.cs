@@ -4,18 +4,24 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
+// The threaded approach probably models what the PSP does the best, but
+// it really holds things up (as the game sits waiting for the next poll)
+// With this undefined wWe still poll in the background, but on calls that
+// would normally block we just poll and return instead.
+//#define THREADED
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 using Noxa.Utilities;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Input;
-using System.Threading;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
@@ -64,8 +70,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_bufferSyncRoot = new object();
 
 			_timer = _kernel.TimerQueue.CreatePeriodicTimer(
-				new TimerCallback( this.PollCallback ), 16,
-				TimerExecutionContext.WorkerThread, false );
+				new TimerCallback( this.PollCallback ),
+#if THREADED
+				5,
+#else
+				25,
+#endif
+				TimerExecutionContext.TimerThread, false );
 		}
 
 		public override void Stop()
@@ -79,7 +90,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				_buffer.Clear();
 		}
 
-		private void PollCallback( Timer timer )
+		private Sample GetSample()
 		{
 			_device.Poll();
 
@@ -88,15 +99,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			sample.Buttons = ( int )_device.Buttons;
 			sample.AnalogX = _device.AnalogX;
 			sample.AnalogY = _device.AnalogY;
+			return sample;
+		}
+
+		private void PollCallback( Timer timer )
+		{
+			Sample sample;
 			lock( _bufferSyncRoot )
 			{
+				sample = this.GetSample();
 				_buffer.Dequeue();
 				_buffer.Enqueue( sample );
 			}
 			_bufferEvent.Set();
 
 			uint oldPressed = _pressedButtons;
-			_pressedButtons = ( uint )_device.Buttons;
+			_pressedButtons = ( uint )sample.Buttons;
 			uint stillPressed = _pressedButtons & oldPressed;
 			_releasedButtons = ~_pressedButtons;
 
@@ -264,12 +282,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				for( int n = 0; n < count; n++ )
 				{
 					Sample sample;
+#if THREADED
 					do
 					{
 						_bufferEvent.WaitOne();
 						lock( _bufferSyncRoot )
 							sample = _buffer.Dequeue();
 					} while( sample == null );
+#else
+					lock( _bufferSyncRoot )
+						sample = this.GetSample();
+#endif
 
 					p = WritePadData( p, sample, true );
 				}
@@ -291,12 +314,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				for( int n = 0; n < count; n++ )
 				{
 					Sample sample;
+#if THREADED
 					do
 					{
 						_bufferEvent.WaitOne();
 						lock( _bufferSyncRoot )
 							sample = _buffer.Dequeue();
 					} while( sample == null );
+#else
+					lock( _bufferSyncRoot )
+						sample = this.GetSample();
+#endif
 
 					p = WritePadData( p, sample, false );
 				}
@@ -336,7 +364,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_breakedButtons = 0;
 			return 0;
 		}
-
 	}
 }
 

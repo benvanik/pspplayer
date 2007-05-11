@@ -196,11 +196,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
+		// 16.7ms is right, but that assumes we just missed the last one
+		//private const int VblankTime = 16777;
+		private const int VblankTime = 1000;
+
 		private void WaitVblank( bool allowCallbacks )
 		{
 			KThread thread = _kernel.ActiveThread;
 			Debug.Assert( thread != null );
-			thread.Delay( 16777, allowCallbacks );
+			thread.Delay( VblankTime, allowCallbacks );
 			_kernel.Schedule();
 		}
 
