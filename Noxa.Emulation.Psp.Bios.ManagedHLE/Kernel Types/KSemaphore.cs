@@ -37,14 +37,40 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			WaitingThreads = new FastLinkedList<KThread>();
 		}
 
-		public void Signal()
+		public void Signal( int count )
 		{
-			throw new NotImplementedException();
+			CurrentCount += count;
+
+			// Try to wake threads
+			bool wokeThreads = false;
+			LinkedListEntry<KThread> e = WaitingThreads.HeadEntry;
+			while( e != null )
+			{
+				int needed = ( int )e.Value.WaitArgument;
+				if( CurrentCount >= needed )
+				{
+					e.Value.Wake( 0 );
+					CurrentCount -= needed;
+					wokeThreads = true;
+				}
+				else
+					break;
+			}
+			if( wokeThreads == true )
+				Kernel.Schedule();
 		}
 
-		public void Wait()
+		public void Wait( bool allowCallbacks, int count, uint timeoutUs )
 		{
-			throw new NotImplementedException();
+			if( CurrentCount >= count )
+			{
+				CurrentCount -= count;
+			}
+			else
+			{
+				KThread thread = Kernel.ActiveThread;
+				thread.Wait( this, count, timeoutUs, allowCallbacks );
+			}
 		}
 	}
 }

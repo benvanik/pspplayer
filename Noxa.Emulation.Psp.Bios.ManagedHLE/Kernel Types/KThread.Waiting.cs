@@ -88,6 +88,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			WaitingOn = KThreadWait.Delay;
 			NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
 			WaitTimeout = waitTimeUs * 10;	// us -> ticks
+			if( ( waitTimeUs / 1000 ) > 1000 )
+				Debugger.Break();
 
 			// Install timer
 			Kernel.AddOneShotTimer( new TimerCallback( this.DelayCallback ), this, waitTimeUs / 1000 );
@@ -127,13 +129,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			targetThread.ExitWaiters.Enqueue( this );
 		}
 
+		public const uint SCE_KERNEL_ERROR_WAIT_TIMEOUT = 0x800201A8;
+
 		private void WaitCallback( Timer timer )
 		{
 			// If we have not been made ready already, we wake
 			if( State == KThreadState.Waiting )
 			{
+				if( WaitHandle is KSemaphore )
+					( ( KSemaphore )WaitHandle ).WaitingThreads.Remove( this );
+				else if( WaitHandle is KEvent )
+					( ( KEvent )WaitHandle ).WaitingThreads.Remove( this );
+				else if( WaitHandle is KPool )
+					( ( KPool )WaitHandle ).WaitingThreads.Remove( this );
+
 				State = KThreadState.Ready;
-				Kernel.Cpu.SetContextRegister( ContextID, 4, unchecked( ( uint )-1 ) );
+				Kernel.Cpu.SetContextRegister( ContextID, 2, SCE_KERNEL_ERROR_WAIT_TIMEOUT );
 
 				this.AddToSchedule();
 
@@ -156,6 +167,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
 				WaitTimeout = timeoutUs * 10;	// us -> ticks
+				WaitTimeout = Math.Max( 1, WaitTimeout );
 
 				// Install timer
 				Kernel.AddOneShotTimer( new TimerCallback( this.WaitCallback ), this, timeoutUs / 1000 );
@@ -185,6 +197,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
 				WaitTimeout = timeoutUs * 10;	// us -> ticks
+				WaitTimeout = Math.Max( 1, WaitTimeout );
 
 				// Install timer
 				Kernel.AddOneShotTimer( new TimerCallback( this.WaitCallback ), this, timeoutUs / 1000 );
@@ -193,6 +206,28 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				WaitTimeout = 0;
 			WaitHandle = pool;
 			WaitAddress = pdata;
+		}
+
+		public void Wait( KSemaphore sema, int count, uint timeoutUs, bool canHandleCallbacks )
+		{
+			State = KThreadState.Waiting;
+			this.RemoveFromSchedule();
+
+			CanHandleCallbacks = canHandleCallbacks;
+
+			sema.WaitingThreads.Enqueue( this );
+			WaitingOn = KThreadWait.Semaphore;
+			if( timeoutUs > 0 )
+			{
+				NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
+				WaitTimeout = timeoutUs * 10;	// us -> ticks
+				WaitTimeout = Math.Max( 1, WaitTimeout );
+
+				// Install timer
+				Kernel.AddOneShotTimer( new TimerCallback( this.WaitCallback ), this, timeoutUs / 1000 );
+			}
+			WaitHandle = sema;
+			WaitArgument = ( uint )count;
 		}
 	}
 }

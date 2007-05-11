@@ -210,7 +210,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// This is essentially the same logic in the video driver, but
 			// replicated here because the video driver can't wait for callbacks
 			long time;
-			//NativeMethods.QueryPerformanceFrequency( out _frequency );
 			NativeMethods.QueryPerformanceCounter( out time );
 			long elapsed = time - _lastVblankWait;
 			if( _lastVblankWait == 0 )
@@ -227,10 +226,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_lastVblankWait = time;
 
 			// elapsed now has the number of milliseconds that have elapsed since the last time
+			uint fixedElapsed =	16777 - Math.Min( 16777, ( uint )elapsed );
+			if( fixedElapsed < 1000 )
+				return;
 
 			KThread thread = _kernel.ActiveThread;
 			Debug.Assert( thread != null );
-			thread.Delay( 16777 - ( uint )elapsed, allowCallbacks );
+			thread.Delay( fixedElapsed, allowCallbacks );
 			_kernel.Schedule();
 		}
 
