@@ -192,7 +192,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		private void AddToSchedule()
 		{
-			Debug.Assert( Kernel.SchedulableThreads.Find( this ) == null );
+			// This can happen sometimes (race conditions)
+			bool alreadyScheduled = ( Kernel.SchedulableThreads.Find( this ) != null );
+			if( alreadyScheduled == true )
+			{
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "KThread: AddToSchedule found thread already scheduled" );
+				return;
+			}
 
 			// Find the right place by walking the thread list and inserting before a thread of higher priority
 			LinkedListEntry<KThread> e = Kernel.SchedulableThreads.HeadEntry;
