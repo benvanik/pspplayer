@@ -7,7 +7,7 @@ Although the emulator is pretty advanced, it is also in its early stages. This m
 === 2007-05-11 - Tales of Eternia ==
 Trying to find something else to work on; ToE is one of my favorite games so that's the next logical choice. Having some issues, but the logo shows up!
 
-[http://pspplayer.google.com/svn/wiki/Sceenshots/PspPlayer-2007.05.11.02-TalesOfEternia.png]
+[http://pspplayer.googlecode.com/svn/wiki/Sceenshots/PspPlayer-2007.05.11.02-TalesOfEternia.png]
 
 === 2007-05-07 - Puzzle Bobble ===
 First commercial game :)
