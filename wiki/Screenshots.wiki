@@ -4,6 +4,11 @@
 = Screenshots and Movies =
 Although the emulator is pretty advanced, it is also in its early stages. This means that the screenshots you see here aren't that pretty yet. Newer images are at the top because I expect them to be cooler.
 
+=== 2007-05-11 - Tales of Eternia ==
+Trying to find something else to work on; ToE is one of my favorite games so that's the next logical choice. Having some issues, but the logo shows up!
+
+[http://pspplayer.google.com/svn/wiki/Sceenshots/PspPlayer-2007.05.11.02-TalesOfEternia]
+
 === 2007-05-07 - Puzzle Bobble ===
 First commercial game :)
 There are a few things missing, like the guide lines while playing, but other than that it works! Speed is pretty good, but is being held back by some bad OpenGL code and probably some game-instructed waits that are taking too long. I actually listen when the game says 'pause for this amount of time' - maybe I should only wait for half the time requested or something. My CPU sits almost idle while playing.
