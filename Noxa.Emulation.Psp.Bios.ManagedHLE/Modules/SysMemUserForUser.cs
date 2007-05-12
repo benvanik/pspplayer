@@ -104,13 +104,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( partition == null )
 				return -1;
 
+			string sname = null;
+			if( name != 0 )
+				sname = _kernel.ReadString( ( uint )name );
+
 			KMemoryBlock block = partition.Allocate( ( KAllocType )type, ( uint )addr, ( uint )size );
 			Debug.Assert( block != null );
 			if( block == null )
 				return -1;
-
-			if( name != 0 )
-				block.Name = _kernel.ReadString( ( uint )name );
+			block.Name = sname;
+			
 			_kernel.AddHandle( block );
 
 			return ( int )block.UID;
