@@ -25,6 +25,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		/// Allocate at the specified address.
 		/// </summary>
 		Specific = 2,
+		/// <summary>
+		/// Allocate the largest contiguous block possible.
+		/// </summary>
+		Maximum = 3,
 	}
 
 	class KPartition
@@ -126,6 +130,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						if( targetBlock == null )
 							break;
 						newBlock = this.SplitBlock( targetBlock, targetBlock.UpperBound - size, size );
+					}
+					break;
+				case KAllocType.Maximum:
+					{
+						KMemoryBlock largest = null;
+						LinkedListEntry<KMemoryBlock> e = FreeList.HeadEntry;
+						while( e != null )
+						{
+							if( largest == null )
+								largest = e.Value;
+							else if( largest.Size < e.Value.Size )
+								largest = e.Value;
+							e = e.Next;
+						}
+						Debug.Assert( largest != null );
+						newBlock = this.SplitBlock( largest, largest.Address, Math.Min( largest.Size, size ) );
 					}
 					break;
 			}
