@@ -158,7 +158,12 @@ void R4000Cpu::ReleaseContextStorage( int tcsId )
 		return;
 	Debug::Assert( tcsId >= 0 );
 	Debug::Assert( tcsId < _threadContexts->Count );
-	Debug::Assert( _currentTcsId != tcsId );
+	//Debug::Assert( _currentTcsId != tcsId );
+	if( _currentTcsId == tcsId )
+	{
+		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "ReleaseContextStorage: trying to release the active context - leaking context!" );
+		return;
+	}
 	LOCK;
 	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	_threadContexts->RemoveAt( tcsId );

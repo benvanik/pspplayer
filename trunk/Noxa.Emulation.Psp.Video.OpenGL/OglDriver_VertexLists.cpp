@@ -75,6 +75,7 @@ void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int ve
 	}
 }
 
+uint _colorBuffer[ 1024 * 10 ];
 float _textureCoordBuffer[ 1024 * 10 ];
 
 void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, int vertexSize, byte* ptr )
@@ -205,7 +206,20 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 			src += 2;
 			break;
 		case VTColorABGR4444:
-			assert( false );
+			{
+				byte* sp = src;
+				uint* dp = _colorBuffer;
+				for( int n = 0; n < vertexCount; n++ )
+				{
+					uint entry = ( uint )( ( ushort* )sp );
+					*dp =	( ( entry & 0xF ) * 16 ) |
+							( ( ( ( entry >> 4 ) & 0xF ) * 16 ) << 8 ) |
+							( ( ( ( entry >> 8 ) & 0xF ) * 16 ) << 16 ) |
+							( ( ( ( entry >> 12 ) & 0xF ) * 16 ) << 24 );
+					sp += vertexSize;
+				}
+				glColorPointer( 4, GL_UNSIGNED_BYTE, 0, _colorBuffer );
+			}
 			src += 2;
 			break;
 		case VTColorABGR5551:
