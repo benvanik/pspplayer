@@ -59,7 +59,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 
 			// Perhaps we shouldn't schedule here?
-			Debug.Assert( false );
 			thread.Wake( 0 );
 			_kernel.Schedule();
 
@@ -182,6 +181,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[BiosFunction( 0xCEADEB47, "sceKernelDelayThread" )]
 		// SDK location: /user/pspthreadman.h:323
 		// SDK declaration: int sceKernelDelayThread(SceUInt delay);
@@ -197,6 +197,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[BiosFunction( 0x68DA9E36, "sceKernelDelayThreadCB" )]
 		// SDK location: /user/pspthreadman.h:335
 		// SDK declaration: int sceKernelDelayThreadCB(SceUInt delay);

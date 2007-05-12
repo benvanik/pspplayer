@@ -362,6 +362,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	case TPSBGR5650:
 		//buffer = Widen5650( buffer, _decodeBuffer, texture->Width, texture->Height );
 		//format = ( TextureFormat* )&__formats[ 3 ];
+		assert( false );
 		break;
 	case TPSABGR5551:
 		buffer = Widen5551( buffer, _decodeBuffer, texture->Width, texture->Height );
@@ -370,6 +371,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	case TPSABGR4444:
 		//buffer = Widen4444( buffer, _decodeBuffer, texture->Width, texture->Height );
 		//format = ( TextureFormat* )&__formats[ 3 ];
+		assert( false );
 		break;
 	case TPSABGR8888:
 		// Pass through
@@ -395,6 +397,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	case TPSDXT3:
 	case TPSDXT5:
 		// Not supported
+		assert( false );
 		break;
 	}
 

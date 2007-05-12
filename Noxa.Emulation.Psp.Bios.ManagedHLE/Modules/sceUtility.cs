@@ -163,28 +163,40 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x50C4CD57, "sceUtilitySavedataInitStart" )]
 		// SDK location: /utility/psputility_savedata.h:97
 		// SDK declaration: int sceUtilitySavedataInitStart(SceUtilitySavedataParam * params);
-		public int sceUtilitySavedataInitStart( int saveParams ){ return Module.NotImplementedReturn; }
+		public int sceUtilitySavedataInitStart( int saveParams )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9790B33C, "sceUtilitySavedataShutdownStart" )]
 		// SDK location: /utility/psputility_savedata.h:117
 		// SDK declaration: int sceUtilitySavedataShutdownStart();
-		public int sceUtilitySavedataShutdownStart(){ return Module.NotImplementedReturn; }
+		public int sceUtilitySavedataShutdownStart()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xD4B95FFB, "sceUtilitySavedataUpdate" )]
 		// SDK location: /utility/psputility_savedata.h:124
-		// SDK declaration: void sceUtilitySavedataUpdate(int unknown);
-		public void sceUtilitySavedataUpdate( int unknown ){}
+		// SDK declaration: int sceUtilitySavedataUpdate(int unknown);
+		public int sceUtilitySavedataUpdate( int unknown )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x8874DBE0, "sceUtilitySavedataGetStatus" )]
 		// SDK location: /utility/psputility_savedata.h:107
 		// SDK declaration: int sceUtilitySavedataGetStatus();
-		public int sceUtilitySavedataGetStatus(){ return Module.NotImplementedReturn; }
+		public int sceUtilitySavedataGetStatus()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		#endregion
 
