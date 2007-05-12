@@ -293,12 +293,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x17C1684E, "sceKernelReferThreadStatus" )]
 		// SDK location: /user/pspthreadman.h:458
 		// SDK declaration: int sceKernelReferThreadStatus(SceUID thid, SceKernelThreadInfo *info);
-		public int sceKernelReferThreadStatus( int thid, int info )
+		public unsafe int sceKernelReferThreadStatus( int thid, int info )
 		{
 			//typedef struct SceKThreadInfo {
 			//    SceSize     size;
@@ -321,42 +320,45 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			//    SceUInt     releaseCount;
 			//} SceKThreadInfo;
 
-			/*
-			SysClock runClocks;
-			runClocks.QuadPart = thread->RunClocks;
+			KThread thread = _kernel.GetHandle<KThread>( thid );
+			if( thread == null )
+				return -1;
+
+			// NOTE: this is wrong! It's not supported!
+			long runClocks = thread.RunClocks;
 
 			// Ensure 104 bytes
-			if( memory->ReadWord( info ) != 104 )
+			uint *p = ( uint* )_memorySystem.Translate( ( uint )info );
+			if( *p != 104 )
 			{
-				Debug::WriteLine( String::Format( "ThreadManForUser::sceKernelReferThreadStatus: app passed struct with size {0}, expected 104",
-					memory->ReadWord( info ) ) );
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelReferThreadStatus: app passed struct with size {0}, expected 104", *p );
 				return -1;
 			}
-			KernelHelpers::WriteString( MSI( memory ), ( const int )( info + 4 ), ( const char* )thread->Name );
-			memory->WriteWord( info + 36, 4, ( int )thread->Attributes );
-			memory->WriteWord( info + 40, 4, ( int )thread->State );
-			memory->WriteWord( info + 44, 4, thread->EntryAddress );
-			memory->WriteWord( info + 48, 4, ( int )thread->StackBlock->Address );
-			memory->WriteWord( info + 52, 4, ( int )thread->StackBlock->Size );
-			memory->WriteWord( info + 56, 4, thread->GlobalPointer );
-			memory->WriteWord( info + 60, 4, thread->InitialPriority );
-			memory->WriteWord( info + 64, 4, thread->Priority );
-			memory->WriteWord( info + 68, 4, ( int )thread->WaitingOn );
-			if( thread->WaitingOn == KThreadWaitEvent )
-				memory->WriteWord( info + 72, 4, thread->WaitEvent->UID );
-			else if( thread->WaitingOn == KThreadWaitJoin )
-				memory->WriteWord( info + 72, 4, thread->WaitThread->UID );
+			p++;
+			_kernel.WriteString( ( uint )info + 4, thread.Name );
+			p += 8;
+			*( p++ ) = ( uint )thread.Attributes;
+			*( p++ ) = ( uint )thread.State;
+			*( p++ ) = thread.EntryAddress;
+			*( p++ ) = thread.StackBlock.Address;
+			*( p++ ) = thread.StackBlock.Size;
+			*( p++ ) = thread.GlobalPointer;
+			*( p++ ) = ( uint )thread.InitialPriority;
+			*( p++ ) = ( uint )thread.Priority;
+			*( p++ ) = ( uint )thread.WaitingOn;
+			if( thread.WaitHandle != null )
+				*( p++ ) = thread.WaitHandle.UID;
 			else
-				memory->WriteWord( info + 72, 4, 0 );
-			memory->WriteWord( info + 76, 4, ( int )thread->WakeupCount );
-			memory->WriteWord( info + 80, 4, thread->ExitCode );
-			memory->WriteWord( info + 84, 4, ( int )runClocks.LowPart );
-			memory->WriteWord( info + 88, 4, ( int )runClocks.HighPart );
-			memory->WriteWord( info + 92, 4, ( int )thread->InterruptPreemptionCount );
-			memory->WriteWord( info + 96, 4, ( int )thread->ThreadPreemptionCount );
-			memory->WriteWord( info + 100, 4, ( int )thread->ReleaseCount );
-			*/
-			return Module.NotImplementedReturn;
+				*( p++ ) = 0;
+			*( p++ ) = thread.WakeupCount;
+			*( p++ ) = ( uint )thread.ExitCode;
+			*( p++ ) = ( uint )runClocks;
+			*( p++ ) = ( uint )( ( ulong )runClocks >> 32 );
+			*( p++ ) = thread.InterruptPreemptionCount;
+			*( p++ ) = thread.ThreadPreemptionCount;
+			*( p++ ) = thread.ReleaseCount;
+
+			return 0;
 		}
 
 		[NotImplemented]
