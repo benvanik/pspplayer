@@ -94,7 +94,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( int )thread.UID;
 		}
 
-		[Stateless]
 		[BiosFunction( 0x9FA03CD3, "sceKernelDeleteThread" )]
 		// SDK location: /user/pspthreadman.h:179
 		// SDK declaration: int sceKernelDeleteThread(SceUID thid);
@@ -105,6 +104,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 
 			// Don't support this
+			if( _kernel.ActiveThread == thread )
+			{
+				_kernel.Schedule();
+			}
 			Debug.Assert( _kernel.ActiveThread != thread );
 			Debug.Assert( thread.State == KThreadState.Dead );
 
