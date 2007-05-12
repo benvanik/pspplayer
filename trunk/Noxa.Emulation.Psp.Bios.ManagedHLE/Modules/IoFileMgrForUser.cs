@@ -58,6 +58,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x3251EA56, "sceIoPollAsync" )]
 		// SDK location: /user/pspiofilemgr.h:419

@@ -196,6 +196,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			bool alreadyScheduled = ( Kernel.SchedulableThreads.Find( this ) != null );
 			if( alreadyScheduled == true )
 			{
+				if( this.State != KThreadState.Running )
+					this.State = KThreadState.Ready;
 				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "KThread: AddToSchedule found thread already scheduled" );
 				return;
 			}

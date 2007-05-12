@@ -95,7 +95,7 @@ void OglDriver::PrintStatistics()
 		for( int n = 0; n < fields->Length; n++ )
 		{
 			Object^ value = fields[ n ]->GetValue( _stats );
-			Log::WriteLine( Verbosity::Normal, Feature::Statistics, "{0}: {1}\n", fields[ n ]->Name, value );
+			Log::WriteLine( Verbosity::Normal, Feature::Statistics, "{0}: {1}", fields[ n ]->Name, value );
 		}
 
 		Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "Video Command Usage Count: ----------------------------------" );
@@ -103,7 +103,7 @@ void OglDriver::PrintStatistics()
 		{
 			if( _stats->CommandCounts[ n ] == 0 )
 				continue;
-			Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "{0:X2}: {1}\n", n, _stats->CommandCounts[ n ] );
+			Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "{0:X2}: {1}", n, _stats->CommandCounts[ n ] );
 		}
 #endif
 }

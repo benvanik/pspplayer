@@ -81,7 +81,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			else
 			{
 				// Only if not broken by choice
-				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "CPU returned to us after {0} instructions", instructionsExecuted );
+				//Log.WriteLine( Verbosity.Verbose, Feature.Bios, "CPU returned to us after {0} instructions", instructionsExecuted );
 			}
 		}
 
