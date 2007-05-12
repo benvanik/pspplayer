@@ -35,6 +35,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public bool CanWrite;
 		public bool CanSeek;
 
+		public long Result;
+
 		public KFile( Kernel kernel, KDevice device, IMediaItem item )
 		{
 			Kernel = kernel;

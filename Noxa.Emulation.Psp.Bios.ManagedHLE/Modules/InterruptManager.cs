@@ -101,7 +101,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceKernelRegisterSubIntrHandler: registered handler for interrupt {0} (slot {1}), calling code at {2:X8}", intno, no, address );
 
-			// Are handlers enabled by default?
+			// Handlers are not enabled by default
 
 			return 0;
 		}
