@@ -190,19 +190,155 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#region MsgDialog
 
-		[NotImplemented]
+		// We fake this pretty hardcore ^_^
+
+		private enum MessageLanguage
+		{
+			// ?? same as PBP I imagine
+			Japanese = 0,
+			English = 1,
+			French = 2,
+			Spanish = 3,
+			German = 4,
+			Italian = 5,
+			Dutch = 6,
+			Portuguese = 7,
+			Korean = 8,
+		}
+
+		private enum MessageFlags
+		{
+			Error = 0x000,
+			Info = 0x001,
+			YesNo = 0x010,
+			DefaultNo = 0x100,
+		}
+
+		private enum MessageType
+		{
+			Internal = 0,
+			Provided = 1,
+		}
+
+		private enum MessageStatus
+		{
+			Unknown = 0,
+			Init = 1,
+			Open = 2,
+			Done = 3,
+			Closed = 4,
+		}
+
+		private enum MessageButton
+		{
+			Unknown = 0,
+			Yes = 1,
+			No = 2,
+			Cancel = 3,
+		}
+
+		private unsafe class MsgDialog
+		{
+			public MessageLanguage Language;
+			public bool SwapButtons;
+
+			public MessageFlags Flags;
+
+			public MessageType Type;
+			public uint MessageID;
+			public string Message;
+
+			public MessageStatus Status;
+			public uint* ReturnValue;
+			public uint* ReturnButton;
+		}
+
+		private MsgDialog _currentDialog;
+
 		[Stateless]
 		[BiosFunction( 0x2AD8E239, "sceUtilityMsgDialogInitStart" )]
 		// SDK location: /utility/psputility_msgdialog.h:50
 		// SDK declaration: int sceUtilityMsgDialogInitStart(SceUtilityMsgDialogParams *params);
-		public int sceUtilityMsgDialogInitStart( int msgParams ){ return Module.NotImplementedReturn; }
+		public unsafe int sceUtilityMsgDialogInitStart( int msgParams )
+		{
+			uint* p = ( uint* )_memorySystem.Translate( ( uint )msgParams );
 
-		[NotImplemented]
+			// Size... we don't care
+			p++;
+
+			MsgDialog dialog = new MsgDialog();
+			dialog.Language = ( MessageLanguage )( *( p++ ) );
+			dialog.SwapButtons = ( *( p++ ) == 1 );
+			
+			// unknowns
+			p += 4;
+
+			// We save the address so we can write to it later
+			dialog.ReturnValue = p;
+			p++;
+
+			// unknowns
+			p += 4;
+			p++;
+
+			dialog.Type = ( MessageType )( *p++ );
+
+			if( dialog.Type == MessageType.Internal )
+			{
+				dialog.MessageID = *( p++ );
+			}
+			else
+			{
+				p++;
+				dialog.Message = _kernel.ReadString( ( byte* )p, Encoding.UTF8 ).Trim();
+			}
+			p += ( 512 / 4 );
+
+			dialog.Flags = ( MessageFlags )( *p++ );
+			
+			// Save address for later
+			dialog.ReturnButton = p;
+			p++;
+
+			dialog.Status = MessageStatus.Open;
+
+			_currentDialog = dialog;
+
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "MsgDialog: {0}", dialog.Message );
+
+			// Fake the result!
+			// Not sure exactly how right this is
+			if( ( dialog.Flags & MessageFlags.YesNo ) == MessageFlags.YesNo )
+			{
+				if( ( dialog.Flags & MessageFlags.DefaultNo ) == MessageFlags.DefaultNo )
+				{
+					*dialog.ReturnValue = unchecked( ( uint )-1 );
+					*dialog.ReturnButton = ( uint )MessageButton.No;
+				}
+				else
+				{
+					*dialog.ReturnValue = 0;
+					*dialog.ReturnButton = ( uint )MessageButton.Yes;
+				}
+			}
+			else
+			{
+				*dialog.ReturnValue = 0;
+				*dialog.ReturnButton = ( uint )MessageButton.Yes;
+			}
+
+			return 0;
+		}
+
 		[Stateless]
 		[BiosFunction( 0x67AF3428, "sceUtilityMsgDialogShutdownStart" )]
 		// SDK location: /utility/psputility_msgdialog.h:57
-		// SDK declaration: void sceUtilityMsgDialogShutdownStart();
-		public void sceUtilityMsgDialogShutdownStart(){}
+		// SDK declaration: int sceUtilityMsgDialogShutdownStart();
+		public int sceUtilityMsgDialogShutdownStart()
+		{
+			_currentDialog.Status = MessageStatus.Closed;
+			return 0;
+		}
 
 		[NotImplemented]
 		[Stateless]
@@ -212,19 +348,48 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x95FC253B, "sceUtilityMsgDialogUpdate" )]
 		// SDK location: /utility/psputility_msgdialog.h:73
-		// SDK declaration: void sceUtilityMsgDialogUpdate(int n);
-		public void sceUtilityMsgDialogUpdate( int n ){}
+		// SDK declaration: int sceUtilityMsgDialogUpdate(int n);
+		public int sceUtilityMsgDialogUpdate( int n )
+		{
+			// Hacky state machine
+			Debug.Assert( _currentDialog != null );
+			switch( _currentDialog.Status )
+			{
+				case MessageStatus.Init:
+					_currentDialog.Status = MessageStatus.Open;
+					break;
+				case MessageStatus.Open:
+					_currentDialog.Status = MessageStatus.Done;
+					break;
+				case MessageStatus.Done:
+					//_currentDialog.Status = MessageStatus.Closed;
+					break;
+				case MessageStatus.Closed:
+					_currentDialog.Status = MessageStatus.Unknown;
+					break;
+			}
+			return 0;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9A1C91D7, "sceUtilityMsgDialogGetStatus" )]
 		// SDK location: /utility/psputility_msgdialog.h:66
 		// SDK declaration: int sceUtilityMsgDialogGetStatus();
-		public int sceUtilityMsgDialogGetStatus(){ return Module.NotImplementedReturn; }
+		public int sceUtilityMsgDialogGetStatus()
+		{
+			Debug.Assert( _currentDialog != null );
+
+			if( _currentDialog.Status == MessageStatus.Unknown )
+				return -1;
+
+			// ToE rarely calls update
+			sceUtilityMsgDialogUpdate( 2 );
+
+			return ( int )_currentDialog.Status;
+		}
 
 		#endregion
 

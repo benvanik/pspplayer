@@ -45,6 +45,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public IMediaItem FindPath( string path )
 		{
+			// Hack for ToE and maybe others
+			path = path.Replace( "host0:UMD", "umd0:" );
+
 			int colonPos = path.IndexOf( ':' );
 			if( colonPos >= 0 )
 			{
@@ -74,6 +77,30 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			byte* p = MemorySystem.Translate( address );
 			return new string( ( sbyte* )p );
+		}
+
+		public unsafe string ReadString( byte* address, Encoding encoding )
+		{
+			// Nasty, but it works
+			byte[] buffer = new byte[ 512 ];
+			byte* p = address;
+			bool done = false;
+			for( int n = 0; n < 512; n++ )
+			{
+				byte c = *( p++ );
+				buffer[ n ] = c;
+				if( c == 0 )
+				{
+					done = true;
+					break;
+				}
+			}
+			if( done == false )
+			{
+				// Hit end of buffer before finishing
+				Debug.Assert( false, "Make buffer larger" );
+			}
+			return encoding.GetString( buffer );
 		}
 
 		public unsafe int WriteString( uint address, string value )

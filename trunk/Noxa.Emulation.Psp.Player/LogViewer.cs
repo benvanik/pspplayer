@@ -87,9 +87,6 @@ namespace Noxa.Emulation.Psp.Player
 
 		private void AddLine( Verbosity verbosity, FeatureInfo feature, ListViewItem item )
 		{
-			if( ( _debugEnabled == true ) &&
-				( _debugWrite == true ) )
-				Debug.WriteLine( string.Format( "{0}: {1}", feature.Name, item.SubItems[ 1 ].Text ) );
 			try
 			{
 
@@ -118,6 +115,10 @@ namespace Noxa.Emulation.Psp.Player
 
 		public void WriteLine( Verbosity verbosity, Feature feature, string value )
 		{
+			if( ( _debugEnabled == true ) &&
+				( _debugWrite == true ) )
+				Debug.WriteLine( string.Format( "{0}: {1}", feature, value ) );
+
 			FeatureInfo f = _features[ ( int )feature ];
 			if( f.Enabled == false )
 				return;

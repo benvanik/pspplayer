@@ -50,6 +50,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceIoCloseAsync(SceUID fd);
 		public int sceIoCloseAsync( int fd )
 		{
+			// Need to keep the handle alive until the poll somehow
 			return Module.NotImplementedReturn;
 		}
 
@@ -136,22 +137,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = new KFile( _kernel, dev, file, stream );
 			_kernel.AddHandle( handle );
 
+			handle.Result = handle.UID;
+
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened file {0} with ID {1}", path, handle.UID );
 			
 			return ( int )handle.UID;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x89AA9906, "sceIoOpenAsync" )]
 		// SDK location: /user/pspiofilemgr.h:73
 		// SDK declaration: SceUID sceIoOpenAsync(const char *file, int flags, SceMode mode);
 		public int sceIoOpenAsync( int file, int flags, int mode )
 		{
-			return Module.NotImplementedReturn;
+			return sceIoOpen( file, flags, mode );
 		}
 
-		[DontTrace]
+		//[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x6A638D83, "sceIoRead" )]
 		// SDK location: /user/pspiofilemgr.h:109
@@ -176,20 +178,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			_memory.WriteStream( data, handle.Stream, length );
 
+			handle.Result = length;
+
 			return length;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xA0B5A7C2, "sceIoReadAsync" )]
 		// SDK location: /user/pspiofilemgr.h:125
 		// SDK declaration: int sceIoReadAsync(SceUID fd, void *data, SceSize size);
 		public int sceIoReadAsync( int fd, int data, int size )
 		{
-			return Module.NotImplementedReturn;
+			int length = sceIoRead( fd, data, size );
+			return 0;
 		}
 
-		[DontTrace]
+		//[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x42EC03AC, "sceIoWrite" )]
 		// SDK location: /user/pspiofilemgr.h:141
@@ -214,20 +218,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				_memory.ReadStream( data, handle.Stream, size );
 			}
 
-			return 0;
+			handle.Result = size;
+
+			return size;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x0FACAB19, "sceIoWriteAsync" )]
 		// SDK location: /user/pspiofilemgr.h:152
 		// SDK declaration: int sceIoWriteAsync(SceUID fd, const void *data, SceSize size);
 		public int sceIoWriteAsync( int fd, int data, int size )
 		{
-			return Module.NotImplementedReturn;
+			int length = sceIoWrite( fd, data, size );
+			return 0;
 		}
 
-		[DontTrace]
+		//[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x27EB27B8, "sceIoLseek" )]
 		// SDK location: /user/pspiofilemgr.h:169
@@ -260,20 +266,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					break;
 			}
 
-			return handle.Stream.Seek( offset, seekOrigin );
+			long ret = handle.Stream.Seek( offset, seekOrigin );
+			handle.Result = ret;
+			return ret;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x71B19E77, "sceIoLseekAsync" )]
 		// SDK location: /user/pspiofilemgr.h:181
 		// SDK declaration: int sceIoLseekAsync(SceUID fd, SceOff offset, int whence);
 		public int sceIoLseekAsync( int fd, long offset, int whence )
 		{
-			return Module.NotImplementedReturn;
+			sceIoLseek( fd, offset, whence );
+			return 0;
 		}
 
-		[DontTrace]
+		//[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x68963324, "sceIoLseek32" )]
 		// SDK location: /user/pspiofilemgr.h:198
@@ -306,17 +314,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					break;
 			}
 
-			return ( int )handle.Stream.Seek( offset, seekOrigin );
+			int ret = ( int )handle.Stream.Seek( offset, seekOrigin );
+			handle.Result = ret;
+			return ret;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x1B385D8F, "sceIoLseek32Async" )]
 		// SDK location: /user/pspiofilemgr.h:210
 		// SDK declaration: int sceIoLseek32Async(SceUID fd, int offset, int whence);
 		public int sceIoLseek32Async( int fd, int offset, int whence )
 		{
-			return Module.NotImplementedReturn;
+			sceIoLseek32( fd, offset, whence );
+			return 0;
 		}
 	}
 }

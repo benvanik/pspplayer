@@ -249,16 +249,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		[Stateless]
-		[BiosFunction( 0xAB96437F, "sceIoSync" )]
-		// SDK location: /user/pspiofilemgr.h:389
-		// SDK declaration: int sceIoSync(const char *device, unsigned int unk);
-		public int sceIoSync( int device, int unk )
-		{
-			// We don't buffer, so nothing to do... right?
-			return 0;
-		}
-
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0xACE946E8, "sceIoGetstat" )]
 		// SDK location: /user/pspiofilemgr.h:344
