@@ -211,7 +211,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelChangeThreadPriority(SceUID thid, int priority);
 		public int sceKernelChangeThreadPriority( int thid, int priority )
 		{
-			KThread thread = _kernel.GetHandle<KThread>( thid );
+			// I think this is right
+			KThread thread;
+			if( thid == 0 )
+				thread = _kernel.ActiveThread;
+			else
+				thread = _kernel.GetHandle<KThread>( thid );
 			if( thread == null )
 				return -1;
 
