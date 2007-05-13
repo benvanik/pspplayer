@@ -17,6 +17,9 @@ Sorry, but no promises on anything. I’m a full-time student and also have a pa
 === When will you do feature X? ===
 See [Todo] for a list of things I plan on doing in the near-term, and [WouldBeCool] for the things in the long-term (or ideally, what other people would help with). If it's not on those lists it does not mean it hasn't been thought of, just that it isn't a high priority yet.
 
+=== What about speed? ===
+Things are pretty fast. There's some room for improvement (especially in the CPU), but Puzzle Bobble runs at 350FPS on my Core Duo 2.1ghz laptop.
+
 == Distribution ==
 === Why don't you offer a download? ===
 I will, just not now. It's too early to be useful to most people, and although I believe in the Release-Early/Release-Often philosophy I also think undercooked builds are annoying. How many times have you grabbed a demo or something that turned out to be unusable in any fashion? I'd rather not turn people off to the project just because not enough time has gone by yet. Rest assured that once a commercial game or two is playable there will be a release.
