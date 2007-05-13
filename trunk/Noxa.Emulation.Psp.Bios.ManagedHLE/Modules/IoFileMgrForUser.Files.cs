@@ -4,7 +4,7 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-//#define DONTTRACE
+#define DONTTRACE
 
 using System;
 using System.Collections.Generic;

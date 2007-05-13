@@ -315,6 +315,12 @@ void ProcessList( OglContext* context, DisplayList* list )
 			}
 			glDepthFunc( temp );
 			break;
+		case NEARZ:
+			//argf = argf;
+			break;
+		case FARZ:
+			//argf = argf;
+			break;
 
 		case ABE:
 			// alpha blend enable
@@ -400,8 +406,10 @@ void ProcessList( OglContext* context, DisplayList* list )
 			}
 			break;
 		case SFIX:	// source fix color
+			temp = argi;
 			break;
 		case DFIX:	// destination fix color
+			temp = argi;
 			break;
 
 		case SCISSOR1:	// scissor start
@@ -576,6 +584,12 @@ void ProcessList( OglContext* context, DisplayList* list )
 #endif
 			}
 			break;
+		case PSUB:
+			break;
+		case BEZIER:
+			break;
+		case SPLINE:
+			break;
 
 		case TME:
 			if( argi == 0 )
@@ -718,19 +732,19 @@ void ProcessList( OglContext* context, DisplayList* list )
 			break;
 		case USCALE:
 			// (float) should be 1
-			//assert( argf == 1.0f );
+			context->TextureScale[ 0 ] = argf;
 			break;
 		case VSCALE:
 			// (float) should be 1
-			//assert( argf == 1.0f );
+			context->TextureScale[ 1 ] = argf;
 			break;
 		case UOFFSET:
 			// (float) should be 0
-			//assert( argf == 0.0f );
+			context->TextureOffset[ 0 ] = argf;
 			break;
 		case VOFFSET:
 			// (float) should be 0
-			//assert( argf == 0.0f );
+			context->TextureOffset[ 1 ] = argf;
 			break;
 		case TBP0:
 		case TBP1:

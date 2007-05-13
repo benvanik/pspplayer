@@ -62,6 +62,10 @@ void OglDriver::StartThread()
 	_context->TextureWrapS = GL_REPEAT;
 	_context->TextureWrapT = GL_REPEAT;
 	_context->TextureCache = new LRU<TextureEntry*>( 256 );
+	_context->TextureOffset[ 0 ] = 0.0f;
+	_context->TextureOffset[ 1 ] = 0.0f;
+	_context->TextureScale[ 0 ] = 1.0f;
+	_context->TextureScale[ 1 ] = 1.0f;
 
 	_thread = gcnew Thread( gcnew ParameterizedThreadStart( &WorkerThreadThunk ) );
 	_thread->Name = "Video worker";
