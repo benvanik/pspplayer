@@ -115,7 +115,11 @@ const TextureFormat __formats[] = {
 
 byte* Unswizzle( const TextureFormat* format, const byte* in, byte* out, const uint width, const uint height )
 {
-	int rowWidth = width * format->Size;
+	int rowWidth;
+	if( format->Size == 0 )
+		rowWidth = ( width / 2 );
+	else
+		rowWidth = width * format->Size;
 	int pitch = ( rowWidth - 16 ) / 4;
 	int bxc = rowWidth / 16;
 	int byc = height / 8;
@@ -330,13 +334,6 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	entry->TextureID = textureId;
 	context->TextureCache->Add( texture->Address, entry );
 
-	/*static bool stop = true;
-	if( stop == true )
-	{
-		if( texture->Height >= 272 )
-			__break();
-	}*/
-
 	if( _unswizzleBuffer == NULL )
 		_unswizzleBuffer = ( byte* )malloc( 512 * 512 * 4 );
 	if( _decodeBuffer == NULL )
@@ -350,7 +347,13 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 
 	byte* buffer = address;
 	if( context->TexturesSwizzled == true )
-		buffer = Unswizzle( format, buffer, _unswizzleBuffer, texture->Width, texture->Height );
+	{
+		// Not sure if this is right, but it works for Puzzle Bobble
+		if( format->Size == 0 )
+			buffer = Unswizzle( format, buffer, _unswizzleBuffer, texture->LineWidth, texture->Height );
+		else
+			buffer = Unswizzle( format, buffer, _unswizzleBuffer, texture->Width, texture->Height );
+	}
 
 	// buffer now contains an unswizzled texture - may need to un-CLUT it, or convert colors
 
@@ -423,9 +426,6 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
 		format->GLFormat,
 		( void* )buffer );
-
-	//glBindTexture( GL_TEXTURE_2D, 0 );
-	//glBindTexture( GL_TEXTURE_2D, textureId );
 
 	return true;
 }
