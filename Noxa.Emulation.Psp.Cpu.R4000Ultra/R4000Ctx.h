@@ -19,10 +19,11 @@ using namespace Noxa::Emulation::Psp;
 #define CTXLL			152
 #define CTXCP1CONDBIT	156
 #define CTXCP1REGS		160
-#define CTXSTOPFLAG		672
+#define CTXCP2REGS		672
+#define CTXSTOPFLAG		1184
 //#define CTXCP0REGS	
 //#define CTXCP0CONTROL	
-#define CTXSIZE			676
+#define CTXSIZE			1188
 
 #define SSE_ALIGN __declspec( align( 16 ) )
 
@@ -71,7 +72,9 @@ namespace Noxa {
 					int				Cp1ConditionBit;		// +156
 					SSE_ALIGN
 					float			Cp1Registers[ 32 * 4 ];	// +160 (512) - large because we want 16b aligned elements
-					CtxStopFlags	StopFlag;				// +672 - used to detect stop conditions
+					SSE_ALIGN
+					float			Cp2Registers[ 128 ];	// +672 (512) - not aligned because we may access as packed
+					CtxStopFlags	StopFlag;				// +1184 - used to detect stop conditions
 					//int			Cp0Registers[ 32 ];		// + (128)
 					//int			Cp0Control[ 32 ];		// + (128)
 				} R4000Ctx;

@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglDriver_Patches.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OglDriver_Processing.cpp"
 				>
 			</File>
