@@ -104,8 +104,6 @@ void __logSyscall( int syscallId, int address )
 
 void __unimplementedSyscall( int syscallId, int address )
 {
-	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
-
 #ifdef LOGSYSCALLS
 	__logSyscall( syscallId, address );
 #endif

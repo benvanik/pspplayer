@@ -39,14 +39,96 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
+		private KCallback _msInsertEjectCallback;
+
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x54F5FB11, "sceIoDevctl" )]
 		// SDK location: /user/pspiofilemgr.h:306
 		// SDK declaration: int sceIoDevctl(const char *dev, unsigned int cmd, void *indata, int inlen, void *outdata, int outlen);
-		public int sceIoDevctl( int dev, int cmd, int indata, int inlen, int outdata, int outlen )
+		public unsafe int sceIoDevctl( int dev, int cmd, int indata, int inlen, int outdata, int outlen )
 		{
-			return Module.NotImplementedReturn;
+			// Usually callbacks are created right before this
+			//Syscall: ThreadManForUser::sceKernelCreateCallback(08AE7638, 08A892D0, 00000000) from 0x08A87F70
+			//Syscall: IoFileMgrForUser::sceIoDevctl(08AE7628, 02415821, 08027BA4, 00000004, 00000000, 00000000) from 0x08A87FAC (NI)
+
+			// Issue the last created callback?
+
+			string name = _kernel.ReadString( ( uint )dev );
+			// We only support ms for now
+			if( ( name != "fatms0:" ) &&
+				( name != "mscmhc0:" ) )
+			{
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDevctl: device {0} not supported", name );
+			}
+
+			byte* inp = ( byte* )0;
+			byte* outp = ( byte* )0;
+			if( indata != 0 )
+				inp = _memorySystem.Translate( ( uint )indata );
+			if( outdata != 0 )
+				outp = _memorySystem.Translate( ( uint )outdata );
+
+			switch( cmd )
+			{
+				case 0x02425818:	// Write free space to indata
+					Debug.Assert( inlen == 4 );
+					{
+						byte* p = _memorySystem.Translate( *( uint* )inp );
+						p[ 0 ] = 0;	// total
+						p[ 1 ] = 0;	// free
+						p[ 2 ] = 0;
+						p[ 3 ] = 0;	// scalar 1
+						p[ 4 ] = 0;	// scalar 2
+						// 0 * 3 * 4 = total bytes
+						// 1 * 3 * 4 = total free bytes
+						// 2 * 3 * 4 = total used bytes????
+					}
+					break;
+				case 0x0240D81E:		// Refresh directory listings - no params
+					break;
+				case 0x02025806:		// Get insertion status
+					// outdata should be pointer to dword to write 1 = in, 2 = out
+					Debug.Assert( outlen == 4 );
+					*( uint* )outp = 1;
+					break;
+				case 0x02415821:		// Register insert/eject callback
+					Debug.Assert( inlen == 4 );
+					{
+						Debug.Assert( _msInsertEjectCallback == null );
+						uint cbid = *( uint* )inp;
+						_msInsertEjectCallback = _kernel.GetHandle<KCallback>( cbid );
+						if( _msInsertEjectCallback != null )
+						{
+							Log.WriteLine( Verbosity.Normal, Feature.Bios, "Registered MemoryStick insert/eject callback: {0} ({1:X8})", _msInsertEjectCallback.Name, _msInsertEjectCallback.UID );
+
+							_kernel.AddOneShotTimer( new TimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 50 );
+						}
+						else
+							Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceIoDevctl: could not find callback {0} for MemoryStick insert/eject", cbid );
+					}
+					break;
+				case 0x02415822:		// Unregister insert/eject callback
+					Debug.Assert( inlen == 4 );
+					{
+						uint cbid = *( uint* )inp;
+						Debug.Assert( _msInsertEjectCallback != null );
+						Debug.Assert( _msInsertEjectCallback.UID == cbid );
+						// We may have multiple callbacks and stuff, but I don't care
+						_msInsertEjectCallback = null;
+					}
+					break;
+			}
+
+			return 0;
+		}
+
+		private void MemoryStickInserted( Timer timer )
+		{
+			KCallback cb = ( KCallback )timer.State;
+			cb.NotifyCount++;
+			// 1 = inserted, 2 = ejected
+			_kernel.IssueCallback( cb, ( uint )1 );
 		}
 
 		[NotImplemented]

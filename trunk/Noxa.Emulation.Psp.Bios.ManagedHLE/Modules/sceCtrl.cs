@@ -200,11 +200,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			{
 				analogX = ( byte )( ( ( ( float )sample.AnalogX / ( float )( ushort.MaxValue / 2 ) ) + 0.5f ) * ( float )( byte.MaxValue - 1 ) );
 				analogY = ( byte )( ( ( ( float )sample.AnalogY / ( float )( ushort.MaxValue / 2 ) ) + 0.5f ) * ( float )( byte.MaxValue - 1 ) );
+				analogX++;
+				analogY++;
 			}
 			else
 			{
-				analogX = 0;
-				analogY = 0;
+				analogX = 128;
+				analogY = 128;
 			}
 
 			*( ( int* )p ) = ( int )sample.Timestamp;
@@ -276,8 +278,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceCtrlReadBufferPositive(SceCtrlData *pad_data, int count);
 		public int sceCtrlReadBufferPositive( int pad_data, int count )
 		{
+			//count = Math.Max( count, 1 );
 			if( pad_data != 0 )
 			{
+				uint timestamp = ( uint )Environment.TickCount;
 				byte* p = _memorySystem.Translate( ( uint )pad_data );
 				for( int n = 0; n < count; n++ )
 				{
@@ -292,6 +296,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 #else
 					lock( _bufferSyncRoot )
 						sample = this.GetSample();
+					sample.Timestamp = timestamp + ( uint )n;
 #endif
 
 					p = WritePadData( p, sample, true );

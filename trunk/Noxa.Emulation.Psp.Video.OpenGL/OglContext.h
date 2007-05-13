@@ -69,6 +69,11 @@ namespace Noxa {
 					int				ClutMask;
 					int				ClutStart;
 
+					// Patches
+					int				PatchFrontFace;
+					int				PatchDivS;
+					int				PatchDivT;
+
 					// Texture transmission (sceGuCopyImage...)
 					struct
 					{

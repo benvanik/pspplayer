@@ -39,6 +39,7 @@ extern HANDLE _hListSyncEvent;
 
 __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
 int DetermineVertexSize( int vertexType );
+void DummyTri();
 
 // OglDriver_VertexLists
 extern void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int vertexCount, byte* indexBuffer );
@@ -545,48 +546,34 @@ void ProcessList( OglContext* context, DisplayList* list )
 					DrawSpriteList( context, vertexType, vertexCount, vertexSize, ptr );
 				}
 
-				// DUMMY TRI
 #if 0
-				glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
-				glPushAttrib( GL_ENABLE_BIT );
-				glDisable( GL_DEPTH_TEST );
-				glDepthMask( GL_FALSE );
-				glDisable( GL_CULL_FACE );
-				glMatrixMode( GL_PROJECTION );
-				glPushMatrix();
-				glLoadIdentity();
-				glOrtho( 0.0f, 480.0f, 272.0f, 0.0f, -1.0f, 1.0f );
-				glMatrixMode( GL_MODELVIEW );
-				glPushMatrix();
-				glLoadIdentity();
-				glBegin( GL_QUADS );
-
-				// 0 ---- 1
-				// |      |
-				// |      |
-				// 3 ---- 2
-				glTexCoord2f( 0, 0 );
-				glVertex3f( 0, 0, 0 );
-				glTexCoord2f( 1, 0 );
-				glVertex3f( 100, 0, 0 );
-				glTexCoord2f( 1, 1 );
-				glVertex3f( 100, 100, 0 );
-				glTexCoord2f( 0, 1 );
-				glVertex3f( 0, 100, 0 );
-
-				glEnd();
-				glPopMatrix();
-				glMatrixMode( GL_PROJECTION );
-				glPopMatrix();
-				glDepthMask( GL_TRUE );
-				glPopAttrib();
-				glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
+				DummyTri();
 #endif
 			}
 			break;
 		case PSUB:
+			context->PatchDivS = ( argi & 0xFF );
+			context->PatchDivT = ( ( argi >> 8 ) & 0xFF );
+			break;
+		case PFACE:
+			// 0 = clockwise
+			// 1 = counter clockwise
+			context->PatchFrontFace = ( argi & 0x1 );
 			break;
 		case BEZIER:
+			{
+				if( context->TexturesEnabled == true )
+					SetTexture( context, 0 );
+
+				int ucount = ( argi & 0xFF );
+				int vcount = ( ( argi >> 8 ) & 0xFF );
+
+				//DrawBezier( context, vertexType, vertexSize, iptr, ptr, ucount, vcount );
+
+#if 1
+				DummyTri();
+#endif
+			}
 			break;
 		case SPLINE:
 			break;
@@ -786,10 +773,10 @@ void ProcessList( OglContext* context, DisplayList* list )
 			break;
 
 		case CBP:
-			context->ClutPointer = argi;
+			context->ClutPointer = ( context->ClutPointer & 0xFF000000 ) | argi;
 			break;
 		case CBPH:
-			context->ClutPointer |= ( argi << 8 );
+			context->ClutPointer = ( argi << 8 ) | ( context->ClutPointer & 0x00FFFFFF );
 			break;
 		case CLOAD:
 			{
@@ -980,6 +967,44 @@ int DetermineVertexSize( int vertexType )
 	
 	size = align( size, biggest );
 	return size;
+}
+
+void DummyTri()
+{
+	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
+	glPushAttrib( GL_ENABLE_BIT );
+	glDisable( GL_DEPTH_TEST );
+	glDepthMask( GL_FALSE );
+	glDisable( GL_CULL_FACE );
+	glMatrixMode( GL_PROJECTION );
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho( 0.0f, 480.0f, 272.0f, 0.0f, -1.0f, 1.0f );
+	glMatrixMode( GL_MODELVIEW );
+	glPushMatrix();
+	glLoadIdentity();
+	glBegin( GL_QUADS );
+
+	// 0 ---- 1
+	// |      |
+	// |      |
+	// 3 ---- 2
+	glTexCoord2f( 0, 0 );
+	glVertex3f( 0, 0, 0 );
+	glTexCoord2f( 1, 0 );
+	glVertex3f( 100, 0, 0 );
+	glTexCoord2f( 1, 1 );
+	glVertex3f( 100, 100, 0 );
+	glTexCoord2f( 0, 1 );
+	glVertex3f( 0, 100, 0 );
+
+	glEnd();
+	glPopMatrix();
+	glMatrixMode( GL_PROJECTION );
+	glPopMatrix();
+	glDepthMask( GL_TRUE );
+	glPopAttrib();
+	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
 }
 
 #pragma managed
