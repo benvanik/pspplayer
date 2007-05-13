@@ -90,6 +90,11 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 	//float x,y,z;
 
 	bool transformed = ( vertexType & VTTransformedMask ) != 0;
+	bool crazyTextures =
+		( context->TextureOffset[ 0 ] != 0.0f ) ||
+		( context->TextureOffset[ 1 ] != 0.0f ) ||
+		( context->TextureScale[ 0 ] != 1.0f ) ||
+		( context->TextureScale[ 1 ] != 1.0f );
 
 	GLenum format = 0;
 
@@ -111,7 +116,7 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 		format = GL_V3F;
 
 	// We can only support interleaved arrays if we are not transformed
-	if( ( format != 0 ) && ( transformed == false ) )
+	if( ( format != 0 ) && ( transformed == false ) && ( crazyTextures == false ) )
 	{
 		// Something we support - issue an interleaved array
 		glInterleavedArrays( format, vertexSize, ptr );
@@ -145,6 +150,11 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 
 		byte* src = ptr;
 
+		float uoffset = context->TextureOffset[ 0 ];
+		float voffset = context->TextureOffset[ 1 ];
+		float uscale = context->TextureScale[ 0 ];
+		float vscale = context->TextureScale[ 1 ];
+
 		switch( textureType )
 		{
 		case VTTextureFixed8:
@@ -161,11 +171,23 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 				for( int n = 0; n < vertexCount; n++ )
 				{
 					ushort* usp = ( ushort* )sp;
-					*dp = ( ( float )*usp / textureWidth );
-					usp++;
-					dp++;
-					*dp = ( ( float )*usp / textureHeight );
-					dp++;
+					dp[ 0 ] = ( ( float )usp[ 0 ] / textureWidth );
+					dp[ 1 ] = ( ( float )usp[ 1 ] / textureHeight );
+					dp += 2;
+					sp += vertexSize;
+				}
+				glTexCoordPointer( 2, GL_FLOAT, 0, _textureCoordBuffer );
+			}
+			else if( crazyTextures == true )
+			{
+				byte* sp = src;
+				float* dp = _textureCoordBuffer;
+				for( int n = 0; n < vertexCount; n++ )
+				{
+					ushort* usp = ( ushort* )sp;
+					dp[ 0 ] = ( ( float )usp[ 0 ] * uscale ) + uoffset;
+					dp[ 1 ] = ( ( float )usp[ 1 ] * vscale ) + voffset;
+					dp += 2;
 					sp += vertexSize;
 				}
 				glTexCoordPointer( 2, GL_FLOAT, 0, _textureCoordBuffer );
@@ -184,11 +206,23 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 				for( int n = 0; n < vertexCount; n++ )
 				{
 					float* usp = ( float* )sp;
-					*dp = ( ( float )*usp / textureWidth );
-					usp++;
-					dp++;
-					*dp = ( ( float )*usp / textureHeight );
-					dp++;
+					dp[ 0 ] = ( usp[ 0 ] / textureWidth );
+					dp[ 1 ] = ( usp[ 1 ] / textureHeight );
+					dp += 2;
+					sp += vertexSize;
+				}
+				glTexCoordPointer( 2, GL_FLOAT, 0, _textureCoordBuffer );
+			}
+			else if( crazyTextures == true )
+			{
+				byte* sp = src;
+				float* dp = _textureCoordBuffer;
+				for( int n = 0; n < vertexCount; n++ )
+				{
+					float* usp = ( float* )sp;
+					dp[ 0 ] = ( usp[ 0 ] * uscale ) + uoffset;
+					dp[ 1 ] = ( usp[ 1 ] * vscale ) + voffset;
+					dp += 2;
 					sp += vertexSize;
 				}
 				glTexCoordPointer( 2, GL_FLOAT, 0, _textureCoordBuffer );

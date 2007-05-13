@@ -177,13 +177,13 @@ void SetTexture( OglContext* context, int stage )
 		}
 	}
 
-	// Must be done for every texture
-	SetTextureModes( context, stage );
-
 	if( entry != NULL )
 	{
 		// Texture has been generated, so we just set
 		glBindTexture( GL_TEXTURE_2D, entry->TextureID );
+
+		// Must be done for every texture
+		SetTextureModes( context, stage );
 
 		return;
 	}
@@ -198,6 +198,9 @@ void SetTexture( OglContext* context, int stage )
 	{
 		// Failed? Not much we can do...
 	}
+
+	// Must be done for every texture
+	SetTextureModes( context, stage );
 }
 
 #pragma managed

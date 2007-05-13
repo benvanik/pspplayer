@@ -79,6 +79,11 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 
 	glBegin( GL_QUADS );
 
+	float uoffset = context->TextureOffset[ 0 ];
+	float voffset = context->TextureOffset[ 1 ];
+	float uscale = context->TextureScale[ 0 ];
+	float vscale = context->TextureScale[ 1 ];
+
 	float vpos[ 4 ][ 3 ];
 	float vtex[ 4 ][ 2 ];
 	byte vclr[ 4 ][ 4 ];
@@ -98,13 +103,13 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 				src += 2;
 				break;
 			case VTTextureFixed16:
-				vtex[ m ][ 0 ] = *( ( short* )src );
-				vtex[ m ][ 1 ] = *( ( short* )src + 1 );
+				vtex[ m ][ 0 ] = *( ( short* )src ) * uscale + uoffset;
+				vtex[ m ][ 1 ] = *( ( short* )src + 1 ) * vscale + voffset;
 				src += 4;
 				break;
 			case VTTextureFloat:
-				vtex[ m ][ 0 ] = *( ( float* )src );
-				vtex[ m ][ 1 ] = *( ( float* )src + 1 );
+				vtex[ m ][ 0 ] = *( ( float* )src ) * uscale + uoffset;
+				vtex[ m ][ 1 ] = *( ( float* )src + 1 ) * vscale + voffset;
 				/*if( vtex[ m ][ 0 ] != 0.0f )
 				{
 					assert( vtex[ m ][ 0 ] > 0.001f );

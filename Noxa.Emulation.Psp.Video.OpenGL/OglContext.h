@@ -57,6 +57,8 @@ namespace Noxa {
 					ushort			TextureFilterMag;
 					ushort			TextureWrapS;
 					ushort			TextureWrapT;
+					float			TextureOffset[ 2 ];
+					float			TextureScale[ 2 ];
 					
 					LRU<TextureEntry*>*	TextureCache;
 

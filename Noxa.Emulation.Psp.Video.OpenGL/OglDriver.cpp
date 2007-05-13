@@ -101,9 +101,9 @@ void OglDriver::PrintStatistics()
 		Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "Video Command Usage Count: ----------------------------------" );
 		for( int n = 0; n < _stats->CommandCounts->Length; n++ )
 		{
-			if( _stats->CommandCounts[ n ] == 0 )
+			if( _stats->CommandCounts[ n ] <= 1 )
 				continue;
-			Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "{0:X2}: {1}", n, _stats->CommandCounts[ n ] );
+			Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "{0:X2}: {1}\t{2}", n, _stats->CommandCounts[ n ], ( VideoCommand )n );
 		}
 #endif
 }
