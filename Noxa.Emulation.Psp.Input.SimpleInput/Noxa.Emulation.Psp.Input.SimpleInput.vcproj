@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="Noxa.Emulation.Psp.Input.SimpleInput"
 	ProjectGUID="{C4A3CB92-6CCA-41CA-B3AA-47754B6382E1}"
 	RootNamespace="NoxaEmulationPspInputSimpleInput"
@@ -59,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="&quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\XInput.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dxguid.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dxerr.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dinput8.lib&quot; $(NOINHERIT)"
+				AdditionalDependencies="XInput.lib dxguid.lib dxerr.lib dinput8.lib $(NOINHERIT)"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
@@ -134,7 +134,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="&quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\XInput.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dxguid.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dxerr.lib&quot; &quot;C:\Program Files\Microsoft DirectX SDK (February 2007)\Lib\x86\dinput8.lib&quot; $(NOINHERIT)"
+				AdditionalDependencies="XInput.lib dxguid.lib dxerr.lib dinput8.lib $(NOINHERIT)"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
