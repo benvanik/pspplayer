@@ -4,6 +4,11 @@
 = Screenshots and Movies =
 Although the emulator is pretty advanced, it is also in its early stages. This means that the screenshots you see here aren't that pretty yet. Newer images are at the top because I expect them to be cooler.
 
+=== 2007-05-14 - More Tales of Eternia Menu hotness ===
+Now I actually show stuff. You can hit start and go to the menu, but then things crash if you try to do anything. Still need to fix the weird texture clamping issues.
+
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.05.14.01-TalesKinda.jpg]
+
 === 2007-05-11 - Tales of Eternia (Menu) ==
 Got it to the menu... kind of. The scene animates in, but when I try to hit start it crashes.
 
