@@ -109,7 +109,7 @@ namespace Noxa.Emulation.Psp.Player
 			}
 			catch
 			{
-				Debugger.Break();
+				//Debugger.Break();
 			}
 		}
 
@@ -289,6 +289,7 @@ namespace Noxa.Emulation.Psp.Player
 		{
 			debugWriteToolStripButton.Checked = !debugWriteToolStripButton.Checked;
 			_debugWrite = debugWriteToolStripButton.Checked;
+			debugWriteToolStripButton.Invalidate();
 		}		
 	}
 

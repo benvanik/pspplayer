@@ -216,14 +216,16 @@ void R4000Cpu::PrintStatistics()
 		BiosFunction^ func = _syscalls[ n ];
 		float p = value / ( float )callCount;
 		p *= 100.0f;
-		String^ type = String::Format( "{0}{1}{2}{3}{4}",
+		String^ type = String::Format( "{0}{1}{2}{3}{4}{5}",
+			func->IsMissing == false ? "" : "(NOT FOUND)",
 			func->IsImplemented ? "" : "(NI)",
 			func->HasCpuImplementation ? "(CPU)" : "",
 			func->NativeMethod == IntPtr::Zero ? "" : "(Native)",
 			func->NativeImplementationSuggested ? "(NativeSugg)" : "",
 			func->IsStateless ? "(Stateless)" : "" );
 		Log::WriteLine( Verbosity::Normal, Feature::Statistics, "{0,-50} {1,10}x, {2,3}%\t{3}",
-			String::Format( "{0}::{1}:", func->Module->Name, func->Name ), value, p, type );
+			String::Format( "{0}::{1}:", ( func->Module != nullptr ) ? func->Module->Name : "*unknown*", ( func->Name != nullptr ) ? func->Name : String::Format( "0x{0:X8}", func->NID ) ),
+			value, p, type );
 	}
 #endif
 #endif

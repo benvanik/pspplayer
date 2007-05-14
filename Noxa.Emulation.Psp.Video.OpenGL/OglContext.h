@@ -25,7 +25,7 @@ namespace Noxa {
 					int				LineWidth;
 					int				Width;
 					int				Height;
-					uint			Checksum;
+					uint			Cookie;
 					int				TextureID;
 				} TextureEntry;
 

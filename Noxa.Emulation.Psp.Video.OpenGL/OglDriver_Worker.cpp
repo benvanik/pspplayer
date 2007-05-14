@@ -61,7 +61,7 @@ void OglDriver::StartThread()
 	_context->TextureFilterMag = GL_LINEAR;
 	_context->TextureWrapS = GL_REPEAT;
 	_context->TextureWrapT = GL_REPEAT;
-	_context->TextureCache = new LRU<TextureEntry*>( 256 );
+	_context->TextureCache = new LRU<TextureEntry*>( 1500 );
 	_context->TextureOffset[ 0 ] = 0.0f;
 	_context->TextureOffset[ 1 ] = 0.0f;
 	_context->TextureScale[ 0 ] = 1.0f;

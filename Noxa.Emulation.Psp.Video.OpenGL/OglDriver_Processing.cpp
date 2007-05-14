@@ -403,7 +403,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 					dest = GL_ONE_MINUS_DST_ALPHA;
 					break;
 				case 10:	// GU_FIX
-					assert( false );
+					//assert( false );
 					break;
 				}
 				glBlendFunc( src, dest );

@@ -84,6 +84,8 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	float uscale = context->TextureScale[ 0 ];
 	float vscale = context->TextureScale[ 1 ];
 
+	uint ambientMat = context->AmbientAlpha;
+
 	float vpos[ 4 ][ 3 ];
 	float vtex[ 4 ][ 2 ];
 	byte vclr[ 4 ][ 4 ];
@@ -110,10 +112,6 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 			case VTTextureFloat:
 				vtex[ m ][ 0 ] = *( ( float* )src ) * uscale + uoffset;
 				vtex[ m ][ 1 ] = *( ( float* )src + 1 ) * vscale + voffset;
-				/*if( vtex[ m ][ 0 ] != 0.0f )
-				{
-					assert( vtex[ m ][ 0 ] > 0.001f );
-				}*/
 				if( vtex[ m ][ 0 ] < 0.0001f ) vtex[ m ][ 0 ] = 0.0f;
 				else if( vtex[ m ][ 0 ] > 10000.0f ) vtex[ m ][ 0 ] = 1.0f;
 				if( vtex[ m ][ 1 ] < 0.0001f ) vtex[ m ][ 1 ] = 0.0f;
@@ -137,7 +135,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 				src += 2;
 				break;
 			case VTColorABGR8888:
-				*( ( int* )vclr[ m ] ) = *( ( int* )src );
+				*( ( int* )vclr[ m ] ) = *( ( int* )src ) + ambientMat;
 				src += 4;
 				break;
 			}
@@ -210,6 +208,8 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 			}
 			if( colorType != 0 )
 				glColor4ubv( vclr[ m ] );
+			else
+				glColor4ub( 255, 255, 255, 255 );
 			glVertex3fv( vpos[ m ] );
 		}
 	}

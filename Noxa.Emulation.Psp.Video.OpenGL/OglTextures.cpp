@@ -343,7 +343,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	TextureFormat* format = ( TextureFormat* )&__formats[ texture->PixelStorage ];
 	int size = texture->LineWidth * texture->Height * format->Size;
 
-	entry->Checksum = *( ( uint* )address );
+	uint* cookieAddress = ( uint* )address;
 
 	byte* buffer = address;
 	if( context->TexturesSwizzled == true )
@@ -426,6 +426,11 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 		( format->Flags & TFAlpha ) ? GL_RGBA : GL_RGB,
 		format->GLFormat,
 		( void* )buffer );
+
+
+	// Write cookie
+	entry->Cookie = ( uint )entry->TextureID; //*( ( uint* )address );
+	*cookieAddress = entry->Cookie;
 
 	return true;
 }

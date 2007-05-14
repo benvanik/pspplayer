@@ -257,7 +257,20 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 			src += 2;
 			break;
 		case VTColorABGR5551:
-			assert( false );
+			{
+				byte* sp = src;
+				uint* dp = _colorBuffer;
+				for( int n = 0; n < vertexCount; n++ )
+				{
+					uint entry = ( uint )( ( ushort* )sp );
+					*dp =	( ( entry & 0x1 ) * 256 ) |
+							( ( ( ( entry >> 1 ) & 0x1F ) * 8 ) << 8 ) |
+							( ( ( ( entry >> 6 ) & 0x1F ) * 8 ) << 16 ) |
+							( ( ( ( entry >> 11 ) & 0x1F ) * 8 ) << 24 );
+					sp += vertexSize;
+				}
+				glColorPointer( 4, GL_UNSIGNED_BYTE, 0, _colorBuffer );
+			}
 			src += 2;
 			break;
 		case VTColorABGR8888:
@@ -268,7 +281,7 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 			if( context->AmbientAlpha != 255 )
 				glColor4ub( 255, 255, 255, context->AmbientAlpha );
 			else
-				glColor3f( 1.0f, 1.0f, 1.0f );
+				glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 			break;
 		}
 		//float f = ( float )rand() / RAND_MAX;
