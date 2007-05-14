@@ -961,3 +961,61 @@ GenerationResult CLO( R4000GenContext^ context, int pass, int address, uint code
 	}
 	return GenerationResult::Success;
 }
+
+GenerationResult WSBH( R4000GenContext^ context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
+{
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		// rd = rt swapped inside each halfword
+		g->mov( EAX, MREG( CTX, rt ) );
+
+		// There may be an instruction for this, but I don't have my manuals handy
+
+		// a = reg(rt)
+		// b = ( a & 0xFF ) << 8
+		// b |= ( a >> 8 ) & 0xFF
+		// b |= ( ( a & 0x00FF0000 ) << 8 )
+		// b |= ( ( a & 0xFF000000 ) >> 8 )
+
+		// b = ( a & 0xFF ) << 8
+		g->mov( EBX, EAX );
+		g->and( EBX, 0x000000FF );
+		g->shl( EBX, 8 );
+
+		// b |= ( a >> 8 ) & 0xFF
+		g->mov( ECX, EAX );
+		g->shr( ECX, 8 );
+		g->and( ECX, 0x000000FF );
+		g->or( EBX, ECX );
+
+		// b |= ( ( a & 0x00FF0000 ) << 8 )
+		g->mov( ECX, EAX );
+		g->and( ECX, 0x00FF0000 );
+		g->shl( ECX, 8 );
+		g->or( EBX, ECX );
+
+		// b |= ( ( a & 0xFF000000 ) >> 8 )
+		g->mov( ECX, EAX );
+		g->and( ECX, 0xFF000000 );
+		g->shr( ECX, 8 );
+		g->or( EBX, ECX );
+
+		g->mov( MREG( CTX, rd ), EBX );
+	}
+	return GenerationResult::Success;
+}
+
+GenerationResult WSBW( R4000GenContext^ context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
+{
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		
+	}
+	return GenerationResult::Success;
+}
