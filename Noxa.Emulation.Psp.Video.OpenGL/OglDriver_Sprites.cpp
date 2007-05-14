@@ -60,6 +60,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	glPushAttrib( GL_ENABLE_BIT );
 	glDisable( GL_DEPTH_TEST );
 	glDepthMask( GL_FALSE );
+	glEnable( GL_CLAMP_TO_EDGE );
 
 	if( transformed == true )
 	{
@@ -165,6 +166,11 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 
 			m += 2;
 		} while( m <= 2 );
+
+		/*vpos[ 0 ][ 0 ] -= 0.25f;
+		vpos[ 0 ][ 1 ] -= 0.25f;
+		vpos[ 2 ][ 0 ] += 0.25f;
+		vpos[ 2 ][ 1 ] += 0.25f;*/
 
 		// 0 ---- 1
 		// |      |

@@ -267,6 +267,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.Opacity = 0.9;
 			this.ShowIcon = false;
 			this.Text = "Log Viewer";
+			this.ShowInTaskbar = true;
 			this.toolStrip1.ResumeLayout( false );
 			this.toolStrip1.PerformLayout();
 			this.ResumeLayout( false );

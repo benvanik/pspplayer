@@ -377,7 +377,8 @@ void ProcessList( OglContext* context, DisplayList* list )
 					src = GL_ONE_MINUS_SRC_ALPHA;
 					break;
 				case 10:	// GU_FIX
-					assert( false );
+					//assert( false );
+					src = GL_ONE;
 					break;
 				}
 				int dest;
@@ -404,16 +405,22 @@ void ProcessList( OglContext* context, DisplayList* list )
 					break;
 				case 10:	// GU_FIX
 					//assert( false );
+					/*dest = GL_CONSTANT_COLOR;
+					glBlendColor(
+						( context->DestFix >> 16 ) / 255.0f,
+						( ( context->DestFix >> 8 ) & 0xFF ) / 255.0f,
+						( context->DestFix & 0xFF ) / 255.0f,
+						1.0f );*/
 					break;
 				}
 				glBlendFunc( src, dest );
 			}
 			break;
 		case SFIX:	// source fix color
-			temp = argi;
+			context->SourceFix = argi;
 			break;
 		case DFIX:	// destination fix color
-			temp = argi;
+			context->DestFix = argi;
 			break;
 
 		case SCISSOR1:	// scissor start

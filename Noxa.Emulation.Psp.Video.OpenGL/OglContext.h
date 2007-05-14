@@ -69,6 +69,9 @@ namespace Noxa {
 					int				ClutMask;
 					int				ClutStart;
 
+					uint			SourceFix;
+					uint			DestFix;
+
 					byte			AmbientAlpha;	// HACK
 
 					// Patches
