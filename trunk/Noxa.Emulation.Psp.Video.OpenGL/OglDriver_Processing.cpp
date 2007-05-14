@@ -465,13 +465,14 @@ void ProcessList( OglContext* context, DisplayList* list )
 			break;
 
 		case ALA:
-			// ambient alpha
+			// ambient light alpha
 			break;
 		case ALC:
-			// ambient color
+			// ambient light color
 			break;
 		case AMA:
 			// ambient material alpha
+			context->AmbientAlpha = argi & 0xFF;
 			break;
 		case AMC:
 			// ambient material color
