@@ -48,7 +48,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-        private bool _isInited = false;
+		private bool _isInited;
+
 		[Stateless]
 		[BiosFunction( 0x39AF39A6, "sceNetInit" )]
 		// SDK location: /net/pspnet.h:22
@@ -61,9 +62,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			//Interesting to know if any apps init the net with different parameters:
 			//0x20000, 0x20, 0x1000, 0x20, 0x1000
-			if (unk1 != 0x20000 || unk2 != 0x20 || unk3 != 0x1000 || unk4 != 0x20 || unk5 != 0x1000)
+			if( unk1 != 0x20000 || unk2 != 0x20 || unk3 != 0x1000 || unk4 != 0x20 || unk5 != 0x1000 )
 			{
-				Log.WriteLine(Verbosity.Normal, Feature.Net, "Different sceNetInit({0},{1},{2},{3},{4})", unk1, unk2, unk3, unk4, unk5);
+				Log.WriteLine( Verbosity.Normal, Feature.Net, "Different sceNetInit({0},{1},{2},{3},{4})", unk1, unk2, unk3, unk4, unk5 );
 			}
 
 			return 0;

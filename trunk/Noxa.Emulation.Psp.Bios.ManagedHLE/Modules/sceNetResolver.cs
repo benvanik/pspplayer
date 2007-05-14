@@ -50,11 +50,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		#endregion
 
 		//FIXME: Use this? Then we can return errors when they didn't init the resolver... useful I guess :|
-		bool _isInited = false;
+		private bool _isInited;
 
 		//List of
-		int _currentResolverID = 0; //Assign resolvers using this
-		Dictionary<int, int> _allocatedResolvers = new Dictionary<int,int>(); //Record allocated resolvers, rid->rid
+		private int _currentResolverID = 0; //Assign resolvers using this
+		private Dictionary<int, int> _allocatedResolvers = new Dictionary<int, int>(); //Record allocated resolvers, rid->rid
 
 		[Stateless]
 		[BiosFunction( 0xF3370E61, "sceNetResolverInit" )]
@@ -84,13 +84,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			//We are passed in a buffer we can use to do resolving work, but we won't use it.
 			// this is buf, with length buflen
-			
+
 			//We allocate a resolver and return the id in *rid
 			//TODO: Check what numbers the psp returns, does it return a file descriptor?
 			//For this implementation we will use a magic int... lol
 
-			_allocatedResolvers.Add(_currentResolverID, _currentResolverID);
-			_memory.WriteWord(rid, 4, _currentResolverID);
+			_allocatedResolvers.Add( _currentResolverID, _currentResolverID );
+			_memory.WriteWord( rid, 4, _currentResolverID );
 			_currentResolverID++;
 
 			return 0;
@@ -102,9 +102,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceNetResolverDelete(int rid);
 		public int sceNetResolverDelete( int rid )
 		{
-			if (_allocatedResolvers.ContainsKey(rid))
+			if( _allocatedResolvers.ContainsKey( rid ) )
 			{
-				_allocatedResolvers.Remove(rid);
+				_allocatedResolvers.Remove( rid );
 				return 0;
 			}
 			else
@@ -123,13 +123,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			//FIXME: Check psp for what error codes to actually return
 			//FIXME: If domain fails to resolve, return error...
 			//FIXME: we are ignoring timeout and retry
-			if (!_allocatedResolvers.ContainsKey(rid)) return -1; //FAILURE
+			if( !_allocatedResolvers.ContainsKey( rid ) )
+				return -1; //FAILURE
 
-			string HostName = _kernel.ReadString((uint)hostname);
-			Log.WriteLine(Verbosity.Verbose, Feature.Net, "Resolving Domain {0}", HostName);
+			string HostName = _kernel.ReadString( ( uint )hostname );
+			Log.WriteLine( Verbosity.Verbose, Feature.Net, "Resolving Domain {0}", HostName );
 
-			IPHostEntry ip = Dns.GetHostEntry(HostName);
-			_memory.WriteWord(addr, 4, (int)(ip.AddressList[0].Address));
+			IPHostEntry ip = Dns.GetHostEntry( HostName );
+			_memory.WriteBytes( addr, ip.AddressList[ 0 ].GetAddressBytes() );
 
 			return 0;
 		}
@@ -142,9 +143,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			//FIXME: return -1 if we fail.
 			//FIXME: we are ignoring timeout and retry
-			long iplong = (uint)_memory.ReadWord(addr);
-			IPHostEntry host = Dns.GetHostEntry(new IPAddress(iplong));
-			_kernel.WriteString((uint)hostname, host.HostName);
+			long iplong = ( uint )_memory.ReadWord( addr );
+			IPHostEntry host = Dns.GetHostEntry( new IPAddress( iplong ) );
+			_kernel.WriteString( ( uint )hostname, host.HostName );
 			return 0;
 		}
 
