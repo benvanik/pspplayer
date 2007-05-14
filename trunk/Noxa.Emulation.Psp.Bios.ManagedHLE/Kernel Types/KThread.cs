@@ -200,7 +200,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				if( this.State != KThreadState.Running )
 					this.State = KThreadState.Ready;
-				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "KThread: AddToSchedule found thread already scheduled" );
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "KThread: AddToSchedule found thread already scheduled - your game is dead!" );
 				return;
 			}
 

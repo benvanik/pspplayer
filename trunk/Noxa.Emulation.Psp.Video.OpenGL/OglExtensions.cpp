@@ -24,6 +24,7 @@ using namespace Noxa::Emulation::Psp::Video;
 #pragma unmanaged
 
 PFNGLBLENDEQUATIONPROC Noxa::Emulation::Psp::Video::glBlendEquation = NULL;
+PFNGLBLENDCOLORPROC Noxa::Emulation::Psp::Video::glBlendColor = NULL;
 PFNWGLSWAPINTERVALEXTPROC Noxa::Emulation::Psp::Video::wglSwapIntervalEXT = NULL;
 
 bool Noxa::Emulation::Psp::Video::SetupExtensions()
@@ -31,6 +32,11 @@ bool Noxa::Emulation::Psp::Video::SetupExtensions()
 	glBlendEquation = (PFNGLBLENDEQUATIONPROC)wglGetProcAddress( "glBlendEquationEXT" );
 	assert( glBlendEquation != NULL );
 	if( glBlendEquation == NULL )
+		return false;
+
+	glBlendColor = (PFNGLBLENDCOLORPROC)wglGetProcAddress( "glBlendColorEXT" );
+	assert( glBlendColor != NULL );
+	if( glBlendColor == NULL )
 		return false;
 
 	wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress( "wglSwapIntervalEXT" );

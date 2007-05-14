@@ -143,12 +143,25 @@ void TextureTransfer( OglContext* context )
 
 void SetTextureModes( OglContext* context, int stage )
 {
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, context->TextureWrapS );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, context->TextureWrapT );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, context->TextureFilterMin );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, context->TextureFilterMag );
+
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+	bool clamping = ( context->TextureWrapS == GL_CLAMP ) || ( context->TextureWrapT == GL_CLAMP );
+	if( clamping == true )
+		glEnable( GL_CLAMP_TO_EDGE );
+	else
+		glDisable( GL_CLAMP_TO_EDGE );
+	if( context->TextureWrapS == GL_CLAMP )
+		context->TextureWrapS = GL_CLAMP_TO_EDGE;
+	if( context->TextureWrapT == GL_CLAMP )
+		context->TextureWrapT = GL_CLAMP_TO_EDGE;
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, context->TextureWrapS );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, context->TextureWrapT );
 }
 
 void SetTexture( OglContext* context, int stage )
