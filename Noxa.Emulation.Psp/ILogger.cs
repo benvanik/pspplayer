@@ -67,6 +67,10 @@ namespace Noxa.Emulation.Psp
 		/// </summary>
 		Media,
 		/// <summary>
+		/// Information pertaining to the networking systems.
+		/// </summary>
+		Net,
+		/// <summary>
 		/// Information pretaining to the video system.
 		/// </summary>
 		Video,

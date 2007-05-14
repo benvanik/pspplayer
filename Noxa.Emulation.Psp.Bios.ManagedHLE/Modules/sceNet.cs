@@ -48,14 +48,25 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		[NotImplemented]
+        private bool _isInited = false;
 		[Stateless]
 		[BiosFunction( 0x39AF39A6, "sceNetInit" )]
 		// SDK location: /net/pspnet.h:22
 		// SDK declaration: public int sceNetInit(int unk1, int unk2, int unk3, int unk4, int unk5);
 		public int sceNetInit( int unk1, int unk2, int unk3, int unk4, int unk5 )
 		{
-			return Module.NotImplementedReturn;
+			//This sould do more, but we don't really need to init anything.
+			//This probably allocates a chunk of psp memory, could investigate
+			_isInited = true;
+
+			//Interesting to know if any apps init the net with different parameters:
+			//0x20000, 0x20, 0x1000, 0x20, 0x1000
+			if (unk1 != 0x20000 || unk2 != 0x20 || unk3 != 0x1000 || unk4 != 0x20 || unk5 != 0x1000)
+			{
+				Log.WriteLine(Verbosity.Normal, Feature.Net, "Different sceNetInit({0},{1},{2},{3},{4})", unk1, unk2, unk3, unk4, unk5);
+			}
+
+			return 0;
 		}
 
 		[NotImplemented]
