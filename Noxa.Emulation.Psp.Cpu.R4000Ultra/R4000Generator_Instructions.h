@@ -52,6 +52,8 @@ DEFSP3( SEB );
 DEFSP3( SEH );
 DEFR( CLZ );
 DEFR( CLO );
+DEFSP3( WSBH );
+DEFSP3( WSBW );
 
 // Control
 DEFR( JR );
