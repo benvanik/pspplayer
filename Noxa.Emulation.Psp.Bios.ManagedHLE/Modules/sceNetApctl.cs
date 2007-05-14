@@ -48,7 +48,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		private bool _inited = false;
+		private bool _inited;
+
 		//State of the connection as the PSP sees it, should probably be an enum (Is one defined in the PSPSDK?)
 		// -1: not trying to connect, not sure if this is the correct value to use but it will work.
 		//1-3: Stages of connecting, 3 = DHCP'ing
@@ -88,15 +89,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			//Not well documented, code 8 = write ip as a char* to pInfo
 			//Shouldn't need to implement much more for now
-			switch (code)
+			switch( code )
 			{
 				case 8:
-					_kernel.WriteString((uint)pInfo, "127.0.0.1"); //HACK :)
+					_kernel.WriteString( ( uint )pInfo, "127.0.0.1" ); //HACK :)
 					return 0;
 				default:
-					Log.WriteLine(Verbosity.Normal, Feature.Net, "Unknown code passed to sceNetApctlGetInfo: {0}", code);
+					Log.WriteLine( Verbosity.Normal, Feature.Net, "Unknown code passed to sceNetApctlGetInfo: {0}", code );
+					return Module.NotImplementedReturn;
 			}
-			return Module.NotImplementedReturn;
 		}
 
 		[NotImplemented]
@@ -143,12 +144,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: public int sceNetApctlGetState(int *pState);
 		public int sceNetApctlGetState( int pState )
 		{
-			_memory.WriteWord(pState, 4, _connectionState);
+			_memory.WriteWord( pState, 4, _connectionState );
 
 			//Pretend-emulation of connecting :)
 			//This could be done based on time passing rather than amount of calls to the function
 			//will have to see if it messes up in any programs.
-			if (_connectionState >= 0 && _connectionState <= 4)
+			if( _connectionState >= 0 && _connectionState <= 4 )
 				_connectionState++;
 
 			return 0;

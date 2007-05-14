@@ -48,7 +48,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		private bool _isInited = false;
+		private bool _isInited;
 
 		[Stateless]
 		[BiosFunction( 0x17943399, "sceNetInetInit" )]
@@ -214,13 +214,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			//Create the string, write it into memory.
 			//we should limit the string length to cnt-1 chars, but who cares.
-			uint ipnum = (uint)(_memory.ReadWord(src));
-			string ip =  + (ipnum & 0xFF) +
-				"." + ((ipnum >> 8) & 0xFF) + 
-				"." + ((ipnum >> 16) & 0xFF) +
-				"." + (ipnum >> 24);
+			uint ipnum = ( uint )( _memory.ReadWord( src ) );
+			string ip = +( ipnum & 0xFF ) +
+				"." + ( ( ipnum >> 8 ) & 0xFF ) +
+				"." + ( ( ipnum >> 16 ) & 0xFF ) +
+				"." + ( ipnum >> 24 );
 
-			_kernel.WriteString((uint)dst, ip);
+			_kernel.WriteString( ( uint )dst, ip );
 			return dst;
 		}
 
