@@ -88,11 +88,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			WaitingOn = KThreadWait.Delay;
 			NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
 			WaitTimeout = waitTimeUs * 10;	// us -> ticks
-			if( ( waitTimeUs / 1000 ) > 1000 )
+
+			uint waitTimeMs = waitTimeUs / 1000;
+			if( waitTimeMs > 1000 )
 				Debugger.Break();
+			if( waitTimeMs <= 0 )
+				waitTimeMs = 1;
 
 			// Install timer
-			Kernel.AddOneShotTimer( new TimerCallback( this.DelayCallback ), this, waitTimeUs / 1000 );
+			Kernel.AddOneShotTimer( new TimerCallback( this.DelayCallback ), this, waitTimeMs );
 		}
 
 		private void JoinCallback( Timer timer )

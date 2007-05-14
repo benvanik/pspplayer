@@ -110,6 +110,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x0FAE370E, "sceAtracSetHalfwayBufferAndGetID" )]
 		public int sceAtracSetHalfwayBufferAndGetID(){ return Module.NotImplementedReturn; }
 
+		[DontTrace]
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x6A8C3CD5, "sceAtracDecodeData" )]

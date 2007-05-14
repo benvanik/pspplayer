@@ -252,6 +252,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.debugWriteToolStripButton.Name = "debugWriteToolStripButton";
 			this.debugWriteToolStripButton.Size = new System.Drawing.Size( 115, 22 );
 			this.debugWriteToolStripButton.Text = "Debug.WriteLine";
+			this.debugWriteToolStripButton.Click += new System.EventHandler( debugWriteToolStripButton_Click );
 			// 
 			// LogViewer
 			// 

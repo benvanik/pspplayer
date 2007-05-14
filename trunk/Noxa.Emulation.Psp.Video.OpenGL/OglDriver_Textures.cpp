@@ -163,7 +163,7 @@ void SetTexture( OglContext* context, int stage )
 	if( entry != NULL )
 	{
 		uint* texturePointer = ( uint* )context->Memory->Translate( texture->Address );
-		if( ( entry->Checksum != *texturePointer ) ||
+		if( ( entry->Cookie != *texturePointer ) ||
 			( entry->Width != texture->Width ) ||
 			( entry->Height != texture->Height ) ||
 			( entry->LineWidth != texture->LineWidth ) ||
