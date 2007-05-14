@@ -17,11 +17,24 @@ using Noxa.Emulation.Psp.Cpu;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
-	class sceUtility : Module
-	{
-		#region Properties
+	unsafe class sceUtility : Module
+    {
+        #region Common
 
-		public override string Name
+        private enum UtilityStatus
+        {
+            None = 0,
+            Init = 1,
+            Running = 2,
+            Finished = 3,
+            Closed = 4,
+        }
+
+        #endregion
+
+        #region Properties
+
+        public override string Name
 		{
 			get
 			{
@@ -158,14 +171,111 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#region Savedata
 
-		[NotImplemented]
+
+        const uint
+            LoadNoMemStick = 0x80110301,
+            LoadAccessError = 0x80110305,
+            LoadDataBroken = 0x80110306,
+            LoadNoData = 0x80110307,
+            LoadBadParams = 0x80110308;
+
+        const uint
+            SaveNoMemStick = 0x80110381,
+            SaveNoSpace = 0x80110383,
+            SaveMemStickProtected = 0x80110384,
+            SaveAccessError = 0x80110385,
+            SaveBadParams = 0x80110388,
+            SaveNoUMD = 0x80110389,
+            SaveWrongUMD = 0x8011038a;
+
+
+        struct PspUtilitySavedataSFOParam
+	    {
+		    fixed char title[0x80];
+		    fixed char savedataTitle[0x80];
+		    fixed char detail[0x400];
+		    byte parentalLevel;
+		    fixed byte unknown[3];
+	    };
+
+	    struct PspUtilitySavedataFileData 
+        {
+		    void *buf;
+		    uint bufSize;
+		    uint size;	/* ??? - why are there two sizes? */
+		    int unknown;
+	    };
+
+	/** Structure to hold the parameters for the ::sceUtilitySavedataInitStart function.
+	*/
+	    struct SceUtilitySavedataParam
+	    {
+		    /** Size of the structure */
+		    public uint size;
+
+            public int language;
+
+            public int buttonSwap;
+
+            public fixed int unknown[4];
+            public int result;
+            public fixed int unknown2[4];
+
+		    /** mode: 0 to load, 1 to save */
+            public int mode;
+            public int bind;
+
+		    /** unknown13 use 0x10 */
+            public int overwriteMode;
+
+		    /** gameName: name used from the game for saves, equal for all saves */
+            public fixed char gameName[16];
+		    /** saveName: name of the particular save, normally a number */
+            public fixed char saveName[24];
+		    /** fileName: name of the data file of the game for example DATA.BIN */
+            public fixed char fileName[16];
+
+		    /** pointer to a buffer that will contain data file unencrypted data */
+            public void* dataBuf;
+		    /** size of allocated space to dataBuf */
+            public uint dataBufSize;
+            public uint dataSize;
+
+            public PspUtilitySavedataSFOParam sfoParam;
+
+            public PspUtilitySavedataFileData icon0FileData;
+            public PspUtilitySavedataFileData icon1FileData;
+            public PspUtilitySavedataFileData pic1FileData;
+            public PspUtilitySavedataFileData snd0FileData;
+
+		    fixed byte unknown17[4];
+	    } ;
+
+        private UtilityStatus status;
+
+
+        [NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x50C4CD57, "sceUtilitySavedataInitStart" )]
 		// SDK location: /utility/psputility_savedata.h:97
 		// SDK declaration: int sceUtilitySavedataInitStart(SceUtilitySavedataParam * params);
 		public int sceUtilitySavedataInitStart( int saveParams )
 		{
-			return Module.NotImplementedReturn;
+            SceUtilitySavedataParam *p = (SceUtilitySavedataParam *)_memorySystem.Translate((uint)saveParams);
+
+            status = UtilityStatus.Running;
+
+            int mode = p->mode;
+            if (mode == 0)
+            {
+                //Load a file
+                return unchecked((int)LoadNoData);
+            }
+            else
+            {
+                //Save a file
+                return unchecked((int)SaveNoMemStick);
+            }
 		}
 
 		[NotImplemented]
@@ -175,7 +285,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilitySavedataShutdownStart();
 		public int sceUtilitySavedataShutdownStart()
 		{
-			return Module.NotImplementedReturn;
+            status = UtilityStatus.Closed;
+            return 0;
 		}
 
 		[NotImplemented]
@@ -185,7 +296,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilitySavedataUpdate(int unknown);
 		public int sceUtilitySavedataUpdate( int unknown )
 		{
-			return Module.NotImplementedReturn;
+            if (status == UtilityStatus.Running)
+                status = UtilityStatus.Finished;
+
+            if (status == UtilityStatus.Closed)
+                status = UtilityStatus.None;
+
+            return 0;
 		}
 
 		[NotImplemented]
@@ -195,7 +312,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilitySavedataGetStatus();
 		public int sceUtilitySavedataGetStatus()
 		{
-			return Module.NotImplementedReturn;
+			return (int)status;
 		}
 
 		#endregion
@@ -232,15 +349,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Provided = 1,
 		}
 
-		private enum MessageStatus
-		{
-			Unknown = 0,
-			Init = 1,
-			Open = 2,
-			Done = 3,
-			Closed = 4,
-		}
-
 		private enum MessageButton
 		{
 			Unknown = 0,
@@ -260,7 +368,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			public uint MessageID;
 			public string Message;
 
-			public MessageStatus Status;
+			public UtilityStatus Status;
 			public uint* ReturnValue;
 			public uint* ReturnButton;
 		}
@@ -312,7 +420,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			dialog.ReturnButton = p;
 			p++;
 
-			dialog.Status = MessageStatus.Open;
+			dialog.Status = UtilityStatus.Running;
 
 			_currentDialog = dialog;
 
@@ -348,7 +456,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilityMsgDialogShutdownStart();
 		public int sceUtilityMsgDialogShutdownStart()
 		{
-			_currentDialog.Status = MessageStatus.Closed;
+			_currentDialog.Status = UtilityStatus.Closed;
 			return 0;
 		}
 
@@ -370,17 +478,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( _currentDialog != null );
 			switch( _currentDialog.Status )
 			{
-				case MessageStatus.Init:
-					_currentDialog.Status = MessageStatus.Open;
+				case UtilityStatus.Init:
+					_currentDialog.Status = UtilityStatus.Running;
 					break;
-				case MessageStatus.Open:
-					_currentDialog.Status = MessageStatus.Done;
+				case UtilityStatus.Running:
+					_currentDialog.Status = UtilityStatus.Finished;
 					break;
-				case MessageStatus.Done:
+				case UtilityStatus.Finished:
 					//_currentDialog.Status = MessageStatus.Closed;
 					break;
-				case MessageStatus.Closed:
-					_currentDialog.Status = MessageStatus.Unknown;
+				case UtilityStatus.Closed:
+					_currentDialog.Status = UtilityStatus.None;
 					break;
 			}
 			return 0;
@@ -394,7 +502,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			Debug.Assert( _currentDialog != null );
 
-			if( _currentDialog.Status == MessageStatus.Unknown )
+			if( _currentDialog.Status == UtilityStatus.None )
 				return -1;
 
 			// ToE rarely calls update
