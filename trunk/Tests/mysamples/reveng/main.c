@@ -9,6 +9,7 @@
 #include <pspkernel.h>
 #include <pspdisplay.h>
 #include <pspthreadman.h>
+#include <stdio.h>
 
 PSP_MODULE_INFO( "reveng", 0, 1, 1 );
 PSP_MAIN_THREAD_ATTR( THREAD_ATTR_USER | THREAD_ATTR_VFPU );
@@ -48,13 +49,13 @@ int main( int argc, char *argv[] )
 	//int  sceKernelCreateFpl (const char *name, int part, int attr, unsigned int size, unsigned int blocks, struct SceKernelFplOptParam *opt) 
 	//SceKernelFplOptParam opts;
 	//opts.size = sizeof( SceKernelFplOptParam );
-	int id = sceKernelCreateFpl( "Fpl1", 2, 0, 0x0145D000, 1, NULL );
+	//int id = sceKernelCreateFpl( "Fpl1", 2, 0, 0x0145D000, 1, NULL );
 
 	// 0x00900010 -> 0890E400
 	// 0x0145D000 -> 0890E400
 	// = next aligned address after program memory
 
-	void* ptr;
+	/*void* ptr;
 	int ret = sceKernelAllocateFpl( id, &ptr, 0 );
 	if( ret >= 0 )
 	{
@@ -65,7 +66,18 @@ int main( int argc, char *argv[] )
 		pspDebugScreenPrintf( "failed alloc - got ret=%X", ret );
 	}
 
-	sceKernelSleepThreadCB();
+	sceKernelSleepThreadCB();*/
+
+	unsigned int buf[5];
+	unsigned int *pbuf = buf;
+	sceIoDevctl("ms0:", 0x02425818, &pbuf, sizeof(pbuf), 0, 0);
+	//pspDebugScreenPrintf( "%d %d %d %d %d", buf[ 0 ], buf[ 1 ], buf[ 2 ], buf[ 3 ], buf[ 4 ] );
+	fprintf( stdout, "%d %d %d %d %d\n", buf[ 0 ], buf[ 1 ], buf[ 2 ], buf[ 3 ], buf[ 4 ] );
+
+	// 124958 42083 41968 512 64
+
+	//sceKernelSleepThreadCB();
+	for( ;; );
 
 	return 0;
 }

@@ -20,6 +20,8 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 #define g context->Generator
 
+extern R4000Ctx* _cpuCtx;
+
 void EmitAddressTranslation( R4000Generator *gen )
 {
 	gen->and( gen->eax, 0x3FFFFFFF );
@@ -27,16 +29,18 @@ void EmitAddressTranslation( R4000Generator *gen )
 
 int __readMemoryThunk( int targetAddress )
 {
+#ifdef _DEBUG
+	int pc = _cpuCtx->PC;
+#endif
 	return R4000Cpu::GlobalCpu->Memory->ReadWord( targetAddress );
 }
 
 void __writeMemoryThunk( int targetAddress, int width, int value )
 {
-	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
-	Debug::Assert( cpu != nullptr );
-	if( cpu != nullptr )
-		cpu->Memory->WriteWord( targetAddress, width, value );
-	return;
+#ifdef _DEBUG
+	int pc = _cpuCtx->PC;
+#endif
+	R4000Cpu::GlobalCpu->Memory->WriteWord( targetAddress, width, value );
 }
 
 // EAX = address, result in EAX

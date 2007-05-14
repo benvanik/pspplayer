@@ -649,6 +649,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							stubImport.Result = StubReferenceResult.Success;
 							nidGoodCount++;
 						}
+
+						// Create dummy when needed
+						if( function == null )
+						{
+							function = new BiosFunction( module, nid );
+							_bios.RegisterFunction( function );
+						}
+
 						if( m < im->func_count )
 							stubImport.Type = StubType.Function;
 						else
@@ -659,8 +667,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						stubImport.Address = ( uint )pcode;
 						results.Imports.Add( stubImport );
 
-						// Perform fixup, if possible
-						if( function != null )
+						// Perform fixup
 						{
 							uint syscall = cpu.RegisterSyscall( nid );
 							*( pcode + 1 ) = ( uint )( ( syscall << 6 ) | 0xC );

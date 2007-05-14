@@ -85,18 +85,27 @@ R4000Cpu::~R4000Cpu()
 uint R4000Cpu::RegisterSyscall( unsigned int nid )
 {
 	BiosFunction^ function = _emu->Bios->FindFunction( nid );
+	Debug::Assert( function != nullptr );
 	if( function == nullptr )
 		return -1;
-
+	
 	int sid = ++_lastSyscall;
 	_syscalls[ sid ] = function;
 
-	void* registers = ( ( R4000Ctx* )_ctx )->Registers;
-	_syscallShims[ sid ] = EmitShim( function, _memory->System, registers );
-	if( function->NativeMethod != IntPtr::Zero )
-		_syscallShimsN[ sid ] = IntPtr( EmitShimN( function, _memory->NativeSystem, registers ) );
+	if( function->IsMissing == false )
+	{
+		void* registers = ( ( R4000Ctx* )_ctx )->Registers;
+		_syscallShims[ sid ] = EmitShim( function, _memory->System, registers );
+		if( function->NativeMethod != IntPtr::Zero )
+			_syscallShimsN[ sid ] = IntPtr( EmitShimN( function, _memory->NativeSystem, registers ) );
+		else
+			_syscallShimsN[ sid ] = IntPtr::Zero;
+	}
 	else
+	{
+		_syscallShims[ sid ] = nullptr;
 		_syscallShimsN[ sid ] = IntPtr::Zero;
+	}
 
 	return ( uint )sid;
 }

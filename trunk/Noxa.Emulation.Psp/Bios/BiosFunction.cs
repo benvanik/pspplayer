@@ -118,6 +118,11 @@ namespace Noxa.Emulation.Psp.Bios
 		public readonly bool IsImplemented;
 
 		/// <summary>
+		/// <c>true</c> if the function was added as a dummy by the loader and isn't found anywhere.
+		/// </summary>
+		public readonly bool IsMissing;
+
+		/// <summary>
 		/// <c>true</c> if the function does not change the state of the BIOS.
 		/// </summary>
 		/// <remarks>
@@ -164,6 +169,19 @@ namespace Noxa.Emulation.Psp.Bios
 		/// <c>true</c> if the CPU has an inlined implementation.
 		/// </summary>
 		public bool HasCpuImplementation;
+
+		/// <summary>
+		/// Initializes a new <see cref="BiosFunction"/> instance in the case of a missing function.
+		/// </summary>
+		/// <param name="module">Module containing the function.</param>
+		/// <param name="nid">Unique ID of the function.</param>
+		public BiosFunction( BiosModule module, uint nid )
+		{
+			this.Module = module;
+			this.NID = nid;
+			this.IsMissing = true;
+			this.IsStateless = true;
+		}
 
 		/// <summary>
 		/// Initializes a new <see cref="BiosFunction"/> instance with the given parameters.
