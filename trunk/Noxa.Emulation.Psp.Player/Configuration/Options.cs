@@ -270,12 +270,12 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 						// Speeds things up, but note that will we will need to reload
 						// later to get the proper types!
 						//assembly = Assembly.ReflectionOnlyLoadFrom( assemblyPath );
-						assembly = Assembly.LoadFile( assemblyPath );
+						assembly = Assembly.LoadFile(assemblyPath);
 					}
-					catch
+					catch (Exception e)
 					{
 						// Failed, ignore
-						Log.WriteLine( Verbosity.Critical, Feature.General, "FindComponents: Failed to load assembly " + assemblyPath + ", probably not .NET" );
+						Log.WriteLine( Verbosity.Critical, Feature.General, "FindComponents: Failed to load assembly " + assemblyPath + ", probably not .NET : " + e.ToString() + " " + e.Message );
 						continue;
 					}
 
