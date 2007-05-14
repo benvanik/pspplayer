@@ -48,14 +48,26 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		[NotImplemented]
+		private bool _inited = false;
+		//State of the connection as the PSP sees it, should probably be an enum (Is one defined in the PSPSDK?)
+		// -1: not trying to connect, not sure if this is the correct value to use but it will work.
+		//1-3: Stages of connecting, 3 = DHCP'ing
+		//  4: connected
+		//  6: We won't use it but on OE firmware I have seen a 6 returned from sceNetApctlGetState... (danzel)
+		private int _connectionState = -1;
+
 		[Stateless]
 		[BiosFunction( 0xE2F91F9B, "sceNetApctlInit" )]
 		// SDK location: /net/pspnet_apctl.h:22
 		// SDK declaration: public int sceNetApctlInit(int stackSize, int initPriority);
 		public int sceNetApctlInit( int stackSize, int initPriority )
 		{
-			return Module.NotImplementedReturn;
+			_inited = true;
+			//How used in PSPSDK:
+			//sceNetApctlInit(0x1400, 0x42)
+			//Looks like we are meant to fire up a thread, for now we won't
+			// as we don't need one, because we won't really connect to wifi :)
+			return 0;
 		}
 
 		[NotImplemented]
@@ -68,13 +80,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x2BEFDF23, "sceNetApctlGetInfo" )]
 		// SDK location: /net/pspnet_apctl.h:26
 		// SDK declaration: public int sceNetApctlGetInfo(int code, void *pInfo);
 		public int sceNetApctlGetInfo( int code, int pInfo )
 		{
+			//Not well documented, code 8 = write ip as a char* to pInfo
+			//Shouldn't need to implement much more for now
+			switch (code)
+			{
+				case 8:
+					_kernel.WriteString((uint)pInfo, "127.0.0.1"); //HACK :)
+					return 0;
+				default:
+					Log.WriteLine(Verbosity.Normal, Feature.Net, "Unknown code passed to sceNetApctlGetInfo: {0}", code);
+			}
 			return Module.NotImplementedReturn;
 		}
 
@@ -94,14 +115,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xCFB957C6, "sceNetApctlConnect" )]
 		// SDK location: /net/pspnet_apctl.h:33
 		// SDK declaration: public int sceNetApctlConnect(int connIndex);
 		public int sceNetApctlConnect( int connIndex )
 		{
-			return Module.NotImplementedReturn;
+			//FIXME: This module should have a list of APCTL's defined
+			//       Then we can check against the list and return the correct value
+			_connectionState = 0;
+			return 0;
 		}
 
 		[NotImplemented]
@@ -114,14 +137,21 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x5DEAC81B, "sceNetApctlGetState" )]
 		// SDK location: /net/pspnet_apctl.h:37
 		// SDK declaration: public int sceNetApctlGetState(int *pState);
 		public int sceNetApctlGetState( int pState )
 		{
-			return Module.NotImplementedReturn;
+			_memory.WriteWord(pState, 4, _connectionState);
+
+			//Pretend-emulation of connecting :)
+			//This could be done based on time passing rather than amount of calls to the function
+			//will have to see if it messes up in any programs.
+			if (_connectionState >= 0 && _connectionState <= 4)
+				_connectionState++;
+
+			return 0;
 		}
 
 		[NotImplemented]

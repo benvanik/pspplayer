@@ -48,12 +48,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		[NotImplemented]
+		private bool _isInited = false;
+
 		[Stateless]
 		[BiosFunction( 0x17943399, "sceNetInetInit" )]
 		// SDK location: /net/pspnet_inet.h:22
 		// SDK declaration: public int sceNetInetInit();
-		public int sceNetInetInit(){ return Module.NotImplementedReturn; }
+		public int sceNetInetInit()
+		{
+			//FIXME: Should this care wether sceNet has been inited?
+			_isInited = true;
+			return 0;
+		}
 
 		[NotImplemented]
 		[Stateless]
@@ -200,12 +206,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: public int sceNetInetInetAton(const char *ip, struct in_addr *in);
 		public int sceNetInetInetAton( int ip, int pin ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xD0792666, "sceNetInetInetNtop" )]
 		// SDK location: ??
 		// SDK declaration: const char* sceNetInetInetNtop(int af, const void *src, char *dst, socklen_t cnt);
-		public int sceNetInetInetNtop( int af, int src, int dst, int cnt ){ return Module.NotImplementedReturn; }
+		public int sceNetInetInetNtop( int af, int src, int dst, int cnt )
+		{
+			//Create the string, write it into memory.
+			//we should limit the string length to cnt-1 chars, but who cares.
+			uint ipnum = (uint)(_memory.ReadWord(src));
+			string ip =  + (ipnum & 0xFF) +
+				"." + ((ipnum >> 8) & 0xFF) + 
+				"." + ((ipnum >> 16) & 0xFF) +
+				"." + (ipnum >> 24);
+
+			_kernel.WriteString((uint)dst, ip);
+			return dst;
+		}
 
 		[NotImplemented]
 		[Stateless]
