@@ -39,7 +39,7 @@ extern HANDLE _hListSyncEvent;
 
 __inline void WidenMatrix( float src[ 16 ], float dest[ 16 ] );
 int DetermineVertexSize( int vertexType );
-void DummyTri();
+void DummyTri( bool ortho );
 
 // OglDriver_VertexLists
 extern void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int vertexCount, byte* indexBuffer );
@@ -51,6 +51,9 @@ extern void DrawSpriteList( OglContext* context, int vertexType, int vertexCount
 // OglDriver_Textures
 extern void TextureTransfer( OglContext* context );
 extern void SetTexture( OglContext* context, int stage );
+
+// OglDriver Patches
+extern void DrawBezier( OglContext* context, int vertexType, int vertexSize, byte* iptr, byte* ptr, int ucount, int vcount );
 
 void __printVideoCommand( int command, int argi, float argf )
 {
@@ -547,7 +550,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 				}
 
 #if 0
-				DummyTri();
+				DummyTri( false );
 #endif
 			}
 			break;
@@ -565,13 +568,21 @@ void ProcessList( OglContext* context, DisplayList* list )
 				if( context->TexturesEnabled == true )
 					SetTexture( context, 0 );
 
+				int vertexSize = DetermineVertexSize( vertexType );
+				byte* ptr = context->Memory->Translate( vertexBufferAddress );
+
+				bool isIndexed = ( vertexType & ( VTIndex8 | VTIndex16 ) ) != 0;
+				byte* iptr = 0;
+				if( isIndexed == true )
+					iptr = context->Memory->Translate( indexBufferAddress );
+
 				int ucount = ( argi & 0xFF );
 				int vcount = ( ( argi >> 8 ) & 0xFF );
 
-				//DrawBezier( context, vertexType, vertexSize, iptr, ptr, ucount, vcount );
+				DrawBezier( context, vertexType, vertexSize, iptr, ptr, ucount, vcount );
 
-#if 1
-				DummyTri();
+#if 0
+				DummyTri( true );
 #endif
 			}
 			break;
@@ -969,20 +980,24 @@ int DetermineVertexSize( int vertexType )
 	return size;
 }
 
-void DummyTri()
+void DummyTri( bool ortho )
 {
-	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
-	glPushAttrib( GL_ENABLE_BIT );
-	glDisable( GL_DEPTH_TEST );
-	glDepthMask( GL_FALSE );
-	glDisable( GL_CULL_FACE );
-	glMatrixMode( GL_PROJECTION );
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho( 0.0f, 480.0f, 272.0f, 0.0f, -1.0f, 1.0f );
-	glMatrixMode( GL_MODELVIEW );
-	glPushMatrix();
-	glLoadIdentity();
+	if( ortho == true )
+	{
+		glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
+		glPushAttrib( GL_ENABLE_BIT );
+		glDisable( GL_DEPTH_TEST );
+		glDepthMask( GL_FALSE );
+		glDisable( GL_CULL_FACE );
+		glMatrixMode( GL_PROJECTION );
+		glPushMatrix();
+		glLoadIdentity();
+		glOrtho( 0.0f, 480.0f, 272.0f, 0.0f, -1.0f, 1.0f );
+		glMatrixMode( GL_MODELVIEW );
+		glPushMatrix();
+		glLoadIdentity();
+	}
+
 	glBegin( GL_QUADS );
 
 	// 0 ---- 1
@@ -999,12 +1014,16 @@ void DummyTri()
 	glVertex3f( 0, 100, 0 );
 
 	glEnd();
-	glPopMatrix();
-	glMatrixMode( GL_PROJECTION );
-	glPopMatrix();
-	glDepthMask( GL_TRUE );
-	glPopAttrib();
-	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
+
+	if( ortho == true )
+	{
+		glPopMatrix();
+		glMatrixMode( GL_PROJECTION );
+		glPopMatrix();
+		glDepthMask( GL_TRUE );
+		glPopAttrib();
+		glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
+	}
 }
 
 #pragma managed
