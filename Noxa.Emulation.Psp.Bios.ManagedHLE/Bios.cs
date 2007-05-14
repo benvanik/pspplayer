@@ -176,7 +176,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Log.WriteLine( Verbosity.Normal, Feature.Bios, "found {0} functions in {1} modules. {2} ({3}%) implemented", functionCount, moduleCount, implementedCount, ( implementedCount / ( float )functionCount ) * 100.0f );
 		}
 
-		private void RegisterFunction( BiosFunction function )
+		public void RegisterFunction( BiosFunction function )
 		{
 			Debug.Assert( function != null );
 			if( _functionLookup.ContainsKey( function.NID ) == true )

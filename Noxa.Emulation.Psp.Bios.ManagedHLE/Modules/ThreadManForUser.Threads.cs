@@ -223,21 +223,62 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( thread.Priority != priority )
 			{
 				thread.ChangePriority( priority );
-				_kernel.Schedule();
+				//_kernel.Schedule();
 			}
 
 			return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x912354A7, "sceKernelRotateThreadReadyQueue" )]
 		// SDK location: /user/pspthreadman.h:390
 		// SDK declaration: int sceKernelRotateThreadReadyQueue(int priority);
 		public int sceKernelRotateThreadReadyQueue( int priority )
 		{
 			// At the given priority, move the head thread to the tail
-			return Module.NotImplementedReturn;
+			// This is tricky - we need to find the first and last thread at a given priority
+			// then move the first one after the last one
+
+			// Find first thread
+			LinkedListEntry<KThread> first = null;
+			LinkedListEntry<KThread> e = _kernel.SchedulableThreads.HeadEntry;
+			while( e != null )
+			{
+				if( e.Value.Priority == priority )
+				{
+					first = e;
+					break;
+				}
+				e = e.Next;
+			}
+			//Debug.Assert( first != null );
+			if( first == null )
+			{
+				// No threads of the given priority found
+				return 0;
+			}
+
+			// Find last thread
+			LinkedListEntry<KThread> last = first;
+			while( e != null )
+			{
+				if( e.Value.Priority != priority )
+					break;
+				last = e;
+				e = e.Next;
+			}
+			if( first == last )
+			{
+				// No change - only one schedulable thread had this priority
+				_kernel.Schedule();
+				return 0;
+			}
+
+			// Perform the move
+			_kernel.SchedulableThreads.Remove( first );
+			_kernel.SchedulableThreads.InsertAfter( first.Value, last );
+
+			_kernel.Schedule();
+			return 0;
 		}
 
 		[Stateless]

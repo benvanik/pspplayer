@@ -24,6 +24,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		Join,			// Wait until the target thread ends
 		EventHandler,	// message pump something
 		Unknown2,		// ?? callbacks?
+		Mutex,			// Wait until mutex unlocked - this may be totally wrong - not sure what it is
+		// TODO: find out proper KThreadWait value for mutexes
 	}
 
 	enum KThreadState

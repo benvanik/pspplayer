@@ -153,16 +153,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 		}
 
-		public void Wait( KEvent ev, KWaitType waitEventMode, uint userValue, uint outAddress, uint timeoutUs, bool canHandleCallbacks )
+		private void WaitTimeoutSetup( uint timeoutUs )
 		{
-			State = KThreadState.Waiting;
-			this.RemoveFromSchedule();
-
-			CanHandleCallbacks = canHandleCallbacks;
-
-			ev.WaitingThreads.Enqueue( this );
-
-			WaitingOn = KThreadWait.Event;
 			if( timeoutUs > 0 )
 			{
 				NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
@@ -174,6 +166,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 			else
 				WaitTimeout = 0;
+		}
+
+		public void Wait( KEvent ev, KWaitType waitEventMode, uint userValue, uint outAddress, uint timeoutUs, bool canHandleCallbacks )
+		{
+			State = KThreadState.Waiting;
+			this.RemoveFromSchedule();
+
+			CanHandleCallbacks = canHandleCallbacks;
+
+			ev.WaitingThreads.Enqueue( this );
+
+			WaitingOn = KThreadWait.Event;
+			this.WaitTimeoutSetup( timeoutUs );
 			WaitHandle = ev;
 			WaitEventMode = waitEventMode;
 			WaitArgument = userValue;
@@ -193,17 +198,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				WaitingOn = KThreadWait.Vpl;
 			else
 				WaitingOn = KThreadWait.Fpl;
-			if( timeoutUs > 0 )
-			{
-				NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
-				WaitTimeout = timeoutUs * 10;	// us -> ticks
-				WaitTimeout = Math.Max( 1, WaitTimeout );
-
-				// Install timer
-				Kernel.AddOneShotTimer( new TimerCallback( this.WaitCallback ), this, timeoutUs / 1000 );
-			}
-			else
-				WaitTimeout = 0;
+			this.WaitTimeoutSetup( timeoutUs );
 			WaitHandle = pool;
 			WaitAddress = pdata;
 		}
@@ -217,17 +212,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			sema.WaitingThreads.Enqueue( this );
 			WaitingOn = KThreadWait.Semaphore;
-			if( timeoutUs > 0 )
-			{
-				NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
-				WaitTimeout = timeoutUs * 10;	// us -> ticks
-				WaitTimeout = Math.Max( 1, WaitTimeout );
-
-				// Install timer
-				Kernel.AddOneShotTimer( new TimerCallback( this.WaitCallback ), this, timeoutUs / 1000 );
-			}
+			this.WaitTimeoutSetup( timeoutUs );
 			WaitHandle = sema;
 			WaitArgument = ( uint )count;
+		}
+
+		public void Wait( KMutex mutex, uint timeoutUs )
+		{
+			State = KThreadState.Waiting;
+			this.RemoveFromSchedule();
+
+			CanHandleCallbacks = false;
+
+			mutex.WaitingThreads.Enqueue( this );
+			WaitingOn = KThreadWait.Mutex;
+			this.WaitTimeoutSetup( timeoutUs );
+			WaitHandle = mutex;
 		}
 	}
 }

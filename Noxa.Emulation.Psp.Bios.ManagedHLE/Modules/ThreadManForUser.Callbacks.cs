@@ -103,7 +103,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceKernelCheckCallback()
 		{
 			// No clue what this does - related to checkthreadstack?
-			return 0;
+			return 1;
 		}
 
 		[Stateless]

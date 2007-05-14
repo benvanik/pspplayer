@@ -59,6 +59,12 @@ namespace Noxa.Emulation.Psp.Bios
 		BiosFunction FindFunction( uint nid );
 
 		/// <summary>
+		/// Register a function (for doing crazy things).
+		/// </summary>
+		/// <param name="function">The function to register.</param>
+		void RegisterFunction( BiosFunction function );
+
+		/// <summary>
 		/// The current game loaded by the BIOS.
 		/// </summary>
 		GameInformation Game

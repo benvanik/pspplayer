@@ -14,6 +14,7 @@ using Noxa.Utilities;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
@@ -57,10 +58,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			string name = _kernel.ReadString( ( uint )dev );
 			// We only support ms for now
 			if( ( name != "fatms0:" ) &&
-				( name != "mscmhc0:" ) )
+				( name != "mscmhc0:" ) &&
+				( name != "ms0:" ) )
 			{
 				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDevctl: device {0} not supported", name );
+				return 0;
 			}
+
+			IMemoryStickDevice memoryStick = _kernel.Emulator.MemoryStick;
+			Debug.Assert( memoryStick != null );
 
 			byte* inp = ( byte* )0;
 			byte* outp = ( byte* )0;
@@ -74,15 +80,32 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				case 0x02425818:	// Write free space to indata
 					Debug.Assert( inlen == 4 );
 					{
-						byte* p = _memorySystem.Translate( *( uint* )inp );
-						p[ 0 ] = 0;	// total
-						p[ 1 ] = 0;	// free
-						p[ 2 ] = 0;
-						p[ 3 ] = 0;	// scalar 1
-						p[ 4 ] = 0;	// scalar 2
+						uint capacity = ( uint )memoryStick.Capacity / ( 512 * 64 );
+						uint free = ( uint )memoryStick.Available / ( 512 * 64 );
 						// 0 * 3 * 4 = total bytes
 						// 1 * 3 * 4 = total free bytes
-						// 2 * 3 * 4 = total used bytes????
+						// 2 * 3 * 4 = slightly less than total free bytes?
+						// 124958 42083 41968 512 64
+						if( indata != 0 )
+						{
+							uint* p = ( uint* )_memorySystem.Translate( *( uint* )inp );
+							p[ 0 ] = capacity;	// total
+							p[ 1 ] = free;		// free
+							p[ 2 ] = free - 115;
+							p[ 3 ] = 512;	// scalar 1
+							p[ 4 ] = 64;	// scalar 2
+						}
+						// Not sure if this is the right thing to do - outp seems to point to the
+						// same address as *inp
+						if( outdata != 0 )
+						{
+							uint* p = ( uint* )outp;
+							p[ 0 ] = capacity;	// total
+							p[ 1 ] = free;		// free
+							p[ 2 ] = free - 115;
+							p[ 3 ] = 512;	// scalar 1
+							p[ 4 ] = 64;	// scalar 2
+						}
 					}
 					break;
 				case 0x0240D81E:		// Refresh directory listings - no params
@@ -102,7 +125,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 						{
 							Log.WriteLine( Verbosity.Normal, Feature.Bios, "Registered MemoryStick insert/eject callback: {0} ({1:X8})", _msInsertEjectCallback.Name, _msInsertEjectCallback.UID );
 
-							_kernel.AddOneShotTimer( new TimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 50 );
+							_kernel.AddOneShotTimer( new TimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 500 );
 						}
 						else
 							Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceIoDevctl: could not find callback {0} for MemoryStick insert/eject", cbid );

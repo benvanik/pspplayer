@@ -247,7 +247,7 @@ void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, Mar
 	_switchRequest.CallbackState = state;
 
 	// Put the request in
-	_currentTcs->Ctx.StopFlag = CtxMarshal;
+	_cpuCtx->StopFlag = CtxMarshal;
 }
 
 CodeBlock* BuildBlock( int pc )
@@ -470,7 +470,6 @@ executeStart:		// Arrived at from call/interrupt handling below
 		case CtxMarshal:
 			// We need to marshal a callback on to another thread and then handle
 			// what happens when it ends
-			assert( false ); // this is totally wrong!
 			assert( _switchRequest.MakeCall == true );
 			PerformSwitch();
 			PushState();
@@ -506,7 +505,9 @@ void R4000Cpu::Execute(
 
 void R4000Cpu::BreakExecution()
 {
-	_cpuCtx->StopFlag = CtxBreakRequest;
+	// Don't overwrite a marshal and stuff
+	if( _cpuCtx->StopFlag == CtxContinue )
+		_cpuCtx->StopFlag = CtxBreakRequest;
 }
 
 void R4000Cpu::Resume()

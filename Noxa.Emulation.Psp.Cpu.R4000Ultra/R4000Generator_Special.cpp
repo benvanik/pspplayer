@@ -34,7 +34,7 @@ extern uint _syscallCounts[ 1024 ];
 
 #define g context->Generator
 
-void __logSyscall( int syscallId, int address )
+void __logSyscall( int syscallId, int address, bool implemented )
 {
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
 
@@ -48,7 +48,8 @@ void __logSyscall( int syscallId, int address )
 		R4000Ctx* ctx = ( R4000Ctx* )cpu->_ctx;
 		String^ args;
 		Debug::Assert( function->ParameterCount <= 12 );
-		switch( function->ParameterCount )
+		int paramCount = ( implemented == true ) ? function->ParameterCount : 8;
+		switch( paramCount )
 		{
 		case 1:
 			args = String::Format( "{0:X8}", ctx->Registers[ 4 ] );
@@ -90,13 +91,17 @@ void __logSyscall( int syscallId, int address )
 			args = "";
 			break;
 		}
-		String^ log = String::Format( "{0}::{1}({2}) from 0x{3:X8}{4}",
-			function->Module->Name, function->Name, args, address - 4, function->IsImplemented ? "" : " (NI)" );
+		String^ log = String::Format( "{5}{0}::{1}({2}) from 0x{3:X8}{4}",
+			( function->Module != nullptr ) ? function->Module->Name : "*unknown*",
+			( function->Name != nullptr ) ? function->Name : String::Format( "{0:X8}", function->NID ),
+			args, address - 4,
+			function->IsImplemented ? "" : " (NI)",
+			function->IsMissing ? "(NOT FOUND) " : "" );
 		Log::WriteLine( Verbosity::Verbose, Feature::Syscall, log );
 	}
 	else
 	{
-		String^ log = String::Format( "Syscall attempt to undefined syscall {0} (0x{0:X8}) from 0x{1:X8}", syscallId, address - 4 );
+		String^ log = String::Format( "{0:X8}) from 0x{1:X8} (NOT FOUND)", syscallId, address - 4 );
 		Log::WriteLine( Verbosity::Normal, Feature::Syscall, log );
 		Debugger::Break();
 	}
@@ -105,7 +110,7 @@ void __logSyscall( int syscallId, int address )
 void __unimplementedSyscall( int syscallId, int address )
 {
 #ifdef LOGSYSCALLS
-	__logSyscall( syscallId, address );
+	__logSyscall( syscallId, address, false );
 #endif
 }
 
@@ -114,7 +119,7 @@ void __syscallBounce( int syscallId, int address )
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
 
 #ifdef LOGSYSCALLS
-	__logSyscall( syscallId, address );
+	__logSyscall( syscallId, address, true );
 #endif
 
 	BiosShim^ shim = cpu->_syscallShims[ syscallId ];
@@ -144,7 +149,7 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 	bool canEmit;
 	bool hasReturn;
 	bool wideReturn;
-	if( function != nullptr )
+	if( ( function != nullptr ) && ( function->IsMissing == false ) )
 	{
 		willCall = function->IsImplemented;
 
@@ -187,7 +192,12 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		wideReturn = false;
 
 		if( pass == 0 )
-			Log::WriteLine( Verbosity::Normal, Feature::Cpu, "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address );
+		{
+			if( function != nullptr )
+				Log::WriteLine( Verbosity::Normal, Feature::Cpu, "R4000Generator: unregistered syscall attempt (at 0x{0:X8}) to NID 0x{1:X8}", address, function->NID );
+			else
+				Log::WriteLine( Verbosity::Normal, Feature::Cpu, "R4000Generator: unregistered syscall attempt (at 0x{0:X8})", address );
+		}
 	}
 
 	context->UseSyscalls = true;
