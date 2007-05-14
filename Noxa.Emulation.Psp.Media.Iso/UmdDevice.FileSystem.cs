@@ -195,9 +195,15 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			// Don't care.... really
 
 			dateString = dateString.Substring( 0, 16 );
-			DateTime dt = DateTime.ParseExact( dateString, "yyyyMMddHHmmssff", CultureInfo.InvariantCulture );
-			
-			return dt;
+			try
+			{
+				DateTime dt = DateTime.ParseExact( dateString, "yyyyMMddHHmmssff", CultureInfo.InvariantCulture );
+				return dt;
+			}
+			catch
+			{
+				return DateTime.Today;
+			}
 		}
 
 		protected static DateTime ReadDate( BinaryReader reader )
@@ -210,7 +216,14 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			byte second = reader.ReadByte();
 			byte gmt = reader.ReadByte();
 
-			return new DateTime( 1900 + year, month, day, hour, minute, second );
+			try
+			{
+				return new DateTime( 1900 + year, month, day, hour, minute, second );
+			}
+			catch
+			{
+				return DateTime.Now;
+			}
 		}
 
 		protected static string ReadString( BinaryReader reader, int length )
