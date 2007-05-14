@@ -47,7 +47,7 @@ namespace Noxa {
 					float			WorldMatrix[ 16 ];
 					float			TextureMatrix[ 16 ];
 
-					// Textures
+					// Textures / colors
 					bool			TexturesEnabled;
 					bool			TexturesSwizzled;
 					int				MipMapLevel;
@@ -68,6 +68,8 @@ namespace Noxa {
 					int				ClutShift;
 					int				ClutMask;
 					int				ClutStart;
+
+					byte			AmbientAlpha;	// HACK
 
 					// Patches
 					int				PatchFrontFace;
