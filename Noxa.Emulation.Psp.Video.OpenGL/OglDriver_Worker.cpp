@@ -53,6 +53,7 @@ void ProcessList( OglContext* context, DisplayList* list );
 void WorkerThreadThunk( Object^ object );
 void SetSpeedLock( bool locked );
 
+#pragma unmanaged
 void TextureCacheFreeHandler( uint key, TextureEntry* value )
 {
 	uint* texturePointer = ( uint* )_memory->Translate( value->Address );
@@ -62,6 +63,7 @@ void TextureCacheFreeHandler( uint key, TextureEntry* value )
 	glDeleteTextures( 1, freeIds );
 	delete value;
 }
+#pragma managed
 
 void OglDriver::StartThread()
 {

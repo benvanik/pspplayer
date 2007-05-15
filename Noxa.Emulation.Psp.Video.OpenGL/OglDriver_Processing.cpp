@@ -198,8 +198,8 @@ void ProcessList( OglContext* context, DisplayList* list )
 			if( ( argi & 0x1 ) == 0x1 )
 			{
 				temp = 0;
-				//if( ( argi & 0x100 ) != 0 )
-				//	temp |= GL_COLOR_BUFFER_BIT; // target
+				if( ( argi & 0x100 ) != 0 )
+					temp |= GL_COLOR_BUFFER_BIT; // target
 				if( ( argi & 0x200 ) != 0 )
 					temp |= GL_ACCUM_BUFFER_BIT | GL_STENCIL_BUFFER_BIT; // stencil/alpha
 				if( ( argi & 0x400 ) != 0 )
