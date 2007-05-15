@@ -5,6 +5,11 @@
 Although the emulator is pretty advanced, it is also in its early stages. This means that the screenshots you see here aren't that pretty yet. Newer images are at the top because I expect them to be cooler.
 
 === 2007-05-14 - Tales of Eternia ===
+The menu is now complete, with fades and everything.
+
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.05.14.04-TalesMenu.jpg]
+
+=== 2007-05-14 - Tales of Eternia ===
 Fixed the texture alignment issues! (and the random sprites)
 
 [http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.05.14.03-TalesPretty.jpg]
