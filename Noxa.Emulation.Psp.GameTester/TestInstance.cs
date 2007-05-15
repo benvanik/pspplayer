@@ -372,6 +372,14 @@ namespace Noxa.Emulation.Psp.GameTester
 		{
 		}
 
+		public void LockSpeed()
+		{
+		}
+
+		public void UnlockSpeed()
+		{
+		}
+
 		public delegate void DummyDelegate();
 
 		public void SwitchToXmb()

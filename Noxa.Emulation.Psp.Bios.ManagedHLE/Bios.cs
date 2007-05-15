@@ -63,6 +63,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 		}
 
+		public bool SpeedLocked
+		{
+			get
+			{
+				return _kernel.SpeedLocked;
+			}
+			set
+			{
+				_kernel.SpeedLocked = value;
+			}
+		}
+
 		public ILoader Loader
 		{
 			get

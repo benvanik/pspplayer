@@ -194,5 +194,15 @@ namespace Noxa.Emulation.Psp
 		/// Reset the instance without destroying components.
 		/// </summary>
 		void LightReset();
+
+		/// <summary>
+		/// Lock the emulator to V-sync.
+		/// </summary>
+		void LockSpeed();
+
+		/// <summary>
+		/// Unlock the emulator from V-sync.
+		/// </summary>
+		void UnlockSpeed();
 	}
 }

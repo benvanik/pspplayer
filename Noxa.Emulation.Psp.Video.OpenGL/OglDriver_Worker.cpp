@@ -51,6 +51,7 @@ DisplayList* GetNextDisplayList();
 void ProcessList( OglContext* context, DisplayList* list );
 
 void WorkerThreadThunk( Object^ object );
+void SetSpeedLock( bool locked );
 
 void TextureCacheFreeHandler( uint key, TextureEntry* value )
 {
@@ -113,6 +114,11 @@ void NativeWorker( HDC hDC, OglContext* context )
 	long long startTime;
 	long long endTime;
 	long long freq;
+
+	bool commaDown = false;
+	bool periodDown = false;
+	bool slashDown = false;
+	bool decoupled = false;
 
 	// We take ticks/sec to ticks/frame (16.6667 ms)
 	QueryPerformanceFrequency( ( LARGE_INTEGER* )&freq );
@@ -188,9 +194,58 @@ listAbort:
 		else
 			Sleep( 0 );
 		_vsyncWaiting = false;
+
+#if _DEBUG
+		bool oldPeriodDown = periodDown;
+		bool oldSlashDown = slashDown;
+		commaDown = ( GetAsyncKeyState( VK_OEM_COMMA ) != 0 );
+		periodDown = ( GetAsyncKeyState( VK_OEM_PERIOD ) != 0 );
+		slashDown = ( GetAsyncKeyState( VK_OEM_2 ) != 0 );
+		if( commaDown == true )
+		{
+			// Draw wireframe
+			glClear( GL_COLOR_BUFFER_BIT );
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		}
+		else
+		{
+			// Draw solid (normal)
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		}
+		if( oldPeriodDown != periodDown )
+		{
+			if( periodDown == true )
+			{
+				// Unlock
+				SetSpeedLock( false );
+			}
+			else
+			{
+				// Lock (normal)
+				SetSpeedLock( true );
+			}
+			decoupled = false;
+		}
+		if( oldSlashDown != slashDown )
+		{
+			if( slashDown == false )
+			{
+				decoupled = !decoupled;
+				SetSpeedLock( !decoupled );
+			}
+		}
+#endif
 	}
 }
 #pragma managed
+
+void SetSpeedLock( bool locked )
+{
+	if( locked == true )
+		OglDriver::GlobalDriver->Emulator->LockSpeed();
+	else
+		OglDriver::GlobalDriver->Emulator->UnlockSpeed();
+}
 
 void OglDriver::SetupOpenGL()
 {
