@@ -61,7 +61,7 @@ void TextureCacheFreeHandler( uint key, TextureEntry* value )
 		*texturePointer = value->CookieOriginal;
 	GLuint freeIds[] = { value->TextureID };
 	glDeleteTextures( 1, freeIds );
-	delete value;
+	//delete value;
 }
 #pragma managed
 

@@ -108,7 +108,10 @@ namespace Noxa {
 				_keyLookup.erase( entry );
 
 				T value = entry->Value;
-				_list.Remove( entry );
+
+				// TODO: figure out why hash_map crashes on insert if we remove the entry (and delete it)
+				//_list.Remove( entry );
+				_list.MoveToTail( entry );
 
 				_count--;
 
