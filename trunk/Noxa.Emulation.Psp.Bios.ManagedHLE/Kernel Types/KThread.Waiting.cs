@@ -24,6 +24,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public void Wake( int returnValue )
 		{
+			if( State == KThreadState.Dead )
+				return;
+
 			State = KThreadState.Ready;
 			Kernel.Cpu.SetContextRegister( ContextID, 4, ( uint )returnValue );
 

@@ -142,6 +142,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public void StopGame( int exitCode )
 		{
+			Cpu.Stop();
+			foreach( KThread thread in this.Threads )
+				thread.Exit( 0 );
+
 			this.DestroyTimerQueue();
 
 			for( int n = 0; n < Interrupts.Length; n++ )

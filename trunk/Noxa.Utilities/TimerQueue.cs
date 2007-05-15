@@ -121,6 +121,17 @@ namespace Noxa
 			DueTime = dueTime;
 			Callback = callback;
 		}
+
+		internal void Dispose()
+		{
+			/*bool result = TimerQueue.NativeMethods.DeleteTimerQueueTimer( this.Queue._hQueue, this.Handle, new IntPtr( -1 ) );
+			if( result == false )
+			{
+				int error = Marshal.GetLastWin32Error();
+				throw new Win32Exception( error );
+			}
+			this.Handle = IntPtr.Zero;*/
+		}
 	}
 
 	#endregion
@@ -132,9 +143,9 @@ namespace Noxa
 	{
 		#region Interop
 
-		private delegate void WaitOrTimerDelegate( IntPtr param, [MarshalAs( UnmanagedType.Bool )] bool timerOrWaitFired );
+		internal delegate void WaitOrTimerDelegate( IntPtr param, [MarshalAs( UnmanagedType.Bool )] bool timerOrWaitFired );
 
-		private static class NativeMethods
+		internal static class NativeMethods
 		{
 			[Flags]
 			public enum TimerQueueFlags : uint
@@ -176,7 +187,7 @@ namespace Noxa
 		/// </summary>
 		public const int MaximumTimers = 256;
 
-		private IntPtr _hQueue;
+		internal IntPtr _hQueue;
 		private FastLinkedList<Timer> _timers;
 		private int _timerId;
 		private object _syncRoot;
@@ -192,6 +203,7 @@ namespace Noxa
 			_timerId = 0;
 			_syncRoot = new object();
 			_delegate = new WaitOrTimerDelegate( this.Callback );
+			GC.KeepAlive( _delegate );
 
 			_hQueue = NativeMethods.CreateTimerQueue();
 			Debug.Assert( _hQueue != IntPtr.Zero );
@@ -224,7 +236,6 @@ namespace Noxa
 			GC.SuppressFinalize( this );
 
 			IntPtr hQueue = _hQueue;
-			_hQueue = IntPtr.Zero;
 			lock( _syncRoot )
 			{
 				_timerId = -1;
@@ -237,6 +248,11 @@ namespace Noxa
 				bool deleted = NativeMethods.DeleteTimerQueueEx( hQueue, new IntPtr( -1 ) );
 				Debug.Assert( deleted == true );
 			}
+
+			_hQueue = IntPtr.Zero;
+
+			// HACK: this is to keep us alive so any pending timer callbacks will work
+			GC.KeepAlive( this );
 		}
 
 		private Timer InternalCreateTimer( TimerMode mode, TimerExecutionContext context, TimerCallback callback, uint dueTime, uint period, bool isLongRunning )
@@ -383,12 +399,7 @@ namespace Noxa
 			lock( _syncRoot )
 				_timers.Remove( timer.Entry );
 
-			bool result = NativeMethods.DeleteTimerQueueTimer( _hQueue, timer.Handle, new IntPtr( -1 ) );
-			if( result == false )
-			{
-				int error = Marshal.GetLastWin32Error();
-				throw new Win32Exception( error );
-			}
+			timer.Dispose();
 		}
 
 		private static int _searchCount = 0;
@@ -409,6 +420,7 @@ namespace Noxa
 					{
 						lock( _syncRoot )
 							_timers.Remove( e );
+						timer.Dispose();
 					}
 					break;
 				}
