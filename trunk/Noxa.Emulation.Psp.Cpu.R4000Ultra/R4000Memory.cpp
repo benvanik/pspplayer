@@ -285,6 +285,9 @@ void R4000Memory::WriteWord( int address, int width, int value )
 	}
 	else
 	{
+		// Some games seem to do this - we ignore it
+		if( ( address & 0x04000000 ) == 0x04000000 )
+			return;
 		Debugger::Break();
 	}
 

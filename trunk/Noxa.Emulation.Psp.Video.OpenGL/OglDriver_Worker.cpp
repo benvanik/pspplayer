@@ -42,6 +42,8 @@ extern HANDLE _hWorkWaitingEvent;
 extern int _workWaiting;
 extern bool _vsyncWaiting;
 
+extern NativeMemorySystem* _memory;
+
 // NativeInterface
 DisplayList* GetNextDisplayList();
 
@@ -49,6 +51,16 @@ DisplayList* GetNextDisplayList();
 void ProcessList( OglContext* context, DisplayList* list );
 
 void WorkerThreadThunk( Object^ object );
+
+void TextureCacheFreeHandler( uint key, TextureEntry* value )
+{
+	uint* texturePointer = ( uint* )_memory->Translate( value->Address );
+	if( *texturePointer == value->Cookie )
+		*texturePointer = value->CookieOriginal;
+	GLuint freeIds[] = { value->TextureID };
+	glDeleteTextures( 1, freeIds );
+	free( value );
+}
 
 void OglDriver::StartThread()
 {
@@ -61,11 +73,14 @@ void OglDriver::StartThread()
 	_context->TextureFilterMag = GL_LINEAR;
 	_context->TextureWrapS = GL_REPEAT;
 	_context->TextureWrapT = GL_REPEAT;
-	_context->TextureCache = new LRU<TextureEntry*>( 1500 );
+	_context->TextureCache = new LRU<TextureEntry*>( TEXTURECACHESIZE );
+	_context->TextureCache->SetFreeHandler( TextureCacheFreeHandler );
 	_context->TextureOffset[ 0 ] = 0.0f;
 	_context->TextureOffset[ 1 ] = 0.0f;
 	_context->TextureScale[ 0 ] = 1.0f;
 	_context->TextureScale[ 1 ] = 1.0f;
+	for( int n = 0; n < 4; n++ )
+		_context->AmbientMaterial[ n ] = 1.0f;
 
 	_thread = gcnew Thread( gcnew ParameterizedThreadStart( &WorkerThreadThunk ) );
 	_thread->Name = "Video worker";

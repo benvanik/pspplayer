@@ -81,6 +81,8 @@ namespace Noxa {
 			{
 				LLEntry<T>* entry = ( LLEntry<T>* )malloc( sizeof( LLEntry<T> ) );
 				entry->Next = _head;
+				if( entry->Next != NULL )
+					entry->Next->Previous = entry;
 				entry->Previous = NULL;
 				entry->Value = value;
 				_head = entry;
@@ -248,6 +250,12 @@ namespace Noxa {
 				free( entry );
 
 				_count--;
+
+				if( _count == 0 )
+				{
+					assert( _head == NULL );
+					assert( _tail == NULL );
+				}
 			}
 
 			template<typename T>
@@ -260,7 +268,8 @@ namespace Noxa {
 					entry->Previous->Next = entry->Next;
 
 				// Add to head
-				entry->Next = _head;
+				if( entry != _head )
+					entry->Next = _head;
 				entry->Previous = NULL;
 				_head = entry;
 			}

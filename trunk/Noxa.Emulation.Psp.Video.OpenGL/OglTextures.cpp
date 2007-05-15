@@ -319,7 +319,7 @@ byte* _unswizzleBuffer = NULL;
 byte* _decodeBuffer = NULL;
 
 extern void __break();
-bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTexture* texture )
+bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTexture* texture, uint checksum )
 {
 	uint textureId;
 	glGenTextures( 1, &textureId );
@@ -332,6 +332,9 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	entry->LineWidth = texture->LineWidth;
 	entry->PixelStorage = texture->PixelStorage;
 	entry->TextureID = textureId;
+	entry->Checksum = checksum;
+	entry->ClutPointer = context->ClutPointer;
+	entry->ClutChecksum = context->ClutChecksum;
 	context->TextureCache->Add( texture->Address, entry );
 
 	if( _unswizzleBuffer == NULL )
@@ -342,8 +345,6 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	byte* address = context->Memory->Translate( texture->Address );
 	TextureFormat* format = ( TextureFormat* )&__formats[ texture->PixelStorage ];
 	int size = texture->LineWidth * texture->Height * format->Size;
-
-	uint* cookieAddress = ( uint* )address;
 
 	byte* buffer = address;
 	if( context->TexturesSwizzled == true )
@@ -427,12 +428,61 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 		format->GLFormat,
 		( void* )buffer );
 
-
-	// Write cookie
-	entry->Cookie = ( uint )entry->TextureID; //*( ( uint* )address );
-	*cookieAddress = entry->Cookie;
+	entry->CookieOriginal = *( ( uint* )address );
+	entry->Cookie = entry->TextureID;
+	*( ( uint* )address ) = entry->Cookie;
 
 	return true;
+}
+
+#define CHECKSUMSPACING 4
+uint Noxa::Emulation::Psp::Video::CalculateTextureChecksum( byte* address, int width, int height, int pixelStorage )
+{
+	//uint checksum = *( uint* )address;
+	//return checksum;
+
+	TextureFormat* format = ( TextureFormat* )&__formats[ pixelStorage ];
+	int size = format->Size;
+	if( size == 0 )
+	{
+		size = 1;
+		width /= 2;
+	}
+
+	uint checksum = 0;
+	int stride = width * size;
+
+	// Offset a bit
+	address += stride / 2;
+
+	stride = stride * CHECKSUMSPACING;
+
+	switch( size )
+	{
+	default:
+	case 1:
+		for( int n = 0; n < ( height / CHECKSUMSPACING ); n++ )
+		{
+			checksum += *address;
+			address += stride;
+		}
+		break;
+	case 2:
+		for( int n = 0; n < ( height / CHECKSUMSPACING ); n++ )
+		{
+			checksum += *( ( ushort* )address );
+			address += stride;
+		}
+		break;
+	case 4:
+		for( int n = 0; n < ( height / CHECKSUMSPACING ); n++ )
+		{
+			checksum += *( ( uint* )address );
+			address += stride;
+		}
+		break;
+	}
+	return checksum;
 }
 
 #pragma managed

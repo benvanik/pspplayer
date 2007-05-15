@@ -266,9 +266,17 @@ void ProcessList( OglContext* context, DisplayList* list )
 				temp = GL_GEQUAL;
 				break;
 			}
-			glAlphaFunc( temp, ( ( argi >> 8 ) & 0xFF ) / 255.0f );
+			argf = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
+			if( argf > 0.0f )
+			{
+				glEnable( GL_ALPHA_TEST );
+				glAlphaFunc( temp, argf );
+			}
+			else
+				glDisable( GL_ALPHA_TEST );
 			// @param mask - Specifies the mask that both values are ANDed with before comparison.
-			//mask = ( argi >> 16 ) & 0xFF;
+			temp = ( argi >> 16 ) & 0xFF;
+			assert( ( temp == 0x0 ) || ( temp == 0xFF ) );
 			break;
 
 		case ZTE:
@@ -479,10 +487,13 @@ void ProcessList( OglContext* context, DisplayList* list )
 			break;
 		case AMA:
 			// ambient material alpha
-			context->AmbientAlpha = argi & 0xFF;
+			context->AmbientMaterial[ 3 ] = ( argi & 0xFF ) / 255.0f;
 			break;
 		case AMC:
 			// ambient material color
+			context->AmbientMaterial[ 0 ] = ( argi & 0xFF ) / 255.0f;
+			context->AmbientMaterial[ 1 ] = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
+			context->AmbientMaterial[ 2 ] = ( ( argi >> 16 ) & 0xFF ) / 255.0f;
 			break;
 
 		case FBP:
@@ -705,7 +716,6 @@ void ProcessList( OglContext* context, DisplayList* list )
 			  */
 			switch( argi & 0x7 )
 			{
-			default:
 			case 0:
 				temp = GL_MODULATE;
 				break;
@@ -715,6 +725,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			case 2:
 				temp = GL_BLEND;
 				break;
+			default:
 			case 3:
 				temp = GL_REPLACE;
 				break;
@@ -729,7 +740,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			color4[ 0 ] = ( ( argi >> 16 ) & 0xFF ) / 255.0f;
 			color4[ 1 ] = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
 			color4[ 2 ] = ( argi & 0xFF ) / 255.0f;
-			color4[ 3 ] = 0;
+			color4[ 3 ] = 1.0f;
 			glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, color4 );
 			break;
 		case TFLUSH:
@@ -803,7 +814,36 @@ void ProcessList( OglContext* context, DisplayList* list )
 				{
 					byte* tablePointer = context->Memory->Translate( context->ClutPointer );
 					int entries = argi * 16;
-					memcpy( context->ClutTable, tablePointer, entries * ( ( context->ClutFormat < 3 ) ? 2 : 3 ) );
+					int entryWidth = ( ( context->ClutFormat < 3 ) ? 2 : 4 );
+					memcpy( context->ClutTable, tablePointer, entries * entryWidth );
+
+					// Checksum so that we can tell if it changed
+					uint checksum = 0;
+					for( int n = 0; n < ( entries * entryWidth ); n++ )
+						checksum += *( tablePointer++ );
+					if( context->ClutChecksum != checksum )
+					{
+						// Checksums don't match! Invalidate all CLUT textures!
+						/*LLEntry<TextureEntry*>* e = context->TextureCache->GetEnumerator();
+						while( e != NULL )
+						{
+							LLEntry<TextureEntry*>* next = e->Next;
+							if( ( e->Value->PixelStorage & 0x4 ) == 0x4 )
+							{
+								// Check to see if it was from this clut
+								if( e->Value->ClutPointer == context->ClutPointer )
+								{
+									// Kill it!
+									GLuint freeIds[] = { e->Value->TextureID };
+									glDeleteTextures( 1, freeIds );
+									context->TextureCache->Remove( ( uint )e->Value->Address );
+								}
+							}
+							e = next;
+						}*/
+						//context->TextureCache->Clear();
+					}
+					context->ClutChecksum = checksum;
 				}
 			}
 			break;
