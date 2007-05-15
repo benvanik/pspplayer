@@ -9,4 +9,5 @@ More coming soon... I've got a partially completed web compatability database as
   * [http://www.easy-monkey.co.uk/TrigWars/ Trigonometry Wars]
 
 == Commercial ==
-  * [http://www.amazon.com/Puzzle-Bobble-Pocket-Version-Game/dp/B0009S57HE Puzzle Bobble Pocket] (JP)
+  * [http://www.amazon.com/Puzzle-Bobble-Pocket-Version-Game/dp/B0009S57HE Puzzle Bobble Pocket] (JP) (single player doesn't work, but all other game modes do)
+  * [http://www.amazon.co.uk/Ubisoft-Tales-of-Eternia-PSP/dp/B000BKBHPQ Tales of Eternia] (UK) (reports are that some versions don't work - mine does :)
