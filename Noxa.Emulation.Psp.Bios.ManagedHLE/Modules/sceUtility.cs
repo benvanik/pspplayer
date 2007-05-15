@@ -189,28 +189,28 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
             SaveWrongUMD = 0x8011038a;
 
 
+        // REMEMBER - char in C# is 2 bytes! have to use bytes!
         struct PspUtilitySavedataSFOParam
 	    {
-		    fixed char title[0x80];
-		    fixed char savedataTitle[0x80];
-		    fixed char detail[0x400];
-		    byte parentalLevel;
-		    fixed byte unknown[3];
+            public fixed sbyte title[0x80];
+            public fixed sbyte savedataTitle[0x80];
+            public fixed sbyte detail[0x400];
+            public byte parentalLevel;
+            public fixed byte unknown[3];
 	    };
 
 	    struct PspUtilitySavedataFileData 
         {
-		    void *buf;
-		    uint bufSize;
-		    uint size;	/* ??? - why are there two sizes? */
-		    int unknown;
+		    public void *buf;
+            public uint bufSize;
+            public uint size;	// ??? - why are there two sizes?
+            public int unknown;
 	    };
 
-	/** Structure to hold the parameters for the ::sceUtilitySavedataInitStart function.
-	*/
+	    // Structure to hold the parameters for the ::sceUtilitySavedataInitStart function.
 	    struct SceUtilitySavedataParam
 	    {
-		    /** Size of the structure */
+		    // Size of the structure
 		    public uint size;
 
             public int language;
@@ -221,23 +221,24 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
             public int result;
             public fixed int unknown2[4];
 
-		    /** mode: 0 to load, 1 to save */
+		    // mode: 0 to load, 1 to save
             public int mode;
             public int bind;
 
-		    /** unknown13 use 0x10 */
+		    // unknown13 use 0x10
             public int overwriteMode;
 
-		    /** gameName: name used from the game for saves, equal for all saves */
-            public fixed char gameName[16];
-		    /** saveName: name of the particular save, normally a number */
-            public fixed char saveName[24];
-		    /** fileName: name of the data file of the game for example DATA.BIN */
-            public fixed char fileName[16];
+		    // gameName: name used from the game for saves, equal for all saves
+            public fixed sbyte gameName[16];
+		    // saveName: name of the particular save, normally a number
+            public fixed sbyte saveName[24];
+		    // fileName: name of the data file of the game for example DATA.BIN
+            public fixed sbyte fileName[16];
 
-		    /** pointer to a buffer that will contain data file unencrypted data */
+		    // pointer to a buffer that will contain data file unencrypted data
             public void* dataBuf;
-		    /** size of allocated space to dataBuf */
+
+		    // size of allocated space to dataBuf
             public uint dataBufSize;
             public uint dataSize;
 
@@ -253,16 +254,32 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
         private UtilityStatus status;
 
-
-        [NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x50C4CD57, "sceUtilitySavedataInitStart" )]
 		// SDK location: /utility/psputility_savedata.h:97
 		// SDK declaration: int sceUtilitySavedataInitStart(SceUtilitySavedataParam * params);
 		public int sceUtilitySavedataInitStart( int saveParams )
 		{
             SceUtilitySavedataParam *p = (SceUtilitySavedataParam *)_memorySystem.Translate((uint)saveParams);
+            
+            string fileName = new string(p->fileName);
+            string gameName = new string(p->gameName);
+            string saveName = new string(p->saveName);
 
+            // these will of course only be filled in on save
+            string title = new string(p->sfoParam.title);
+            string saveDataTitle = new string(p->sfoParam.savedataTitle);
+            string detail = new string(p->sfoParam.detail);
+            
+            //A pointer to the data to be saved is in p->dataBuf, 
+            //with length p->dataBufSize or p->dataSize
+            
+            //Data for the save icon0,1,pic1,snd0 is in the corresponding members of p
+
+            Log.WriteLine(Verbosity.Critical, Feature.Bios, "sceUtilitySavedataInitStart: {0} {1} {2} {3}",
+                p->mode == 0 ? "Load" : "Save", fileName, gameName, saveName);
+
+            //For now, we just fake it all by saying that there is no data when a game wants to 
+            //load, and that there is no memstick when a game wants to save.
             status = UtilityStatus.Running;
 
             int mode = p->mode;
@@ -278,8 +295,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
             }
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x9790B33C, "sceUtilitySavedataShutdownStart" )]
 		// SDK location: /utility/psputility_savedata.h:117
 		// SDK declaration: int sceUtilitySavedataShutdownStart();
@@ -289,8 +304,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
             return 0;
 		}
 
-		[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0xD4B95FFB, "sceUtilitySavedataUpdate" )]
 		// SDK location: /utility/psputility_savedata.h:124
 		// SDK declaration: int sceUtilitySavedataUpdate(int unknown);
@@ -305,7 +318,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
             return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x8874DBE0, "sceUtilitySavedataGetStatus" )]
 		// SDK location: /utility/psputility_savedata.h:107
@@ -561,12 +573,24 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilitySetSystemParamString(int id, const char *str);
 		public int sceUtilitySetSystemParamString( int id, int str ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xA5DA2406, "sceUtilityGetSystemParamInt" )]
 		// SDK location: /utility/psputility_sysparam.h:122
 		// SDK declaration: int sceUtilityGetSystemParamInt( int id, int *value );
-		public int sceUtilityGetSystemParamInt( int id, int value ){ return Module.NotImplementedReturn; }
+		public int sceUtilityGetSystemParamInt( int id, int valueAddr )
+        {
+            uint* ptr = (uint*)_memorySystem.Translate((uint)valueAddr);
+            switch (id)
+            {
+                case 7:
+                    *ptr = 1; //english
+                    break;
+                default:
+                    *ptr = 0;
+                    break;
+            };
+            return 0;
+        }
 
 		[NotImplemented]
 		[Stateless]
