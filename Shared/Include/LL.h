@@ -54,6 +54,7 @@ namespace Noxa {
 				void Remove( LLEntry<T>* entry );
 
 				void MoveToHead( LLEntry<T>* entry );
+				void MoveToTail( LLEntry<T>* entry );
 
 				int GetCount(){ return _count; }
 				LLEntry<T>* GetHead(){ return _head; }
@@ -272,6 +273,22 @@ namespace Noxa {
 					entry->Next = _head;
 				entry->Previous = NULL;
 				_head = entry;
+			}
+
+			template<typename T>
+			void LL<T>::MoveToTail( LLEntry<T>* entry )
+			{
+				// Remove from old location
+				if( entry->Next != NULL )
+					entry->Next->Previous = entry->Previous;
+				if( entry->Previous != NULL )
+					entry->Previous->Next = entry->Next;
+
+				// Add to tail
+				if( entry != _tail )
+					entry->Previous = _tail;
+				entry->Next = NULL;
+				_tail = entry;
 			}
 
 			template<typename T>
