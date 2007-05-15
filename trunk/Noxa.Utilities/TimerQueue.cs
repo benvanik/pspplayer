@@ -405,6 +405,11 @@ namespace Noxa
 				if( e.Value.ID == id )
 				{
 					timer = e.Value;
+					if( timer.Mode == TimerMode.OneShot )
+					{
+						lock( _syncRoot )
+							_timers.Remove( e );
+					}
 					break;
 				}
 				e = e.Next;
