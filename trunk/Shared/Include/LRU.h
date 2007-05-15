@@ -107,11 +107,13 @@ namespace Noxa {
 				_lookup.erase( key );
 				_keyLookup.erase( entry );
 
-				if( _freeHandler != NULL )
-					_freeHandler( key, entry->Value );
-				
+				T value = entry->Value;
 				_list.Remove( entry );
+
 				_count--;
+
+				if( _freeHandler != NULL )
+					_freeHandler( key, value );
 			}
 
 			template<typename T>

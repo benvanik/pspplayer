@@ -169,7 +169,10 @@ void SetTexture( OglContext* context, int stage )
 	OglTexture* texture = &context->Textures[ stage ];
 
 	if( texture->Address == 0 )
+	{
+		glBindTexture( GL_TEXTURE_2D, 0 );
 		return;
+	}
 
 	byte* texturePointer = ( byte* )context->Memory->Translate( texture->Address );
 	uint checksum = CalculateTextureChecksum( texturePointer, texture->Width, texture->Height, texture->PixelStorage );
@@ -178,6 +181,7 @@ void SetTexture( OglContext* context, int stage )
 	TextureEntry* entry = context->TextureCache->Find( texture->Address );
 	if( entry != NULL )
 	{
+		assert( entry->Address == texture->Address );
 		uint cookie = *( ( uint* )texturePointer );
 
 		bool match =
