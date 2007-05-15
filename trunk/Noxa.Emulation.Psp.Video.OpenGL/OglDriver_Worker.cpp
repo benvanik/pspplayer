@@ -59,7 +59,7 @@ void TextureCacheFreeHandler( uint key, TextureEntry* value )
 		*texturePointer = value->CookieOriginal;
 	GLuint freeIds[] = { value->TextureID };
 	glDeleteTextures( 1, freeIds );
-	free( value );
+	delete value;
 }
 
 void OglDriver::StartThread()
