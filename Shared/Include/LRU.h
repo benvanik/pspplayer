@@ -22,6 +22,9 @@ namespace Noxa {
 			template<typename T>
 			class LRU
 			{
+			public:
+				typedef void (*FreeHandler)( uint key, T value );
+
 			private:
 				// I'm lame and actually keep two lookups - one for key -> entry and one for entry -> key
 				stdext::hash_map<uint, LLEntry<T>*>	_lookup;
@@ -29,6 +32,7 @@ namespace Noxa {
 				LL<T>				_list;
 				int					_count;
 				int					_maxCount;
+				FreeHandler			_freeHandler;
 
 			public:
 				LRU( int maxCount );
@@ -37,11 +41,17 @@ namespace Noxa {
 				void Add( uint key, T value );
 				void Remove( uint key );
 				T Find( uint key );
+				LLEntry<T>* GetEnumerator();
 
 				int GetCount(){ return _count; }
 				int GetMaxCount(){ return _maxCount; }
 
 				void Clear();
+
+				void SetFreeHandler( FreeHandler handler )
+				{
+					_freeHandler = handler;
+				}
 			};
 
 			template<typename T>
@@ -49,6 +59,7 @@ namespace Noxa {
 			{
 				_count = 0;
 				_maxCount = maxCount;
+				_freeHandler = NULL;
 			}
 
 			template<typename T>
@@ -72,7 +83,10 @@ namespace Noxa {
 					_lookup.erase( oldKey );
 					_keyLookup.erase( dead );
 
-					//_list.Remove( dead );
+					if( _freeHandler != NULL )
+						_freeHandler( oldKey, dead->Value );
+
+					_list.Remove( dead );
 					_count--;
 				}
 
@@ -92,9 +106,12 @@ namespace Noxa {
 
 				_lookup.erase( key );
 				_keyLookup.erase( entry );
+
+				if( _freeHandler != NULL )
+					_freeHandler( key, entry->Value );
 				
+				_list.Remove( entry );
 				_count--;
-				//_list.Remove( entry );
 			}
 
 			template<typename T>
@@ -110,14 +127,30 @@ namespace Noxa {
 			}
 
 			template<typename T>
+			LLEntry<T>* LRU<T>::GetEnumerator()
+			{
+				return _list.GetHead();
+			}
+
+			template<typename T>
 			void LRU<T>::Clear()
 			{
 				_lookup.clear();
 				_keyLookup.clear();
+
+				if( _freeHandler != NULL )
+				{
+					LLEntry<T>* e = _list.GetHead();
+					while( e != NULL )
+					{
+						_freeHandler( 0, e->Value );
+						e = e->Next;
+					}
+				}
+
 				_list.Clear();
 				_count = 0;
 			}
-
 		}
 	}
 }

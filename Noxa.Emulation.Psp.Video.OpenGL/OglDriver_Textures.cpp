@@ -171,21 +171,28 @@ void SetTexture( OglContext* context, int stage )
 	if( texture->Address == 0 )
 		return;
 
+	byte* texturePointer = ( byte* )context->Memory->Translate( texture->Address );
+	uint checksum = CalculateTextureChecksum( texturePointer, texture->Width, texture->Height, texture->PixelStorage );
+
 	// Check texture cache
 	TextureEntry* entry = context->TextureCache->Find( texture->Address );
 	if( entry != NULL )
 	{
-		uint* texturePointer = ( uint* )context->Memory->Translate( texture->Address );
-		if( ( entry->Cookie != *texturePointer ) ||
-			( entry->Width != texture->Width ) ||
-			( entry->Height != texture->Height ) ||
-			( entry->LineWidth != texture->LineWidth ) ||
-			( entry->PixelStorage != texture->PixelStorage ) )
+		uint cookie = *( ( uint* )texturePointer );
+
+		bool match =
+			( entry->Cookie == cookie ) &&
+			( entry->Checksum == checksum ) &&
+			( entry->Width == texture->Width ) &&
+			( entry->Height == texture->Height ) &&
+			( entry->LineWidth == texture->LineWidth ) &&
+			( entry->PixelStorage == texture->PixelStorage );
+		if( ( match == true ) && ( ( entry->PixelStorage & 0x4 ) == 0x4 ) )
+			match = entry->ClutChecksum == context->ClutChecksum;
+		if( match == false )
 		{
 			// Mismatch - free
 			context->TextureCache->Remove( texture->Address );
-			GLuint freeIds[] = { entry->TextureID };
-			glDeleteTextures( 1, freeIds );
 			entry = NULL;
 		}
 	}
@@ -207,7 +214,7 @@ void SetTexture( OglContext* context, int stage )
 		return;
 	
 	// Grab and decode texture, then create in OGL
-	if( GenerateTexture( context, texture ) == false )
+	if( GenerateTexture( context, texture, checksum ) == false )
 	{
 		// Failed? Not much we can do...
 	}

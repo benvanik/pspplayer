@@ -11,6 +11,26 @@ namespace Noxa {
 		namespace Psp {
 			namespace Video {
 
+				typedef struct TextureEntry_t
+				{
+					int				PixelStorage;
+					int				Address;
+					int				LineWidth;
+					int				Width;
+					int				Height;
+
+					int				TextureID;
+
+					uint			Checksum;
+					uint			Cookie;
+					uint			CookieOriginal;
+
+					// If PixelStorage & 0x4, these are valid
+					uint			ClutPointer;
+					uint			ClutChecksum;
+
+				} TextureEntry;
+
 				typedef struct OglTexture_t
 				{
 					int				PixelStorage;
@@ -33,8 +53,8 @@ namespace Noxa {
 				struct OglContext_t;
 
 				bool IsTextureValid( OglTexture* texture );
-				bool GenerateTexture( OglContext_t* context, OglTexture* texture );
-
+				bool GenerateTexture( OglContext_t* context, OglTexture* texture, uint checksum );
+				uint CalculateTextureChecksum( byte* address, int width, int height, int pixelStorage );
 			}
 		}
 	}

@@ -18,17 +18,6 @@ namespace Noxa {
 
 				#define CLUTSIZE	65536
 
-				typedef struct TextureEntry_t
-				{
-					int				PixelStorage;
-					int				Address;
-					int				LineWidth;
-					int				Width;
-					int				Height;
-					uint			Cookie;
-					int				TextureID;
-				} TextureEntry;
-
 				typedef struct OglContext_t
 				{
 					// Memory from the CPU
@@ -64,6 +53,7 @@ namespace Noxa {
 
 					void*			ClutTable;		// Allocated to CLUTSIZE and pallettes are copied in
 					uint			ClutPointer;
+					uint			ClutChecksum;
 					int				ClutFormat;
 					int				ClutShift;
 					int				ClutMask;
@@ -72,7 +62,7 @@ namespace Noxa {
 					uint			SourceFix;
 					uint			DestFix;
 
-					byte			AmbientAlpha;	// HACK
+					float			AmbientMaterial[ 4 ];
 
 					// Patches
 					int				PatchFrontFace;

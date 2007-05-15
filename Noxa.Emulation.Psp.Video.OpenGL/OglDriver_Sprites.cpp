@@ -85,8 +85,6 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	float uscale = context->TextureScale[ 0 ];
 	float vscale = context->TextureScale[ 1 ];
 
-	uint ambientMat = context->AmbientAlpha;
-
 	float vpos[ 4 ][ 3 ];
 	float vtex[ 4 ][ 2 ];
 	byte vclr[ 4 ][ 4 ];
@@ -136,7 +134,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 				src += 2;
 				break;
 			case VTColorABGR8888:
-				*( ( int* )vclr[ m ] ) = *( ( int* )src ) + ambientMat;
+				*( ( int* )vclr[ m ] ) = *( ( int* )src );
 				src += 4;
 				break;
 			}
@@ -193,6 +191,13 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 
 		if( colorType != 0 )
 		{
+			// Scale color by material
+			float* ambientMat = context->AmbientMaterial;
+			vclr[ 2 ][ 0 ] = ( byte )( vclr[ 2 ][ 0 ] * ambientMat[ 0 ] );
+			vclr[ 2 ][ 1 ] = ( byte )( vclr[ 2 ][ 1 ] * ambientMat[ 1 ] );
+			vclr[ 2 ][ 2 ] = ( byte )( vclr[ 2 ][ 2 ] * ambientMat[ 2 ] );
+			vclr[ 2 ][ 3 ] = ( byte )( vclr[ 2 ][ 3 ] * ambientMat[ 3 ] );
+
 			*( ( int* )vclr[ 0 ] ) = *( ( int* )vclr[ 2 ] );
 			*( ( int* )vclr[ 1 ] ) = *( ( int* )vclr[ 2 ] );
 			*( ( int* )vclr[ 3 ] ) = *( ( int* )vclr[ 2 ] );
@@ -215,7 +220,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 			if( colorType != 0 )
 				glColor4ubv( vclr[ m ] );
 			else
-				glColor4ub( 255, 255, 255, 255 );
+				glColor4fv( context->AmbientMaterial );
 			glVertex3fv( vpos[ m ] );
 		}
 	}

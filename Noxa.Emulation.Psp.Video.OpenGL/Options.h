@@ -19,6 +19,9 @@
 // Double buffer the display surface
 #define VSYNC
 
+// Number of textures to hold on to
+#define TEXTURECACHESIZE	1500
+
 // ---------------------- Debug options -------------------------------------
 #ifdef _DEBUG
 
