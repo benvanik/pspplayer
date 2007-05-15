@@ -18,6 +18,7 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 
 // Number of vertical traces
 uint _vcount;
+bool Noxa::Emulation::Psp::Video::_speedLocked;
 
 OglDriver::OglDriver( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 {
@@ -35,6 +36,7 @@ OglDriver::OglDriver( IEmulationInstance^ emulator, ComponentParameters^ paramet
 	this->SetupNativeInterface();
 
 	_vcount = 0;
+	_speedLocked = true;
 }
 
 OglDriver::~OglDriver()

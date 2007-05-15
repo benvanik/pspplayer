@@ -21,6 +21,15 @@ namespace Noxa.Emulation.Psp.Bios
 	public interface IBios : IComponentInstance
 	{
 		/// <summary>
+		/// Lock the emulator to V-sync.
+		/// </summary>
+		bool SpeedLocked
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// The <see cref="ILoader"/> instance that controls loading of games and modules.
 		/// </summary>
 		ILoader Loader

@@ -397,6 +397,18 @@ namespace Noxa.Emulation.Psp.Player
 		{
 		}
 
+		public void LockSpeed()
+		{
+			_bios.SpeedLocked = true;
+			_video.SpeedLocked = true;
+		}
+
+		public void UnlockSpeed()
+		{
+			_bios.SpeedLocked = false;
+			_bios.SpeedLocked = false;
+		}
+
 		public delegate void DummyDelegate();
 
 		public void SwitchToXmb()

@@ -60,6 +60,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public long StartTick;
 		public long TickFrequency;
 
+		public bool SpeedLocked;
+
 		private int _lastUid;
 
 		public Kernel( Bios bios )
@@ -81,6 +83,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			Handles = new Dictionary<uint, KHandle>();
 			_lastUid = 100;
+
+			SpeedLocked = true;
 		}
 
 		~Kernel()

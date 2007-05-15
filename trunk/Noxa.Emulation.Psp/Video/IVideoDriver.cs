@@ -67,6 +67,15 @@ namespace Noxa.Emulation.Psp.Video
 		}
 
 		/// <summary>
+		/// Lock the emulator to V-sync.
+		/// </summary>
+		bool SpeedLocked
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// Resize the video context.
 		/// </summary>
 		/// <param name="width">The new width of the client area.</param>

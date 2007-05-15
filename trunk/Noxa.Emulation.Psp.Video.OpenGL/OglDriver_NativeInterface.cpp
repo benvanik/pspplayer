@@ -341,11 +341,14 @@ void niWaitForVsync()
 	// ticks are 100ns, we need ms
 	duration /= ( _freq / 1000 );
 
-	// If we are under 16ms, wait until 16ms
-	// Sleep is pretty expensive, so if we are <= 1, don't do it - we can take the inaccuracy
-	//if( ( ( duration > 1 ) &&
-	if( ( duration > 0 ) && ( duration < 16 ) )
-		Sleep( 16 - ( int )duration );
+	if( _speedLocked == true )
+	{
+		// If we are under 16ms, wait until 16ms
+		// Sleep is pretty expensive, so if we are <= 1, don't do it - we can take the inaccuracy
+		//if( ( ( duration > 1 ) &&
+		if( ( duration > 0 ) && ( duration < 16 ) )
+			Sleep( 16 - ( int )duration );
+	}
 
 	_vsyncWaiting = true;
 }

@@ -22,6 +22,8 @@ namespace Noxa {
 		namespace Psp {
 			namespace Video {
 
+				extern bool _speedLocked;
+
 				ref class OpenGLVideo;
 				
 				ref class OglDriver : IVideoDriver
@@ -130,6 +132,18 @@ namespace Noxa {
 						virtual IntPtr get()
 						{
 							return IntPtr::IntPtr( _nativeInterface );
+						}
+					}
+
+					property bool SpeedLocked
+					{
+						virtual bool get()
+						{
+							return _speedLocked;
+						}
+						virtual void set( bool value )
+						{
+							_speedLocked = value;
 						}
 					}
 

@@ -75,7 +75,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceDisplayGetFramePerSec()
 		{
 			// ?
-			return 30;
+			return 60;
 		}
 
 		[NotImplemented]
@@ -229,6 +229,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			uint fixedElapsed =	16777 - Math.Min( 16777, ( uint )elapsed );
 			if( fixedElapsed < 1000 )
 				return;
+
+			// This could be just a return
+			if( _kernel.SpeedLocked == false )
+				fixedElapsed = 1000;
 
 			KThread thread = _kernel.ActiveThread;
 			Debug.Assert( thread != null );
