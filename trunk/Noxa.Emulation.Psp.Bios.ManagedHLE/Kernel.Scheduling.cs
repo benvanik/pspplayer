@@ -76,9 +76,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			bool breakFlag;
 			uint instructionsExecuted;
 			Cpu.Execute( out breakFlag, out instructionsExecuted );
-			if( breakFlag == true )
-				this.Schedule();
-			else
+			if( breakFlag == false )
 			{
 				// Only if not broken by choice
 				//Log.WriteLine( Verbosity.Verbose, Feature.Bios, "CPU returned to us after {0} instructions", instructionsExecuted );
