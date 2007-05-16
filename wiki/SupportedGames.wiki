@@ -11,3 +11,4 @@ More coming soon... I've got a partially completed web compatability database as
 == Commercial ==
   * [http://www.amazon.com/Puzzle-Bobble-Pocket-Version-Game/dp/B0009S57HE Puzzle Bobble Pocket] (JP) (perfect speed and everything!)
   * [http://www.amazon.co.uk/Ubisoft-Tales-of-Eternia-PSP/dp/B000BKBHPQ Tales of Eternia] (UK) (reports are that some versions don't work - mine does :)
+  * [http://psp.ign.com/objects/696/696084.html AI Igo] (JP) (goes in game, but on the second movie it crashes)
