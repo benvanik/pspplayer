@@ -18,23 +18,23 @@ using Noxa.Emulation.Psp.Cpu;
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
 	unsafe class sceUtility : Module
-    {
-        #region Common
+	{
+		#region Common
 
-        private enum UtilityStatus
-        {
-            None = 0,
-            Init = 1,
-            Running = 2,
-            Finished = 3,
-            Closed = 4,
-        }
+		private enum UtilityStatus
+		{
+			None = 0,
+			Init = 1,
+			Running = 2,
+			Finished = 3,
+			Closed = 4,
+		}
 
-        #endregion
+		#endregion
 
-        #region Properties
+		#region Properties
 
-        public override string Name
+		public override string Name
 		{
 			get
 			{
@@ -171,151 +171,163 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#region Savedata
 
+		private const uint
+			LoadNoMemStick = 0x80110301,
+			LoadAccessError = 0x80110305,
+			LoadDataBroken = 0x80110306,
+			LoadNoData = 0x80110307,
+			LoadBadParams = 0x80110308;
 
-        const uint
-            LoadNoMemStick = 0x80110301,
-            LoadAccessError = 0x80110305,
-            LoadDataBroken = 0x80110306,
-            LoadNoData = 0x80110307,
-            LoadBadParams = 0x80110308;
+		private const uint
+			SaveNoMemStick = 0x80110381,
+			SaveNoSpace = 0x80110383,
+			SaveMemStickProtected = 0x80110384,
+			SaveAccessError = 0x80110385,
+			SaveBadParams = 0x80110388,
+			SaveNoUMD = 0x80110389,
+			SaveWrongUMD = 0x8011038a;
 
-        const uint
-            SaveNoMemStick = 0x80110381,
-            SaveNoSpace = 0x80110383,
-            SaveMemStickProtected = 0x80110384,
-            SaveAccessError = 0x80110385,
-            SaveBadParams = 0x80110388,
-            SaveNoUMD = 0x80110389,
-            SaveWrongUMD = 0x8011038a;
+		// REMEMBER - char in C# is 2 bytes! have to use bytes!
+		private struct PspUtilitySavedataSFOParam
+		{
+			public fixed sbyte title[ 0x80 ];
+			public fixed sbyte savedataTitle[ 0x80 ];
+			public fixed sbyte detail[ 0x400 ];
+			public byte parentalLevel;
+			public fixed byte unknown[ 3 ];
+		}
 
+		private struct PspUtilitySavedataFileData
+		{
+			public void* buf;
+			public uint bufSize;
+			public uint size;	// ??? - why are there two sizes?
+			public int unknown;
+		}
 
-        // REMEMBER - char in C# is 2 bytes! have to use bytes!
-        struct PspUtilitySavedataSFOParam
-	    {
-            public fixed sbyte title[0x80];
-            public fixed sbyte savedataTitle[0x80];
-            public fixed sbyte detail[0x400];
-            public byte parentalLevel;
-            public fixed byte unknown[3];
-	    };
+		// Structure to hold the parameters for the ::sceUtilitySavedataInitStart function.
+		private struct SceUtilitySavedataParam
+		{
+			// Size of the structure
+			public uint size;
 
-	    struct PspUtilitySavedataFileData 
-        {
-		    public void *buf;
-            public uint bufSize;
-            public uint size;	// ??? - why are there two sizes?
-            public int unknown;
-	    };
+			public int language;
 
-	    // Structure to hold the parameters for the ::sceUtilitySavedataInitStart function.
-	    struct SceUtilitySavedataParam
-	    {
-		    // Size of the structure
-		    public uint size;
+			public int buttonSwap;
 
-            public int language;
+			public fixed int unknown[ 4 ];
+			public int result;
+			public fixed int unknown2[ 4 ];
 
-            public int buttonSwap;
+			// mode: 0 to load, 1 to save
+			public int mode;
+			public int bind;
 
-            public fixed int unknown[4];
-            public int result;
-            public fixed int unknown2[4];
+			// unknown13 use 0x10
+			public int overwriteMode;
 
-		    // mode: 0 to load, 1 to save
-            public int mode;
-            public int bind;
+			// gameName: name used from the game for saves, equal for all saves
+			public fixed sbyte gameName[ 16 ];
+			// saveName: name of the particular save, normally a number
+			public fixed sbyte saveName[ 24 ];
+			// fileName: name of the data file of the game for example DATA.BIN
+			public fixed sbyte fileName[ 16 ];
 
-		    // unknown13 use 0x10
-            public int overwriteMode;
+			// pointer to a buffer that will contain data file unencrypted data
+			public void* dataBuf;
 
-		    // gameName: name used from the game for saves, equal for all saves
-            public fixed sbyte gameName[16];
-		    // saveName: name of the particular save, normally a number
-            public fixed sbyte saveName[24];
-		    // fileName: name of the data file of the game for example DATA.BIN
-            public fixed sbyte fileName[16];
+			// size of allocated space to dataBuf
+			public uint dataBufSize;
+			public uint dataSize;
 
-		    // pointer to a buffer that will contain data file unencrypted data
-            public void* dataBuf;
+			public PspUtilitySavedataSFOParam sfoParam;
 
-		    // size of allocated space to dataBuf
-            public uint dataBufSize;
-            public uint dataSize;
+			public PspUtilitySavedataFileData icon0FileData;
+			public PspUtilitySavedataFileData icon1FileData;
+			public PspUtilitySavedataFileData pic1FileData;
+			public PspUtilitySavedataFileData snd0FileData;
 
-            public PspUtilitySavedataSFOParam sfoParam;
+			fixed byte unknown17[ 4 ];
+		}
 
-            public PspUtilitySavedataFileData icon0FileData;
-            public PspUtilitySavedataFileData icon1FileData;
-            public PspUtilitySavedataFileData pic1FileData;
-            public PspUtilitySavedataFileData snd0FileData;
+		private UtilityStatus _saveStatus;
 
-		    fixed byte unknown17[4];
-	    } ;
-
-        private UtilityStatus status;
-
+		[Stateless]
 		[BiosFunction( 0x50C4CD57, "sceUtilitySavedataInitStart" )]
 		// SDK location: /utility/psputility_savedata.h:97
 		// SDK declaration: int sceUtilitySavedataInitStart(SceUtilitySavedataParam * params);
 		public int sceUtilitySavedataInitStart( int saveParams )
 		{
-            SceUtilitySavedataParam *p = (SceUtilitySavedataParam *)_memorySystem.Translate((uint)saveParams);
-            
-            string fileName = new string(p->fileName);
-            string gameName = new string(p->gameName);
-            string saveName = new string(p->saveName);
+			SceUtilitySavedataParam* p = ( SceUtilitySavedataParam* )_memorySystem.Translate( ( uint )saveParams );
 
-            // these will of course only be filled in on save
-            string title = new string(p->sfoParam.title);
-            string saveDataTitle = new string(p->sfoParam.savedataTitle);
-            string detail = new string(p->sfoParam.detail);
-            
-            //A pointer to the data to be saved is in p->dataBuf, 
-            //with length p->dataBufSize or p->dataSize
-            
-            //Data for the save icon0,1,pic1,snd0 is in the corresponding members of p
+			string fileName = new string( p->fileName );
+			string gameName = new string( p->gameName );
+			string saveName = new string( p->saveName );
 
-            Log.WriteLine(Verbosity.Critical, Feature.Bios, "sceUtilitySavedataInitStart: {0} {1} {2} {3}",
-                p->mode == 0 ? "Load" : "Save", fileName, gameName, saveName);
+			// these will of course only be filled in on save
+			string title = new string( p->sfoParam.title );
+			string saveDataTitle = new string( p->sfoParam.savedataTitle );
+			string detail = new string( p->sfoParam.detail );
 
-            //For now, we just fake it all by saying that there is no data when a game wants to 
-            //load, and that there is no memstick when a game wants to save.
-            status = UtilityStatus.Running;
+			//A pointer to the data to be saved is in p->dataBuf, 
+			//with length p->dataBufSize or p->dataSize
 
-            int mode = p->mode;
-            if (mode == 0)
-            {
-                //Load a file
-                return unchecked((int)LoadNoData);
-            }
-            else
-            {
-                //Save a file
-                return unchecked((int)SaveNoMemStick);
-            }
+			//Data for the save icon0,1,pic1,snd0 is in the corresponding members of p
+
+			Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceUtilitySavedataInitStart: {0} {1} {2} {3}",
+				p->mode == 0 ? "Load" : "Save", fileName, gameName, saveName );
+
+			//For now, we just fake it all by saying that there is no data when a game wants to 
+			//load, and that there is no memstick when a game wants to save.
+			_saveStatus = UtilityStatus.Running;
+
+			int mode = p->mode;
+			if( mode == 0 )
+			{
+				//Load a file
+				return unchecked( ( int )LoadNoData );
+			}
+			else
+			{
+				//Save a file
+				return unchecked( ( int )SaveNoMemStick );
+			}
 		}
 
+		[Stateless]
 		[BiosFunction( 0x9790B33C, "sceUtilitySavedataShutdownStart" )]
 		// SDK location: /utility/psputility_savedata.h:117
 		// SDK declaration: int sceUtilitySavedataShutdownStart();
 		public int sceUtilitySavedataShutdownStart()
 		{
-            status = UtilityStatus.Closed;
-            return 0;
+			_saveStatus = UtilityStatus.Closed;
+			return 0;
 		}
 
+		[Stateless]
 		[BiosFunction( 0xD4B95FFB, "sceUtilitySavedataUpdate" )]
 		// SDK location: /utility/psputility_savedata.h:124
 		// SDK declaration: int sceUtilitySavedataUpdate(int unknown);
 		public int sceUtilitySavedataUpdate( int unknown )
 		{
-            if (status == UtilityStatus.Running)
-                status = UtilityStatus.Finished;
-
-            if (status == UtilityStatus.Closed)
-                status = UtilityStatus.None;
-
-            return 0;
+			switch( _saveStatus )
+			{
+				case UtilityStatus.Init:
+					_saveStatus = UtilityStatus.Running;
+					break;
+				case UtilityStatus.Running:
+					_saveStatus = UtilityStatus.Finished;
+					break;
+				case UtilityStatus.Finished:
+					//_saveStatus = MessageStatus.Closed;
+					break;
+				case UtilityStatus.Closed:
+					_saveStatus = UtilityStatus.None;
+					break;
+				case UtilityStatus.None:
+					break;
+			}
+			return 0;
 		}
 
 		[Stateless]
@@ -324,7 +336,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilitySavedataGetStatus();
 		public int sceUtilitySavedataGetStatus()
 		{
-			return (int)status;
+			//this.sceUtilitySavedataUpdate( 2 );
+
+			return ( int )_saveStatus;
 		}
 
 		#endregion
@@ -401,7 +415,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			MsgDialog dialog = new MsgDialog();
 			dialog.Language = ( MessageLanguage )( *( p++ ) );
 			dialog.SwapButtons = ( *( p++ ) == 1 );
-			
+
 			// unknowns
 			p += 4;
 
@@ -427,7 +441,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			p += ( 512 / 4 );
 
 			dialog.Flags = ( MessageFlags )( *p++ );
-			
+
 			// Save address for later
 			dialog.ReturnButton = p;
 			p++;
@@ -519,7 +533,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 
 			// ToE rarely calls update
-			sceUtilityMsgDialogUpdate( 2 );
+			this.sceUtilityMsgDialogUpdate( 2 );
 
 			return ( int )_currentDialog.Status;
 		}
@@ -533,28 +547,40 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xF6269B82, "sceUtilityOskInitStart" )]
 		// SDK location: /utility/psputility_osk.h:86
 		// SDK declaration: int sceUtilityOskInitStart(SceUtilityOskParams* params);
-		public int sceUtilityOskInitStart( int oskParams ){ return Module.NotImplementedReturn; }
+		public int sceUtilityOskInitStart( int oskParams )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x3DFAEBA9, "sceUtilityOskShutdownStart" )]
 		// SDK location: /utility/psputility_osk.h:92
 		// SDK declaration: int sceUtilityOskShutdownStart();
-		public int sceUtilityOskShutdownStart(){ return Module.NotImplementedReturn; }
+		public int sceUtilityOskShutdownStart()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x4B85C861, "sceUtilityOskUpdate" )]
 		// SDK location: /utility/psputility_osk.h:99
 		// SDK declaration: int sceUtilityOskUpdate(int n);
-		public int sceUtilityOskUpdate( int n ){ return Module.NotImplementedReturn; }
+		public int sceUtilityOskUpdate( int n )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xF3F76017, "sceUtilityOskGetStatus" )]
 		// SDK location: /utility/psputility_osk.h:106
 		// SDK declaration: int sceUtilityOskGetStatus();
-		public int sceUtilityOskGetStatus(){ return Module.NotImplementedReturn; }
+		public int sceUtilityOskGetStatus()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		#endregion
 
@@ -565,40 +591,49 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x45C18506, "sceUtilitySetSystemParamInt" )]
 		// SDK location: /utility/psputility_sysparam.h:104
 		// SDK declaration: int sceUtilitySetSystemParamInt(int id, int value);
-		public int sceUtilitySetSystemParamInt( int id, int value ){ return Module.NotImplementedReturn; }
+		public int sceUtilitySetSystemParamInt( int id, int value )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x41E30674, "sceUtilitySetSystemParamString" )]
 		// SDK location: /utility/psputility_sysparam.h:113
 		// SDK declaration: int sceUtilitySetSystemParamString(int id, const char *str);
-		public int sceUtilitySetSystemParamString( int id, int str ){ return Module.NotImplementedReturn; }
+		public int sceUtilitySetSystemParamString( int id, int str )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[Stateless]
 		[BiosFunction( 0xA5DA2406, "sceUtilityGetSystemParamInt" )]
 		// SDK location: /utility/psputility_sysparam.h:122
 		// SDK declaration: int sceUtilityGetSystemParamInt( int id, int *value );
 		public int sceUtilityGetSystemParamInt( int id, int valueAddr )
-        {
-            uint* ptr = (uint*)_memorySystem.Translate((uint)valueAddr);
-            switch (id)
-            {
-                case 7:
-                    *ptr = 1; //english
-                    break;
-                default:
-                    *ptr = 0;
-                    break;
-            };
-            return 0;
-        }
+		{
+			uint* ptr = ( uint* )_memorySystem.Translate( ( uint )valueAddr );
+			switch( id )
+			{
+				case 7:
+					*ptr = 1; //english
+					break;
+				default:
+					*ptr = 0;
+					break;
+			};
+			return 0;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x34B78343, "sceUtilityGetSystemParamString" )]
 		// SDK location: /utility/psputility_sysparam.h:132
 		// SDK declaration: int sceUtilityGetSystemParamString(int id, char *str, int len);
-		public int sceUtilityGetSystemParamString( int id, int str, int len ){ return Module.NotImplementedReturn; }
+		public int sceUtilityGetSystemParamString( int id, int str, int len )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		#endregion
 
@@ -609,42 +644,60 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x5EEE6548, "sceUtilityCheckNetParam" )]
 		// SDK location: /utility/psputility_netparam.h:60
 		// SDK declaration: int sceUtilityCheckNetParam(int id);
-		public int sceUtilityCheckNetParam( int id ){ return Module.NotImplementedReturn; }
+		public int sceUtilityCheckNetParam( int id )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x434D4B3A, "sceUtilityGetNetParam" )]
 		// SDK location: /utility/psputility_netparam.h:71
 		// SDK declaration: int sceUtilityGetNetParam(int conf, int param, netData *data);
-		public int sceUtilityGetNetParam( int conf, int param, int data ){ return Module.NotImplementedReturn; }
+		public int sceUtilityGetNetParam( int conf, int param, int data )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x072DEBF2, "sceUtilityCreateNetParam" )]
 		// SDK location: /utility/psputility_netparam.h:81
 		// SDK declaration: int sceUtilityCreateNetParam(int conf);
-		public int sceUtilityCreateNetParam( int conf ){ return Module.NotImplementedReturn; }
+		public int sceUtilityCreateNetParam( int conf )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x9CE50172, "sceUtilityDeleteNetParam" )]
 		// SDK location: /utility/psputility_netparam.h:111
 		// SDK declaration: int sceUtilityDeleteNetParam(int conf);
-		public int sceUtilityDeleteNetParam( int conf ){ return Module.NotImplementedReturn; }
+		public int sceUtilityDeleteNetParam( int conf )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xFB0C4840, "sceUtilityCopyNetParam" )]
 		// SDK location: /utility/psputility_netparam.h:102
 		// SDK declaration: int sceUtilityCopyNetParam(int src, int dest);
-		public int sceUtilityCopyNetParam( int src, int dest ){ return Module.NotImplementedReturn; }
+		public int sceUtilityCopyNetParam( int src, int dest )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xFC4516F3, "sceUtilitySetNetParam" )]
 		// SDK location: /utility/psputility_netparam.h:92
 		// SDK declaration: int sceUtilitySetNetParam(int param, const void *val);
-		public int sceUtilitySetNetParam( int param, int val ){ return Module.NotImplementedReturn; }
+		public int sceUtilitySetNetParam( int param, int val )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		#endregion
 	}
