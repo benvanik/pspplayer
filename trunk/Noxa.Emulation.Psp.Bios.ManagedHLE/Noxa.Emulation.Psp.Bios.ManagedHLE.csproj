@@ -85,6 +85,7 @@
     <Compile Include="Modules\scePower.cs" />
     <Compile Include="Modules\sceReg.cs" />
     <Compile Include="Modules\sceRtc.cs" />
+    <Compile Include="Modules\sceSas.cs" />
     <Compile Include="Modules\sceSircs.cs" />
     <Compile Include="Modules\sceSuspendForUser.cs" />
     <Compile Include="Modules\sceUmdUser.cs" />

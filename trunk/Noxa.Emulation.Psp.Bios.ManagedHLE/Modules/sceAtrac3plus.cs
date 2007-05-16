@@ -76,10 +76,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xD5C28CC0, "sceAtracEndEntry" )]
 		public int sceAtracEndEntry(){ return Module.NotImplementedReturn; }
 
+
+		//allocates an Atrac ID (decoding context?)
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x780F88D1, "sceAtracGetAtracID" )]
-		public int sceAtracGetAtracID(){ return Module.NotImplementedReturn; }
+		public int sceAtracGetAtracID(int codecType){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
@@ -128,12 +130,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x5D268707, "sceAtracGetStreamDataInfo" )]
-		public int sceAtracGetStreamDataInfo(){ return Module.NotImplementedReturn; }
+		public int sceAtracGetStreamDataInfo(int atracID){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x7DB31251, "sceAtracAddStreamData" )]
-		public int sceAtracAddStreamData(){ return Module.NotImplementedReturn; }
+		public int sceAtracAddStreamData(int atracID, int numBytesAdded){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]

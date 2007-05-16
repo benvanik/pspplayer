@@ -76,19 +76,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int scePowerIdleTimerDisable(int unknown);
 		public int scePowerIdleTimerDisable( int unknown ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x87440F5E, "scePowerIsPowerOnline" )]
 		// SDK location: /power/psppower.h:66
 		// SDK declaration: int scePowerIsPowerOnline();
-		public int scePowerIsPowerOnline(){ return Module.NotImplementedReturn; }
+		public int scePowerIsPowerOnline()
+        {
+            return 1;
+        }
 
-		[NotImplemented]
-		[Stateless]
-		[BiosFunction( 0x0AFD0D8B, "scePowerIsBatteryExist" )]
-		// SDK location: /power/psppower.h:71
-		// SDK declaration: int scePowerIsBatteryExist();
-		public int scePowerIsBatteryExist(){ return Module.NotImplementedReturn; }
+        [Stateless]
+        [BiosFunction(0x0AFD0D8B, "scePowerIsBatteryExist")]
+        // SDK location: /power/psppower.h:71
+        // SDK declaration: int scePowerIsBatteryExist();
+        public int scePowerIsBatteryExist()
+        {
+            return 1; //yes we have battery :P
+        }
 
 		[NotImplemented]
 		[Stateless]
