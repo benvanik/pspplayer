@@ -46,6 +46,7 @@ namespace Noxa {
 					ushort			TextureFilterMag;
 					ushort			TextureWrapS;
 					ushort			TextureWrapT;
+					int				TextureEnvMode;
 					float			TextureOffset[ 2 ];
 					float			TextureScale[ 2 ];
 					

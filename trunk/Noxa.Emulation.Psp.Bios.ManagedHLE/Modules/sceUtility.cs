@@ -512,7 +512,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceUtilityMsgDialogGetStatus();
 		public int sceUtilityMsgDialogGetStatus()
 		{
-			Debug.Assert( _currentDialog != null );
+			if( _currentDialog == null )
+				return -1;
 
 			if( _currentDialog.Status == UtilityStatus.None )
 				return -1;

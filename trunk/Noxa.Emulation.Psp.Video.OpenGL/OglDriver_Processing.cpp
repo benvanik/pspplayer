@@ -716,25 +716,24 @@ void ProcessList( OglContext* context, DisplayList* list )
 			  */
 			switch( argi & 0x7 )
 			{
+			default:
 			case 0:
-				temp = GL_MODULATE;
+				context->TextureEnvMode = GL_MODULATE;
 				break;
 			case 1:
-				temp = GL_DECAL;
+				context->TextureEnvMode = GL_DECAL;
 				break;
 			case 2:
-				temp = GL_BLEND;
+				context->TextureEnvMode = GL_BLEND;
 				break;
-			default:
 			case 3:
-				temp = GL_REPLACE;
+				context->TextureEnvMode = GL_REPLACE;
 				break;
 			case 4:
 				// I think this works
-				temp = GL_ADD;
+				context->TextureEnvMode = GL_ADD;
 				break;
 			}
-			glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, temp );
 			break;
 		case TEC:
 			color4[ 0 ] = ( ( argi >> 16 ) & 0xFF ) / 255.0f;

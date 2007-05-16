@@ -223,6 +223,13 @@ void R4000Cpu::SwitchContext( int newTcsId )
 
 void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, MarshalCompleteDelegate^ resultCallback, int state )
 {
+	if( tcsId < 0 )
+	{
+		// Happens
+		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "MarshalCall: attempted to marshal call on to thread with tcsId={0}", tcsId );
+		return;
+	}
+
 	LOCK;
 	ThreadContext* targetContext = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	UNLOCK;

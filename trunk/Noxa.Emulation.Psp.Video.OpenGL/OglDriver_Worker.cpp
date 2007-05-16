@@ -82,6 +82,7 @@ void OglDriver::StartThread()
 	_context->TextureOffset[ 1 ] = 0.0f;
 	_context->TextureScale[ 0 ] = 1.0f;
 	_context->TextureScale[ 1 ] = 1.0f;
+	_context->TextureEnvMode = GL_MODULATE;
 	for( int n = 0; n < 4; n++ )
 		_context->AmbientMaterial[ n ] = 1.0f;
 

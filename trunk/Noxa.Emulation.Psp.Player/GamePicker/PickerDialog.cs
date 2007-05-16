@@ -102,14 +102,22 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			if( Properties.Settings.Default.RecentGames != null )
 			{
 				string lastPlayed = Properties.Settings.Default.LastPlayedGame;
+				List<GameInformation> umds = new List<GameInformation>();
 				foreach( string gamePath in Properties.Settings.Default.RecentGames )
 				{
 					GameInformation game = this.LoadGameFromUmd( gamePath );
 					if( game != null )
 					{
-						GameEntry entry = recentGamesListing.AddGame( game );
-						if( lastPlayed == ( string )game.Tag )
-							recentGamesListing.SelectedEntry = entry;
+						umds.Add( game );
+					}
+				}
+				recentGamesListing.AddGames( umds );
+				foreach( GameEntry entry in recentGamesListing.GameEntries )
+				{
+					if( lastPlayed == ( string )entry.Game.Tag )
+					{
+						recentGamesListing.SelectedEntry = entry;
+						break;
 					}
 				}
 			}
@@ -182,23 +190,24 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		{
 			if( openFileDialog.ShowDialog( this ) == DialogResult.OK )
 			{
-				string gamePath = openFileDialog.FileName;
-
-				GameInformation game = this.LoadGameFromUmd( gamePath );
-				if( game != null )
+				foreach( string gamePath in openFileDialog.FileNames )
 				{
-					if( Properties.Settings.Default.RecentGames == null )
-						Properties.Settings.Default.RecentGames = new System.Collections.Specialized.StringCollection();
-					bool exists = Properties.Settings.Default.RecentGames.Contains( gamePath );
-					if( exists == false )
-						Properties.Settings.Default.RecentGames.Add( gamePath );
-					this.SortRecentGames();
-					Properties.Settings.Default.Save();
+					GameInformation game = this.LoadGameFromUmd( gamePath );
+					if( game != null )
+					{
+						if( Properties.Settings.Default.RecentGames == null )
+							Properties.Settings.Default.RecentGames = new System.Collections.Specialized.StringCollection();
+						bool exists = Properties.Settings.Default.RecentGames.Contains( gamePath );
+						if( exists == false )
+							Properties.Settings.Default.RecentGames.Add( gamePath );
+						this.SortRecentGames();
+						Properties.Settings.Default.Save();
 
-					if( exists == false )
-						recentGamesListing.AddGame( game );
+						if( exists == false )
+							recentGamesListing.AddGame( game );
 
-					recentGamesListing_SelectionChanged( recentGamesListing, EventArgs.Empty );
+						recentGamesListing_SelectionChanged( recentGamesListing, EventArgs.Empty );
+					}
 				}
 			}
 		}
