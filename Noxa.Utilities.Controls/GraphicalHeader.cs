@@ -81,7 +81,7 @@ namespace Noxa.Utilities.Controls
 
 		void LabelResize( object sender, EventArgs e )
 		{
-			this.Invalidate();
+			this.Invalidate( true );
 		}
 	}
 }

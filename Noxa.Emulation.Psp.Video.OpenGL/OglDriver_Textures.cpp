@@ -162,6 +162,8 @@ void SetTextureModes( OglContext* context, int stage )
 		context->TextureWrapT = GL_CLAMP_TO_EDGE;
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, context->TextureWrapS );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, context->TextureWrapT );
+
+	glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, context->TextureEnvMode );
 }
 
 void SetTexture( OglContext* context, int stage )

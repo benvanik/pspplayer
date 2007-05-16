@@ -19,6 +19,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 	partial class GameListing : UserControl
 	{
 		protected GameEntry _selectedEntry;
+		private VScrollBar _dummyScroller;
 
 		public GameListing()
 		{
@@ -26,6 +27,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 			this.HScroll = false;
 			this.VScroll = true;
+
+			_dummyScroller = new VScrollBar();
 		}
 
 		public event EventHandler SelectionChanged;
@@ -68,26 +71,30 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			}
 		}
 
+		public ControlCollection GameEntries
+		{
+			get
+			{
+				return flowLayoutPanel1.Controls;
+			}
+		}
+
 		public void AddGames( List<GameInformation> games )
 		{
 			Debug.Assert( games != null );
 
 			this.SuspendLayout();
-
-			VScrollBar scrollBar = new VScrollBar();
+			this.AutoScrollPosition = new Point( 0, 0 );
 
 			int index = 0;
-			int top = 0;
 			foreach( GameInformation game in games )
 			{
 				GameEntry entry = new GameEntry( game );
 				entry.TabIndex = index++;
 				entry.Click += new EventHandler( EntryClick );
 				entry.DoubleClick += new EventHandler( EntryDoubleClick );
-				entry.Width = this.ClientSize.Width - scrollBar.Width;
-				entry.Top = top;
-				top += entry.Height;
-				this.Controls.Add( entry );
+				entry.Width = this.ClientSize.Width - _dummyScroller.Width - 5;
+				flowLayoutPanel1.Controls.Add( entry );
 			}
 
 			this.ResumeLayout( true );
@@ -99,20 +106,14 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 			this.SuspendLayout();
 
-			VScrollBar scrollBar = new VScrollBar();
-
 			int index = this.Controls.Count;
-			int top = 0;
-			if( this.Controls.Count > 0 )
-				top = this.Controls[ this.Controls.Count - 1 ].Bottom;
 
 			GameEntry entry = new GameEntry( game );
 			entry.TabIndex = index;
 			entry.Click += new EventHandler( EntryClick );
 			entry.DoubleClick += new EventHandler( EntryDoubleClick );
-			entry.Width = this.ClientSize.Width - scrollBar.Width;
-			entry.Top = top;
-			this.Controls.Add( entry );
+			entry.Width = this.ClientSize.Width - _dummyScroller.Width - 5;
+			flowLayoutPanel1.Controls.Add( entry );
 
 			this.LayoutGames();
 
@@ -125,7 +126,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		{
 			this.SuspendLayout();
 
-			this.Controls.Remove( entry );
+			flowLayoutPanel1.Controls.Remove( entry );
 			this.LayoutGames();
 
 			if( _selectedEntry == entry )
@@ -137,12 +138,13 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		public void ClearGames()
 		{
 			this.SuspendLayout();
-			foreach( Control control in this.Controls )
+			this.AutoScrollPosition = new Point( 0, 0 );
+			foreach( Control control in flowLayoutPanel1.Controls )
 			{
 				if( control is GameEntry )
 					( ( GameEntry )control ).Game.Dispose();
 			}
-			this.Controls.Clear();
+			flowLayoutPanel1.Controls.Clear();
 			this.SelectedEntry = null;
 			this.ResumeLayout( true );
 		}
@@ -151,27 +153,26 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		{
 			this.SuspendLayout();
 
+			this.AutoScrollPosition = new Point( 0, 0 );
+
 			List<GameEntry> entries = new List<GameEntry>();
 			foreach( GameEntry entry in this.Controls )
 				entries.Add( entry );
-			this.Controls.Clear();
+			flowLayoutPanel1.Controls.Clear();
 			entries.Sort( delegate( GameEntry x, GameEntry y )
 			{
 				return string.Compare( x.Game.Parameters.Title, y.Game.Parameters.Title, true );
 			} );
 
 			int index = 0;
-			int top = 0;
 			foreach( GameEntry entry in entries )
 			{
 				entry.TabIndex = index++;
-				entry.Top = top;
-				top += entry.Height + 2;
 				this.Controls.Add( entry );
 			}
 
 			if( _selectedEntry != null )
-				this.ScrollControlIntoView( _selectedEntry );
+				flowLayoutPanel1.ScrollControlIntoView( _selectedEntry );
 
 			this.ResumeLayout( true );
 		}

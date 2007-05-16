@@ -37,12 +37,12 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.toolTip1 = new System.Windows.Forms.ToolTip( this.components );
 			this.whidbeyTabControl1 = new Noxa.Utilities.Controls.WhidbeyTabControl();
 			this.whidbeyTabPage1 = ( ( Noxa.Utilities.Controls.WhidbeyTabPage )( new Noxa.Utilities.Controls.WhidbeyTabPage() ) );
-			this.recentGamesListing = new Noxa.Emulation.Psp.Player.GamePicker.GameListing();
 			this.graphicalHeader1 = new Noxa.Utilities.Controls.GraphicalHeader();
 			this.whidbeyTabPage2 = ( ( Noxa.Utilities.Controls.WhidbeyTabPage )( new Noxa.Utilities.Controls.WhidbeyTabPage() ) );
-			this.memoryStickListing = new Noxa.Emulation.Psp.Player.GamePicker.GameListing();
 			this.graphicalHeader2 = new Noxa.Utilities.Controls.GraphicalHeader();
 			this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+			this.recentGamesListing = new Noxa.Emulation.Psp.Player.GamePicker.GameListing();
+			this.memoryStickListing = new Noxa.Emulation.Psp.Player.GamePicker.GameListing();
 			this.whidbeyTabPage1.SuspendLayout();
 			this.whidbeyTabPage2.SuspendLayout();
 			this.SuspendLayout();
@@ -77,7 +77,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			// 
 			this.playButton.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.playButton.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.StartIcon;
-			this.playButton.Location = new System.Drawing.Point( 342, 389 );
+			this.playButton.Location = new System.Drawing.Point( 361, 389 );
 			this.playButton.Name = "playButton";
 			this.playButton.Size = new System.Drawing.Size( 75, 23 );
 			this.playButton.TabIndex = 4;
@@ -91,7 +91,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			// 
 			this.cancelButton.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.cancelButton.Location = new System.Drawing.Point( 423, 389 );
+			this.cancelButton.Location = new System.Drawing.Point( 442, 389 );
 			this.cancelButton.Name = "cancelButton";
 			this.cancelButton.Size = new System.Drawing.Size( 75, 23 );
 			this.cancelButton.TabIndex = 5;
@@ -118,9 +118,9 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.whidbeyTabControl1.Location = new System.Drawing.Point( 12, 12 );
 			this.whidbeyTabControl1.Name = "whidbeyTabControl1";
-			this.whidbeyTabControl1.SelectedIndex = 1;
-			this.whidbeyTabControl1.SelectedTab = this.whidbeyTabPage2;
-			this.whidbeyTabControl1.Size = new System.Drawing.Size( 487, 371 );
+			this.whidbeyTabControl1.SelectedIndex = 0;
+			this.whidbeyTabControl1.SelectedTab = this.whidbeyTabPage1;
+			this.whidbeyTabControl1.Size = new System.Drawing.Size( 506, 371 );
 			this.whidbeyTabControl1.TabIndex = 0;
 			this.whidbeyTabControl1.TabPages.Add( this.whidbeyTabPage1 );
 			this.whidbeyTabControl1.TabPages.Add( this.whidbeyTabPage2 );
@@ -134,23 +134,10 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.whidbeyTabPage1.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.SmallUmdIcon;
 			this.whidbeyTabPage1.Location = new System.Drawing.Point( 0, 0 );
 			this.whidbeyTabPage1.Name = "whidbeyTabPage1";
-			this.whidbeyTabPage1.Size = new System.Drawing.Size( 372, 357 );
+			this.whidbeyTabPage1.Size = new System.Drawing.Size( 391, 357 );
 			this.whidbeyTabPage1.TabIndex = 0;
 			this.whidbeyTabPage1.Text = "Recent Games";
 			this.whidbeyTabPage1.Showing += new System.EventHandler( this.whidbeyTabPage1_Showing );
-			// 
-			// recentGamesListing
-			// 
-			this.recentGamesListing.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
-						| System.Windows.Forms.AnchorStyles.Left )
-						| System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.recentGamesListing.AutoScroll = true;
-			this.recentGamesListing.Location = new System.Drawing.Point( 17, 31 );
-			this.recentGamesListing.Name = "recentGamesListing";
-			this.recentGamesListing.SelectedEntry = null;
-			this.recentGamesListing.Size = new System.Drawing.Size( 339, 311 );
-			this.recentGamesListing.TabIndex = 5;
-			this.recentGamesListing.SelectionChanged += new System.EventHandler( this.recentGamesListing_SelectionChanged );
 			// 
 			// graphicalHeader1
 			// 
@@ -158,7 +145,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.graphicalHeader1.Location = new System.Drawing.Point( 5, 3 );
 			this.graphicalHeader1.Name = "graphicalHeader1";
-			this.graphicalHeader1.Size = new System.Drawing.Size( 364, 22 );
+			this.graphicalHeader1.Size = new System.Drawing.Size( 383, 22 );
 			this.graphicalHeader1.TabIndex = 4;
 			this.graphicalHeader1.Text = "Recently Played Games";
 			// 
@@ -171,10 +158,38 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.whidbeyTabPage2.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.SmallMemoryStickIcon;
 			this.whidbeyTabPage2.Location = new System.Drawing.Point( 0, 0 );
 			this.whidbeyTabPage2.Name = "whidbeyTabPage2";
-			this.whidbeyTabPage2.Size = new System.Drawing.Size( 372, 357 );
+			this.whidbeyTabPage2.Size = new System.Drawing.Size( 380, 357 );
 			this.whidbeyTabPage2.TabIndex = 1;
 			this.whidbeyTabPage2.Text = "Memory Stick";
 			this.whidbeyTabPage2.Showing += new System.EventHandler( this.whidbeyTabPage2_Showing );
+			// 
+			// graphicalHeader2
+			// 
+			this.graphicalHeader2.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left )
+						| System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.graphicalHeader2.Location = new System.Drawing.Point( 5, 3 );
+			this.graphicalHeader2.Name = "graphicalHeader2";
+			this.graphicalHeader2.Size = new System.Drawing.Size( 372, 22 );
+			this.graphicalHeader2.TabIndex = 6;
+			this.graphicalHeader2.Text = "Programs on the Memory Stick";
+			// 
+			// openFileDialog
+			// 
+			this.openFileDialog.Filter = "UMD Image Files (*.iso)|*.iso|All Files (*.*)|*.*";
+			this.openFileDialog.Multiselect = true;
+			// 
+			// recentGamesListing
+			// 
+			this.recentGamesListing.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+						| System.Windows.Forms.AnchorStyles.Left )
+						| System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.recentGamesListing.AutoScroll = true;
+			this.recentGamesListing.Location = new System.Drawing.Point( 17, 31 );
+			this.recentGamesListing.Name = "recentGamesListing";
+			this.recentGamesListing.SelectedEntry = null;
+			this.recentGamesListing.Size = new System.Drawing.Size( 358, 311 );
+			this.recentGamesListing.TabIndex = 5;
+			this.recentGamesListing.SelectionChanged += new System.EventHandler( this.recentGamesListing_SelectionChanged );
 			// 
 			// memoryStickListing
 			// 
@@ -185,29 +200,15 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.memoryStickListing.Location = new System.Drawing.Point( 17, 31 );
 			this.memoryStickListing.Name = "memoryStickListing";
 			this.memoryStickListing.SelectedEntry = null;
-			this.memoryStickListing.Size = new System.Drawing.Size( 339, 311 );
+			this.memoryStickListing.Size = new System.Drawing.Size( 347, 311 );
 			this.memoryStickListing.TabIndex = 7;
 			this.memoryStickListing.SelectionChanged += new System.EventHandler( this.memoryStickListing_SelectionChanged );
-			// 
-			// graphicalHeader2
-			// 
-			this.graphicalHeader2.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left )
-						| System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.graphicalHeader2.Location = new System.Drawing.Point( 5, 3 );
-			this.graphicalHeader2.Name = "graphicalHeader2";
-			this.graphicalHeader2.Size = new System.Drawing.Size( 364, 22 );
-			this.graphicalHeader2.TabIndex = 6;
-			this.graphicalHeader2.Text = "Programs on the Memory Stick";
-			// 
-			// openFileDialog
-			// 
-			this.openFileDialog.Filter = "UMD Image Files (*.iso)|*.iso|All Files (*.*)|*.*";
 			// 
 			// PickerDialog
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size( 510, 424 );
+			this.ClientSize = new System.Drawing.Size( 529, 424 );
 			this.Controls.Add( this.whidbeyTabControl1 );
 			this.Controls.Add( this.removeButton );
 			this.Controls.Add( this.cancelButton );

@@ -48,7 +48,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 					break;
 				case GameType.UmdGame:
 					{
-						string hostPath = _game.Folder.Device.HostPath;
+						Debug.Assert( _game.Tag != null );
+						string hostPath = ( string )_game.Tag;
 						this.infoLabel.Text = string.Format( "{0}", Path.GetFileName( hostPath ) );
 						string tooltip = string.Format( "{0}", hostPath );
 						this.toolTip1.SetToolTip( this.infoLabel, tooltip );

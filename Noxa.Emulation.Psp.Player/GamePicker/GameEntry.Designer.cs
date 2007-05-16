@@ -30,13 +30,13 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		{
 			this.components = new System.ComponentModel.Container();
 			this.gamePicture = new System.Windows.Forms.PictureBox();
-			this.infoLabel = new System.Windows.Forms.Label();
-			this.titleLabel = new System.Windows.Forms.Label();
-			this.toolTip1 = new System.Windows.Forms.ToolTip( this.components );
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip( this.components );
 			this.checkCompatibilityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.infoLabel = new System.Windows.Forms.Label();
+			this.titleLabel = new System.Windows.Forms.Label();
+			this.toolTip1 = new System.Windows.Forms.ToolTip( this.components );
 			( ( System.ComponentModel.ISupportInitialize )( this.gamePicture ) ).BeginInit();
 			this.contextMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -53,6 +53,36 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.gamePicture.TabStop = false;
 			this.gamePicture.DoubleClick += new System.EventHandler( this.gamePicture_DoubleClick );
 			this.gamePicture.Click += new System.EventHandler( this.gamePicture_Click );
+			// 
+			// contextMenuStrip1
+			// 
+			this.contextMenuStrip1.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.checkCompatibilityToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.removeToolStripMenuItem} );
+			this.contextMenuStrip1.Name = "contextMenuStrip1";
+			this.contextMenuStrip1.Size = new System.Drawing.Size( 183, 54 );
+			// 
+			// checkCompatibilityToolStripMenuItem
+			// 
+			this.checkCompatibilityToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.ReportIcon;
+			this.checkCompatibilityToolStripMenuItem.Name = "checkCompatibilityToolStripMenuItem";
+			this.checkCompatibilityToolStripMenuItem.Size = new System.Drawing.Size( 182, 22 );
+			this.checkCompatibilityToolStripMenuItem.Text = "&Check Compatibility";
+			this.checkCompatibilityToolStripMenuItem.Click += new System.EventHandler( this.checkCompatibilityToolStripMenuItem_Click );
+			// 
+			// toolStripMenuItem1
+			// 
+			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+			this.toolStripMenuItem1.Size = new System.Drawing.Size( 179, 6 );
+			// 
+			// removeToolStripMenuItem
+			// 
+			this.removeToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.RemoveIcon;
+			this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+			this.removeToolStripMenuItem.Size = new System.Drawing.Size( 182, 22 );
+			this.removeToolStripMenuItem.Text = "&Remove";
+			this.removeToolStripMenuItem.Click += new System.EventHandler( this.removeToolStripMenuItem_Click );
 			// 
 			// infoLabel
 			// 
@@ -83,36 +113,6 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.titleLabel.DoubleClick += new System.EventHandler( this.titleLabel_DoubleClick );
 			this.titleLabel.Click += new System.EventHandler( this.titleLabel_Click );
 			// 
-			// contextMenuStrip1
-			// 
-			this.contextMenuStrip1.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
-            this.checkCompatibilityToolStripMenuItem,
-            this.toolStripMenuItem1,
-            this.removeToolStripMenuItem} );
-			this.contextMenuStrip1.Name = "contextMenuStrip1";
-			this.contextMenuStrip1.Size = new System.Drawing.Size( 186, 54 );
-			// 
-			// checkCompatibilityToolStripMenuItem
-			// 
-			this.checkCompatibilityToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.ReportIcon;
-			this.checkCompatibilityToolStripMenuItem.Name = "checkCompatibilityToolStripMenuItem";
-			this.checkCompatibilityToolStripMenuItem.Size = new System.Drawing.Size( 185, 22 );
-			this.checkCompatibilityToolStripMenuItem.Text = "&Check Compatibility";
-			this.checkCompatibilityToolStripMenuItem.Click += new System.EventHandler( this.checkCompatibilityToolStripMenuItem_Click );
-			// 
-			// toolStripMenuItem1
-			// 
-			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-			this.toolStripMenuItem1.Size = new System.Drawing.Size( 182, 6 );
-			// 
-			// removeToolStripMenuItem
-			// 
-			this.removeToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.RemoveIcon;
-			this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
-			this.removeToolStripMenuItem.Size = new System.Drawing.Size( 185, 22 );
-			this.removeToolStripMenuItem.Text = "&Remove";
-			this.removeToolStripMenuItem.Click += new System.EventHandler( this.removeToolStripMenuItem_Click );
-			// 
 			// GameEntry
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
@@ -121,6 +121,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.Controls.Add( this.titleLabel );
 			this.Controls.Add( this.infoLabel );
 			this.Controls.Add( this.gamePicture );
+			this.Margin = new System.Windows.Forms.Padding( 1, 1, 1, 0 );
 			this.Name = "GameEntry";
 			this.Size = new System.Drawing.Size( 258, 48 );
 			( ( System.ComponentModel.ISupportInitialize )( this.gamePicture ) ).EndInit();
