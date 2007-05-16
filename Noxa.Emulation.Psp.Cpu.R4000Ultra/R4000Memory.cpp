@@ -124,7 +124,7 @@ int R4000Memory::ReadWord( int address )
 	}
 	else
 	{
-#if BREAKONBADADDRESS
+#ifdef BREAKONBADADDRESS
 		Debugger::Break();
 #endif
 		return 0;
@@ -160,7 +160,7 @@ int64 R4000Memory::ReadDoubleWord( int address )
 	}
 	else
 	{
-#if BREAKONBADADDRESS
+#ifdef BREAKONBADADDRESS
 		Debugger::Break();
 #endif
 		return 0;
@@ -295,7 +295,7 @@ void R4000Memory::WriteWord( int address, int width, int value )
 		// Some games seem to do this - we ignore it
 		if( ( address & 0x04000000 ) == 0x04000000 )
 			return;
-#if BREAKONBADADDRESS
+#ifdef BREAKONBADADDRESS
 		Debugger::Break();
 #endif
 	}
