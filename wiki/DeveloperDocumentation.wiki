@@ -1,0 +1,20 @@
+#summary Useful links and such related to development of pspplayer
+
+= Audio / Video support =
+Currently most of the Audio functionality is not implemented / does nothing so we can run more programs.
+We will probably need to include a lib to do decoding of video/audio for us.
+libavcodec/ffmpeg looks like our best bet.
+It seems to have Atrac3 decoding, and it definately has MP3/WMA/H263/H264 support.
+http://ffmpeg.mplayerhq.hu/
+
+= libAtrac3 / AudioCodec (Not sure on actual module name(s), FIXME) =
+
+Example usage of Atrac3/AudioCodec libs on PSP:
+http://forums.ps2dev.org/viewtopic.php?t=5500 (Moonlight's example)
+http://insomniac.0x89.org/pgeAt3.rar (InsertWittyName Example, thanks!)
+http://forums.ps2dev.org/viewtopic.php?t=8357 (Another Example)
+
+= sceNet/Inet/Apctl/Resolver =
+
+danzel is working on these, most can be directly mapped to c# functions.
+The resolver/simple samples in the SDK are good test targets, don't forget to disable #define printf pspDebugScreenPrintf.
