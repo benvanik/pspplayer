@@ -67,12 +67,15 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	// if < 0x0400000 && > VideoMemoryBound, skip and do a read from method
 	g->cmp( EAX, VideoMemoryBase );
 	g->jb( l2 );
-	g->cmp( EAX, VideoMemoryBound );
+	// Test for shadowing? ECX = address fixed up
+	g->mov( ECX, EAX );
+	g->and( ECX, 0x041FFFFF );
+	g->cmp( ECX, VideoMemoryBound );
 	g->ja( l2 );
 
 	// else, do a direct fb read
-	g->sub( EAX, VideoMemoryBase );
-	g->mov( EAX, g->dword_ptr[ EAX + (int)context->FrameBuffer ] );
+	g->sub( ECX, VideoMemoryBase );
+	g->mov( EAX, g->dword_ptr[ ECX + (int)context->FrameBuffer ] );
 	g->jmp( l3 );
 
 	g->MarkLabel( l2 );
@@ -154,21 +157,24 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 	// if < 0x0400000 && > VideoMemoryBound, skip and do a read from method
 	g->cmp( EAX, VideoMemoryBase );
 	g->jb( l2 );
-	g->cmp( EAX, VideoMemoryBound );
+	// Test for shadowing? ECX = address fixed up
+	g->mov( ECX, EAX );
+	g->and( ECX, 0x041FFFFF );
+	g->cmp( ECX, VideoMemoryBound );
 	g->ja( l2 );
 	
 	// else, do a direct fb read
-	g->sub( EAX, VideoMemoryBase ); // get to offset in fb
+	g->sub( ECX, VideoMemoryBase ); // get to offset in fb
 	switch( width )
 	{
 	case 1:
-		g->mov( g->byte_ptr[ EAX + (int)context->FrameBuffer ], BL );
+		g->mov( g->byte_ptr[ ECX + (int)context->FrameBuffer ], BL );
 		break;
 	case 2:
-		g->mov( g->word_ptr[ EAX + (int)context->FrameBuffer ], BX );
+		g->mov( g->word_ptr[ ECX + (int)context->FrameBuffer ], BX );
 		break;
 	case 4:
-		g->mov( g->dword_ptr[ EAX + (int)context->FrameBuffer ], EBX );
+		g->mov( g->dword_ptr[ ECX + (int)context->FrameBuffer ], EBX );
 		break;
 	}
 	g->jmp( l3 );

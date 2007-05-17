@@ -128,9 +128,12 @@ void niCleanup()
 	UNLOCK;
 }
 
+uint _fakeVcount = 0;
+
 uint niGetVcount()
 {
-	return _vcount;
+	//return _vcount;
+	return _fakeVcount++;
 }
 
 void niSwitchFrameBuffer( int address, int bufferWidth, int pixelFormat, int syncMode )

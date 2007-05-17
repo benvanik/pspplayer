@@ -55,6 +55,7 @@ __inline int power( int base, int exponent )
 
 // Memory ---------------------------------------------------------------------
 // These are some useful constants dealing with memory addresses
+#define MainMemoryMask			0xF7000000
 #define MainMemoryBase			0x08000000
 #define MainMemorySize			0x01FFFFFF
 #define MainMemoryBound			( MainMemoryBase + MainMemorySize )
@@ -86,6 +87,9 @@ typedef struct NativeMemorySystem_t
 		}
 		else if( ( guestAddress & VideoMemoryBase ) != 0 )
 		{
+			// Shadow memory?
+			guestAddress &= 0x041FFFFF;
+
 			assert( ( guestAddress >= VideoMemoryBase ) && ( guestAddress < VideoMemoryBound ) );
 			return ( VideoMemory + ( guestAddress - VideoMemoryBase ) );
 		}

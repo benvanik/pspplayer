@@ -153,10 +153,10 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		{
 			this.SuspendLayout();
 
-			this.AutoScrollPosition = new Point( 0, 0 );
+			//this.AutoScrollPosition = new Point( 0, 0 );
 
 			List<GameEntry> entries = new List<GameEntry>();
-			foreach( GameEntry entry in this.Controls )
+			foreach( GameEntry entry in flowLayoutPanel1.Controls )
 				entries.Add( entry );
 			flowLayoutPanel1.Controls.Clear();
 			entries.Sort( delegate( GameEntry x, GameEntry y )
@@ -168,7 +168,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			foreach( GameEntry entry in entries )
 			{
 				entry.TabIndex = index++;
-				this.Controls.Add( entry );
+				flowLayoutPanel1.Controls.Add( entry );
 			}
 
 			if( _selectedEntry != null )
