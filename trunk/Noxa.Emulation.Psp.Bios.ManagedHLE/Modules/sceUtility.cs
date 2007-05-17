@@ -21,6 +21,20 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 	{
 		#region Common
 
+		private enum Language
+		{
+			// ?? same as PBP I imagine
+			Japanese = 0,
+			English = 1,
+			French = 2,
+			Spanish = 3,
+			German = 4,
+			Italian = 5,
+			Dutch = 6,
+			Portuguese = 7,
+			Korean = 8,
+		}
+
 		private enum UtilityStatus
 		{
 			None = 0,
@@ -347,20 +361,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		// We fake this pretty hardcore ^_^
 
-		private enum MessageLanguage
-		{
-			// ?? same as PBP I imagine
-			Japanese = 0,
-			English = 1,
-			French = 2,
-			Spanish = 3,
-			German = 4,
-			Italian = 5,
-			Dutch = 6,
-			Portuguese = 7,
-			Korean = 8,
-		}
-
 		private enum MessageFlags
 		{
 			Error = 0x000,
@@ -385,7 +385,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		private unsafe class MsgDialog
 		{
-			public MessageLanguage Language;
+			public Language Language;
 			public bool SwapButtons;
 
 			public MessageFlags Flags;
@@ -413,7 +413,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			p++;
 
 			MsgDialog dialog = new MsgDialog();
-			dialog.Language = ( MessageLanguage )( *( p++ ) );
+			dialog.Language = ( Language )( *( p++ ) );
 			dialog.SwapButtons = ( *( p++ ) == 1 );
 
 			// unknowns
@@ -586,6 +586,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#region SystemParam
 
+		private enum SystemParams
+		{
+			Nickname = 1,
+			SystemLanguage = 8,
+		}
+
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x45C18506, "sceUtilitySetSystemParamInt" )]
@@ -613,26 +619,40 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceUtilityGetSystemParamInt( int id, int valueAddr )
 		{
 			uint* ptr = ( uint* )_memorySystem.Translate( ( uint )valueAddr );
-			switch( id )
+			switch( ( SystemParams )id )
 			{
-				case 7:
-					*ptr = 1; //english
+				case SystemParams.SystemLanguage:
+					*ptr = ( uint )Language.English;
 					break;
 				default:
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceUtilityGetSystemParamInt( {0} ) not implemented", id );
 					*ptr = 0;
 					break;
-			};
+			}
 			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x34B78343, "sceUtilityGetSystemParamString" )]
 		// SDK location: /utility/psputility_sysparam.h:132
 		// SDK declaration: int sceUtilityGetSystemParamString(int id, char *str, int len);
 		public int sceUtilityGetSystemParamString( int id, int str, int len )
 		{
-			return Module.NotImplementedReturn;
+			byte* ptr = ( byte* )_memorySystem.Translate( ( uint )str );
+			switch( ( SystemParams )id )
+			{
+				case SystemParams.Nickname:
+					string nickname = Environment.UserName;
+					if( nickname.Length > len - 1 )
+						nickname = nickname.Substring( 0, len - 1 );
+					_kernel.WriteString( ( uint )str, nickname );
+					break;
+				default:
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceUtilityGetSystemParamString( {0} ) not implemented", id );
+					*ptr = 0;
+					break;
+			}
+			return 0;
 		}
 
 		#endregion

@@ -99,7 +99,10 @@ int R4000Memory::ReadWord( int address )
 	_managedMemoryReadCount++;
 #endif
 
-	address &= 0x0FFFFFFF;
+#ifdef _DEBUG
+	int rawAddress = address;
+#endif
+	address &= 0x3FFFFFFF;
 
 	//Debug::WriteLine( String::Format( "RW @ 0x{0:X8}", address ) );
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
@@ -125,6 +128,7 @@ int R4000Memory::ReadWord( int address )
 	else
 	{
 #ifdef BREAKONBADADDRESS
+		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "memory read attempt from invalid address 0x{0:X8}", rawAddress );
 		Debugger::Break();
 #endif
 		return 0;
@@ -210,6 +214,11 @@ void R4000Memory::WriteWord( int address, int width, int value )
 	_managedMemoryWriteCount++;
 #endif
 
+#ifdef _DEBUG
+	int rawAddress = address;
+#endif
+	address &= 0x3FFFFFFF;
+
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
 		byte* ptr = MainMemory + ( address - MainMemoryBase );
@@ -292,10 +301,8 @@ void R4000Memory::WriteWord( int address, int width, int value )
 	}
 	else
 	{
-		// Some games seem to do this - we ignore it
-		if( ( address & 0x04000000 ) == 0x04000000 )
-			return;
 #ifdef BREAKONBADADDRESS
+		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "memory write attempt to invalid address 0x{0:X8} = 0x{1:X8} ({1}) [{2}b]", rawAddress, value, width );
 		Debugger::Break();
 #endif
 	}
