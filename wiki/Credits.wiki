@@ -6,4 +6,6 @@ Almost everything: [http://www.noxa.org Me] :)
 
 Some bits about CLUT's and vertex alignment: ector
 
+Network Bits: danzel
+
 BIOS stubs: [http://ps2dev.org pspsdk]
