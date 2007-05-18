@@ -1,4 +1,5 @@
 #summary Useful links and such related to development of pspplayer
+#labels Development
 
 = Audio / Video support =
 Currently most of the Audio functionality is not implemented / does nothing so we can run more programs. We will probably need to include a lib to do decoding of video/audio for us.
@@ -18,7 +19,6 @@ Example usage of Atrac3/AudioCodec libs on PSP:
 danzel is working on these, most can be directly mapped to c# functions.
 
 The resolver/simple samples in the SDK are good test targets, don't forget to disable #define printf pspDebugScreenPrintf.
-
 
 
 
