@@ -1,5 +1,5 @@
 #summary How to build the emulator
-#labels Featured
+#labels Featured,Development
 
 = Building PSP Player =
 
