@@ -1,0 +1,7 @@
+#summary Information about the debugging functionality in the emulator.
+
+= Features =
+ * bar
+
+= TODO =
+ * foo
