@@ -1,4 +1,5 @@
 #summary What to do if you are crazy enough to try to port this...
+#labels Development
 
 = Porting PSP Player =
 I'll admit it, I own a Mac, so this is somewhat interesting to me. If you want to help port PSP Player to your platform of choice, let me know and we can chat.
