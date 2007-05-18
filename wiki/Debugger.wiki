@@ -19,6 +19,7 @@ This page contains information about features/functionality that may not yet be 
   * Component state visualization: CPU registers/etc, video state (buffers, textures, etc), BIOS handles (threads, file handles, etc), audio stuff...
   * Memory inspection: dumping, differences, searching (including differential searches)
  * *Code display/analysis*
+  * Callstacks
   * Regular disassembly dumps
   * Basic code annotation (jump targets, flow constructs (if(...), for(...)))
   * Infotips like VS (hover over anything to get more information)
@@ -26,5 +27,4 @@ This page contains information about features/functionality that may not yet be 
 
 = TODO =
  * Everything
-
 
