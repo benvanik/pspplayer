@@ -1,4 +1,5 @@
 #summary The TODO for other people, or stuff that I may do when lazy
+#labels Development
 
 = Things That Would be Cool =
 An emulator is a large project, especially for one person to undertake. If you are feeling generous or just want to test your coding skills, please feel free to volunteer. I'm happy to give out write-access accounts to anyone who proves trustworthy and knowledgeable. For more information, see [CodeSharing].
