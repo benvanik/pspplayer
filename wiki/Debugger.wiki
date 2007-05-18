@@ -4,6 +4,8 @@
 This page contains information about features/functionality that may not yet be implemented. This is mainly an area where I can put my ideas down so I don't forget them :)
 
 = Features =
+ * *Out of process debugging*
+  * The debugger is a separate application that communicates with the emulator. This allows for the debugger to resist emulator crashes, remain active while the emulator is being debugged by VS, and not have to worry about fighting for resources with the emulator
  * *Per-game persistence*
   * Breakpoints, options, etc are saved across runs of games
  * *Detailed statistics*
@@ -27,4 +29,3 @@ This page contains information about features/functionality that may not yet be 
 
 = TODO =
  * Everything
-
