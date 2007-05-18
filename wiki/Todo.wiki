@@ -1,5 +1,5 @@
 #summary TODO list
-#labels Featured
+#labels Featured,Development
 
 = TODO =
 The following are items on my TODO list. Just because something isn't on here doesn't mean I won't do it; I either forgot about it or it's probably under [WouldBeCool] (where I imply that I want you to do it :). See [KnownIssues] for workarounds or other information regarding problems with the current code.
