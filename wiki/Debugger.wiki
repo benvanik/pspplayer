@@ -27,5 +27,8 @@ This page contains information about features/functionality that may not yet be 
   * Infotips like VS (hover over anything to get more information)
   * 'Find All References'-like support for code locations (find code that calls this method, find code that references this address, etc)
 
+= Debug Architecture =
+The debugger is set up in a client/server fashion, with the emulator acting as the server via the DebugHost class and the actual debugger acting as the client via the IDebugger interface. On startup of the emulator, the DebugHost begins listening for connections; at any time, a debugger can connect and attach itself. The user can then start a game via the normal emulation interfaces, or via the debugger (which will instruct the emulator to start a game). If the user starts the emulator via the command line, if the --debug option is present the emulator will wait until a debugger attaches before continuing; the 'Start with Debugging' toolbar item does the same thing.
+
 = TODO =
  * Everything
