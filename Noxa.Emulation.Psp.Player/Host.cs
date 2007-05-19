@@ -48,7 +48,21 @@ namespace Noxa.Emulation.Psp.Player
 			// If we have args, try to start the player
 			if( args.Length > 0 )
 			{
-				_player.StartGameDirect( args[ 0 ] );
+				bool debug = false;
+				string path = null;
+				foreach( string arg in args )
+				{
+					if( ( arg == "--debug" ) ||
+						( arg == "-d" ) )
+						debug = true;
+					else
+					{
+						// ??
+						path = arg;
+					}
+				}
+				if( path != null )
+					_player.StartGameDirect( path, debug );
 			}
 		}
 
@@ -252,9 +266,6 @@ namespace Noxa.Emulation.Psp.Player
 
 		public void AttachDebugger()
 		{
-			_instance.Bios.EnableDebugging();
-			_instance.Cpu.EnableDebugging();
-			_instance.Video.EnableDebugging();
 		}
 	}
 }

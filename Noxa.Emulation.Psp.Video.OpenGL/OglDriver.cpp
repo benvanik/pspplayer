@@ -30,6 +30,7 @@ OglDriver::OglDriver( IEmulationInstance^ emulator, ComponentParameters^ paramet
 	_currentProps = _props;
 	_caps = gcnew OglCapabilities();
 	_stats = gcnew OglStatistics();
+	Diag::Instance->Counters->RegisterSource( _stats );
 
 	_nativeInterface = ( VideoApi* )malloc( sizeof( VideoApi ) );
 	memset( _nativeInterface, 0, sizeof( VideoApi ) );

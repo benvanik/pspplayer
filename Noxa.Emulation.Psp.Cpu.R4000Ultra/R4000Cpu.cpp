@@ -52,6 +52,10 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_timeSinceLastIpsPrint = 0.0;
 #endif
 
+#ifdef STATISTICS
+		Diag::Instance->Counters->RegisterSource( _stats );
+#endif
+
 	_controller = gcnew R4000Controller( this );
 
 	_lastSyscall = -1;
@@ -156,10 +160,6 @@ void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 	Debug::Assert( _hasExecuted == false );
 	if( _hasExecuted == false )
 	{
-#ifdef STATISTICS
-		Diag::Instance->Counters->RegisterSource( _stats );
-#endif
-
 		// Prepare tracer
 #ifdef TRACE
 		Tracer::OpenFile( TRACEFILE );

@@ -34,6 +34,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public DebugView View;
 		public CodeView Code;
 		public LogViewer Log;
+		public StatisticsViewer Statistics;
 
 		public BreakpointManager Breakpoints;
 
@@ -63,7 +64,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.Breakpoints = new BreakpointManager( this );
 
 			this.View = new DebugView( this );
-			this.Code = new CodeView( this );
+
+			// Log is created here because it is special
 			this.Log = new LogViewer( this );
 		}
 
@@ -74,8 +76,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 			if( this.IsConnected == true )
 			{
+				this.Code = new CodeView( this );
+				this.Statistics = new StatisticsViewer( this );
+
 				this.Code.Show( this.View.DockPanel );
 				this.Log.Show( this.View.DockPanel );
+				this.Statistics.Show( this.View.DockPanel );
 			}
 			else
 				Environment.Exit( 0 );
@@ -106,6 +112,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		{
 			BinaryClientFormatterSinkProvider clientProvider = new BinaryClientFormatterSinkProvider();
 			BinaryServerFormatterSinkProvider serverProvider = new BinaryServerFormatterSinkProvider();
+			serverProvider.TypeFilterLevel = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
 
 			Hashtable clientProps = new Hashtable();
 			clientProps[ "port" ] = DebugHost.ClientPort;
@@ -125,12 +132,27 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		#region Debugger State
 
+		private delegate void DummyDelegate();
+
 		public void OnStarted( GameInformation game, Stream bootStream )
 		{
+			// Need to marshal all UI calls to the proper thread
+			DummyDelegate del = delegate
+			{
+				this.Log.OnStarted();
+				this.Statistics.OnStarted();
+			};
+			this.View.Invoke( del );
 		}
 
 		public void OnStopped()
 		{
+			DummyDelegate del = delegate
+			{
+				this.Log.OnStopped();
+				this.Statistics.OnStopped();
+			};
+			this.View.Invoke( del );
 		}
 
 		#endregion
