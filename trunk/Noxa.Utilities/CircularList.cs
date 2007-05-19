@@ -156,7 +156,10 @@ namespace Noxa
 		{
 			if( _length == 0 )
 				return default( T );
-			return _list[ ( _index - 1 ) % _list.Length ];
+			int index = ( _index - 1 );
+			if( index < 0 )
+				index += _list.Length;
+			return _list[ index ];
 		}
 
 		/// <summary>

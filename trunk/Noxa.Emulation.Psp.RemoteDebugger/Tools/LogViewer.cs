@@ -302,7 +302,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			debugWriteToolStripButton.Checked = !debugWriteToolStripButton.Checked;
 			_debugWrite = debugWriteToolStripButton.Checked;
 			debugWriteToolStripButton.Invalidate();
-		}		
+		}
+
+		public override object InitializeLifetimeService()
+		{
+			return null;
+		}
 	}
 
 	class FeatureInfo

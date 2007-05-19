@@ -68,6 +68,7 @@ namespace Noxa.Emulation.Psp.Games
 	/// <summary>
 	/// Game parameters.
 	/// </summary>
+	[Serializable]
 	public class GameParameters
 	{
 		/// <summary>
@@ -109,6 +110,7 @@ namespace Noxa.Emulation.Psp.Games
 	/// <summary>
 	/// Game information.
 	/// </summary>
+	[Serializable]
 	public class GameInformation : IDisposable
 	{
 		/// <summary>
@@ -139,6 +141,7 @@ namespace Noxa.Emulation.Psp.Games
 		/// <summary>
 		/// Folder where the game is located.
 		/// </summary>
+		[NonSerialized]
 		public IMediaFolder Folder;
 
 		/// <summary>

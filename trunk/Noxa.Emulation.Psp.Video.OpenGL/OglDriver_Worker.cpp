@@ -87,8 +87,6 @@ void OglDriver::StartThread()
 	for( int n = 0; n < 4; n++ )
 		_context->AmbientMaterial[ n ] = 1.0f;
 
-	Diag::Instance->Counters->RegisterSource( _stats );
-
 	_thread = gcnew Thread( gcnew ParameterizedThreadStart( &WorkerThreadThunk ) );
 	_thread->Name = "Video worker";
 	_thread->Priority = ThreadPriority::Normal;

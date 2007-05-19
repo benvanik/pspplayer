@@ -14,7 +14,7 @@ namespace Noxa.Emulation.Psp.Debugging.Statistics
 	/// <summary>
 	/// Provides a general <see cref="Counter"/> data sink.
 	/// </summary>
-	public class CounterSink
+	public class CounterSink : MarshalByRefObject
 	{
 		/// <summary>
 		/// A list of <see cref="CounterSource"/> instances registered with this sink.

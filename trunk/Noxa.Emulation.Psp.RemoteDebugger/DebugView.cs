@@ -99,7 +99,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		private void statisticsToolStripButton_Click( object sender, EventArgs e )
 		{
-
+			this.Debugger.Statistics.Show( this.dockPanel1 );
 		}
 
 		private void logViewToolStripButton_Click( object sender, EventArgs e )

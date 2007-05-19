@@ -26,6 +26,25 @@ namespace Noxa.Emulation.Psp.Debugging.Statistics
 	}
 
 	/// <summary>
+	/// Defines default <see cref="Counter"/> display modes.
+	/// </summary>
+	public enum CounterDisplayType
+	{
+		/// <summary>
+		/// Display the last sampled value.
+		/// </summary>
+		LastValue,
+		/// <summary>
+		/// Display the rate at which the value is changing.
+		/// </summary>
+		Rate,
+		/// <summary>
+		/// Display the average of the values.
+		/// </summary>
+		Average,
+	}
+
+	/// <summary>
 	/// Generic performance counter.
 	/// </summary>
 	public class Counter : MarshalByRefObject
@@ -38,6 +57,11 @@ namespace Noxa.Emulation.Psp.Debugging.Statistics
 		/// The sampling mode of the counter.
 		/// </summary>
 		public readonly CounterMode Mode;
+
+		/// <summary>
+		/// The default display type of the counter.
+		/// </summary>
+		public readonly CounterDisplayType DisplayType;
 
 		/// <summary>
 		/// The name of the counter instance.
@@ -102,6 +126,11 @@ namespace Noxa.Emulation.Psp.Debugging.Statistics
 		public double MaximumValue;
 
 		/// <summary>
+		/// The change between the last two sampled values.
+		/// </summary>
+		public double Delta;
+
+		/// <summary>
 		/// A trailing history of values.
 		/// </summary>
 		public CircularList<double> History;
@@ -117,7 +146,18 @@ namespace Noxa.Emulation.Psp.Debugging.Statistics
 		/// <param name="name">The name of the counter.</param>
 		/// <param name="description">The description of the counter.</param>
 		public Counter( string name, string description )
-			: this( name, description, CounterMode.Historical )
+			: this( name, description, CounterMode.Historical, CounterDisplayType.LastValue )
+		{
+		}
+
+		/// <summary>
+		/// Initialize a new <see cref="Counter"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="name">The name of the counter.</param>
+		/// <param name="description">The description of the counter.</param>
+		/// <param name="displayType">The default display mode for the ocunter.</param>
+		public Counter( string name, string description, CounterDisplayType displayType )
+			: this( name, description, CounterMode.Historical, displayType )
 		{
 		}
 
@@ -128,12 +168,29 @@ namespace Noxa.Emulation.Psp.Debugging.Statistics
 		/// <param name="description">The description of the counter.</param>
 		/// <param name="mode">The mode of the counter sampling.</param>
 		public Counter( string name, string description, CounterMode mode )
+			: this( name, description, mode, CounterDisplayType.LastValue )
+		{
+		}
+
+		/// <summary>
+		/// Initialize a new <see cref="Counter"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="name">The name of the counter.</param>
+		/// <param name="description">The description of the counter.</param>
+		/// <param name="mode">The mode of the counter sampling.</param>
+		/// <param name="displayType">The default display mode for the counter.</param>
+		public Counter( string name, string description, CounterMode mode, CounterDisplayType displayType )
 		{
 			this.Mode = mode;
 			this.Name = name;
 			this.Description = description;
+
+			// HACK
+			this.Mode = CounterMode.Historical;
+
 			if( this.Mode == CounterMode.Historical )
 				this.History = new CircularList<double>( CounterHistorySize, true );
+			this.DisplayType = displayType;
 		}
 
 		/// <summary>
@@ -150,7 +207,10 @@ namespace Noxa.Emulation.Psp.Debugging.Statistics
 			{
 				case CounterMode.Historical:
 					lock( this.History )
+					{
+						this.Delta = value - this.History.PeekTail();
 						this.History.Enqueue( value );
+					}
 					break;
 				case CounterMode.ArithmeticMean:
 					break;
@@ -175,13 +235,13 @@ namespace Noxa.Emulation.Psp.Debugging.Statistics
 					sum += sample;
 					if( first == true )
 					{
-						last = sample;
-						first = false;
-						continue;
+					    last = sample;
+					    first = false;
+					    continue;
 					}
 					else
 					{
-						total += ( sample - last );
+					    total += ( sample - last );
 					}
 				}
 				_average = sum / count;

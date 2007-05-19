@@ -167,12 +167,12 @@ namespace Noxa.Emulation.Psp.Player
 			_host.CurrentInstance.Start( debugging );
 		}
 
-		public void StartGameDirect( string path )
+		public void StartGameDirect( string path, bool debugging )
 		{
 			if( path == null )
 				return;
 
-			this.StartInstance( false, false );
+			this.StartInstance( false, true );
 
 			// If the path contains 'iso', we assume it's an iso and load it via the UMD driver
 			Games.GameInformation game = null;

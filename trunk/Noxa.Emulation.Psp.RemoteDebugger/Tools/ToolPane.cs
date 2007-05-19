@@ -22,6 +22,14 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 		{
 			InitializeComponent();
 		}
+
+		public virtual void OnStarted()
+		{
+		}
+
+		public virtual void OnStopped()
+		{
+		}
 	}
 }
 
