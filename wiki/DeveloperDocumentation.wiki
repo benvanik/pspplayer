@@ -27,6 +27,9 @@ The resolver/simple samples in the SDK are good test targets, don't forget to di
   * http://www.idevgames.com/forum/archive/index.php/t-10348.html (advanced combining - would be required for sfix/dfix)
   * http://www.devmaster.net/forums/archive/index.php/t-3087.html (more combining)
   * http://www.gpgpu.org/forums/viewtopic.php?=&p=15888 (good use of multiple framebuffers - may be useful for allowing framebuffer reads/writes)
+  * *Tools*
+   * [http://glintercept.nutty.org/index.html GLIntercept]
+   * [http://ogle.eyebeamresearch.org/ OpenGLExtractor]
  * GU
   * http://forums.ps2dev.org/viewtopic.php?t=2197 (general notes)
   * http://forums.ps2dev.org/viewtopic.php?t=3960 (DXT)
