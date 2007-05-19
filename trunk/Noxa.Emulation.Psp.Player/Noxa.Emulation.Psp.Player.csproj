@@ -240,6 +240,7 @@
     <None Include="Resources\RemoveIcon.png" />
     <Content Include="Resources\ResizeIcon.png" />
     <None Include="Resources\SaveIcon.png" />
+    <None Include="Resources\ScreenshotIcon.png" />
     <Content Include="Resources\SelectedMemoryStickIcon.png" />
     <Content Include="Resources\SelectedUmdIcon.png" />
     <None Include="Resources\SmallUmdIcon.png" />

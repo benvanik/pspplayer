@@ -47,6 +47,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.twoXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.threeXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fullscreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.screenshotToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.configureToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -69,6 +70,7 @@ namespace Noxa.Emulation.Psp.Player
             this.restartToolStripButton,
             this.toolStripSeparator2,
             this.sizeToolStripSplitButton,
+            this.screenshotToolStripButton,
             this.toolStripSeparator1,
             this.configureToolStripButton,
             this.toolStripSeparator3,
@@ -172,6 +174,16 @@ namespace Noxa.Emulation.Psp.Player
 			this.fullscreenToolStripMenuItem.Size = new System.Drawing.Size( 240, 22 );
 			this.fullscreenToolStripMenuItem.Text = "&Fullscreen";
 			this.fullscreenToolStripMenuItem.Click += new System.EventHandler( this.fullscreenToolStripMenuItem_Click );
+			// 
+			// screenshotToolStripButton
+			// 
+			this.screenshotToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.screenshotToolStripButton.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.ScreenshotIcon;
+			this.screenshotToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.screenshotToolStripButton.Name = "screenshotToolStripButton";
+			this.screenshotToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.screenshotToolStripButton.Text = "Take Screenshot";
+			this.screenshotToolStripButton.Click += new System.EventHandler( this.screenshotToolStripButton_Click );
 			// 
 			// toolStripSeparator1
 			// 
@@ -286,6 +298,7 @@ namespace Noxa.Emulation.Psp.Player
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		private System.Windows.Forms.ToolStripButton attachToolStripButton;
 		private System.Windows.Forms.ToolStripButton debugToolStripButton;
+		private System.Windows.Forms.ToolStripButton screenshotToolStripButton;
 	}
 }
 

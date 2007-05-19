@@ -23,6 +23,7 @@
 #include "OglExtensions.h"
 
 using namespace System::Diagnostics;
+using namespace System::Drawing;
 using namespace System::Threading;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Video;
@@ -112,6 +113,37 @@ void OglDriver::StopThread()
 	}
 }
 
+void TakeScreenshot()
+{
+	OglDriver^ driver = OglDriver::GlobalDriver;
+
+	glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
+
+	int viewport[ 4 ];
+	glGetIntegerv( GL_VIEWPORT, viewport );
+
+	int compWidth = 3;
+
+	glPixelStorei( GL_PACK_ALIGNMENT, compWidth );
+    glPixelStorei( GL_PACK_ROW_LENGTH, 0 );
+    glPixelStorei( GL_PACK_SKIP_ROWS, 0 );
+    glPixelStorei( GL_PACK_SKIP_PIXELS, 0 );
+
+	glReadBuffer( GL_FRONT );
+
+	void* buffer = malloc( compWidth * viewport[ 2 ] * viewport[ 3 ] );
+    glReadPixels( 0, 0, viewport[ 2 ], viewport[ 3 ], GL_BGR, GL_UNSIGNED_BYTE, buffer );
+	GLenum err = glGetError();
+
+	Bitmap^ b = gcnew Bitmap( viewport[ 2 ], viewport[ 3 ], viewport[ 2 ] * compWidth, System::Drawing::Imaging::PixelFormat::Format24bppRgb, IntPtr( buffer ) );
+	b->RotateFlip( RotateFlipType::RotateNoneFlipY );
+
+	glPopClientAttrib();
+
+	driver->_screenshot = b;
+	driver->_screenshotEvent->Set();
+}
+
 #pragma unmanaged
 void NativeWorker( HDC hDC, OglContext* context )
 {
@@ -198,6 +230,12 @@ listAbort:
 		else
 			Sleep( 0 );
 		_vsyncWaiting = false;
+
+		if( _screenshotPending == true )
+		{
+			_screenshotPending = false;
+			TakeScreenshot();
+		}
 
 #if _DEBUG
 		bool oldPeriodDown = periodDown;
@@ -317,6 +355,8 @@ void OglDriver::DestroyOpenGL()
 
 void OglDriver::Resize( int width, int height )
 {
+	_screenWidth = width;
+	_screenHeight = height;
 	glViewport( 0, height, width, height );
 }
 

@@ -128,26 +128,36 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 
 		private void timer1_Tick( object sender, EventArgs e )
 		{
-			foreach( CounterGroup group in this.Groups )
-				group.Source.Sample();
-
-			this.listView1.BeginUpdate();
-			foreach( CounterGroup group in this.Groups )
+			try
 			{
-				foreach( CounterItem item in group.Items )
+				foreach( CounterGroup group in this.Groups )
+					group.Source.Sample();
+
+				this.listView1.BeginUpdate();
+				foreach( CounterGroup group in this.Groups )
 				{
-					item.SubItems[ 1 ].Text = string.Format( "{0}", item.Counter.LastValue );
-					double delta = item.Counter.Delta;
-					item.SubItems[ 2 ].Text = string.Format( "{0}/s", delta );
-					if( delta < 0.0 )
-						item.SubItems[ 2 ].ForeColor = Color.Red;
-					else if( delta == 0.0 )
-						item.SubItems[ 2 ].ForeColor = SystemColors.ControlText;
-					else
-						item.SubItems[ 2 ].ForeColor = Color.Green;
+					foreach( CounterItem item in group.Items )
+					{
+						item.SubItems[ 1 ].Text = string.Format( "{0}", item.Counter.LastValue );
+						double delta = item.Counter.Delta;
+						item.SubItems[ 2 ].Text = string.Format( "{0}/s", delta );
+						if( delta < 0.0 )
+							item.SubItems[ 2 ].ForeColor = Color.Red;
+						else if( delta == 0.0 )
+							item.SubItems[ 2 ].ForeColor = SystemColors.ControlText;
+						else
+							item.SubItems[ 2 ].ForeColor = Color.Green;
+					}
 				}
+				this.listView1.EndUpdate();
 			}
-			this.listView1.EndUpdate();
+			catch( System.Net.Sockets.SocketException ex )
+			{
+				// Assume we got dc/ed
+				this.Debugger.OnConnectionLost();
+
+				this.timer1.Enabled = false;
+			}
 		}
 	}
 }

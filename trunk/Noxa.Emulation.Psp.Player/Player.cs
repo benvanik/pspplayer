@@ -89,6 +89,7 @@ namespace Noxa.Emulation.Psp.Player
 						this.pauseToolStripButton.Enabled = false;
 						this.stopToolStripButton.Enabled = false;
 						this.restartToolStripButton.Enabled = false;
+						this.screenshotToolStripButton.Enabled = false;
 						this.configureToolStripButton.Enabled = true;
 						this.debugToolStripButton.Enabled = true;
 						this.attachToolStripButton.Enabled = false;
@@ -100,6 +101,7 @@ namespace Noxa.Emulation.Psp.Player
 						this.pauseToolStripButton.Enabled = true;
 						this.stopToolStripButton.Enabled = true;
 						this.restartToolStripButton.Enabled = true;
+						this.screenshotToolStripButton.Enabled = true;
 						this.configureToolStripButton.Enabled = false;
 						this.debugToolStripButton.Enabled = false;
 						this.attachToolStripButton.Enabled = true;
@@ -110,6 +112,7 @@ namespace Noxa.Emulation.Psp.Player
 						this.pauseToolStripButton.Enabled = true;
 						this.stopToolStripButton.Enabled = true;
 						this.restartToolStripButton.Enabled = true;
+						this.screenshotToolStripButton.Enabled = true;
 						this.configureToolStripButton.Enabled = false;
 						this.debugToolStripButton.Enabled = false;
 						this.attachToolStripButton.Enabled = true;
@@ -120,6 +123,7 @@ namespace Noxa.Emulation.Psp.Player
 						this.pauseToolStripButton.Enabled = false;
 						this.stopToolStripButton.Enabled = false;
 						this.restartToolStripButton.Enabled = true;
+						this.screenshotToolStripButton.Enabled = false;
 						this.configureToolStripButton.Enabled = true;
 						this.debugToolStripButton.Enabled = true;
 						this.attachToolStripButton.Enabled = false;
@@ -133,6 +137,7 @@ namespace Noxa.Emulation.Psp.Player
 						this.pauseToolStripButton.Enabled = false;
 						this.stopToolStripButton.Enabled = false;
 						this.restartToolStripButton.Enabled = true;
+						this.screenshotToolStripButton.Enabled = false;
 						this.configureToolStripButton.Enabled = true;
 						this.debugToolStripButton.Enabled = false;
 						this.attachToolStripButton.Enabled = true;
@@ -389,6 +394,18 @@ namespace Noxa.Emulation.Psp.Player
 		}
 
 		#endregion
+
+		private void screenshotToolStripButton_Click( object sender, EventArgs e )
+		{
+			using( Bitmap b = _host.CurrentInstance.Video.CaptureScreen() )
+			{
+				string timestamp = DateTime.Now.ToString( "yyyy.MM.dd-HH.mm.ss" );
+				string fileName = string.Format( "Screenshot-{0}-{1}.png",
+					_host.CurrentInstance.Bios.Game.Parameters.DiscID,
+					timestamp );
+				b.Save( fileName );
+			}
+		}
 
 		protected override void OnResize( EventArgs e )
 		{
