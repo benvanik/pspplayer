@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OglDriver_Debugging.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OglDriver_ManagedInterface.cpp"
 				>
 			</File>
@@ -236,6 +240,10 @@
 			</File>
 			<File
 				RelativePath=".\OglExtensions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OglHook.cpp"
 				>
 			</File>
 			<File
@@ -298,6 +306,10 @@
 			</File>
 			<File
 				RelativePath=".\OglExtensions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OglHook.h"
 				>
 			</File>
 			<File

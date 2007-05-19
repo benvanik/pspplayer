@@ -15,6 +15,7 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 	/// <summary>
 	/// CPU core state.
 	/// </summary>
+	[Serializable]
 	public class CoreState
 	{
 		public int ProgramCounter;
@@ -29,6 +30,9 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 
 		public uint FpuControlRegister;
 		public float[] FpuRegisters;
+
+		//public uint VfpuControlRegister;
+		//public float[] VfpuRegisters;
 		
 		//bool InDelaySlot;
 		//int DelayPc;

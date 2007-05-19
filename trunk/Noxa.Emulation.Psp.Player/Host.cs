@@ -18,10 +18,10 @@ namespace Noxa.Emulation.Psp.Player
 	class Host : IEmulationHost
 	{
 		protected Player _player;
+		protected DebugHost _debugHost;
 		protected Instance _instance;
-		protected IDebugger _debugger;
 		protected Settings _componentSettings;
-		protected LogViewer _logger;
+		protected Logger _logger;
 
 		public Host( string[] args )
 		{
@@ -37,9 +37,10 @@ namespace Noxa.Emulation.Psp.Player
 
 			Properties.Settings.Default.Save();
 
-			_debugger = null;
-			_logger = new LogViewer();
-			_logger.Show();
+			_debugHost = new DebugHost( this );
+			Diag.Instance = _debugHost;
+
+			_logger = new Logger();
 			_player = new Player( this );
 
 			this.Load();
@@ -64,14 +65,6 @@ namespace Noxa.Emulation.Psp.Player
 			get
 			{
 				return _instance;
-			}
-		}
-
-		public IDebugger Debugger
-		{
-			get
-			{
-				return _debugger;
 			}
 		}
 
@@ -241,17 +234,27 @@ namespace Noxa.Emulation.Psp.Player
 				return false;
 		}
 
+		public bool IsDebuggerAttached
+		{
+			get
+			{
+				return _debugHost.IsAttached;
+			}
+		}
+
+		public DebugHost Debugger
+		{
+			get
+			{
+				return _debugHost;
+			}
+		}
+
 		public void AttachDebugger()
 		{
-			Debug.Assert( _debugger == null, "Debugger already attached!" );
-			if( _debugger != null )
-				return;
-
-			//_debugger = new Noxa.Emulation.Psp.Player.Development.Debugger( this );
-			//_debugger.Show();
-
-			_instance.Cpu.EnableDebugging( _debugger );
-			_instance.Bios.EnableDebugging( _debugger );
+			_instance.Bios.EnableDebugging();
+			_instance.Cpu.EnableDebugging();
+			_instance.Video.EnableDebugging();
 		}
 	}
 }

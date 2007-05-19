@@ -13,7 +13,8 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 	/// <summary>
 	/// A single frame in a callstack.
 	/// </summary>
-	public abstract class Frame
+	[Serializable]
+	public class Frame
 	{
 		/// <summary>
 		/// The entry address.

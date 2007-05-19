@@ -23,7 +23,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -43,6 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -58,31 +59,31 @@
     <Compile Include="ComponentIssue.cs" />
     <Compile Include="ComponentParameters.cs" />
     <Compile Include="Cpu\MemorySystem.cs" />
+    <Compile Include="Debugging\DebugData\IDebugDatabase.cs" />
+    <Compile Include="Debugging\DebugHost.cs" />
+    <Compile Include="Debugging\Hooks\IHook.cs" />
+    <Compile Include="Debugging\Hooks\IVideoHook.cs" />
+    <Compile Include="Debugging\IDebuggable.cs" />
+    <Compile Include="Debugging\DebugModel\Event.cs" />
     <Compile Include="Debugging\DebugModel\CoreState.cs" />
-    <Compile Include="Cpu\IAvcDecoder.cs" />
     <Compile Include="Cpu\ICpu.cs" />
     <Compile Include="Cpu\ICpuCapabilities.cs" />
     <Compile Include="Cpu\ICpuCore.cs" />
-    <Compile Include="Cpu\ICpuCoreProfiler.cs" />
-    <Compile Include="Cpu\ICpuStatistics.cs" />
     <Compile Include="Cpu\IMemory.cs" />
     <Compile Include="Cpu\IMemorySegment.cs" />
-    <Compile Include="Debugging\DebugModel\Breakpoint.cs" />
-    <Compile Include="Debugging\DebugModel\BreakpointEventArgs.cs" />
     <Compile Include="Debugging\DebugModel\Frame.cs" />
-    <Compile Include="Debugging\DebugData\ElfDebugData.cs" />
-    <Compile Include="Debugging\IBiosHook.cs" />
-    <Compile Include="Debugging\IDebugControl.cs" />
-    <Compile Include="Debugging\IDebugger.cs" />
-    <Compile Include="Debugging\ICpuHook.cs" />
-    <Compile Include="Debugging\IDebugInspector.cs" />
-    <Compile Include="Debugging\DebugData\IProgramDebugData.cs" />
+    <Compile Include="Debugging\DebugModel\Error.cs" />
+    <Compile Include="Debugging\Hooks\IBiosHook.cs" />
+    <Compile Include="Debugging\Protocol\IDebugController.cs" />
+    <Compile Include="Debugging\Protocol\IDebugger.cs" />
+    <Compile Include="Debugging\Hooks\ICpuHook.cs" />
+    <Compile Include="Debugging\Protocol\IDebugHandler.cs" />
     <Compile Include="Debugging\DebugModel\Method.cs" />
-    <Compile Include="Debugging\NullDebugger.cs" />
-    <Compile Include="Debugging\DebugData\ProgramDebugData.cs" />
-    <Compile Include="Debugging\DebugData\SimpleElfDebugData.cs" />
+    <Compile Include="Debugging\Statistics\Counter.cs" />
+    <Compile Include="Debugging\Statistics\CounterSink.cs" />
+    <Compile Include="Debugging\Statistics\CounterSource.cs" />
+    <Compile Include="Diag.cs" />
     <Compile Include="EmulationParameters.cs" />
-    <Compile Include="Debugging\DebugData\ElfFile.cs" />
     <Compile Include="Games\GameInformation.cs" />
     <Compile Include="Games\PbpReader.cs" />
     <Compile Include="Games\SfoReader.cs" />
@@ -91,7 +92,7 @@
     <Compile Include="IComponentInstance.cs" />
     <Compile Include="IEmulationHost.cs" />
     <Compile Include="IEmulationInstance.cs" />
-    <Compile Include="ILogger.cs" />
+    <Compile Include="Debugging\ILogger.cs" />
     <Compile Include="IO\IIODriver.cs" />
     <Compile Include="Input\IInputDevice.cs" />
     <Compile Include="Log.cs" />
@@ -108,7 +109,6 @@
     <Compile Include="Video\DisplayProperties.cs" />
     <Compile Include="Video\IVideoCapabilities.cs" />
     <Compile Include="Video\IVideoDriver.cs" />
-    <Compile Include="Video\IVideoStatistics.cs" />
     <Compile Include="Video\VideoCommand.cs" />
   </ItemGroup>
   <ItemGroup>

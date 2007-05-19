@@ -1,0 +1,258 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{227E2719-42F4-47C3-9637-872CE0594056}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Noxa.Emulation.Psp.RemoteDebugger</RootNamespace>
+    <AssemblyName>Noxa.Emulation.Psp.RemoteDebugger</AssemblyName>
+    <ApplicationIcon>Resources\pspdev.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.0.2649.16786, Culture=neutral, PublicKeyToken=d481317c817cec47, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Breakpoint.cs" />
+    <Compile Include="BreakpointEventArgs.cs" />
+    <Compile Include="BreakpointManager.cs" />
+    <Compile Include="CodeView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CodeView.Designer.cs">
+      <DependentUpon>CodeView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConnectionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConnectionDialog.Designer.cs">
+      <DependentUpon>ConnectionDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EmuDebugger.cs" />
+    <Compile Include="DebugView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DebugView.Designer.cs">
+      <DependentUpon>DebugView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\LogViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\LogViewer.Designer.cs">
+      <DependentUpon>LogViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CodeView.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>CodeView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConnectionDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ConnectionDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DebugView.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DebugView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\LogViewer.resx">
+      <DependentUpon>LogViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\ToolPane.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ToolPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Tools\ToolPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\ToolPane.Designer.cs">
+      <DependentUpon>ToolPane.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Noxa.Emulation.Psp.Configuration\Noxa.Emulation.Psp.Configuration.csproj">
+      <Project>{9FC81B11-9C39-42AE-9DF6-3C08D4A9F8C1}</Project>
+      <Name>Noxa.Emulation.Psp.Configuration</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj">
+      <Project>{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}</Project>
+      <Name>Noxa.Emulation.Psp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities.Controls\Noxa.Utilities.Controls.csproj">
+      <Project>{67000884-BAF0-40B5-8D24-F06D2D623787}</Project>
+      <Name>Noxa.Utilities.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Noxa.Utilities\Noxa.Utilities.csproj">
+      <Project>{7609D1BE-23AC-4E67-AD44-9D1E637FB202}</Project>
+      <Name>Noxa.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OutputIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\SaveIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ClearIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CopyIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AeroWait.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pspdev.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BreakpointOffIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BreakpointsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CallstackIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DeleteAllBreakpointsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DeleteBreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DisassemblyIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\FindBreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HelpContentsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HelpIndexIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\HighlightIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MemoryIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NewBreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OptionsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PauseIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PlayIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RegistersIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RestartIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatementCallIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatementDeadIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatementIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StepIntoIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StepOutIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StepOverIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StopIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ThreadsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToggleAllBreakpointsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ToggleBreakpointIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\WatchesIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\StatisticsIcon.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

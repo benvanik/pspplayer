@@ -23,6 +23,9 @@ using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
 
 extern R4000Ctx* _cpuCtx;
+extern uint _codeBlocksGenerated;
+extern uint _jumpBlockThunkCalls;
+extern uint _jumpBlockThunkBuilds;
 extern uint _jumpBlockThunkHits;
 
 void __fixupBlockJump( void* sourceAddress, int newTarget );
@@ -215,22 +218,21 @@ CodeBlock* R4000BlockBuilder::Build( int address )
 	_gen->Reset();
 
 #ifdef STATISTICS
-	R4000Statistics^ stats = _cpu->_stats;
-	stats->CodeBlocksGenerated++;
+	_codeBlocksGenerated++;
+
+	R4000Statistics^ stats = this->_cpu->_stats;
+
+	stats->CodeBlockLength->Update( block->InstructionCount );
 
 	double ratio = block->Size / ( block->InstructionCount * 4 );
-	stats->AverageCodeSizeRatio = ( stats->AverageCodeSizeRatio * .5 ) + ( ratio * .5 );
+	stats->CodeSizeRatio->Update( ratio );
 
 	double genTime = _cpu->_timer->Elapsed - blockStart;
 	if( genTime <= 0.0 )
 		genTime = 0.000001;
-	stats->AverageGenerationTime += genTime;
+	stats->GenerationTime->Update( genTime );
 
 	//Debug::WriteLine( String::Format( "gen block at 0x{0:X8} took {1}s ({2} instructions)", address, genTime, block->InstructionCount ) );
-
-	stats->AverageCodeBlockLength += block->InstructionCount;
-	if( block->InstructionCount > stats->LargestCodeBlockLength )
-		stats->LargestCodeBlockLength = block->InstructionCount;
 #endif
 
 	return block;
@@ -372,7 +374,7 @@ void* __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stac
 	Debug::Assert( builder != nullptr );
 
 #ifdef STATISTICS
-	R4000Cpu::GlobalCpu->_stats->JumpBlockThunkCalls++;
+	_jumpBlockThunkCalls++;
 #endif
 
 	CodeBlock* targetBlock = builder->_codeCache->Find( ( int )targetAddress );
@@ -383,7 +385,7 @@ void* __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stac
 		Debug::Assert( targetBlock != NULL );
 
 #ifdef STATISTICS
-		R4000Cpu::GlobalCpu->_stats->JumpBlockThunkBuilds++;
+		_jumpBlockThunkBuilds++;
 #endif
 	}
 	else
@@ -391,7 +393,7 @@ void* __missingBlockThunkM( void* sourceAddress, void* targetAddress, void* stac
 		// Found, just need to do the patchup below
 
 #ifdef STATISTICS
-		R4000Cpu::GlobalCpu->_stats->JumpBlockThunkHits++;
+		_jumpBlockThunkHits++;
 #endif
 	}
 

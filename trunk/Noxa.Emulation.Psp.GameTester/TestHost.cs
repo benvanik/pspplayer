@@ -33,14 +33,6 @@ namespace Noxa.Emulation.Psp.GameTester
 			}
 		}
 
-		public IDebugger Debugger
-		{
-			get
-			{
-				return null;
-			}
-		}
-
 		public bool CreateInstance()
 		{
 			EmulationParameters emulationParams = new EmulationParameters();
@@ -90,8 +82,28 @@ namespace Noxa.Emulation.Psp.GameTester
 				return false;
 		}
 
+		#region Debugging Members
+
+		public bool IsDebuggerAttached
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		public DebugHost Debugger
+		{
+			get
+			{
+				return null;
+			}
+		}
+
 		public void AttachDebugger()
 		{
 		}
+
+		#endregion
 	}
 }

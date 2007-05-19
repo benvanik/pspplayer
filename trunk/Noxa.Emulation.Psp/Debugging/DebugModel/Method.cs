@@ -11,10 +11,31 @@ using System.Text;
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
 	/// <summary>
+	/// Defines the type of a <see cref="Method"/>.
+	/// </summary>
+	public enum MethodType
+	{
+		/// <summary>
+		/// Method consists of user code.
+		/// </summary>
+		User,
+		/// <summary>
+		/// Method is a BIOS stub.
+		/// </summary>
+		Bios,
+	}
+
+	/// <summary>
 	/// Represents a method inside of a program debug database.
 	/// </summary>
-	public abstract class Method
+	[Serializable]
+	public class Method
 	{
+		/// <summary>
+		/// The type of the method.
+		/// </summary>
+		public readonly MethodType Type;
+
 		/// <summary>
 		/// The start address of the method.
 		/// </summary>
@@ -31,16 +52,25 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		public readonly string Name;
 
 		/// <summary>
+		/// A list of breakpoint IDs defined inside the method.
+		/// </summary>
+		public List<int> Breakpoints;
+
+		/// <summary>
 		/// Initializes a new <see cref="Method"/> instance with the given parameters.
 		/// </summary>
+		/// <param name="type">The type of the method.</param>
 		/// <param name="entryAddress">The start address of the method.</param>
 		/// <param name="length">The length of the method, in bytes.</param>
 		/// <param name="name">The name of the method, if available.</param>
-		protected Method( int entryAddress, int length, string name )
+		public Method( MethodType type, int entryAddress, int length, string name )
 		{
+			Type = type;
 			EntryAddress = entryAddress;
 			Length = length;
 			Name = name;
+
+			Breakpoints = new List<int>();
 		}
 
 		/// <summary>

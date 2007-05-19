@@ -77,6 +77,14 @@ namespace Noxa.Emulation.Psp
 		}
 
 		/// <summary>
+		/// A list of <see cref="IComponentInstance"/> instances in use by this instance.
+		/// </summary>
+		IComponentInstance[] Components
+		{
+			get;
+		}
+
+		/// <summary>
 		/// The audio driver in use by the instance.
 		/// </summary>
 		IAudioDriver Audio

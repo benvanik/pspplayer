@@ -56,7 +56,7 @@ bool _vsyncWaiting;
 int64 _lastVsync;
 
 // Statistics
-extern uint _vcount;
+extern uint64 _vcount;
 
 void __break()
 {

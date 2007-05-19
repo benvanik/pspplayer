@@ -6,44 +6,53 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.Hooks;
 using Noxa.Emulation.Psp.Games;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 {
 	partial class Bios
 	{
+		private BiosDebugHook _hook;
+
 		public bool DebuggingEnabled
 		{
 			get
 			{
+				return ( _hook != null );
+			}
+		}
+
+		public bool SupportsDebugging
+		{
+			get
+			{
+#if DEBUG
+				return true;
+#else
 				return false;
+#endif
 			}
 		}
 
-		public IDebugger Debugger
+		public IHook DebugHook
 		{
 			get
 			{
-				return null;
+				return _hook;
 			}
 		}
 
-		public IBiosHook DebugHook
+		public void EnableDebugging()
 		{
-			get
-			{
-				return null;
-			}
-		}
-
-		public void EnableDebugging( IDebugger debugger )
-		{
-			throw new NotImplementedException();
+			Debug.Assert( this.SupportsDebugging == true );
+			_hook = new BiosDebugHook( this );
 		}
 	}
 }

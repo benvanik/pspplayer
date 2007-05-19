@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
+using Noxa.Emulation.Psp.Debugging;
+
 namespace Noxa.Emulation.Psp.Cpu
 {
 	/// <summary>

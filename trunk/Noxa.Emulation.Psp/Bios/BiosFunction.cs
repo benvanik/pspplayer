@@ -171,6 +171,11 @@ namespace Noxa.Emulation.Psp.Bios
 		public bool HasCpuImplementation;
 
 		/// <summary>
+		/// The address of the stub in guest memory.
+		/// </summary>
+		public uint StubAddress;
+
+		/// <summary>
 		/// Initializes a new <see cref="BiosFunction"/> instance in the case of a missing function.
 		/// </summary>
 		/// <param name="module">Module containing the function.</param>

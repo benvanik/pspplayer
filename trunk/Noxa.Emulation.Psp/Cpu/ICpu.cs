@@ -9,9 +9,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using Noxa.Emulation.Psp.Debugging;
-using Noxa.Emulation.Psp.Games;
 using Noxa.Emulation.Psp.Bios;
+using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.Protocol;
+using Noxa.Emulation.Psp.Games;
 
 namespace Noxa.Emulation.Psp.Cpu
 {
@@ -41,20 +42,12 @@ namespace Noxa.Emulation.Psp.Cpu
 	/// <summary>
 	/// A CPU.
 	/// </summary>
-	public interface ICpu : IComponentInstance
+	public interface ICpu : IComponentInstance, IDebuggable
 	{
 		/// <summary>
 		/// The capability definition instance.
 		/// </summary>
 		ICpuCapabilities Capabilities
-		{
-			get;
-		}
-
-		/// <summary>
-		/// The statistics reporter.
-		/// </summary>
-		ICpuStatistics Statistics
 		{
 			get;
 		}
@@ -78,14 +71,6 @@ namespace Noxa.Emulation.Psp.Cpu
 		}
 
 		/// <summary>
-		/// The audio/video decoder, if supported.
-		/// </summary>
-		IAvcDecoder Avc
-		{
-			get;
-		}
-
-		/// <summary>
 		/// The memory system.
 		/// </summary>
 		IMemory Memory
@@ -101,39 +86,13 @@ namespace Noxa.Emulation.Psp.Cpu
 			get;
 		}
 
-		#region Debugging
-
 		/// <summary>
-		/// <c>true</c> if debugging is enabled.
+		/// Debug controller implementation.
 		/// </summary>
-		bool DebuggingEnabled
+		IDebugController DebugController
 		{
 			get;
 		}
-
-		/// <summary>
-		/// The current debugger instance, if enabled.
-		/// </summary>
-		IDebugger Debugger
-		{
-			get;
-		}
-
-		/// <summary>
-		/// The CPU debug inspection instance.
-		/// </summary>
-		ICpuHook DebugHook
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Enable debugging on the CPU.
-		/// </summary>
-		/// <param name="debugger">The debugger instance to attach to.</param>
-		void EnableDebugging( IDebugger debugger );
-
-		#endregion
 
 		#region Syscalls / Exports
 
@@ -308,10 +267,5 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// Stop the CPU.
 		/// </summary>
 		void Stop();
-
-		/// <summary>
-		/// Print the statistics to the console.
-		/// </summary>
-		void PrintStatistics();
 	}
 }

@@ -11,8 +11,92 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
+using Noxa.Emulation.Psp.Debugging;
+
 namespace Noxa.Emulation.Psp
 {
+	#region Enumerations
+
+	/// <summary>
+	/// Defines the level of logging.
+	/// </summary>
+	public enum Verbosity
+	{
+		/// <summary>
+		/// Only critical messages will be logged.
+		/// </summary>
+		Critical = 0,
+		/// <summary>
+		/// Critical and some other import messages will be logged.
+		/// </summary>
+		Normal = 1,
+		/// <summary>
+		/// Extra debugging info will be logged.
+		/// </summary>
+		Verbose = 2,
+		/// <summary>
+		/// Everything will be logged.
+		/// </summary>
+		Everything = 3,
+	}
+
+	/// <summary>
+	/// Defines the feature a log message pertains to.
+	/// </summary>
+	public enum Feature
+	{
+		/// <summary>
+		/// General emulation information, such as run state/etc.
+		/// </summary>
+		General,
+		/// <summary>
+		/// Information pertaining to the audio system.
+		/// </summary>
+		Audio,
+		/// <summary>
+		/// Information pertaining to the BIOS.
+		/// </summary>
+		Bios,
+		/// <summary>
+		/// Information pertaining to the CPU.
+		/// </summary>
+		Cpu,
+		/// <summary>
+		/// Information pertaining to the game/module loader.
+		/// </summary>
+		Loader,
+		/// <summary>
+		/// Information pertaining to the input system.
+		/// </summary>
+		Input,
+		/// <summary>
+		/// Information pertaining to the media (MemoryStick/UMD) systems.
+		/// </summary>
+		Media,
+		/// <summary>
+		/// Information pertaining to the networking systems.
+		/// </summary>
+		Net,
+		/// <summary>
+		/// Information pretaining to the video system.
+		/// </summary>
+		Video,
+		/// <summary>
+		/// Statistical information.
+		/// </summary>
+		Statistics,
+		/// <summary>
+		/// STDOUT/STDERR output from the game.
+		/// </summary>
+		Stdout,
+		/// <summary>
+		/// Trace of syscalls and their parameters.
+		/// </summary>
+		Syscall,
+	}
+
+	#endregion
+
 	/// <summary>
 	/// Singleton logging helper.
 	/// </summary>

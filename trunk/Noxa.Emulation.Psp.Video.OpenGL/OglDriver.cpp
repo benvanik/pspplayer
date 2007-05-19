@@ -17,7 +17,7 @@ using namespace Noxa::Emulation::Psp::Video;
 using namespace Noxa::Emulation::Psp::Video::Native;
 
 // Number of vertical traces
-uint _vcount;
+uint64 _vcount;
 bool Noxa::Emulation::Psp::Video::_speedLocked;
 
 OglDriver::OglDriver( IEmulationInstance^ emulator, ComponentParameters^ parameters )
@@ -45,7 +45,7 @@ OglDriver::~OglDriver()
 	SAFEFREE( _nativeInterface );
 }
 
-uint OglDriver::Vcount::get()
+uint64 OglDriver::Vcount::get()
 {
 	return _vcount;
 }
@@ -78,34 +78,4 @@ void OglDriver::Cleanup()
 	// Cleanup everything else here
 
 	_threadSync = nullptr;
-}
-
-void OglDriver::PrintStatistics()
-{
-#ifdef STATISTICS
-		_stats->GatherStats();
-		//_stats->AverageCodeBlockLength /= _stats->CodeBlocksGenerated;
-		//_stats->AverageGenerationTime /= _stats->CodeBlocksGenerated;
-		//_stats->RunTime = _timer->Elapsed - _stats->RunTime;
-		//_stats->IPS = _stats->InstructionsExecuted / _stats->RunTime;
-		TimeSpan elapsed = DateTime::Now - _startTime;
-		_stats->FPS = _stats->ProcessedFrames / ( float )elapsed.TotalSeconds;
-		_stats->AttemptedFPS = ( _stats->ProcessedFrames + _stats->SkippedFrames ) / ( float )elapsed.TotalSeconds;
-
-		Log::WriteLine( Verbosity::Normal, Feature::Statistics, "OpenGL Video Driver Statistics: -----------------------------" );
-		array<FieldInfo^>^ fields = ( OglStatistics::typeid )->GetFields();
-		for( int n = 0; n < fields->Length; n++ )
-		{
-			Object^ value = fields[ n ]->GetValue( _stats );
-			Log::WriteLine( Verbosity::Normal, Feature::Statistics, "{0}: {1}", fields[ n ]->Name, value );
-		}
-
-		Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "Video Command Usage Count: ----------------------------------" );
-		for( int n = 0; n < _stats->CommandCounts->Length; n++ )
-		{
-			if( _stats->CommandCounts[ n ] <= 1 )
-				continue;
-			Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "{0:X2}: {1}\t{2}", n, _stats->CommandCounts[ n ], ( VideoCommand )n );
-		}
-#endif
 }

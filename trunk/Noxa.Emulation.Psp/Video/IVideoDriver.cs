@@ -6,29 +6,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Drawing;
+using System.Text;
 using System.Threading;
+
+using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.Statistics;
 
 namespace Noxa.Emulation.Psp.Video
 {
 	/// <summary>
 	/// A video driver.
 	/// </summary>
-	public interface IVideoDriver : IComponentInstance
+	public interface IVideoDriver : IComponentInstance, IDebuggable
 	{
 		/// <summary>
 		/// The capability definition instance.
 		/// </summary>
 		IVideoCapabilities Capabilities
-		{
-			get;
-		}
-
-		/// <summary>
-		/// The statistics reporter.
-		/// </summary>
-		IVideoStatistics Statistics
 		{
 			get;
 		}
@@ -53,7 +48,7 @@ namespace Noxa.Emulation.Psp.Video
 		/// <summary>
 		/// The number of V blanks that have elapsed.
 		/// </summary>
-		uint Vcount
+		ulong Vcount
 		{
 			get;
 		}
@@ -92,10 +87,5 @@ namespace Noxa.Emulation.Psp.Video
 		/// </summary>
 		/// <returns><c>true</c> if the resume was successful; otherwise <c>false</c>.</returns>
 		bool Resume();
-
-		/// <summary>
-		/// Print the statistics to the console.
-		/// </summary>
-		void PrintStatistics();
 	}
 }

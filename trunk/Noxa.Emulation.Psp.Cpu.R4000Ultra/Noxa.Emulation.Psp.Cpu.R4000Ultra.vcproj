@@ -229,6 +229,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Controller.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Cpu.cpp"
 				>
 			</File>
@@ -286,6 +290,10 @@
 			</File>
 			<File
 				RelativePath=".\R4000Generator_Special.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Hook.cpp"
 				>
 			</File>
 			<File
@@ -367,6 +375,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Controller.h"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Core.h"
 				>
 			</File>
@@ -400,6 +412,10 @@
 			</File>
 			<File
 				RelativePath=".\R4000Generator_Instructions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Hook.h"
 				>
 			</File>
 			<File

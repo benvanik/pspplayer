@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 
+using Noxa.Emulation.Psp.Debugging;
+
 namespace Noxa.Emulation.Psp.GameTester
 {
 	class Logger : ILogger

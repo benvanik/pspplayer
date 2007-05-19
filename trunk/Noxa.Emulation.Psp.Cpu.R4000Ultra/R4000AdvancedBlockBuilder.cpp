@@ -48,6 +48,11 @@ extern uint _codeBlocksExecuted;
 extern uint _jumpBlockInlineHits;
 extern uint _jumpBlockInlineMisses;
 
+extern uint _jumpBlockInlineCount;
+extern uint _jumpBlockThunkCount;
+extern uint _jumpBlockLookupCount;
+extern uint _codeBlockRetCount;
+
 void __flushTrace();
 
 #define ENDADDRESS ( startAddress + ( maxCodeLength << 2 ) )
@@ -755,7 +760,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 			this->EmitJumpBlockEbx();
 
 #ifdef STATISTICS
-			_cpu->_stats->JumpBlockLookupCount++;
+			_jumpBlockLookupCount++;
 #endif
 		}
 		else
@@ -776,7 +781,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 				this->EmitJumpBlock( targetAddress );
 
 #ifdef STATISTICS
-				_cpu->_stats->JumpBlockThunkCount++;
+				_jumpBlockThunkCount++;
 #endif
 			}
 			else
@@ -790,7 +795,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 				g->jmp( ( int )block->Pointer );
 
 #ifdef STATISTICS
-				_cpu->_stats->JumpBlockInlineCount++;
+				_jumpBlockInlineCount++;
 #endif
 			}
 		}
@@ -802,7 +807,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 		g->ret();
 
 #ifdef STATISTICS
-		_cpu->_stats->CodeBlockRetCount++;
+		_codeBlockRetCount++;
 #endif
 	}
 }

@@ -15,6 +15,7 @@ using namespace System::Threading;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Debugging;
+using namespace Noxa::Emulation::Psp::Debugging::Hooks;
 using namespace Noxa::Emulation::Psp::Utilities;
 
 namespace Noxa {
@@ -23,8 +24,10 @@ namespace Noxa {
 			namespace Video {
 
 				extern bool _speedLocked;
+				extern bool _debugEnabled;
 
 				ref class OpenGLVideo;
+				ref class OglHook;
 				
 				ref class OglDriver : IVideoDriver
 				{
@@ -41,6 +44,7 @@ namespace Noxa {
 					DisplayProperties^			_props;
 					DisplayProperties^			_currentProps;
 					OglCapabilities^			_caps;
+					OglHook^					_hook;
 					OglStatistics^				_stats;
 					DateTime					_startTime;
 
@@ -106,9 +110,9 @@ namespace Noxa {
 						}
 					}
 
-					property uint OglDriver::Vcount
+					property uint64 OglDriver::Vcount
 					{
-						virtual uint get();
+						virtual uint64 get();
 					}
 
 					property IVideoCapabilities^ Capabilities
@@ -116,14 +120,6 @@ namespace Noxa {
 						virtual IVideoCapabilities^ get()
 						{
 							return _caps;
-						}
-					}
-
-					property IVideoStatistics^ Statistics
-					{
-						virtual IVideoStatistics^ get()
-						{
-							return _stats;
 						}
 					}
 
@@ -157,7 +153,22 @@ namespace Noxa {
 
 					virtual void Cleanup();
 
-					virtual void PrintStatistics();
+					property IHook^ DebugHook
+					{
+						virtual IHook^ get()
+						{
+							return ( IHook^ )_hook;
+						}
+					}
+					property bool SupportsDebugging
+					{
+						virtual bool get();
+					}
+					property bool DebuggingEnabled
+					{
+						virtual bool get();
+					}
+					virtual void EnableDebugging();
 
 				protected:
 					void SetupNativeInterface();

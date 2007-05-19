@@ -8,36 +8,24 @@
 
 using namespace System;
 using namespace Noxa::Emulation::Psp;
+using namespace Noxa::Emulation::Psp::Debugging::Statistics;
 
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {
 			namespace Video {
 
-				ref class OglStatistics : public IVideoStatistics
+				ref class OglStatistics : public CounterSource
 				{
 				public:
-					OglStatistics(){}
+					OglStatistics();
 
-					float FPS;								// Frames per second
-					float AttemptedFPS;						// Attempted frames per second (if skipping were disabled)
-					uint ProcessedFrames;					// # of frames processed
-					uint SkippedFrames;						// # of frames skipped
-					uint DisplayListsProcessed;				// # of display lists processed
-					uint AbortedDisplayLists;				// # of display lists forcefully aborted
+					Counter^	Frames;
+					Counter^	SkippedFrames;
+					Counter^	DisplayLists;
+					Counter^	AbortedDisplayLists;
 
-					array<uint>^ CommandCounts;				// Count of each command used
-
-					void GatherStats();
-
-					property int FramesPerSecond
-					{
-						virtual int get()
-						{
-							return ( int )FPS;
-						}
-					}
-
+					virtual void Sample() override;
 				};
 
 			}

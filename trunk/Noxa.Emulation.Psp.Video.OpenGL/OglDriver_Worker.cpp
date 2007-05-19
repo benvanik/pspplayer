@@ -31,10 +31,11 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 bool _shutdown;
 
 // Statistics
-extern uint _vcount;
-extern uint _displayListsProcessed;
-extern uint _processedFrames;
-extern uint _abortedLists;
+extern uint64 _vcount;
+extern uint64 _displayListsProcessed;
+extern uint64 _processedFrames;
+extern uint64 _skippedFrames;
+extern uint64 _abortedLists;
 
 extern HANDLE _hSyncEvent;
 extern HANDLE _hListSyncEvent;
@@ -85,6 +86,8 @@ void OglDriver::StartThread()
 	_context->TextureEnvMode = GL_MODULATE;
 	for( int n = 0; n < 4; n++ )
 		_context->AmbientMaterial[ n ] = 1.0f;
+
+	Diag::Instance->Counters->RegisterSource( _stats );
 
 	_thread = gcnew Thread( gcnew ParameterizedThreadStart( &WorkerThreadThunk ) );
 	_thread->Name = "Video worker";

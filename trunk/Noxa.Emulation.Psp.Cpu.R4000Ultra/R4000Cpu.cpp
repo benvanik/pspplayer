@@ -10,6 +10,7 @@
 #include "R4000Core.h"
 #include "R4000Memory.h"
 #include "R4000Cache.h"
+#include "R4000Controller.h"
 #include "Tracer.h"
 
 #include "R4000AdvancedBlockBuilder.h"
@@ -50,6 +51,8 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_timer = gcnew PerformanceTimer();
 	_timeSinceLastIpsPrint = 0.0;
 #endif
+
+	_controller = gcnew R4000Controller( this );
 
 	_lastSyscall = -1;
 	_syscalls = gcnew array<BiosFunction^>( 1024 );
@@ -153,6 +156,10 @@ void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 	Debug::Assert( _hasExecuted == false );
 	if( _hasExecuted == false )
 	{
+#ifdef STATISTICS
+		Diag::Instance->Counters->RegisterSource( _stats );
+#endif
+
 		// Prepare tracer
 #ifdef TRACE
 		Tracer::OpenFile( TRACEFILE );
@@ -174,6 +181,7 @@ void R4000Cpu::SetupGame( GameInformation^ game, Stream^ bootStream )
 	}
 }
 
+/*
 void R4000Cpu::PrintStatistics()
 {
 #ifdef TRACE
@@ -230,3 +238,4 @@ void R4000Cpu::PrintStatistics()
 #endif
 #endif
 }
+*/
