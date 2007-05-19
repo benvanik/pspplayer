@@ -260,13 +260,6 @@ namespace Noxa.Emulation.Psp.Player
 
 		private void attachToolStripButton_Click( object sender, EventArgs e )
 		{
-			if( _host.Debugger != null )
-			{
-				_host.Debugger.Show();
-				return;
-			}
-
-			_host.AttachDebugger();
 		}
 
 		private string GetStatusText()
@@ -289,12 +282,12 @@ namespace Noxa.Emulation.Psp.Player
 						{
 							string status = string.Format( "Running {0}",
 								_host.CurrentInstance.Bios.Game.Parameters.Title );
-							if( ( _host.CurrentInstance.Cpu.Capabilities.SupportedStatistics & Noxa.Emulation.Psp.Cpu.CpuStatisticsCapabilities.InstructionsPerSecond ) != 0 )
+							/*if( ( _host.CurrentInstance.Cpu.Capabilities.SupportedStatistics & Noxa.Emulation.Psp.Cpu.CpuStatisticsCapabilities.InstructionsPerSecond ) != 0 )
 							{
 								string ips = string.Format( "IPS: {0:###.##}M",
 									_host.CurrentInstance.Cpu.Statistics.InstructionsPerSecond / 1000000.0 );
 								status = string.Format( "{0} - {1}", status, ips );
-							}
+							}*/
 							return status;
 						}
 						else

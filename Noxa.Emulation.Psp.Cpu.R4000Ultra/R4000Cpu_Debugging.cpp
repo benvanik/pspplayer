@@ -9,6 +9,7 @@
 #include "R4000Core.h"
 #include "R4000Memory.h"
 #include "R4000Cache.h"
+#include "R4000Hook.h"
 #include "Tracer.h"
 
 #include "R4000AdvancedBlockBuilder.h"
@@ -24,43 +25,24 @@ using namespace Noxa::Emulation::Psp::Cpu;
 using namespace Noxa::Emulation::Psp::Debugging;
 using namespace Noxa::Emulation::Psp::Debugging::DebugModel;
 
-void R4000Cpu::EnableDebugging( IDebugger^ debugger )
+bool Noxa::Emulation::Psp::Cpu::_debugEnabled = false;
+
+bool R4000Cpu::SupportsDebugging::get()
 {
-	_debugger = debugger;
-	if( _debugger != nullptr )
-		_debugger->CpuHook = this;
+#ifdef _DEBUG
+	return true;
+#else
+	return false;
+#endif
 }
 
-CoreState^ R4000Cpu::GetCoreState( int core )
+bool R4000Cpu::DebuggingEnabled::get()
 {
-	Debug::Assert( core == 0 );
-
-	if( core == 0 )
-	{
-		CoreState^ state = gcnew CoreState();
-
-		state->ProgramCounter = *_core0->PC;
-		state->GeneralRegisters = _core0->GeneralRegisters;
-		state->Hi = *_core0->HI;
-		state->Lo = *_core0->LO;
-		state->LL = ( *_core0->LL == 1 ) ? true : false;
-
-		state->Cp0ControlRegisters = _core0->Cp0->Control;
-		state->Cp0Registers = _core0->Cp0->Registers;
-		state->Cp0ConditionBit = _core0->Cp0->ConditionBit;
-
-		state->FpuControlRegister = _core0->Cp1->Control;
-		state->FpuRegisters = _core0->Cp1->Registers;
-
-		return state;
-	}
-	else
-	{
-		return nullptr;
-	}
+	return ( _hook != nullptr );
 }
 
-array<Frame^>^ R4000Cpu::GetCallstack()
+void R4000Cpu::EnableDebugging()
 {
-	return nullptr;
+	_hook = gcnew R4000Hook( this );
+	_debugEnabled = true;
 }

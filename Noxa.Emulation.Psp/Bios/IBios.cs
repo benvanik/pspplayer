@@ -18,7 +18,7 @@ namespace Noxa.Emulation.Psp.Bios
 	/// <summary>
 	/// BIOS/Operating System.
 	/// </summary>
-	public interface IBios : IComponentInstance
+	public interface IBios : IComponentInstance, IDebuggable
 	{
 		/// <summary>
 		/// Lock the emulator to V-sync.
@@ -109,39 +109,5 @@ namespace Noxa.Emulation.Psp.Bios
 		/// Run the BIOS scheduler and execute code.
 		/// </summary>
 		void Execute();
-
-		#region Debugging
-
-		/// <summary>
-		/// <c>true</c> if a debugger has been attached.
-		/// </summary>
-		bool DebuggingEnabled
-		{
-			get;
-		}
-
-		/// <summary>
-		/// The currently attached debugger.
-		/// </summary>
-		IDebugger Debugger
-		{
-			get;
-		}
-
-		/// <summary>
-		/// The debug hook that allows for inspection.
-		/// </summary>
-		IBiosHook DebugHook
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Enable debugging support.
-		/// </summary>
-		/// <param name="debugger">The <see cref="IDebugger"/> instance to attach to.</param>
-		void EnableDebugging( IDebugger debugger );
-
-		#endregion
 	}
 }

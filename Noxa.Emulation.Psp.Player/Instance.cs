@@ -79,6 +79,14 @@ namespace Noxa.Emulation.Psp.Player
 			}
 		}
 
+		public IComponentInstance[] Components
+		{
+			get
+			{
+				return _instances.ToArray();
+			}
+		}
+
 		public IAudioDriver Audio
 		{
 			get
@@ -330,7 +338,9 @@ namespace Noxa.Emulation.Psp.Player
 			}
 
 			if( debugging == true )
-				_host.AttachDebugger();
+			{
+				Diag.Instance.WaitUntilAttached();
+			}
 
 			_state = InstanceState.Running;
 			_stateChangeEvent.Set();
@@ -346,10 +356,6 @@ namespace Noxa.Emulation.Psp.Player
 			_state = InstanceState.Ended;
 			_stateChangeEvent.Set();
 			this.OnStateChanged();
-
-			_cpu.PrintStatistics();
-			if( _video != null )
-				_video.PrintStatistics();
 
 			this.Destroy();
 		}

@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bios.Debugging.cs" />
+    <Compile Include="BiosDebugHook.cs" />
     <Compile Include="Kernel Types\KCallback.cs" />
     <Compile Include="Kernel Types\KDevice.cs" />
     <Compile Include="Kernel Types\KMutex.cs" />

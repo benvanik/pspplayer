@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Bios.Man
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.GameTester", "Noxa.Emulation.Psp.GameTester\Noxa.Emulation.Psp.GameTester.csproj", "{950D0FA2-7755-4599-8A31-6DF3CCEA2F25}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.RemoteDebugger", "Noxa.Emulation.Psp.RemoteDebugger\Noxa.Emulation.Psp.RemoteDebugger.csproj", "{227E2719-42F4-47C3-9637-872CE0594056}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -179,6 +181,16 @@ Global
 		{950D0FA2-7755-4599-8A31-6DF3CCEA2F25}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{950D0FA2-7755-4599-8A31-6DF3CCEA2F25}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{950D0FA2-7755-4599-8A31-6DF3CCEA2F25}.Release|Win32.ActiveCfg = Release|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Release|Any CPU.Build.0 = Release|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{227E2719-42F4-47C3-9637-872CE0594056}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -14,6 +14,8 @@ using namespace Noxa::Emulation::Psp::Bios;
 using namespace Noxa::Emulation::Psp::Debugging;
 using namespace Noxa::Emulation::Psp::Debugging::DebugData;
 using namespace Noxa::Emulation::Psp::Debugging::DebugModel;
+using namespace Noxa::Emulation::Psp::Debugging::Hooks;
+using namespace Noxa::Emulation::Psp::Debugging::Protocol;
 using namespace Noxa::Emulation::Psp::Games;
 using namespace Noxa::Emulation::Psp::Utilities;
 
@@ -36,10 +38,14 @@ namespace Noxa {
 				ref class R4000BiosStubs;
 				ref class R4000VideoInterface;
 				ref class R4000BlockBuilder;
+				ref class R4000Hook;
+				ref class R4000Controller;
 
 				delegate void BiosShim( R4000Cpu^ cpu );
 
-				ref class R4000Cpu : ICpu, ICpuHook
+				extern bool _debugEnabled;
+
+				ref class R4000Cpu : ICpu
 				{
 				public:
 					static R4000Cpu^			GlobalCpu;
@@ -60,7 +66,8 @@ namespace Noxa {
 					TimerQueue^					_timerQueue;
 
 				internal:
-					IDebugger^					_debugger;
+					R4000Controller^			_controller;
+					R4000Hook^					_hook;
 
 					R4000Memory^				_memory;
 					R4000Core^					_core0;
@@ -93,7 +100,7 @@ namespace Noxa {
 					FieldInfo^					_privateMemoryFieldInfo;
 					FieldInfo^					_privateModuleInstancesFieldInfo;
 
-					IProgramDebugData^			_symbols;
+					//IProgramDebugData^			_symbols;
 
 				public:
 
@@ -125,15 +132,7 @@ namespace Noxa {
 					{
 						virtual ICpuCapabilities^ get()
 						{
-							return _caps;
-						}
-					}
-
-					property ICpuStatistics^ Statistics
-					{
-						virtual ICpuStatistics^ get()
-						{
-							return _stats;
+							return ( ICpuCapabilities^ )_caps;
 						}
 					}
 
@@ -161,14 +160,6 @@ namespace Noxa {
 						}
 					}
 
-					property IAvcDecoder^ Avc
-					{
-						virtual IAvcDecoder^ get()
-						{
-							return nullptr;
-						}
-					}
-
 					property IMemory^ Memory
 					{
 						virtual IMemory^ get()
@@ -185,29 +176,30 @@ namespace Noxa {
 						}
 					}
 
-					property bool DebuggingEnabled
+					property IDebugController^ DebugController
 					{
-						virtual bool get()
+						virtual IDebugController^ get()
 						{
-							return ( _debugger != nullptr );
-						}
-					}
-					
-					property IDebugger^ Debugger
-					{
-						virtual IDebugger^ get()
-						{
-							return _debugger;
+							return ( IDebugController^ )_controller;
 						}
 					}
 
-					property ICpuHook^ DebugHook
+					property IHook^ DebugHook
 					{
-						virtual ICpuHook^ get()
+						virtual IHook^ get()
 						{
-							return this;
+							return ( IHook^ )_hook;
 						}
 					}
+					property bool SupportsDebugging
+					{
+						virtual bool get();
+					}
+					property bool DebuggingEnabled
+					{
+						virtual bool get();
+					}
+					virtual void EnableDebugging();
 
 					property R4000Cache* CodeCache
 					{
@@ -219,8 +211,6 @@ namespace Noxa {
 
 					R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameters );
 					~R4000Cpu();
-
-					virtual void EnableDebugging( IDebugger^ debugger );
 
 					virtual void Cleanup();
 
@@ -265,8 +255,6 @@ namespace Noxa {
 
 					virtual void Stop();
 
-					virtual void PrintStatistics();
-
 				protected:
 					int LookupOrAddModule( IModule^ module );
 					BiosShim^ EmitShim( BiosFunction^ function, MemorySystem^ memory, void* registers );
@@ -277,10 +265,6 @@ namespace Noxa {
 
 					void SetupThreading();
 					void DestroyThreading();
-
-				public:
-					virtual CoreState^ GetCoreState( int core );
-					virtual array<Frame^>^ GetCallstack();
 				};
 
 			}

@@ -26,9 +26,17 @@ namespace Noxa.Emulation.Psp
 		}
 
 		/// <summary>
-		/// The current <see cref="IDebugger"/>, if one is attached.
+		/// <c>true</c> if the debugger is attached.
 		/// </summary>
-		IDebugger Debugger
+		bool IsDebuggerAttached
+		{
+			get;
+		}
+
+		/// <summary>
+		/// The current <see cref="DebugHost"/>.
+		/// </summary>
+		DebugHost Debugger
 		{
 			get;
 		}

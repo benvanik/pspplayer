@@ -513,6 +513,8 @@ void R4000Cpu::Execute(
 void R4000Cpu::BreakExecution()
 {
 	// Don't overwrite a marshal and stuff
+	if( _cpuCtx == NULL )
+		return;
 	if( _cpuCtx->StopFlag == CtxContinue )
 		_cpuCtx->StopFlag = CtxBreakRequest;
 }
