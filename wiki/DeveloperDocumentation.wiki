@@ -14,6 +14,8 @@ Example usage of Atrac3/AudioCodec libs on PSP:
  * http://insomniac.0x89.org/pgeAt3.rar (InsertWittyName Example, thanks!)
  * http://forums.ps2dev.org/viewtopic.php?t=8357 (Another Example)
 
+= Networking =
+
 == sceNet/Inet/Apctl/Resolver ==
 
 danzel is working on these, most can be directly mapped to c# functions.
