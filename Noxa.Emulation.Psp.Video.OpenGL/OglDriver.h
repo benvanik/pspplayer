@@ -25,6 +25,7 @@ namespace Noxa {
 
 				extern bool _speedLocked;
 				extern bool _debugEnabled;
+				extern bool _screenshotPending;
 
 				ref class OpenGLVideo;
 				ref class OglHook;
@@ -55,6 +56,12 @@ namespace Noxa {
 					void*						_hRC;
 
 					OglContext*					_context;
+
+					int							_screenWidth;
+					int							_screenHeight;
+
+					AutoResetEvent^				_screenshotEvent;
+					Drawing::Bitmap^			_screenshot;
 
 				public:
 
@@ -150,6 +157,8 @@ namespace Noxa {
 
 					virtual void Suspend();
 					virtual bool Resume();
+
+					virtual Drawing::Bitmap^ CaptureScreen();
 
 					virtual void Cleanup();
 

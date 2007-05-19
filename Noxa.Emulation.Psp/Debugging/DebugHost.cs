@@ -91,6 +91,11 @@ namespace Noxa.Emulation.Psp.Debugging
 		public IVideoHook VideoHook;
 
 		/// <summary>
+		/// Description of the host.
+		/// </summary>
+		public readonly string HostString;
+
+		/// <summary>
 		/// Fired when a debugger is attached.
 		/// </summary>
 		public event EventHandler DebuggerAttached;
@@ -107,6 +112,8 @@ namespace Noxa.Emulation.Psp.Debugging
 			this.Counters = new CounterSink();
 
 			_attachedEvent = new ManualResetEvent( false );
+
+			this.HostString = string.Format( "{0}@{1}", Environment.UserName, Environment.MachineName );
 
 			bool setupOk = this.SetupRemoting();
 			Debug.Assert( setupOk == true );

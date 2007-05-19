@@ -87,5 +87,11 @@ namespace Noxa.Emulation.Psp.Video
 		/// </summary>
 		/// <returns><c>true</c> if the resume was successful; otherwise <c>false</c>.</returns>
 		bool Resume();
+
+		/// <summary>
+		/// Capture the current contents of the screen.
+		/// </summary>
+		/// <returns>The contents of the screen.</returns>
+		Bitmap CaptureScreen();
 	}
 }

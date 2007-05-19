@@ -5,11 +5,22 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <assert.h>
+#pragma unmanaged
+#include <gl/gl.h>
+#include <gl/glu.h>
+#include <gl/glext.h>
+#include <gl/wglext.h>
+#pragma managed
+
 #include "OglDriver.h"
 #include "VideoApi.h"
 #include <string>
 
 using namespace System::Diagnostics;
+using namespace System::Drawing;
 using namespace System::Reflection;
 using namespace System::Text;
 using namespace Noxa::Emulation::Psp;
@@ -19,6 +30,7 @@ using namespace Noxa::Emulation::Psp::Video::Native;
 // Number of vertical traces
 uint64 _vcount;
 bool Noxa::Emulation::Psp::Video::_speedLocked;
+bool Noxa::Emulation::Psp::Video::_screenshotPending;
 
 OglDriver::OglDriver( IEmulationInstance^ emulator, ComponentParameters^ parameters )
 {
@@ -38,6 +50,11 @@ OglDriver::OglDriver( IEmulationInstance^ emulator, ComponentParameters^ paramet
 
 	_vcount = 0;
 	_speedLocked = true;
+
+	_screenWidth = 480;
+	_screenHeight = 272;
+
+	_screenshotEvent = gcnew AutoResetEvent( false );
 }
 
 OglDriver::~OglDriver()
@@ -70,6 +87,15 @@ bool OglDriver::Resume()
 	_currentProps->HasChanged = false;
 
 	return true;
+}
+
+Bitmap^ OglDriver::CaptureScreen()
+{
+	_screenshotPending = true;
+	if( _screenshotEvent->WaitOne( 5000, true ) == false )
+		return nullptr;
+	else
+		return _screenshot;
 }
 
 void OglDriver::Cleanup()

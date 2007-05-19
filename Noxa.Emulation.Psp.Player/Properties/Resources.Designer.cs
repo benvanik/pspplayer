@@ -200,6 +200,13 @@ namespace Noxa.Emulation.Psp.Player.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap ScreenshotIcon {
+            get {
+                object obj = ResourceManager.GetObject("ScreenshotIcon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static byte[] SelectedMemoryStickIcon {
             get {
                 object obj = ResourceManager.GetObject("SelectedMemoryStickIcon", resourceCulture);

@@ -141,6 +141,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			{
 				this.Log.OnStarted();
 				this.Statistics.OnStarted();
+
+				this.View.SetStatusText( Verbosity.Normal, "Connection to emulator {0} established.", this.Host.HostString );
 			};
 			this.View.Invoke( del );
 		}
@@ -176,5 +178,16 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		}
 
 		#endregion
+
+		internal void OnConnectionLost()
+		{
+			if( this.IsConnected == false )
+				return;
+			this.IsConnected = false;
+
+			this.OnStopped();
+
+			this.View.SetStatusText( Verbosity.Critical, "Connection to emulator lost!" );
+		}
 	}
 }

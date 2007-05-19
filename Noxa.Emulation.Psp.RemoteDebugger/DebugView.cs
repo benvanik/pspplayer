@@ -108,5 +108,44 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		}
 
 		#endregion
+
+		#region Statusbar
+
+		private delegate void StatusUpdate( Verbosity verbosity, string text );
+
+		internal void SetStatusText( Verbosity verbosity, string text )
+		{
+			StatusUpdate del = delegate
+			{
+				this.toolStripStatusLabel1.Text = text;
+				switch( verbosity )
+				{
+					case Verbosity.Critical:
+						this.toolStripStatusLabel1.ForeColor = Color.Red;
+						break;
+					default:
+					case Verbosity.Normal:
+						this.toolStripStatusLabel1.ForeColor = SystemColors.ControlText;
+						break;
+					case Verbosity.Verbose:
+						this.toolStripStatusLabel1.ForeColor = Color.Green;
+						break;
+					case Verbosity.Everything:
+						this.toolStripStatusLabel1.ForeColor = Color.Blue;
+						break;
+				}
+			};
+			if( this.InvokeRequired == true )
+				this.Invoke( del, verbosity, text );
+			else
+				del( verbosity, text );
+		}
+
+		internal void SetStatusText( Verbosity verbosity, string format, params object[] args )
+		{
+			this.SetStatusText( verbosity, string.Format( format, args ) );
+		}
+
+		#endregion
 	}
 }
