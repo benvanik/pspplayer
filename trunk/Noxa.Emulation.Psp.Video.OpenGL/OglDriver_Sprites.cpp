@@ -192,11 +192,14 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 		if( colorType != 0 )
 		{
 			// Scale color by material
-			float* ambientMat = context->AmbientMaterial;
-			vclr[ 2 ][ 0 ] = ( byte )( vclr[ 2 ][ 0 ] * ambientMat[ 0 ] );
-			vclr[ 2 ][ 1 ] = ( byte )( vclr[ 2 ][ 1 ] * ambientMat[ 1 ] );
-			vclr[ 2 ][ 2 ] = ( byte )( vclr[ 2 ][ 2 ] * ambientMat[ 2 ] );
-			vclr[ 2 ][ 3 ] = ( byte )( vclr[ 2 ][ 3 ] * ambientMat[ 3 ] );
+			if( context->LightingEnabled == true )
+			{
+				float* ambientMat = context->AmbientMaterial;
+				vclr[ 2 ][ 0 ] = ( byte )( ( float )vclr[ 2 ][ 0 ] * ambientMat[ 0 ] );
+				vclr[ 2 ][ 1 ] = ( byte )( ( float )vclr[ 2 ][ 1 ] * ambientMat[ 1 ] );
+				vclr[ 2 ][ 2 ] = ( byte )( ( float )vclr[ 2 ][ 2 ] * ambientMat[ 2 ] );
+				vclr[ 2 ][ 3 ] = ( byte )( ( float )vclr[ 2 ][ 3 ] * ambientMat[ 3 ] );
+			}
 
 			*( ( int* )vclr[ 0 ] ) = *( ( int* )vclr[ 2 ] );
 			*( ( int* )vclr[ 1 ] ) = *( ( int* )vclr[ 2 ] );
@@ -219,8 +222,10 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 			}
 			if( colorType != 0 )
 				glColor4ubv( vclr[ m ] );
-			else
+			else if( context->LightingEnabled == true )
 				glColor4fv( context->AmbientMaterial );
+			else
+				glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 			glVertex3fv( vpos[ m ] );
 		}
 	}

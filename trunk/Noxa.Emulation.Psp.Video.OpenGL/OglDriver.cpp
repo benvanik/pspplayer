@@ -100,6 +100,8 @@ Bitmap^ OglDriver::CaptureScreen()
 
 void OglDriver::Cleanup()
 {
+	_stats->DumpCommandCounts();
+
 	this->StopThread();
 
 	// Cleanup everything else here

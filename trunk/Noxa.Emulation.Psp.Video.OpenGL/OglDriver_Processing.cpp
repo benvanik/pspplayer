@@ -479,6 +479,16 @@ void ProcessList( OglContext* context, DisplayList* list )
 			glFogf( GL_FOG_END, argf );
 			break;
 
+		case LTE:
+			// lighting enable
+			context->LightingEnabled = ( argi == 1 );
+			// TODO: stuff
+			break;
+		case LTE0:
+		case LTE1:
+		case LTE2:
+		case LTE3:
+			break;
 		case ALA:
 			// ambient light alpha
 			break;

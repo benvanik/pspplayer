@@ -26,6 +26,8 @@ namespace Noxa {
 					Counter^	AbortedDisplayLists;
 
 					virtual void Sample() override;
+
+					void DumpCommandCounts();
 				};
 
 			}
