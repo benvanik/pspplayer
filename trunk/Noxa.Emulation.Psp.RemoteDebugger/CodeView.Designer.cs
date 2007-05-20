@@ -38,12 +38,13 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			// 
 			// CodeView
 			// 
-			this.ClientSize = new System.Drawing.Size( 643, 427 );
+			this.ClientSize = new System.Drawing.Size( 650, 437 );
 			this.CloseButton = false;
 			this.DockAreas = WeifenLuo.WinFormsUI.Docking.DockAreas.Document;
 			this.HideOnClose = true;
 			this.Name = "CodeView";
 			this.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.Document;
+			this.TabText = "Code View";
 			this.ResumeLayout( false );
 
 		}
