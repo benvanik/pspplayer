@@ -34,3 +34,7 @@ The resolver/simple samples in the SDK are good test targets, don't forget to di
   * http://forums.ps2dev.org/viewtopic.php?t=2197 (general notes)
   * http://forums.ps2dev.org/viewtopic.php?t=3960 (DXT)
   * http://forums.ps2dev.org/viewtopic.php?p=22980 (DXT)
+
+= CPU =
+ * VFPU
+  * http://wiki.fx-world.org/doku.php
