@@ -489,6 +489,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 		case LTE2:
 		case LTE3:
 			break;
+
 		case ALA:
 			// ambient light alpha
 			break;
