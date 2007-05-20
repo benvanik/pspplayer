@@ -39,14 +39,15 @@ void OglStatistics::Sample()
 	this->AbortedDisplayLists->Update( ( double )_abortedLists );
 }
 
-/*
+void OglStatistics::DumpCommandCounts()
+{
 #ifdef STATISTICS
 		Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "Video Command Usage Count: ----------------------------------" );
-		for( int n = 0; n < _stats->CommandCounts->Length; n++ )
+		for( int n = 0; n < 255; n++ )
 		{
-			if( _stats->CommandCounts[ n ] <= 1 )
+			if( _commandCounts[ n ] <= 1 )
 				continue;
-			Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "{0:X2}: {1}\t{2}", n, _stats->CommandCounts[ n ], ( VideoCommand )n );
+			Log::WriteLine( Verbosity::Verbose, Feature::Statistics, "{0:X2}: {1}\t{2}", n, _commandCounts[ n ], ( VideoCommand )n );
 		}
 #endif
-*/
+}

@@ -63,6 +63,9 @@ namespace Noxa {
 					uint			SourceFix;
 					uint			DestFix;
 
+					// Lighting / materials
+					bool			LightingEnabled;
+
 					float			AmbientMaterial[ 4 ];
 
 					// Patches

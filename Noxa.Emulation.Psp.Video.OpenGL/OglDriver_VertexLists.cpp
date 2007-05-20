@@ -278,7 +278,10 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 			src += 4;
 			break;
 		default:
-			glColor4fv( context->AmbientMaterial );
+			if( context->LightingEnabled == true )
+				glColor4fv( context->AmbientMaterial );
+			else
+				glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 			break;
 		}
 		//float f = ( float )rand() / RAND_MAX;

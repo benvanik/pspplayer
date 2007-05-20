@@ -156,7 +156,6 @@ byte* Widen5650( const byte* in, byte* out, const uint width, const uint height 
 	{
 		short spixel = *input;
 		/*
-		  RRRRRGGGGGBBBBBA	<- GL
 		  BBBBBGGGGGGRRRRR	<- PSP
 		 */
 		unsigned short r = ( ( spixel & 0xF800 ) >> 11 );
@@ -188,7 +187,6 @@ byte* Widen5551( const byte* in, byte* out, const uint width, const uint height 
 	{
 		short spixel = *input;
 		/*
-		  RRRRRGGGGGBBBBBA	<- GL
 		  ABBBBBGGGGGRRRRR	<- PSP
 		 */
 		unsigned short r = ( ( spixel & 0xF800 ) >> 11 );
@@ -221,7 +219,6 @@ byte* Widen4444( const byte* in, byte* out, const uint width, const uint height 
 	{
 		short spixel = *input;
 		/*
-		  RRRRRGGGGGBBBBBA	<- GL
 		  AAAABBBBGGGGRRRR	<- PSP
 		 */
 		unsigned short r = ( ( spixel & 0xF000 ) >> 12 );
@@ -242,7 +239,6 @@ byte* Widen4444( const byte* in, byte* out, const uint width, const uint height 
 		input++;
 		output++;
 	}
-	return out;
 	return out;
 }
 
@@ -396,13 +392,17 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	context->TextureCache->Add( texture->Address, entry );
 
 	if( _unswizzleBuffer == NULL )
-		_unswizzleBuffer = ( byte* )malloc( 512 * 512 * 4 );
+		_unswizzleBuffer = ( byte* )malloc( 1024 * 1024 * 4 );
 	if( _decodeBuffer == NULL )
-		_decodeBuffer = ( byte* )malloc( 512 * 512 * 4 );
+		_decodeBuffer = ( byte* )malloc( 1024 * 1024 * 4 );
 
 	byte* address = context->Memory->Translate( texture->Address );
 	TextureFormat* format = ( TextureFormat* )&__formats[ texture->PixelStorage ];
 	int size = texture->LineWidth * texture->Height * format->Size;
+
+	int width = texture->Width;
+	int lineWidth = texture->LineWidth;
+	bool needRowLength = false;
 
 	byte* buffer = address;
 	if( context->TexturesSwizzled == true )
@@ -411,28 +411,27 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 		if( format->Size == 0 )
 			buffer = Unswizzle( format, buffer, _unswizzleBuffer, texture->LineWidth, texture->Height );
 		else
-			buffer = Unswizzle( format, buffer, _unswizzleBuffer, texture->Width, texture->Height );
+			buffer = Unswizzle( format, buffer, _unswizzleBuffer, lineWidth, texture->Height );
 	}
 
 	// buffer now contains an unswizzled texture - may need to un-CLUT it, or convert colors
 
-	int width = texture->Width;
-	bool needRowLength = false;
-
 	switch( format->Format )
 	{
 	case TPSBGR5650:
-		buffer = Widen5650( buffer, _decodeBuffer, texture->Width, texture->Height );
+		buffer = Widen5650( buffer, _decodeBuffer, lineWidth, texture->Height );
 		format = ( TextureFormat* )&__formats[ 3 ];
+		//needRowLength = true;
 		break;
 	case TPSABGR5551:
-		buffer = Widen5551( buffer, _decodeBuffer, texture->Width, texture->Height );
+		buffer = Widen5551( buffer, _decodeBuffer, lineWidth, texture->Height );
 		format = ( TextureFormat* )&__formats[ 3 ];
+		//needRowLength = true;
 		break;
 	case TPSABGR4444:
-		buffer = Widen4444( buffer, _decodeBuffer, texture->Width, texture->Height );
+		buffer = Widen4444( buffer, _decodeBuffer, lineWidth, texture->Height );
 		format = ( TextureFormat* )&__formats[ 3 ];
-		assert( false );
+		//needRowLength = true;
 		break;
 	case TPSABGR8888:
 		// Pass through
@@ -464,7 +463,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 
 	glPixelStorei( GL_UNPACK_ALIGNMENT, format->Size );
 	if( needRowLength == true )
-		glPixelStorei( GL_UNPACK_ROW_LENGTH, texture->LineWidth );
+		glPixelStorei( GL_UNPACK_ROW_LENGTH, lineWidth );
 
 #ifdef _DEBUG
 	static bool write = false;
