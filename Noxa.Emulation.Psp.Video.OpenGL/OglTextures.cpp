@@ -149,6 +149,33 @@ byte* Unswizzle( const TextureFormat* format, const byte* in, byte* out, const u
 
 byte* Widen5650( const byte* in, byte* out, const uint width, const uint height )
 {
+	// Copy 0565 to 8888
+	short* input = ( short* )in;
+	uint* output = ( uint* )out;
+	for( uint n = 0; n < width * height; n++ )
+	{
+		short spixel = *input;
+		/*
+		  RRRRRGGGGGBBBBBA	<- GL
+		  BBBBBGGGGGGRRRRR	<- PSP
+		 */
+		unsigned short r = ( ( spixel & 0xF800 ) >> 11 );
+		unsigned short g = ( ( spixel & 0x07E0 ) >> 5 );
+		unsigned short b = ( spixel & 0x001F );
+		if( r > 0 )
+			r = ( ( r + 1 ) * 255 ) / 32;
+		if( g > 0 )
+			g = ( ( g + 1 ) * 255 ) / 64;
+		if( b > 0 )
+			b = ( ( b + 1 ) * 255 ) / 32;
+
+		uint dpixel = 0x000000FF;
+		dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
+		*output = dpixel;
+
+		input++;
+		output++;
+	}
 	return out;
 }
 
@@ -164,17 +191,19 @@ byte* Widen5551( const byte* in, byte* out, const uint width, const uint height 
 		  RRRRRGGGGGBBBBBA	<- GL
 		  ABBBBBGGGGGRRRRR	<- PSP
 		 */
-		unsigned short r = ( ( spixel & 0xF800 ) >> 11 ) * 8;
-		unsigned short g = ( ( spixel & 0x07C0 ) >> 6 ) * 8;
-		unsigned short b = ( ( spixel & 0x003E ) >> 1 ) * 8;
+		unsigned short r = ( ( spixel & 0xF800 ) >> 11 );
+		unsigned short g = ( ( spixel & 0x07C0 ) >> 6 );
+		unsigned short b = ( ( spixel & 0x003E ) >> 1 );
 		unsigned short a = ( spixel & 0x0001 );
+		if( r > 0 )
+			r = ( ( r + 1 ) * 255 ) / 32;
+		if( g > 0 )
+			g = ( ( g + 1 ) * 255 ) / 32;
+		if( b > 0 )
+			b = ( ( b + 1 ) * 255 ) / 32;
 
 		uint dpixel = a ? 0x000000FF : 0x0;
 		dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
-		/*dpixel |=
-			( 8 * ( spixel & 0x1F ) ) |
-			( 8 * ( spixel >> 5 ) & 0x1F ) |
-			( 8 * ( spixel >> 10 ) & 0x1F );*/
 		*output = dpixel;
 
 		input++;
@@ -185,6 +214,35 @@ byte* Widen5551( const byte* in, byte* out, const uint width, const uint height 
 
 byte* Widen4444( const byte* in, byte* out, const uint width, const uint height )
 {
+	// Copy 4444 to 8888
+	short* input = ( short* )in;
+	uint* output = ( uint* )out;
+	for( uint n = 0; n < width * height; n++ )
+	{
+		short spixel = *input;
+		/*
+		  RRRRRGGGGGBBBBBA	<- GL
+		  AAAABBBBGGGGRRRR	<- PSP
+		 */
+		unsigned short r = ( ( spixel & 0xF000 ) >> 12 );
+		unsigned short g = ( ( spixel & 0x0F00 ) >> 8 );
+		unsigned short b = ( ( spixel & 0x00F0 ) >> 4 );
+		unsigned short a = ( spixel & 0x000F );
+		if( r > 0 )
+			r = ( ( r + 1 ) * 255 ) / 16;
+		if( g > 0 )
+			g = ( ( g + 1 ) * 255 ) / 16;
+		if( b > 0 )
+			b = ( ( b + 1 ) * 255 ) / 16;
+
+		uint dpixel = a ? 0x000000FF : 0x0;
+		dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
+		*output = dpixel;
+
+		input++;
+		output++;
+	}
+	return out;
 	return out;
 }
 
@@ -364,17 +422,16 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	switch( format->Format )
 	{
 	case TPSBGR5650:
-		//buffer = Widen5650( buffer, _decodeBuffer, texture->Width, texture->Height );
-		//format = ( TextureFormat* )&__formats[ 3 ];
-		assert( false );
+		buffer = Widen5650( buffer, _decodeBuffer, texture->Width, texture->Height );
+		format = ( TextureFormat* )&__formats[ 3 ];
 		break;
 	case TPSABGR5551:
 		buffer = Widen5551( buffer, _decodeBuffer, texture->Width, texture->Height );
 		format = ( TextureFormat* )&__formats[ 3 ];
 		break;
 	case TPSABGR4444:
-		//buffer = Widen4444( buffer, _decodeBuffer, texture->Width, texture->Height );
-		//format = ( TextureFormat* )&__formats[ 3 ];
+		buffer = Widen4444( buffer, _decodeBuffer, texture->Width, texture->Height );
+		format = ( TextureFormat* )&__formats[ 3 ];
 		assert( false );
 		break;
 	case TPSABGR8888:
