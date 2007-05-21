@@ -1,6 +1,11 @@
 #summary Useful links and such related to development of pspplayer
 #labels Development
 
+= Code Style =
+
+To keep everyones code looking the same so VS doesn't auto restyle it all the time there are some standard styles, to load them up:
+Go to Tools->Import and Export Settings in VS, and import the setting file (trunk/CodeFormatting.vssettings). These ONLY specify C# editor settings. Now, when you write code, it will auto format to the code style used everywhere else in the project.
+
 = Audio / Video support =
 Currently most of the Audio functionality is not implemented / does nothing so we can run more programs. We will probably need to include a lib to do decoding of video/audio for us.
 
