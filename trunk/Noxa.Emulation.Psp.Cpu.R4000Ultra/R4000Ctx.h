@@ -32,6 +32,11 @@ using namespace Noxa::Emulation::Psp;
 #define CALL_RETURN_DUMMY	CUSTOM_METHOD_TRAP + 1
 #define BIOS_SAFETY_DUMMY	CUSTOM_METHOD_TRAP + 2
 
+// Callstack sentinel values
+#define CALLSTACK_SENTINEL	0xBABE0000
+#define CS_MARSHALLED_CALL	CALLSTACK_SENTINEL + 1
+#define CS_INTERRUPT		CALLSTACK_SENTINEL + 2
+
 namespace Noxa {
 	namespace Emulation {
 		namespace Psp {

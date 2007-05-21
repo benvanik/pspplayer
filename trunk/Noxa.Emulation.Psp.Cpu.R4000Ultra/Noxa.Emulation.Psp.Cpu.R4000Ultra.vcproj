@@ -229,6 +229,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Callstack.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000Controller.cpp"
 				>
 			</File>

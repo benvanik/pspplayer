@@ -44,6 +44,8 @@ typedef struct ThreadContext_t
 
 	gcref<ContextSafetyDelegate^>	SafetyCallback;
 	int				SafetyState;
+
+	bool			MarshalSwitchback;
 } ThreadContext;
 
 typedef struct SwitchRequest_t
@@ -344,6 +346,7 @@ void PerformSwitchBack( SwitchType type )
 		memcpy( &_currentTcs->Ctx, _cpuCtx, sizeof( R4000Ctx ) );
 	}
 	_currentTcs->Ctx.StopFlag = CtxContinue;
+
 	int oldIntMask = _cpuCtx->InterruptMask;
 
 	// Switch back to old context
@@ -390,7 +393,8 @@ uint NativeExecute( bool* breakFlag )
 		PopState();
 
 		// Switch state back
-		PerformSwitchBack( SwitchNormal );
+		if( _currentTcs->MarshalSwitchback == true )
+			PerformSwitchBack( SwitchNormal );
 		
 		// Make callback
 		_switchRequest.MakeCall = false;
@@ -478,7 +482,9 @@ executeStart:		// Arrived at from call/interrupt handling below
 			// We need to marshal a callback on to another thread and then handle
 			// what happens when it ends
 			assert( _switchRequest.MakeCall == true );
-			PerformSwitch();
+			_currentTcs->MarshalSwitchback = ( _currentTcsId != _switchRequest.TargetID );
+			if( _currentTcs->MarshalSwitchback == true )
+				PerformSwitch();
 			PushState();
 			_cpuCtx->PC = _switchRequest.CallAddress;
 			for( int n = 0; n < _switchRequest.CallArgumentCount; n++ )

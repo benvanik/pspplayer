@@ -59,9 +59,43 @@ void R4000Hook::SetCoreState( int core, CoreState^ state )
 {
 }
 
+#ifdef CALLSTACKS
+extern uint _callstack[ CALLSTACKSIZE ];
+extern int _callstackIndex;
+#endif
+
+int pspDebugGetStackTrace(unsigned int *results, int max);
+
 array<Frame^>^ R4000Hook::GetCallstack()
 {
-	return nullptr;
+	/*Debug::Assert( _callstackIndex >= 0 );
+	array<Frame^>^ frames = gcnew array<Frame^>( _callstackIndex );
+	for( int n = 0; n < _callstackIndex; n++ )
+	{
+		FrameType type = FrameType::UserCode;
+		uint address = _callstack[ n ];
+		if( address == CS_MARSHALLED_CALL )
+			type = FrameType::CallMarshal;
+		else if( address == CS_INTERRUPT )
+			type = FrameType::Interrupt;
+		frames[ n ] = gcnew Frame( type, address );
+	}*/
+
+	uint* addresses = ( uint* )malloc( sizeof( uint ) * 512 );
+	int count = pspDebugGetStackTrace( addresses, 512 );
+	array<Frame^>^ frames = gcnew array<Frame^>( count );
+	for( int n = 0; n < count; n++ )
+	{
+		FrameType type = FrameType::UserCode;
+		uint address = addresses[ n ];
+		if( address == CALL_RETURN_DUMMY )
+			type = FrameType::CallMarshal;
+		else if( address == BIOS_SAFETY_DUMMY )
+			type = FrameType::BiosBarrier;
+		frames[ n ] = gcnew Frame( type, address );
+	}
+	free( addresses );
+	return frames;
 }
 
 void R4000Hook::AddCodeBreakpoint( int id, uint address )
@@ -72,10 +106,6 @@ void R4000Hook::RemoveCodeBreakpoint( int id )
 {
 }
 
-void R4000Hook::SetCodeBreakpointState( int id, bool enabled )
-{
-}
-
 // -- Memory --
 
 void R4000Hook::AddMemoryBreakpoint( int id, uint address, MemoryAccessType accessType )
@@ -83,10 +113,6 @@ void R4000Hook::AddMemoryBreakpoint( int id, uint address, MemoryAccessType acce
 }
 
 void R4000Hook::RemoveMemoryBreakpoint( int id )
-{
-}
-
-void R4000Hook::SetMemoryBreakpointState( int id, bool enabled )
 {
 }
 

@@ -48,6 +48,11 @@
 //#define RUNTIMEDEBUG
 //#define RUNTIMEREGS
 
+// Emit callstack information
+// Depending on the size of the stack (number of elements), context switches could get slow
+#define CALLSTACKS
+#define CALLSTACKSIZE	512
+
 #endif
 
 // -- macro hacks --

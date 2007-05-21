@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
@@ -116,6 +117,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 			Hashtable clientProps = new Hashtable();
 			clientProps[ "port" ] = DebugHost.ClientPort;
+			clientProps[ "timeout" ] = unchecked( ( uint )Timeout.Infinite );
 
 			TcpChannel chan = new TcpChannel( clientProps, clientProvider, serverProvider );
 			ChannelServices.RegisterChannel( chan, false );
