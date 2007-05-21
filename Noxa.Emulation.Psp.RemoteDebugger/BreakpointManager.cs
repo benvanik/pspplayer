@@ -149,10 +149,10 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			{
 				case BreakpointType.CodeExecute:
 				case BreakpointType.BiosFunction:
-					this.Debugger.Host.CpuHook.SetCodeBreakpointState( breakpoint.ID, breakpoint.Enabled );
+					//this.Debugger.Host.CpuHook.SetCodeBreakpointState( breakpoint.ID, breakpoint.Enabled );
 					break;
 				case BreakpointType.MemoryAccess:
-					this.Debugger.Host.CpuHook.SetMemoryBreakpointState( breakpoint.ID, breakpoint.Enabled );
+					//this.Debugger.Host.CpuHook.SetMemoryBreakpointState( breakpoint.ID, breakpoint.Enabled );
 					break;
 			}
 			if( this.Toggled != null )

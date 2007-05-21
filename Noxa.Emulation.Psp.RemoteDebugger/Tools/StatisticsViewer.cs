@@ -151,7 +151,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 				}
 				this.listView1.EndUpdate();
 			}
-			catch( System.Net.Sockets.SocketException ex )
+			catch( System.Net.Sockets.SocketException )
 			{
 				// Assume we got dc/ed
 				this.Debugger.OnConnectionLost();

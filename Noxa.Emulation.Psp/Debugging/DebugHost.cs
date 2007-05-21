@@ -261,6 +261,7 @@ namespace Noxa.Emulation.Psp.Debugging
 
 			Hashtable serverProps = new Hashtable();
 			serverProps[ "port" ] = ServerPort;
+			serverProps[ "timeout" ] = unchecked( ( uint )Timeout.Infinite );
 
 			TcpChannel channel = new TcpChannel( serverProps, clientProvider, serverProvider );
 			ChannelServices.RegisterChannel( channel, false );

@@ -69,13 +69,6 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		/// <param name="id">The ID of the breakpoint to remove.</param>
 		void RemoveCodeBreakpoint( int id );
 
-		/// <summary>
-		/// Set a breakpoints enabled state.
-		/// </summary>
-		/// <param name="id">The ID of the breakpoint to modify.</param>
-		/// <param name="enabled"><c>true</c> to activate the breakpoint.</param>
-		void SetCodeBreakpointState( int id, bool enabled );
-
 		#region Memory
 
 		/// <summary>
@@ -91,13 +84,6 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		/// </summary>
 		/// <param name="id">The ID of the breakpoint to remove.</param>
 		void RemoveMemoryBreakpoint( int id );
-
-		/// <summary>
-		/// Set a breakpoints enabled state.
-		/// </summary>
-		/// <param name="id">The ID of the breakpoint to modify.</param>
-		/// <param name="enabled"><c>true</c> to activate the breakpoint.</param>
-		void SetMemoryBreakpointState( int id, bool enabled );
 
 		/// <summary>
 		/// Get the block of memory in the given range.

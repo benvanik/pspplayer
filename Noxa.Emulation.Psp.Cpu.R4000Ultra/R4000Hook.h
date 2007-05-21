@@ -40,13 +40,11 @@ namespace Noxa {
 
 					virtual void AddCodeBreakpoint( int id, uint address );
 					virtual void RemoveCodeBreakpoint( int id );
-					virtual void SetCodeBreakpointState( int id, bool enabled );
 
 					// -- Memory --
 
 					virtual void AddMemoryBreakpoint( int id, uint address, MemoryAccessType accessType );
 					virtual void RemoveMemoryBreakpoint( int id );
-					virtual void SetMemoryBreakpointState( int id, bool enabled );
 
 					virtual array<byte>^ GetMemory( uint startAddress, int length );
 					virtual void SetMemory( uint startAddress, array<byte>^ buffer, int offset, int length );

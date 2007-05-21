@@ -41,7 +41,8 @@ using namespace Noxa::Emulation::Psp::Cpu;
 // Debugging addresses
 //#define BREAKADDRESS1		0x08909ECC
 //#define BREAKADDRESS2		0x08900160
-//#define GENBREAKADDRESS		0x089534E4
+//#define GENBREAKADDRESS		0x08910BA4
+//0x08900204
 
 extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
@@ -463,7 +464,6 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 #ifdef VERBOSEBUILD
 					Debug::WriteLine( String::Format( "Marking jump delay tail - target: 0x{0:X8}", _ctx->JumpTarget ) );
 #endif
-
 					// We may be doing a JR and not have a known target at gen time
 					if( _ctx->JumpTarget != NULL )
 						GenerateTail( address - 4, true, _ctx->JumpTarget );
@@ -544,8 +544,12 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 				break;
 			case GenerationResult::Jump:
 				// This is tricky - if lastTargetPc > currentPc, don't break out
-				if( _ctx->LastBranchTarget <= address )
+				if( ( _ctx->LastBranchTarget != 0x0 ) &&
+					( _ctx->LastBranchTarget <= address ) )
 				{
+					// WARNING: THIS IS PROBABLY BROKEN!
+					// Make sure that the delay handling is proper!
+
 					// This is the last jump in the block - need to exit
 #ifdef VERBOSEBUILD
 					if( pass == 1 )

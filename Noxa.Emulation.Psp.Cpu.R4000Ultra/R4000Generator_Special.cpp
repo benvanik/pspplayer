@@ -11,6 +11,7 @@
 #include "R4000Memory.h"
 #include "R4000GenContext.h"
 #include "R4000BiosStubs.h"
+#include "R4000Hook.h"
 
 #include "CodeGenerator.h"
 
@@ -98,6 +99,20 @@ void __logSyscall( int syscallId, int address, bool implemented )
 			function->IsImplemented ? "" : " (NI)",
 			function->IsMissing ? "(NOT FOUND) " : "" );
 		Log::WriteLine( Verbosity::Verbose, Feature::Syscall, log );
+
+#if 0
+		array<Frame^>^ frames = cpu->_hook->GetCallstack();
+		Text::StringBuilder^ sb = gcnew Text::StringBuilder();
+		for( int n = 0; n < frames->Length; n++ )
+		{
+			if( frames[ n ]->Type == FrameType::UserCode )
+				sb->AppendFormat( "{0:X}, ", frames[ n ]->Address );
+			else
+				sb->AppendFormat( "{0}, ", frames[ n ]->Type );
+		}
+		if( sb->Length > 0 )
+			Log::WriteLine( Verbosity::Verbose, Feature::Syscall, sb->ToString() );
+#endif
 	}
 	else
 	{
