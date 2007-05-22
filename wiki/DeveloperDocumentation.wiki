@@ -41,6 +41,8 @@ The resolver/simple samples in the SDK are good test targets, don't forget to di
   * http://forums.ps2dev.org/viewtopic.php?p=22980 (DXT)
 
 = CPU =
+ * General
+  * http://www.mono-project.com/Mono_DataConvert <- may be useful
  * x86
   * http://www.piclist.com/techref/intel/32bit/32bitx86tips.htm
  * VFPU
