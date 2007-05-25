@@ -39,8 +39,6 @@ uint	_debugResumeParam;
 byte* FindInstructionStart( CodeBlock* block, uint address, int* size );
 void SetBreakpoint( Breakpoint^ breakpoint );
 void UnsetBreakpoint( Breakpoint^ breakpoint );
-//void RestoreOriginal( Breakpoint^ breakpoint );
-//void RestoreRecovery( Breakpoint^ breakpoint );
 
 R4000Controller::R4000Controller( R4000Cpu^ cpu )
 {
@@ -101,8 +99,6 @@ int __debugHandlerM( int breakpointId )
 			// - notify debugger
 			// - wait on debug resume handle
 			// - handle re-add/etc
-
-			//RestoreOriginal( breakpoint );
 
 			switch( breakpoint->Type )
 			{
@@ -227,12 +223,6 @@ void SetBreakpoint( Breakpoint^ breakpoint )
 				int size;
 				byte* start = FindInstructionStart( block, breakpoint->Address, &size );
 
-				// Get original bytes
-				/*if( breakpoint->Internal == nullptr )
-					breakpoint->Internal = gcnew array<byte>( DEBUGTHUNKSIZE );
-				pin_ptr<byte> pob = &( ( array<byte>^ )breakpoint->Internal )[ 0 ];
-				memcpy( pob, start, DEBUGTHUNKSIZE );*/
-
 				// Write break jump bytes (see __debugThunk for more info)
 				assert( start[ 0 ] == 0x90 );
 				start[ 0 ] = 0x68;
@@ -274,68 +264,3 @@ void UnsetBreakpoint( Breakpoint^ breakpoint )
 		break;
 	}
 }
-
-//void RestoreOriginal( Breakpoint^ breakpoint )
-//{
-//	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
-//
-//	// Restoring a breakpoint that was never set?
-//	Debug::Assert( breakpoint->Internal != nullptr );
-//
-//	switch( breakpoint->Type )
-//	{
-//	case BreakpointType::CodeExecute:
-//	case BreakpointType::BiosFunction:
-//		{
-//			CodeBlock* blocks[ 10 ];
-//			int blockCount = cpu->_codeCache->Search( ( int )breakpoint->Address, ( CodeBlock** )blocks );
-//			for( int n = 0; n < blockCount; n++ )
-//			{
-//				CodeBlock* block = blocks[ n ];
-//				int size;
-//				byte* start = FindInstructionStart( block, breakpoint->Address, &size );
-//
-//				// Restore original
-//				pin_ptr<byte> pob = &( ( array<byte>^ )breakpoint->Internal )[ 0 ];
-//				memcpy( start, pob, DEBUGTHUNKSIZE );
-//			}
-//		}
-//		break;
-//	case BreakpointType::MemoryAccess:
-//		break;
-//	}
-//}
-
-//void RestoreRecovery( Breakpoint^ breakpoint )
-//{
-//	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
-//
-//	// Restoring a breakpoint that was never set?
-//	Debug::Assert( breakpoint->Internal != nullptr );
-//
-//	switch( breakpoint->Type )
-//	{
-//	case BreakpointType::CodeExecute:
-//	case BreakpointType::BiosFunction:
-//		{
-//			CodeBlock* blocks[ 10 ];
-//			int blockCount = cpu->_codeCache->Search( ( int )breakpoint->Address, ( CodeBlock** )blocks );
-//			for( int n = 0; n < blockCount; n++ )
-//			{
-//				CodeBlock* block = blocks[ n ];
-//				int size;
-//				byte* start = FindInstructionStart( block, breakpoint->Address, &size );
-//
-//				// Skip to the next instruction
-//				start += size;
-//
-//				// Restore original
-//				pin_ptr<byte> pob = &( ( array<byte>^ )breakpoint->Internal )[ 0 ];
-//				memcpy( start, pob, DEBUGTHUNKSIZE );
-//			}
-//		}
-//		break;
-//	case BreakpointType::MemoryAccess:
-//		break;
-//	}
-//}

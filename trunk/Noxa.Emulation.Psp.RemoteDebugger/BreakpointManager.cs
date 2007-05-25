@@ -11,6 +11,7 @@ using System.Text;
 
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.RemoteDebugger.Model;
 
 namespace Noxa.Emulation.Psp.RemoteDebugger
 {

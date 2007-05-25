@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(TargetDir)Noxa.Emulation.Psp.CodeGen.lib $(NOINHERIT)"
+				AdditionalDependencies="$(TargetDir)Noxa.Emulation.Psp.CodeGen.lib Winmm.lib $(NOINHERIT)"
 				LinkIncremental="2"
 				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="$(TargetDir)Noxa.Emulation.Psp.CodeGen.lib $(NOINHERIT)"
+				AdditionalDependencies="$(TargetDir)Noxa.Emulation.Psp.CodeGen.lib Winmm.lib $(NOINHERIT)"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="LIBCMTD.lib"
 				GenerateDebugInformation="true"
