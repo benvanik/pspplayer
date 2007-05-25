@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-using Noxa.Emulation.Psp.RemoteDebugger;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
-namespace Noxa.Emulation.Psp.Debugging.DebugModel
+namespace Noxa.Emulation.Psp.RemoteDebugger.Model
 {
 	/// <summary>
 	/// Event arguments for <see cref="Breakpoint"/> events.

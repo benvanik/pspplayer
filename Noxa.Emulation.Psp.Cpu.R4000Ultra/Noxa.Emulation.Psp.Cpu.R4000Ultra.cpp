@@ -5,8 +5,10 @@
 // ----------------------------------------------------------------------------
 
 #include "stdafx.h"
-
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include "Noxa.Emulation.Psp.Cpu.R4000Ultra.h"
+#include "Mmsystem.h"
 
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
@@ -47,6 +49,18 @@ IList<ComponentIssue^>^ UltraCpu::Test( ComponentParameters^ parameters )
 	bool hasSSE = CheckSSE();
 	if( hasSSE == false )
 		issues->Add( gcnew ComponentIssue( this, IssueLevel::Error, "SSE support is required. Please get a CPU made within the last half-decade." ) );
+
+	uint minPeriod = 1;
+	while( timeBeginPeriod( minPeriod ) == TIMERR_NOCANDO )
+	{
+		minPeriod++;
+		if( minPeriod > 3 )
+		{
+			// Uh oh
+			issues->Add( gcnew ComponentIssue( this, IssueLevel::Warning, "Your clock sucks - it cannot handle a resolution of <= 3ms. Timing may be off." ) );
+			break;
+		}
+	}
 
 	return issues;
 }
