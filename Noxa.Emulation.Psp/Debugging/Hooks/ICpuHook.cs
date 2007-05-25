@@ -36,6 +36,41 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 	/// </summary>
 	public interface ICpuHook : IHook
 	{
+		#region Breakpoints
+
+		/// <summary>
+		/// Add the given breakpoint.
+		/// </summary>
+		/// <param name="breakpoint">The breakpoint to add.</param>
+		void AddBreakpoint( Breakpoint breakpoint );
+
+		/// <summary>
+		/// Find a breakpoint by ID.
+		/// </summary>
+		/// <param name="id">The ID of the breakpoint to retrieve.</param>
+		/// <returns>The <see cref="Breakpoint"/> associated with the given <paramref name="id"/> or <c>null</c> if not found.</returns>
+		Breakpoint FindBreakpoint( int id );
+
+		/// <summary>
+		/// Update the CPU copy of the breakpoint.
+		/// </summary>
+		/// <param name="newBreakpoint">The new value of the breakpoint.</param>
+		/// <returns><c>true</c> if the operation succeeded.</returns>
+		/// <remarks>
+		/// Ensure that the ID matches the one previously added via <see cref="ICpuHook.AddBreakpoint"/>.
+		/// </remarks>
+		bool UpdateBreakpoint( Breakpoint newBreakpoint );
+
+		/// <summary>
+		/// Remove the given breakpoint.
+		/// </summary>
+		/// <param name="id">The ID of the breakpoint to remove.</param>
+		void RemoveBreakpoint( int id );
+
+		#endregion
+
+		#region CPU
+
 		/// <summary>
 		/// Get the processor state for the given core.
 		/// </summary>
@@ -56,34 +91,9 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		/// <returns>The callstack or <c>null</c> if frame tracking is disabled.</returns>
 		Frame[] GetCallstack();
 
-		/// <summary>
-		/// Add the given breakpoint.
-		/// </summary>
-		/// <param name="id">Breakpoint ID.</param>
-		/// <param name="address">The address to set the breakpoint at.</param>
-		void AddCodeBreakpoint( int id, uint address );
-
-		/// <summary>
-		/// Remove the given breakpoint.
-		/// </summary>
-		/// <param name="id">The ID of the breakpoint to remove.</param>
-		void RemoveCodeBreakpoint( int id );
+		#endregion
 
 		#region Memory
-
-		/// <summary>
-		/// Add the given breakpoint.
-		/// </summary>
-		/// <param name="id">Breakpoint ID.</param>
-		/// <param name="address">The address to set the breakpoint at.</param>
-		/// <param name="accessType">The memory access type to break on.</param>
-		void AddMemoryBreakpoint( int id, uint address, MemoryAccessType accessType );
-
-		/// <summary>
-		/// Remove the given breakpoint.
-		/// </summary>
-		/// <param name="id">The ID of the breakpoint to remove.</param>
-		void RemoveMemoryBreakpoint( int id );
 
 		/// <summary>
 		/// Get the block of memory in the given range.
@@ -117,6 +127,13 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		/// <param name="length">The total number of bytes to include.</param>
 		/// <returns>The checksum of the given memory range.</returns>
 		uint Checksum( uint startAddress, int length );
+
+		/// <summary>
+		/// Get the body of the given method.
+		/// </summary>
+		/// <param name="method"></param>
+		/// <returns></returns>
+		byte[] GetMethodBody( Method method );
 
 		#endregion
 	}

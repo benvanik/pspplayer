@@ -239,5 +239,14 @@ namespace Noxa.Emulation.Psp.Bios
 #endif
 			}
 		}
+
+		/// <summary>
+		/// Returns a <see cref="String"/> representing the BIOS function.
+		/// </summary>
+		/// <returns>A <see cref="String"/> representing the function.</returns>
+		public override string ToString()
+		{
+			return string.Format( "[{0:X8}] {1}::{2}", this.NID, this.Module.Name, this.Name );
+		}
 	}
 }

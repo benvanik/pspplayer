@@ -667,6 +667,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						stubImport.Address = ( uint )pcode;
 						results.Imports.Add( stubImport );
 
+						function.StubAddress = ( uint )( im->funcs + ( m * 2 ) );
+
 						// Perform fixup
 						{
 							uint syscall = cpu.RegisterSyscall( nid );

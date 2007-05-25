@@ -61,6 +61,8 @@
     <Compile Include="Cpu\MemorySystem.cs" />
     <Compile Include="Debugging\DebugData\IDebugDatabase.cs" />
     <Compile Include="Debugging\DebugHost.cs" />
+    <Compile Include="Debugging\DebugModel\BiosFunctionToken.cs" />
+    <Compile Include="Debugging\DebugModel\Breakpoint.cs" />
     <Compile Include="Debugging\Hooks\IHook.cs" />
     <Compile Include="Debugging\Hooks\IVideoHook.cs" />
     <Compile Include="Debugging\IDebuggable.cs" />

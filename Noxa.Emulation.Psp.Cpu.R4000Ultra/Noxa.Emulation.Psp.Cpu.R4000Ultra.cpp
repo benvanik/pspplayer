@@ -40,6 +40,10 @@ IList<ComponentIssue^>^ UltraCpu::Test( ComponentParameters^ parameters )
 {
 	List<ComponentIssue^>^ issues = gcnew List<ComponentIssue^>();
 
+	bool is64 = ( sizeof( void* ) > 4 );
+	if( is64 == true )
+		issues->Add( gcnew ComponentIssue( this, IssueLevel::Error, "The CPU is compiled for 64-bit - this is NOT supported! Recompile!" ) );
+
 	bool hasSSE = CheckSSE();
 	if( hasSSE == false )
 		issues->Add( gcnew ComponentIssue( this, IssueLevel::Error, "SSE support is required. Please get a CPU made within the last half-decade." ) );

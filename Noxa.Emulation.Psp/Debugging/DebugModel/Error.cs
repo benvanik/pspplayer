@@ -68,6 +68,11 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		public readonly CpuErrorCode Code;
 
 		/// <summary>
+		/// The address at which the error occured.
+		/// </summary>
+		public readonly uint Address;
+
+		/// <summary>
 		/// Initializes a new <see cref="CpuError"/> instance with the given parameters.
 		/// </summary>
 		/// <param name="code">The error code.</param>
@@ -85,6 +90,18 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 			: base( message )
 		{
 			this.Code = code;
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="CpuError"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="code">The error code.</param>
+		/// <param name="message">An optional message describing the error.</param>
+		/// <param name="address">The address at which the error occured.</param>
+		public CpuError( CpuErrorCode code, string message, uint address )
+			: this( code, message )
+		{
+			this.Address = address;
 		}
 	}
 

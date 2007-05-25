@@ -12,12 +12,12 @@ using System.Threading;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Debugging.Hooks;
 
-namespace Noxa.Emulation.Psp.RemoteDebugger
+namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
 	/// <summary>
 	/// Describes the type of <see cref="Breakpoint"/>.
 	/// </summary>
-	enum BreakpointType
+	public enum BreakpointType
 	{
 		/// <summary>
 		/// Fired when a line of code is executed.
@@ -31,18 +31,37 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		/// Fired when a memory address is accessed.
 		/// </summary>
 		MemoryAccess,
+		/// <summary>
+		/// Internal stepping breakpoint. Don't use!
+		/// </summary>
+		Stepping,
+	}
+
+	/// <summary>
+	/// Describes the mode of a <see cref="Breakpoint"/>.
+	/// </summary>
+	public enum BreakpointMode
+	{
+		/// <summary>
+		/// Do nothing when hit (act as a counter).
+		/// </summary>
+		Silent,
+		/// <summary>
+		/// Break when hit.
+		/// </summary>
+		Break,
+		/// <summary>
+		/// Trace a message when hit.
+		/// </summary>
+		Trace,
 	}
 
 	/// <summary>
 	/// A breakpoint.
 	/// </summary>
-	class Breakpoint
+	[Serializable]
+	public class Breakpoint
 	{
-		/// <summary>
-		/// The <see cref="BreakpointManager"/> instance that owns this breakpoint.
-		/// </summary>
-		public readonly BreakpointManager Manager;
-
 		/// <summary>
 		/// Unique ID of the breakpoint.
 		/// </summary>
@@ -64,38 +83,60 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public readonly uint Address;
 
 		/// <summary>
+		/// The current mode of the breakpoint.
+		/// </summary>
+		public BreakpointMode Mode;
+
+		/// <summary>
 		/// The BIOS function of the breakpoint.
 		/// </summary>
-		public readonly BiosFunction Function;
+		public readonly BiosFunctionToken Function;
 
 		/// <summary>
 		/// The enabled state of the breakpoint.
 		/// </summary>
-		protected bool _enabled;
+		public bool Enabled;
 
 		/// <summary>
 		/// The optional user-defined name of the breakpoint.
 		/// </summary>
 		public string Name;
 
-		private static int _ids = 0;
+		/// <summary>
+		/// The number of times the breakpoint has been hit.
+		/// </summary>
+		public long HitCount;
 
-		private Breakpoint( BreakpointManager manager, BreakpointType type )
+		/// <summary>
+		/// Internal: Used by the CPU.
+		/// </summary>
+		[NonSerialized]
+		public object Internal;
+
+		/// <summary>
+		/// Internal: Used by the CPU.
+		/// </summary>
+		[NonSerialized]
+		public BiosFunction CachedFunction;
+
+		private static int _ids = 100;
+
+		private Breakpoint( BreakpointType type )
 		{
-			this.Manager = manager;
 			this.ID = Interlocked.Increment( ref _ids );
 			this.Type = type;
 			this.Name = null;
+			this.Mode = BreakpointMode.Break;
+			this.Enabled = true;
 		}
 
 		/// <summary>
 		/// Initializes a new <see cref="Breakpoint"/> instance with the given parameters.
 		/// </summary>
-		/// <param name="manager">The manager that owns this instance.</param>
 		/// <param name="type">The breakpoint type.</param>
 		/// <param name="address">The address of the breakpoint.</param>
-		public Breakpoint( BreakpointManager manager, BreakpointType type, uint address )
-			: this( manager, type )
+		public Breakpoint( BreakpointType type, uint address )
+			: this( type )
 		{
 			this.Address = address;
 		}
@@ -103,11 +144,10 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		/// <summary>
 		/// Initializes a new <see cref="Breakpoint"/> instance with the given parameters.
 		/// </summary>
-		/// <param name="manager">The manager that owns this instance.</param>
 		/// <param name="address">The memory address to break at.</param>
 		/// <param name="accessType">The access type that triggers the breakpoint.</param>
-		public Breakpoint( BreakpointManager manager, uint address, MemoryAccessType accessType )
-			: this( manager, BreakpointType.MemoryAccess )
+		public Breakpoint( uint address, MemoryAccessType accessType )
+			: this( BreakpointType.MemoryAccess )
 		{
 			this.AccessType = accessType;
 			this.Address = address;
@@ -116,31 +156,11 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		/// <summary>
 		/// Initializes a new <see cref="Breakpoint"/> instance with the given parameters.
 		/// </summary>
-		/// <param name="manager">The manager that owns this instance.</param>
 		/// <param name="function">The BIOS function to break on.</param>
-		public Breakpoint( BreakpointManager manager, BiosFunction function )
-			: this( manager, BreakpointType.BiosFunction )
+		public Breakpoint( BiosFunctionToken function )
+			: this( BreakpointType.BiosFunction )
 		{
 			this.Function = function;
-		}
-
-		/// <summary>
-		/// The current enabled state of the breakpoint.
-		/// </summary>
-		public bool Enabled
-		{
-			get
-			{
-				return _enabled;
-			}
-			set
-			{
-				if( _enabled != value )
-				{
-					_enabled = value;
-					this.Manager.OnBreakpointToggled( this );
-				}
-			}
 		}
 	}
 }

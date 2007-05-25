@@ -37,7 +37,6 @@ namespace Noxa.Emulation.Psp.Bios
 			Debug.Assert( name != null );
 			Name = name;
 			Exports = new StubExport[] { };
-			_exportLookup = null;
 		}
 
 		/// <summary>

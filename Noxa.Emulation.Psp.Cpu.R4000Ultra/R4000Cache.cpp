@@ -68,6 +68,7 @@ R4000Cache::R4000Cache()
 {
 	_lookup = NULL;
 	_ptrLookup = NULL;
+	Version = 0;
 	this->Clear( true );
 }
 
@@ -187,6 +188,102 @@ CodeBlock* R4000Cache::Find( int address )
 	}
 }
 
+// Max words we search up
+#define MAXCODELENGTH 400
+
+int R4000Cache::Search( int address, CodeBlock** buffer )
+{
+	uint addr = ( ( uint )address ) >> 2;
+
+	uint b0 = addr >> 20;
+	uint b1 = ( addr >> L2SHIFT ) & L2MASK;
+	uint b2 = addr & L3MASK;
+
+	LOCK;
+	{
+		// We need to start at where we think we are and go up, moving between lists when required
+
+		bool hadValid = false;
+		int searchCount = 0;
+		int n = 0;
+		while( searchCount < MAXCODELENGTH )
+		{
+			CodeBlock** block0 = _lookup[ b0 ];
+			if( block0 == NULL )
+			{
+				if( b0 == 0 )
+					break;
+				b0--;
+				continue;
+			}
+
+			CodeBlock* block1 = block0[ b1 ];
+			if( block1 == NULL )
+			{
+				if( b1 == 0 )
+				{
+					b1 = L1SIZE - 1;
+					if( b0 == 0 )
+						break;
+					b0--;
+				}
+				else
+					b1--;
+				continue;
+			}
+
+			CodeBlock* block = &block1[ b2 ];
+			bool valid = ( block->Address + block->Size ) > address;
+			if( valid == false )
+			{
+				if( ( block->Address == 0x0 ) &&
+					( hadValid == true ) )
+				{
+					// We had previously found a valid one, but now we found a good block that is not
+					// valid - we are done!
+					UNLOCK;
+					return n;
+				}
+
+				if( b2 == 0 )
+				{
+					b2 = L2SIZE - 1;
+					if( b1 == 0 )
+						break;
+					b1--;
+				}
+				else
+					b2--;
+				searchCount++;
+				continue;
+			}
+
+			// Found one!
+			hadValid = true;
+			buffer[ n++ ] = block;
+
+			// -- continue trying to find more
+			if( b2 == 0 )
+			{
+				b2 = L2SIZE - 1;
+				if( b1 == 0 )
+					break;
+				b1--;
+			}
+			else
+				b2--;
+		}
+
+		if( hadValid == true )
+		{
+			UNLOCK;
+			return n;
+		}
+	}
+	UNLOCK;
+	return 0;
+}
+
 void R4000Cache::Invalidate( int address )
 {
 	uint addr = ( ( uint )address ) >> 2;
@@ -230,7 +327,10 @@ void R4000Cache::Invalidate( int address )
 			if( ( address >= block->Address ) &&
 				( address <= upper ) )
 			{
-				memset( &block1[ n ], 0, sizeof( CodeBlock ) );
+#ifdef DEBUGGING
+				SAFEFREE( block->InstructionSizes );
+#endif
+				memset( block, 0, sizeof( CodeBlock ) );
 				*( pblock1 + n ) = NULL;
 			}
 		}
@@ -257,6 +357,13 @@ void R4000Cache::Clear( bool realloc )
 					for( int m = 0; m < L2SIZE; m++ )
 					{
 						CodeBlock* b1 = b0[ m ];
+#ifdef DEBUGGING
+						if( b1 != NULL )
+						{
+							for( int i = 0; i < L3SIZE; i++ )
+								SAFEFREE( b1[ n ].InstructionSizes );
+						}
+#endif
 						SAFEFREE( b1 );
 					}
 					SAFEFREE( b0 );
@@ -284,5 +391,6 @@ void R4000Cache::Clear( bool realloc )
 			CCLookupTable = _ptrLookup;
 		}
 	}
+	Version++;
 	UNLOCK;
 }

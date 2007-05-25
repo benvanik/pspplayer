@@ -21,13 +21,14 @@ namespace Noxa {
 
 				ref class R4000Cpu;
 
-				ref class R4000Controller : public IDebugController
+				ref class R4000Controller : public IDebugController, MarshalByRefObject
 				{
 				public:
 					R4000Cpu^			Cpu;
 
 				public:
 					R4000Controller( R4000Cpu^ cpu );
+					~R4000Controller();
 
 					virtual void Run(){}
 					virtual void RunUntil( uint address ){}

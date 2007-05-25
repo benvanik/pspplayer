@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Games;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE
@@ -117,6 +118,31 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			if( _functionLookup.TryGetValue( nid, out function ) == true )
 				return function;
 			return null;
+		}
+
+		public BiosFunction FindFunction( BiosFunctionToken token )
+		{
+			// It's possible that a NID could be 0x0, but whatever :)
+			// It's also possible that there are the same NID in multiple modules.... whatever
+			if( token.NID != 0x0 )
+			{
+				return this.FindFunction( token.NID );
+			}
+			else
+			{
+				BiosModule module = this.FindModule( token.ModuleName );
+				if( module == null )
+					return null;
+				// This is lame - if this is used a lot, we need a better lookup!
+				foreach( StubExport export in module.Exports )
+				{
+					BiosFunction target = this.FindFunction( export.NID );
+					if( ( target != null ) &&
+						( target.Name == token.MethodName ) )
+						return target;
+				}
+				return null;
+			}
 		}
 
 		private void GatherModulesAndFunctions()
