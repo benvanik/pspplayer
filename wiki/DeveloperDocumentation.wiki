@@ -45,5 +45,9 @@ The resolver/simple samples in the SDK are good test targets, don't forget to di
   * http://www.mono-project.com/Mono_DataConvert <- may be useful
  * x86
   * http://www.piclist.com/techref/intel/32bit/32bitx86tips.htm
+ * .NET
+  * [http://blogs.msdn.com/haibo_luo/archive/2005/10/25/484861.aspx ILStream viz]
+  * [http://blogs.msdn.com/jmstall/archive/2005/02/03/366429.aspx Ref.Emit debugging]
+  * [http://blogs.msdn.com/jmstall/archive/2006/11/14/lcg-feedback.aspx LCG debugging?]
  * VFPU
   * http://wiki.fx-world.org/doku.php
