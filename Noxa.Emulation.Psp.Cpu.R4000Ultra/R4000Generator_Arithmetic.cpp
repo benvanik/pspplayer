@@ -975,35 +975,20 @@ GenerationResult WSBH( R4000GenContext^ context, int pass, int address, uint cod
 		// There may be an instruction for this, but I don't have my manuals handy
 
 		// a = reg(rt)
-		// b = ( a & 0xFF ) << 8
-		// b |= ( a >> 8 ) & 0xFF
-		// b |= ( ( a & 0x00FF0000 ) << 8 )
-		// b |= ( ( a & 0xFF000000 ) >> 8 )
+		// b = ( ( a & 0x00FF00FF ) << 8 )
+		// b |= ( ( a & 0xFF00FF00 ) >> 8 )
 
-		// b = ( a & 0xFF ) << 8
+		// b = ( ( a & 0x00FF00FF ) << 8 )
 		g->mov( EBX, EAX );
-		g->and( EBX, 0x000000FF );
+		g->and( EBX, 0x00FF00FF );
 		g->shl( EBX, 8 );
 
-		// b |= ( a >> 8 ) & 0xFF
-		g->mov( ECX, EAX );
-		g->shr( ECX, 8 );
-		g->and( ECX, 0x000000FF );
-		g->or( EBX, ECX );
+		// b |= ( ( a & 0xFF00FF00 ) >> 8 )
+		g->and( EAX, 0xFF00FF00 );
+		g->shr( EAX, 8 );
+		g->or( EAX, EBX );
 
-		// b |= ( ( a & 0x00FF0000 ) << 8 )
-		g->mov( ECX, EAX );
-		g->and( ECX, 0x00FF0000 );
-		g->shl( ECX, 8 );
-		g->or( EBX, ECX );
-
-		// b |= ( ( a & 0xFF000000 ) >> 8 )
-		g->mov( ECX, EAX );
-		g->and( ECX, 0xFF000000 );
-		g->shr( ECX, 8 );
-		g->or( EBX, ECX );
-
-		g->mov( MREG( CTX, rd ), EBX );
+		g->mov( MREG( CTX, rd ), EAX );
 	}
 	return GenerationResult::Success;
 }
@@ -1015,7 +1000,9 @@ GenerationResult WSBW( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		
+		g->mov( EAX, MREG( CTX, rt ) );
+		g->bswap( EAX );
+		g->mov( MREG( CTX, rd ), EBX );
 	}
 	return GenerationResult::Success;
 }

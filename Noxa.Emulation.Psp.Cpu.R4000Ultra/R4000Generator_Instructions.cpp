@@ -284,12 +284,14 @@ void R4000Generator::Setup()
 
 	TableSpecial3[ 0 ] = EXT;
 	TableSpecial3[ 2 ] = WSBH;
+	TableSpecial3[ 3 ] = WSBW;
 	TableSpecial3[ 4 ] = INS;
 	TableSpecial3[ 16 ] = SEB;
 	TableSpecial3[ 24 ] = SEH;
 
 	TableSpecial3_n[ 0 ] = "EXT";
 	TableSpecial3_n[ 2 ] = "WSBH";
+	TableSpecial3_n[ 3 ] = "WSBW";
 	TableSpecial3_n[ 4 ] = "INS";
 	TableSpecial3_n[ 16 ] = "SEB";
 	TableSpecial3_n[ 24 ] = "SEH";
