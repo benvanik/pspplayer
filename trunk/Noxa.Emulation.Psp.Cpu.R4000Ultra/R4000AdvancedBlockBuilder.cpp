@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#include "DebugOptions.h"
 #include "TraceOptions.h"
 #include "R4000BlockBuilder.h"
 #include "R4000AdvancedBlockBuilder.h"
@@ -13,6 +14,7 @@
 #include "R4000Memory.h"
 #include "R4000Cache.h"
 #include "R4000Generator.h"
+#include "R4000Hook.h"
 #include "Tracer.h"
 
 using namespace System::Diagnostics;
@@ -41,8 +43,7 @@ using namespace Noxa::Emulation::Psp::Cpu;
 // Debugging addresses
 //#define BREAKADDRESS1		0x08909ECC
 //#define BREAKADDRESS2		0x08900160
-//#define GENBREAKADDRESS		0x08910BA4
-//0x08900204
+//#define GENBREAKADDRESS		0x895c658
 
 extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
@@ -55,6 +56,11 @@ extern uint _jumpBlockLookupCount;
 extern uint _codeBlockRetCount;
 
 void __flushTrace();
+
+#ifdef DEBUGGING
+// In R4000Controller
+void SetBreakpoint( Breakpoint^ breakpoint );
+#endif
 
 #define ENDADDRESS ( startAddress + ( maxCodeLength << 2 ) )
 
@@ -88,11 +94,22 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 
 	byte* mainMemory = _memory->MainMemory;
 
+#ifdef DEBUGGING
+	List<int>^ breakpoints = gcnew List<int>();
+#endif
+
 	int maxCodeLength = MAXCODELENGTH;
 	for( int pass = 0; pass <= 1; pass++ )
 	{
 		if( pass == 1 )
+		{
 			GeneratePreamble();
+
+#ifdef DEBUGGING
+			// We know the length, so allocate the size buffer
+			block->InstructionSizes = ( ushort* )malloc( sizeof( ushort ) * count );
+#endif
+		}
 
 		// Regarding maxCodeLength, we need to be able to pad out block lengths by 1 in
 		// the case of hitting the max while in a delay slot. Nasty, but it should work
@@ -105,6 +122,17 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 		bool maxLengthHit = false;
 		bool checkNullDelay = false;
 		int address = startAddress;
+		
+#ifdef DEBUGGING
+		// Used for sizing - we get the length now because the preamble has stuff
+		int lastOffset = 0;
+		if( pass == 1 )
+		{
+			lastOffset = _gen->GetLength();
+			block->PreambleSize = lastOffset;
+		}
+#endif
+
 		for( int n = 0; n < maxCodeLength; n++ )
 		{
 			GenerationResult result = GenerationResult::Invalid;
@@ -170,6 +198,22 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 					_gen->MarkLabel( lm->Label );
 				}
 			}
+
+#ifdef DEBUGGING
+			if( pass == 1 )
+			{
+				// Add debug thunk space - 12 bytes
+				Debug::Assert( DEBUGTHUNKSIZE == 12 );
+				_gen->dd( ( uint )0x90909090 );
+				_gen->dd( ( uint )0x90909090 );
+				_gen->dd( ( uint )0x90909090 );
+
+				// See if this instruction has a breakpoint defined
+				int breakpointId;
+				if( _cpu->_hook->BreakpointLookup->TryGetValue( address, breakpointId ) == true )
+					breakpoints->Add( breakpointId );
+			}
+#endif
 
 #ifdef STATISTICS
 			if( pass == 1 )
@@ -525,6 +569,18 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 				}
 			}
 
+#ifdef DEBUGGING
+			if( pass == 1 )
+			{
+				// Sizing information
+				int newOffset = _gen->GetLength();
+				int lastSize = ( newOffset - lastOffset );
+				Debug::Assert( lastSize < ushort::MaxValue );
+				block->InstructionSizes[ n ] = lastSize;
+				lastOffset = newOffset;
+			}
+#endif
+
 			// Syscalls always exit
 			if( result == GenerationResult::Syscall )
 			{
@@ -627,6 +683,22 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 	}
 
 	block->EndsOnSyscall = ( lastResult == GenerationResult::Syscall );
+
+	// Must be set for breakpoint searching
+	block->Size = _gen->GetLength();
+	block->InstructionCount = count;
+
+	FunctionPointer ptr = _gen->GenerateCode();
+	_cpu->_codeCache->UpdatePointer( block, ptr );
+
+#ifdef DEBUGGING
+	// Add breakpoints that are defined in this method
+	for( int n = 0; n < breakpoints->Count; n++ )
+	{
+		Breakpoint^ bp = _cpu->_hook->Breakpoints[ breakpoints[ n ] ];
+		SetBreakpoint( bp );
+	}
+#endif
 
 #ifdef GENDEBUG
 	Debug::WriteLine( String::Format( "!- Finished block at 0x{0:X8} ({1} instructions)", startAddress, count ) );

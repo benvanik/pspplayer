@@ -11,6 +11,7 @@ using System.Text;
 
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Games;
 
 namespace Noxa.Emulation.Psp.Bios
@@ -66,6 +67,13 @@ namespace Noxa.Emulation.Psp.Bios
 		/// <param name="nid">The unique ID to look for.</param>
 		/// <returns>The <see cref="BiosFunction"/> corresponding to the given <paramref name="nid"/> or <c>null</c> if it was not found.</returns>
 		BiosFunction FindFunction( uint nid );
+
+		/// <summary>
+		/// Find a <see cref="BiosFunction"/> by reference.
+		/// </summary>
+		/// <param name="token">The reference to the BIOS function.</param>
+		/// <returns>The <see cref="BiosFunction"/> corresponding to the given <paramref name="BiosFunctionToken"/> or <c>null</c> if it was not found.</returns>
+		BiosFunction FindFunction( BiosFunctionToken token );
 
 		/// <summary>
 		/// Register a function (for doing crazy things).

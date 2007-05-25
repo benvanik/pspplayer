@@ -42,7 +42,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Breakpoint.cs" />
     <Compile Include="BreakpointEventArgs.cs" />
     <Compile Include="BreakpointManager.cs" />
     <Compile Include="CodeView.cs">

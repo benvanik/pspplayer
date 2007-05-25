@@ -351,10 +351,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Options.h"
-				>
-			</File>
-			<File
 				RelativePath=".\R4000AdvancedBlockBuilder.h"
 				>
 			</File>
@@ -442,10 +438,6 @@
 				RelativePath=".\Stdafx.h"
 				>
 			</File>
-			<File
-				RelativePath=".\TraceOptions.h"
-				>
-			</File>
 			<Filter
 				Name="Shared"
 				>
@@ -479,6 +471,22 @@
 				</File>
 				<File
 					RelativePath="..\Shared\Include\VideoApi.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Options"
+				>
+				<File
+					RelativePath=".\DebugOptions.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Options.h"
+					>
+				</File>
+				<File
+					RelativePath=".\TraceOptions.h"
 					>
 				</File>
 			</Filter>

@@ -7,6 +7,7 @@
 #pragma once
 
 using namespace System;
+using namespace System::Collections::Generic;
 using namespace System::Threading;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
@@ -23,13 +24,22 @@ namespace Noxa {
 
 				ref class R4000Cpu;
 
-				ref class R4000Hook : public ICpuHook
+				ref class R4000Hook : public ICpuHook, MarshalByRefObject
 				{
 				public:
 					R4000Cpu^			Cpu;
 
+					Dictionary<int, Breakpoint^>^	Breakpoints;
+
 				public:
 					R4000Hook( R4000Cpu^ cpu );
+
+					// -- Breakpoints --
+
+					virtual void AddBreakpoint( Breakpoint^ breakpoint );
+					virtual Breakpoint^ FindBreakpoint( int id );
+					virtual bool UpdateBreakpoint( Breakpoint^ newBreakpoint );
+					virtual void RemoveBreakpoint( int id );
 
 					// -- CPU --
 
@@ -38,19 +48,18 @@ namespace Noxa {
 
 					virtual array<Frame^>^ GetCallstack();
 
-					virtual void AddCodeBreakpoint( int id, uint address );
-					virtual void RemoveCodeBreakpoint( int id );
-
 					// -- Memory --
-
-					virtual void AddMemoryBreakpoint( int id, uint address, MemoryAccessType accessType );
-					virtual void RemoveMemoryBreakpoint( int id );
 
 					virtual array<byte>^ GetMemory( uint startAddress, int length );
 					virtual void SetMemory( uint startAddress, array<byte>^ buffer, int offset, int length );
 
 					virtual array<uint>^ SearchMemory( uint64 value, int width );
 					virtual uint Checksum( uint startAddress, int length );
+					virtual array<byte>^ GetMethodBody( Method^ method );
+
+				public:
+					Dictionary<uint, int>^	BreakpointLookup;
+					void RefreshBreakpointTable();
 				};
 
 			}

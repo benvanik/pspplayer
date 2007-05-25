@@ -95,9 +95,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			{
 				this.Host.Ping();
 			}
-			catch( Exception ex )
+			catch( Exception )
 			{
-				Debug.WriteLine( "EmuDebugger::Connect: ping failed: " + ex.ToString() );
+				Debug.WriteLine( "EmuDebugger::Connect: ping failed" );// + ex.ToString() );
 				return false;
 			}
 
@@ -117,7 +117,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 			Hashtable clientProps = new Hashtable();
 			clientProps[ "port" ] = DebugHost.ClientPort;
-			clientProps[ "timeout" ] = unchecked( ( uint )Timeout.Infinite );
+			clientProps[ "timeout" ] = Timeout.Infinite;
 
 			TcpChannel chan = new TcpChannel( clientProps, clientProvider, serverProvider );
 			ChannelServices.RegisterChannel( chan, false );
@@ -147,6 +147,10 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 				this.View.SetStatusText( Verbosity.Normal, "Connection to emulator {0} established.", this.Host.HostString );
 			};
 			this.View.Invoke( del );
+
+			// TEST
+			Breakpoint bp = new Breakpoint( BreakpointType.CodeExecute, 0x0890003c );
+			//this.Host.CpuHook.AddBreakpoint( bp );
 		}
 
 		public void OnStopped()
@@ -165,18 +169,22 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		public void OnStepComplete( int address )
 		{
+			Debugger.Break();
 		}
 
 		public void OnBreakpointHit( int id )
 		{
+			Debugger.Break();
 		}
 
 		public void OnEvent( Event biosEvent )
 		{
+			Debugger.Break();
 		}
 
 		public void OnError( Error error )
 		{
+			Debugger.Break();
 		}
 
 		#endregion

@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
@@ -69,6 +70,8 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 			EntryAddress = entryAddress;
 			Length = length;
 			Name = name;
+
+			Debug.Assert( length % 4 == 0 );
 
 			Breakpoints = new List<int>();
 		}

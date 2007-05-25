@@ -5,6 +5,7 @@
 // ----------------------------------------------------------------------------
 
 #include "StdAfx.h"
+#include "DebugOptions.h"
 #include "TraceOptions.h"
 #include "Tracer.h"
 #include "R4000BlockBuilder.h"
@@ -202,11 +203,7 @@ CodeBlock* R4000BlockBuilder::Build( int address )
 	_gen->annotate( "Block @ [%#08X]: ----------------------------------------------------------", address );
 #endif
 
-	block->InstructionCount = InternalBuild( address, block );
-
-	FunctionPointer ptr = _gen->GenerateCode();
-	block->Size = _gen->GetLength();
-	_codeCache->UpdatePointer( block, ptr );
+	InternalBuild( address, block );
 
 #ifdef _DEBUG
 	// Listing

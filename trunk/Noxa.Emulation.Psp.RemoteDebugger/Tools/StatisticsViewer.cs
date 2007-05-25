@@ -77,6 +77,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			this.Groups = groups.ToArray();
 
 			this.listView1.BeginUpdate();
+			this.listView1.Items.Clear();
 			foreach( CounterGroup group in this.Groups )
 				this.AddCounters( group );
 			this.listView1.EndUpdate();

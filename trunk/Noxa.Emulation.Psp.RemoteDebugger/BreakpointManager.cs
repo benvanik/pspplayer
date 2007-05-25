@@ -21,7 +21,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private List<Breakpoint> _breakpoints;
 		private Dictionary<int, Breakpoint> _breakpointLookup;
 		private Dictionary<uint, Breakpoint> _addressBreakpointLookup;
-		private Dictionary<BiosFunction, Breakpoint> _biosBreakpointLookup;
+		private Dictionary<BiosFunctionToken, Breakpoint> _biosBreakpointLookup;
 
 		public BreakpointManager( EmuDebugger debugger )
 		{
@@ -30,7 +30,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			_breakpoints = new List<Breakpoint>( 100 );
 			_breakpointLookup = new Dictionary<int, Breakpoint>( 100 );
 			_addressBreakpointLookup = new Dictionary<uint, Breakpoint>( 100 );
-			_biosBreakpointLookup = new Dictionary<BiosFunction, Breakpoint>( 100 );
+			_biosBreakpointLookup = new Dictionary<BiosFunctionToken, Breakpoint>( 100 );
 		}
 
 		public Breakpoint[] Breakpoints
@@ -45,22 +45,20 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public event EventHandler<BreakpointEventArgs> Removed;
 		public event EventHandler<BreakpointEventArgs> Toggled;
 
-		public Breakpoint Add( BreakpointType type, uint address )
+		public void Add( Breakpoint breakpoint )
 		{
-			Breakpoint breakpoint = new Breakpoint( this, type, address );
 			_breakpointLookup.Add( breakpoint.ID, breakpoint );
-			_addressBreakpointLookup.Add( address, breakpoint );
+			switch( breakpoint.Type )
+			{
+				case BreakpointType.CodeExecute:
+				case BreakpointType.MemoryAccess:
+					_addressBreakpointLookup.Add( breakpoint.Address, breakpoint );
+					break;
+				case BreakpointType.BiosFunction:
+					_biosBreakpointLookup.Add( breakpoint.Function, breakpoint );
+					break;
+			}
 			this.OnBreakpointAdded( breakpoint );
-			return breakpoint;
-		}
-
-		public Breakpoint Add( BiosFunction function )
-		{
-			Breakpoint breakpoint = new Breakpoint( this, function );
-			_breakpointLookup.Add( breakpoint.ID, breakpoint );
-			_biosBreakpointLookup.Add( function, breakpoint );
-			this.OnBreakpointAdded( breakpoint );
-			return breakpoint;
 		}
 
 		public void Remove( Breakpoint breakpoint )
@@ -100,7 +98,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 				return null;
 		}
 
-		public Breakpoint Find( BiosFunction function )
+		public Breakpoint Find( BiosFunctionToken function )
 		{
 			Breakpoint breakpoint;
 			if( _biosBreakpointLookup.TryGetValue( function, out breakpoint ) == true )
@@ -111,34 +109,14 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		private void OnBreakpointAdded( Breakpoint breakpoint )
 		{
-			switch( breakpoint.Type )
-			{
-				case BreakpointType.CodeExecute:
-					this.Debugger.Host.CpuHook.AddCodeBreakpoint( breakpoint.ID, breakpoint.Address );
-					break;
-				case BreakpointType.MemoryAccess:
-					this.Debugger.Host.CpuHook.AddMemoryBreakpoint( breakpoint.ID, breakpoint.Address, breakpoint.AccessType );
-					break;
-				case BreakpointType.BiosFunction:
-					this.Debugger.Host.CpuHook.AddCodeBreakpoint( breakpoint.ID, breakpoint.Function.StubAddress );
-					break;
-			}
+			this.Debugger.Host.CpuHook.AddBreakpoint( breakpoint );
 			if( this.Added != null )
 				this.Added( this, new BreakpointEventArgs( breakpoint ) );
 		}
 
 		private void OnBreakpointRemoved( Breakpoint breakpoint )
 		{
-			switch( breakpoint.Type )
-			{
-				case BreakpointType.CodeExecute:
-				case BreakpointType.BiosFunction:
-					this.Debugger.Host.CpuHook.RemoveCodeBreakpoint( breakpoint.ID );
-					break;
-				case BreakpointType.MemoryAccess:
-					this.Debugger.Host.CpuHook.RemoveMemoryBreakpoint( breakpoint.ID );
-					break;
-			}
+			this.Debugger.Host.CpuHook.RemoveBreakpoint( breakpoint.ID );
 			if( this.Removed != null )
 				this.Removed( this, new BreakpointEventArgs( breakpoint ) );
 		}

@@ -93,6 +93,10 @@ namespace Noxa.Emulation.Psp
 		/// Trace of syscalls and their parameters.
 		/// </summary>
 		Syscall,
+		/// <summary>
+		/// Debugger system information.
+		/// </summary>
+		Debug,
 	}
 
 	#endregion
