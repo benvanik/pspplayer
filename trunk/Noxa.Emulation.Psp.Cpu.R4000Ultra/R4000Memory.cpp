@@ -6,6 +6,7 @@
 
 #include "StdAfx.h"
 //#include <Windows.h>
+#include "DebugOptions.h"
 #include "R4000Memory.h"
 #include <string>
 
@@ -13,6 +14,7 @@ using namespace System::Diagnostics;
 using namespace System::IO;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
+using namespace Noxa::Emulation::Psp::Debugging::DebugModel;
 
 // When defined we will break on a bad address access
 #define BREAKONBADADDRESS
@@ -99,9 +101,7 @@ int R4000Memory::ReadWord( int address )
 	_managedMemoryReadCount++;
 #endif
 
-#ifdef _DEBUG
 	int rawAddress = address;
-#endif
 	address &= 0x3FFFFFFF;
 
 	//Debug::WriteLine( String::Format( "RW @ 0x{0:X8}", address ) );
@@ -127,9 +127,14 @@ int R4000Memory::ReadWord( int address )
 	}
 	else
 	{
-#ifdef BREAKONBADADDRESS
 		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "memory read attempt from invalid address 0x{0:X8}", rawAddress );
+#ifdef BREAKONBADADDRESS
 		Debugger::Break();
+#endif
+#ifdef DEBUGGING
+		CpuError^ error = gcnew CpuError( CpuErrorCode::InvalidAccess,
+			String::Format( "memory read attempt from invalid address 0x{0:X8}", rawAddress ) );
+		Diag::ThrowError( error );
 #endif
 		return 0;
 	}
@@ -140,6 +145,9 @@ int64 R4000Memory::ReadDoubleWord( int address )
 #ifdef STATISTICS
 	_managedMemoryReadCount++;
 #endif
+
+	int rawAddress = address;
+	address &= 0x3FFFFFFF;
 
 	//Debug::WriteLine( String::Format( "RW @ 0x{0:X8}", address ) );
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
@@ -164,8 +172,14 @@ int64 R4000Memory::ReadDoubleWord( int address )
 	}
 	else
 	{
+		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "memory read attempt from invalid address 0x{0:X8}", rawAddress );
 #ifdef BREAKONBADADDRESS
 		Debugger::Break();
+#endif
+#ifdef DEBUGGING
+		CpuError^ error = gcnew CpuError( CpuErrorCode::InvalidAccess,
+			String::Format( "memory read attempt from invalid address 0x{0:X8}", rawAddress ) );
+		Diag::ThrowError( error );
 #endif
 		return 0;
 	}
@@ -214,9 +228,7 @@ void R4000Memory::WriteWord( int address, int width, int value )
 	_managedMemoryWriteCount++;
 #endif
 
-#ifdef _DEBUG
 	int rawAddress = address;
-#endif
 	address &= 0x3FFFFFFF;
 
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
@@ -301,9 +313,14 @@ void R4000Memory::WriteWord( int address, int width, int value )
 	}
 	else
 	{
-#ifdef BREAKONBADADDRESS
 		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "memory write attempt to invalid address 0x{0:X8} = 0x{1:X8} ({1}) [{2}b]", rawAddress, value, width );
+#ifdef BREAKONBADADDRESS
 		Debugger::Break();
+#endif
+#ifdef DEBUGGING
+		CpuError^ error = gcnew CpuError( CpuErrorCode::InvalidAccess,
+			String::Format( "memory write attempt to invalid address 0x{0:X8} = 0x{1:X8} ({1}) [{2}b]", rawAddress, value, width ) );
+		Diag::ThrowError( error );
 #endif
 	}
 
@@ -316,6 +333,9 @@ void R4000Memory::WriteDoubleWord( int address, int64 value )
 #ifdef STATISTICS
 	_managedMemoryWriteCount++;
 #endif
+
+	int rawAddress = address;
+	address &= 0x3FFFFFFF;
 
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
@@ -342,8 +362,14 @@ void R4000Memory::WriteDoubleWord( int address, int64 value )
 	}
 	else
 	{
+		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "memory write attempt to invalid address 0x{0:X8} = 0x{1:X8} ({1}) [8b]", rawAddress, value );
 #ifdef BREAKONBADADDRESS
 		Debugger::Break();
+#endif
+#ifdef DEBUGGING
+		CpuError^ error = gcnew CpuError( CpuErrorCode::InvalidAccess,
+			String::Format( "memory write attempt to invalid address 0x{0:X8} = 0x{1:X8} ({1}) [8b]", rawAddress, value ) );
+		Diag::ThrowError( error );
 #endif
 	}
 

@@ -41,19 +41,23 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// An undefined error.
 		/// </summary>
-		GenericError,
+		Generic,
 		/// <summary>
 		/// An error during code generation.
 		/// </summary>
-		GenerationError,
+		Generation,
 		/// <summary>
 		/// An error executing code.
 		/// </summary>
-		RuntimeError,
+		Runtime,
 		/// <summary>
 		/// An error during a syscall.
 		/// </summary>
-		SyscallError,
+		SyscallFailed,
+		/// <summary>
+		/// An error occured on a memory access attmept.
+		/// </summary>
+		InvalidAccess,
 	}
 
 	/// <summary>
@@ -102,6 +106,21 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 			: this( code, message )
 		{
 			this.Address = address;
+		}
+
+		/// <summary>
+		/// Returns a <see cref="String"/> that represents the current <see cref="CpuError"/>.
+		/// </summary>
+		/// <returns>A <see cref="String"/> representing the current <see cref="CpuError"/>.</returns>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.AppendFormat( "{0}: ", Code );
+			if( Address != 0x0 )
+				sb.AppendFormat( "[0x{0:X8}] ", Address );
+			if( Message != null )
+				sb.Append( Message );
+			return sb.ToString();
 		}
 	}
 

@@ -40,6 +40,7 @@ namespace Noxa.Emulation.Psp.Debugging.Protocol
 		/// Handle an error.
 		/// </summary>
 		/// <param name="error">The error description instance.</param>
-		void OnError( Error error );
+		/// <returns><c>true</c> if the error was handled, otherwise <c>false</c>.</returns>
+		bool OnError( Error error );
 	}
 }

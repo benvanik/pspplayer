@@ -182,9 +182,11 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			Debugger.Break();
 		}
 
-		public void OnError( Error error )
+		public bool OnError( Error error )
 		{
 			Debugger.Break();
+
+			return true;
 		}
 
 		#endregion

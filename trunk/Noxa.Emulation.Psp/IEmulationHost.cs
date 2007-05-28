@@ -45,5 +45,12 @@ namespace Noxa.Emulation.Psp
 		/// Attach the debugger to the current <see cref="IEmulationInstance"/>.
 		/// </summary>
 		void AttachDebugger();
+
+		/// <summary>
+		/// Ask the user to attach the debugger.
+		/// </summary>
+		/// <param name="message">The diagnostic message to display to the user.</param>
+		/// <returns><c>true</c> if the user agreed, otherwise <c>false</c>.</returns>
+		bool AskForDebugger( string message );
 	}
 }

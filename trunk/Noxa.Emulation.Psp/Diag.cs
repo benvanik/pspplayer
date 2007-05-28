@@ -6,9 +6,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp
 {
@@ -33,6 +35,39 @@ namespace Noxa.Emulation.Psp
 					return false;
 				return Instance.IsAttached;
 			}
+		}
+
+		private static bool EnsureAttached( string message )
+		{
+			if( IsAttached == false )
+			{
+				// We should at least have a debug host!
+				Debug.Assert( Instance != null );
+
+				// Ask the user what to do
+				if( Instance.Emulator.AskForDebugger( message ) == false )
+				{
+					// They said no... fuck em
+					return false;
+				}
+
+				// Wait until the debugger attaches
+				Instance.WaitUntilAttached();
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Throw an error to the debugger.
+		/// </summary>
+		/// <param name="error">The <see cref="Error"/> to throw.</param>
+		/// <returns><c>true</c> if the debugger has handled the error, <c>false</c> to continue on if it was ignored.</returns>
+		public static bool ThrowError( Error error )
+		{
+			if( EnsureAttached( error.ToString() ) == false )
+				return false;
+			return Instance.Client.Handler.OnError( error );
 		}
 	}
 }
