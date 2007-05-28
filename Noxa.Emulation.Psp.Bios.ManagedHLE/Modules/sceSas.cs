@@ -4,6 +4,8 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
+//#define USE
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,7 +43,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			get
 			{
-				return "sceSas";
+				return "sceSasCore";
 			}
 		}
 
@@ -49,8 +51,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#region State Management
 
-		public sceSas(Kernel kernel)
-			: base(kernel)
+		public sceSas( Kernel kernel )
+			: base( kernel )
 		{
 		}
 
@@ -88,20 +90,24 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			public int sampleSize;
 		}
 
-		Voice [] voices = new Voice[32];
+		private Voice[] voices = new Voice[ 32 ];
 
-		double[,] vagC = new double[5, 2] { { 0.0, 0.0 },
+		private double[ , ] vagC = new double[ 5, 2 ] { { 0.0, 0.0 },
 			{   60.0 / 64.0,  0.0 },
 			{  115.0 / 64.0, -52.0 / 64.0 },
 			{   98.0 / 64.0, -55.0 / 64.0 },
 			{  122.0 / 64.0, -60.0 / 64.0 } };
 
-		[BiosFunction(0x42778a9f, "__sceSasInit")]
-		public int __sceSasInit() 
+#if !USE
+		[NotImplemented]
+#endif
+		[Stateless]
+		[BiosFunction( 0x42778a9f, "__sceSasInit" )]
+		public int __sceSasInit()
 		{
-			for (int i = 0; i < 32; i++)
+			for( int i = 0; i < 32; i++ )
 			{
-				voices[i].finished = true;
+				voices[ i ].finished = true;
 			}
 			return coreID;
 		}
@@ -111,51 +117,69 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		//This will then be played back with sceAudio functions.
 		//Alternatively, we can just skip this and output directly, but any CPU effects
 		//applied on top will then not be heard.
+#if !USE
+		[NotImplemented]
+#endif
 		[Stateless]
-		[BiosFunction(0xa3589d81, "__sceSasCore")]
-		public int __sceSasCore(int sasCore, int outBufPtr)
+		[BiosFunction( 0xa3589d81, "__sceSasCore" )]
+		public int __sceSasCore( int sasCore, int outBufPtr )
 		{
 			return 0;
 		}
 
-
+#if !USE
+		[NotImplemented]
+		[DontTrace]
+#endif
 		[Stateless]
-		[BiosFunction(0x68a46b95, "__sceSasGetEndFlag")]
-		public int __sceSasGetEndFlag(int sasCore) 
+		[BiosFunction( 0x68a46b95, "__sceSasGetEndFlag" )]
+		public int __sceSasGetEndFlag( int sasCore )
 		{
 			int f = 0;
-			for (int i = 0; i < 32; i++)
+			for( int i = 0; i < 32; i++ )
 			{
-				if (voices[i].finished)
+				if( voices[ i ].finished )
 				{
-					f |= (1 << i);
+					f |= ( 1 << i );
 				}
 			}
-			return f; 
+			return f;
 		}
 
-		[BiosFunction(0x440ca7d8, "__sceSasSetVolume")]
-		public int __sceSasSetVolume(int sasCore, int num, int l, int el, int r, int er) 
+#if !USE
+		[NotImplemented]
+#endif
+		[Stateless]
+		[BiosFunction( 0x440ca7d8, "__sceSasSetVolume" )]
+		public int __sceSasSetVolume( int sasCore, int num, int l, int el, int r, int er )
 		{
 			//if (sasCore != coreID) ; //Do something
-			voices[num].volumeLeft = l;
-			voices[num].volumeRight = r;
-			voices[num].volumeEffectLeft = el;
-			voices[num].volumeEffectRight = er;
+			voices[ num ].volumeLeft = l;
+			voices[ num ].volumeRight = r;
+			voices[ num ].volumeEffectLeft = el;
+			voices[ num ].volumeEffectRight = er;
 			return 0;
 		}
 
-		[BiosFunction(0xad84d37f, "__sceSasSetPitch")]
-		public int __sceSasSetPitch(int sasCore, int num, int pitch)
+#if !USE
+		[NotImplemented]
+#endif
+		[Stateless]
+		[BiosFunction( 0xad84d37f, "__sceSasSetPitch" )]
+		public int __sceSasSetPitch( int sasCore, int num, int pitch )
 		{
-			voices[num].playbackDelta = (ulong)pitch; //TODO: Rather, some function of pitch
+			voices[ num ].playbackDelta = ( ulong )pitch; //TODO: Rather, some function of pitch
 			return 0;
 		}
 
 		//This is NOT getting called, at least not by AI Go
 		//It should be :(
-		[BiosFunction(0x99944089, "__sceSasSetVoice")]
-		public int __sceSasSetVoice(int sasCore, int num, int vagPtr, int size, int loopmode) 
+#if !USE
+		[NotImplemented]
+#endif
+		[Stateless]
+		[BiosFunction( 0x99944089, "__sceSasSetVoice" )]
+		public int __sceSasSetVoice( int sasCore, int num, int vagPtr, int size, int loopmode )
 		{
 			//Real VAG header is 0x30 bytes behind the vagAddr
 			//The existance of this header can probably not be relied on 
@@ -164,160 +188,214 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			//Regardless, the info in the parameters to this function should be enough
 			//I haven't been able to find any decent documentation of the VAG header anyway
-			
+
 			//VAG is 3.5:1 compression
-			if (vagPtr == voices[num].samplePointer && size == voices[num].sampleSize)
+			if( vagPtr == voices[ num ].samplePointer && size == voices[ num ].sampleSize )
 			{
 				//We got the same sample as last time - no need to do anything
 				return 0; //all OK
 			}
 
-			voices[num].unpackedData = new short[size];
-			voices[num].samplePointer = vagPtr;
-			voices[num].sampleSize = size;
-			voices[num].loopMode = loopmode;
+			voices[ num ].unpackedData = new short[ size ];
+			voices[ num ].samplePointer = vagPtr;
+			voices[ num ].sampleSize = size;
+			voices[ num ].loopMode = loopmode;
 
-			byte *data = _memorySystem.Translate((uint)vagPtr);
+			byte* data = _memorySystem.Translate( ( uint )vagPtr );
 
 			int dataPtr = 0;
 			int outPtr = 0;
 
 			//based on VAG-Depack, hacked by bITmASTER@bigfoot.com, V0.1
-			double[] samples = new double[28];
-			while (outPtr < size)  //for safety only ; should be possible to be while (true) as well, due to the end flag
+			double[] samples = new double[ 28 ];
+			while( outPtr < size )  //for safety only ; should be possible to be while (true) as well, due to the end flag
 			{
-				int predict_nr = data[dataPtr++];
+				int predict_nr = data[ dataPtr++ ];
 				int shift_factor = predict_nr & 0xf;
 				predict_nr >>= 4;
-				int flags = data[dataPtr++];                           // flags
-				if ( flags == 7 )
-					break;              
+				int flags = data[ dataPtr++ ];                           // flags
+				if( flags == 7 )
+					break;
 				//Read raw samples
 				double s_1 = 0.0;
 				double s_2 = 0.0;
-				for (int i = 0; i < 28; i += 2)
+				for( int i = 0; i < 28; i += 2 )
 				{
-					int d = data[dataPtr++];
-					int s = (int)(short)((d & 0xf) << 12);
-					samples[i] = (double) ( s >> shift_factor  );
-					s = (int)(short)((d & 0xf0) << 8);
-					samples[i+1] = (double) ( s >> shift_factor  );
+					int d = data[ dataPtr++ ];
+					int s = ( int )( short )( ( d & 0xf ) << 12 );
+					samples[ i ] = ( double )( s >> shift_factor );
+					s = ( int )( short )( ( d & 0xf0 ) << 8 );
+					samples[ i + 1 ] = ( double )( s >> shift_factor );
 				}
 				//Adjust them (ADPCM) and convert them to our 16-bit voice data
-				for (int i = 0; i < 28; i++ ) 
+				for( int i = 0; i < 28; i++ )
 				{
-					samples[i] = samples[i] + s_1 * vagC[predict_nr,0] + s_2 * vagC[predict_nr,1];
+					samples[ i ] = samples[ i ] + s_1 * vagC[ predict_nr, 0 ] + s_2 * vagC[ predict_nr, 1 ];
 					s_2 = s_1;
-					s_1 = samples[i];
-					int d = (int) ( samples[i] + 0.5 );
-					if (d > 32767) d = 32767;
-					if (d < -32768) d = 32768;
-					voices[num].unpackedData[outPtr++] = (short)d;
+					s_1 = samples[ i ];
+					int d = ( int )( samples[ i ] + 0.5 );
+					if( d > 32767 )
+						d = 32767;
+					if( d < -32768 )
+						d = 32768;
+					voices[ num ].unpackedData[ outPtr++ ] = ( short )d;
 				}
 			}
 			return 0; //success
 		}
 
-		[BiosFunction(0x019b25eb, "__sceSasSetADSR")]
-		public int __sceSasSetADSR(int sasCore, int num, int flag, int a, int d, int s, int r)
+#if !USE
+		[NotImplemented]
+#endif
+		[Stateless]
+		[BiosFunction( 0x019b25eb, "__sceSasSetADSR" )]
+		public int __sceSasSetADSR( int sasCore, int num, int flag, int a, int d, int s, int r )
 		{
-			voices[num].a = a;
-			voices[num].d = d;
-			voices[num].s = s;
-			voices[num].r = r;
+			voices[ num ].a = a;
+			voices[ num ].d = d;
+			voices[ num ].s = s;
+			voices[ num ].r = r;
 			return 0;
 		}
 
+#if !USE
+		[NotImplemented]
+#endif
 		[Stateless]
-		[BiosFunction(0x74ae582a, "__sceSasGetEnvelopeHeight")]
-		public int __sceSasGetEnvelopeHeight(int sasCore, int num)
+		[BiosFunction( 0x74ae582a, "__sceSasGetEnvelopeHeight" )]
+		public int __sceSasGetEnvelopeHeight( int sasCore, int num )
 		{
-			return voices[num].envelopeValue; //max : 0x40000000
+			return voices[ num ].envelopeValue; //max : 0x40000000
 		}
 
-
-		[BiosFunction(0x9ec3676a, "__sceSasSetADSRmode")]
-		public int __sceSasSetADSRmode(int sasCore, int num, int aMode, int dMode, int sMode, int rMode) 
+#if !USE
+		[NotImplemented]
+#endif
+		[Stateless]
+		[BiosFunction( 0x9ec3676a, "__sceSasSetADSRmode" )]
+		public int __sceSasSetADSRmode( int sasCore, int num, int aMode, int dMode, int sMode, int rMode )
 		{
-			voices[num].aMode = aMode;
-			voices[num].dMode = dMode;
-			voices[num].sMode = sMode;
-			voices[num].rMode = rMode;
+			voices[ num ].aMode = aMode;
+			voices[ num ].dMode = dMode;
+			voices[ num ].sMode = sMode;
+			voices[ num ].rMode = rMode;
 			return 0;
 		}
 
 		//Start a voice
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x76f01aca, "__sceSasSetKeyOn")]
-		public int __sceSasSetKeyOn(int sasCore, int num) { return Module.NotImplementedReturn; }
+		[BiosFunction( 0x76f01aca, "__sceSasSetKeyOn" )]
+		public int __sceSasSetKeyOn( int sasCore, int num )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		//Stop a voice
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0xa0cf2fa4, "__sceSasSetKeyOff")]
-		public int __sceSasSetKeyOff(int sasCore, int num) { return Module.NotImplementedReturn; }
-		
-		[NotImplemented]
-		[Stateless]
-		[BiosFunction(0xb7660a23, "__sceSasSetNoise")]
-		public int __sceSasSetNoise() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0xa0cf2fa4, "__sceSasSetKeyOff" )]
+		public int __sceSasSetKeyOff( int sasCore, int num )
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x5f9529f6, "__sceSasSetSL")]
-		public int __sceSasSetSL() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0xb7660a23, "__sceSasSetNoise" )]
+		public int __sceSasSetNoise()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0xcbcd4f79, "__sceSasSetSimpleADSR")]
-		public int __sceSasSetSimpleADSR() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0x5f9529f6, "__sceSasSetSL" )]
+		public int __sceSasSetSL()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0xd5a229c9, "__sceSasRevEVOL")]
-		public int __sceSasRevEVOL() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0xcbcd4f79, "__sceSasSetSimpleADSR" )]
+		public int __sceSasSetSimpleADSR()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x33d4ab37, "__sceSasRevType")]
-		public int __sceSasRevType() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0xd5a229c9, "__sceSasRevEVOL" )]
+		public int __sceSasRevEVOL()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x267a6dd2, "__sceSasRevParam")]
-		public int __sceSasRevParam() { return Module.NotImplementedReturn; }
-	
-		[NotImplemented]
-		[Stateless]
-		[BiosFunction(0x2c8e6ab3, "__sceSasGetPauseFlag")]
-		public int __sceSasGetPauseFlag() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0x33d4ab37, "__sceSasRevType" )]
+		public int __sceSasRevType()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x787d04d5, "__sceSasSetPause")]
-		public int __sceSasSetPause() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0x267a6dd2, "__sceSasRevParam" )]
+		public int __sceSasRevParam()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x2c8e6ab3, "__sceSasGetPauseFlag" )]
+		public int __sceSasGetPauseFlag()
+		{
+			return Module.NotImplementedReturn;
+		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x787d04d5, "__sceSasSetPause" )]
+		public int __sceSasSetPause()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x50a14dfc, "sceSasCore_50a14dfc")]
-		public int sceSasCore_50a14dfc() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0x50a14dfc, "sceSasCore_50a14dfc" )]
+		public int sceSasCore_50a14dfc()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0xa232cbe6, "sceSasCore_a232cbe6")]
-		public int sceSasCore_a232cbe6() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0xa232cbe6, "sceSasCore_a232cbe6" )]
+		public int sceSasCore_a232cbe6()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0xd5ebbbcd, "sceSasCore_d5ebbbcd")]
-		public int sceSasCore_d5ebbbcd() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0xd5ebbbcd, "sceSasCore_d5ebbbcd" )]
+		public int sceSasCore_d5ebbbcd()
+		{
+			return Module.NotImplementedReturn;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0xf983b186, "sceSasCore_f983b186")]
-		public int sceSasCore_f983b186() { return Module.NotImplementedReturn; }
+		[BiosFunction( 0xf983b186, "sceSasCore_f983b186" )]
+		public int sceSasCore_f983b186()
+		{
+			return Module.NotImplementedReturn;
+		}
 	}
 }
 

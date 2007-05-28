@@ -4,6 +4,8 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
+//#define USE
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -93,7 +95,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		//http://forums.ps2dev.org/viewtopic.php?t=4249&view=previous&sid=9d8a720000a0a90209a4286162677861
 
-		//[NotImplemented]
+#if !USE
+		[NotImplemented]
+#endif
 		[Stateless]
 		[BiosFunction( 0x9D3F790C, "sceAudiocodecCheckNeedMem" )]
 		// manual add
@@ -102,7 +106,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		//[NotImplemented]
+#if !USE
+		[NotImplemented]
+#endif
 		[Stateless]
 		[BiosFunction( 0x5B37EB1D, "sceAudiocodecInit" )]
 		// SDK location: /audio/pspaudiocodec.h:18
@@ -112,7 +118,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		//[NotImplemented]
+#if !USE
+		[NotImplemented]
+#endif
 		[Stateless]
 		[BiosFunction( 0x70A703F8, "sceAudiocodecDecode" )]
 		// SDK location: /audio/pspaudiocodec.h:19
@@ -137,7 +145,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x59176A0F, "sceAudiocodec_59176A0F" )]
 		public int sceAudiocodec_59176A0F(){ return Module.NotImplementedReturn; }
 
-		//[NotImplemented]
+#if !USE
+		[NotImplemented]
+#endif
 		[Stateless]
 		[BiosFunction( 0x3A20A200, "sceAudiocodecGetEDRAM" )]
 		// SDK location: /audio/pspaudiocodec.h:20
@@ -147,7 +157,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		//[NotImplemented]
+#if !USE
+		[NotImplemented]
+#endif
 		[Stateless]
 		[BiosFunction( 0x29681260, "sceAudiocodecReleaseEDRAM" )]
 		// SDK location: /audio/pspaudiocodec.h:21
