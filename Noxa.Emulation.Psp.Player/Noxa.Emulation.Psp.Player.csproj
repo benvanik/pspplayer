@@ -49,6 +49,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AttachDebuggerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AttachDebuggerDialog.Designer.cs">
+      <DependentUpon>AttachDebuggerDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Configuration\ConfigurationHost.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -99,6 +105,10 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AttachDebuggerDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>AttachDebuggerDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Configuration\ConfigurationHost.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ConfigurationHost.cs</DependentUpon>

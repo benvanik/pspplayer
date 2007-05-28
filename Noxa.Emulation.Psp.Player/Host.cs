@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Diagnostics;
 using Noxa.Emulation.Psp.Player.Configuration;
 using Noxa.Emulation.Psp.Debugging;
+using System.Windows.Forms;
 
 namespace Noxa.Emulation.Psp.Player
 {
@@ -266,6 +267,41 @@ namespace Noxa.Emulation.Psp.Player
 
 		public void AttachDebugger()
 		{
+		}
+
+		private delegate bool AskForDebuggerDelegate( string message );
+
+		public bool AskForDebugger( string message )
+		{
+			AskForDebuggerDelegate del = delegate
+			{
+				using( AttachDebuggerDialog dialog = new AttachDebuggerDialog( message ) )
+				{
+					System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+					switch( result )
+					{
+						default:
+						case System.Windows.Forms.DialogResult.Retry:
+							{
+								// Start the debugger up - we know it probably exists
+								string path = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
+								path = Path.Combine( path, "Noxa.Emulation.Psp.RemoteDebugger.exe" );
+								if( File.Exists( path ) == false )
+									MessageBox.Show( "The debugger was not found in the same path as the emulator.\nPut the exe there for debugging to work automatically.\n\nSTART THE DEBUGGER YOURSELF!", "Debugger Not Found" );
+								else
+									Process.Start( path );
+								return true;
+							}
+						case System.Windows.Forms.DialogResult.Ignore:
+							return false;
+						case System.Windows.Forms.DialogResult.Cancel:
+							Environment.Exit( -2 );
+							return false;
+					}
+				}
+			};
+			// Invoke ?
+			return del( message );
 		}
 	}
 }

@@ -104,6 +104,11 @@ namespace Noxa.Emulation.Psp.GameTester
 		{
 		}
 
+		public bool AskForDebugger( string message )
+		{
+			throw new Exception( "The method or operation is not implemented." );
+		}
+
 		#endregion
 	}
 }
