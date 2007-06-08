@@ -18,6 +18,7 @@ Example usage of Atrac3/AudioCodec libs on PSP:
  * http://forums.ps2dev.org/viewtopic.php?t=5500 (Moonlight's example)
  * http://insomniac.0x89.org/pgeAt3.rar (InsertWittyName Example, thanks!)
  * http://forums.ps2dev.org/viewtopic.php?t=8357 (Another Example)
+ * http://forums.ps2dev.org/viewtopic.php?t=8469 (MP3/AAC Example)
 
 = Networking =
 
