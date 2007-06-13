@@ -202,11 +202,21 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 #ifdef DEBUGGING
 			if( pass == 1 )
 			{
+				// We only need accurate PC tracking if we are debugging
+				// This may be a bit overzealous, but it's easier than finding all the instances
+				// that need an accurate PC and doing it then
+				//g->mov( MPC( ( byte* )_ctx->CtxPointer ), address );
+			}
+#endif
+
+#ifdef DEBUGGING
+			if( pass == 1 )
+			{
 				// Add debug thunk space - 12 bytes
 				Debug::Assert( DEBUGTHUNKSIZE == 12 );
-				_gen->dd( ( uint )0x90909090 );
-				_gen->dd( ( uint )0x90909090 );
-				_gen->dd( ( uint )0x90909090 );
+				g->dd( ( uint )0x90909090 );
+				g->dd( ( uint )0x90909090 );
+				g->dd( ( uint )0x90909090 );
 
 				// See if this instruction has a breakpoint defined
 				int breakpointId;

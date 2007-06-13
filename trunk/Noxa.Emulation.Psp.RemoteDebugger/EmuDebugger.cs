@@ -40,6 +40,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public BreakpointManager Breakpoints;
 
 		public bool IsConnected;
+		public bool CallstacksEnabled;
 
 		public ILogger Logger
 		{
@@ -167,23 +168,35 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		#region Handlers
 
+		private Frame[] GetCallstack()
+		{
+			if( this.CallstacksEnabled == true )
+				return this.Host.CpuHook.GetCallstack();
+			else
+				return null;
+		}
+
 		public void OnStepComplete( int address )
 		{
+			Frame[] stack = this.GetCallstack();
 			Debugger.Break();
 		}
 
 		public void OnBreakpointHit( int id )
 		{
+			Frame[] stack = this.GetCallstack();
 			Debugger.Break();
 		}
 
 		public void OnEvent( Event biosEvent )
 		{
+			Frame[] stack = this.GetCallstack();
 			Debugger.Break();
 		}
 
 		public bool OnError( Error error )
 		{
+			Frame[] stack = this.GetCallstack();
 			Debugger.Break();
 
 			return true;

@@ -69,5 +69,14 @@ namespace Noxa.Emulation.Psp
 				return false;
 			return Instance.Client.Handler.OnError( error );
 		}
+
+		/// <summary>
+		/// Attempt to extract the callstack if frame tracking is enabled.
+		/// </summary>
+		/// <returns>The callstack or <c>null</c> if frame tracking is disabled.</returns>
+		public static Frame[] GetCallstack()
+		{
+			return Instance.CpuHook.GetCallstack();
+		}
 	}
 }

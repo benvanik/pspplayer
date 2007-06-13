@@ -184,18 +184,20 @@ void R4000Hook::SetCoreState( int core, CoreState^ state )
 {
 }
 
-#ifdef CALLSTACKS
-extern uint _callstack[ CALLSTACKSIZE ];
-extern int _callstackIndex;
-#endif
-
 int pspDebugGetStackTrace(unsigned int *results, int max);
 
 array<Frame^>^ R4000Hook::GetCallstack()
 {
+	R4000Core^ core = this->Cpu->_core0;
+
 	uint* addresses = ( uint* )malloc( sizeof( uint ) * 512 );
 	int count = pspDebugGetStackTrace( addresses, 512 );
-	array<Frame^>^ frames = gcnew array<Frame^>( count );
+	array<Frame^>^ frames = gcnew array<Frame^>( count + 1 );
+
+	// Add current PC
+	frames[ 0 ] = gcnew Frame( FrameType::UserCode, *core->PC );
+
+	// Add all others
 	for( int n = 0; n < count; n++ )
 	{
 		FrameType type = FrameType::UserCode;
@@ -204,8 +206,9 @@ array<Frame^>^ R4000Hook::GetCallstack()
 			type = FrameType::CallMarshal;
 		else if( address == BIOS_SAFETY_DUMMY )
 			type = FrameType::BiosBarrier;
-		frames[ n ] = gcnew Frame( type, address );
+		frames[ n + 1 ] = gcnew Frame( type, address );
 	}
+
 	free( addresses );
 	return frames;
 }

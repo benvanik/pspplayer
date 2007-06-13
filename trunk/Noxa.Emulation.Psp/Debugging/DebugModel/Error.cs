@@ -53,7 +53,7 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// An error during a syscall.
 		/// </summary>
-		SyscallFailed,
+		Syscall,
 		/// <summary>
 		/// An error occured on a memory access attmept.
 		/// </summary>
@@ -72,11 +72,6 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		public readonly CpuErrorCode Code;
 
 		/// <summary>
-		/// The address at which the error occured.
-		/// </summary>
-		public readonly uint Address;
-
-		/// <summary>
 		/// Initializes a new <see cref="CpuError"/> instance with the given parameters.
 		/// </summary>
 		/// <param name="code">The error code.</param>
@@ -90,22 +85,10 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// </summary>
 		/// <param name="code">The error code.</param>
 		/// <param name="message">An optional message describing the error.</param>
-		public CpuError( CpuErrorCode code, string message )
+		public CpuError( CpuErrorCode code,string message )
 			: base( message )
 		{
 			this.Code = code;
-		}
-
-		/// <summary>
-		/// Initializes a new <see cref="CpuError"/> instance with the given parameters.
-		/// </summary>
-		/// <param name="code">The error code.</param>
-		/// <param name="message">An optional message describing the error.</param>
-		/// <param name="address">The address at which the error occured.</param>
-		public CpuError( CpuErrorCode code, string message, uint address )
-			: this( code, message )
-		{
-			this.Address = address;
 		}
 
 		/// <summary>
@@ -116,8 +99,6 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.AppendFormat( "{0}: ", Code );
-			if( Address != 0x0 )
-				sb.AppendFormat( "[0x{0:X8}] ", Address );
 			if( Message != null )
 				sb.Append( Message );
 			return sb.ToString();
