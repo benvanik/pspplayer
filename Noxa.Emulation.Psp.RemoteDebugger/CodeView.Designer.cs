@@ -37,12 +37,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager( typeof( CodeView ) );
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.registersToolStrip = new System.Windows.Forms.ToolStrip();
-			this.disassemblyControl1 = new Noxa.Emulation.Psp.RemoteDebugger.Tools.DisassemblyControl();
 			this.codeToolStrip = new System.Windows.Forms.ToolStrip();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
 			this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
 			this.hexToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.disassemblyControl1 = new Noxa.Emulation.Psp.RemoteDebugger.Tools.DisassemblyControl();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
@@ -75,18 +75,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.registersToolStrip.Size = new System.Drawing.Size( 207, 25 );
 			this.registersToolStrip.TabIndex = 0;
 			this.registersToolStrip.Text = "Register Tools";
-			// 
-			// disassemblyControl1
-			// 
-			this.disassemblyControl1.DisplayHex = true;
-			this.disassemblyControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.disassemblyControl1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-			this.disassemblyControl1.FormattingEnabled = true;
-			this.disassemblyControl1.Location = new System.Drawing.Point( 0, 25 );
-			this.disassemblyControl1.Name = "disassemblyControl1";
-			this.disassemblyControl1.ScrollAlwaysVisible = true;
-			this.disassemblyControl1.Size = new System.Drawing.Size( 583, 602 );
-			this.disassemblyControl1.TabIndex = 2;
 			// 
 			// codeToolStrip
 			// 
@@ -132,6 +120,18 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.hexToolStripButton.Size = new System.Drawing.Size( 31, 22 );
 			this.hexToolStripButton.Text = "Hex";
 			this.hexToolStripButton.Click += new System.EventHandler( this.hexToolStripButton_Click );
+			// 
+			// disassemblyControl1
+			// 
+			this.disassemblyControl1.DisplayHex = true;
+			this.disassemblyControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.disassemblyControl1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+			this.disassemblyControl1.FormattingEnabled = true;
+			this.disassemblyControl1.Location = new System.Drawing.Point( 0, 25 );
+			this.disassemblyControl1.Name = "disassemblyControl1";
+			this.disassemblyControl1.ScrollAlwaysVisible = true;
+			this.disassemblyControl1.Size = new System.Drawing.Size( 583, 602 );
+			this.disassemblyControl1.TabIndex = 2;
 			// 
 			// CodeView
 			// 
