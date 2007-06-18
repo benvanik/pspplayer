@@ -43,6 +43,14 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 			}
 		}
 
+		public long LogicalBlockNumber
+		{
+			get
+			{
+				return 0;
+			}
+		}
+
 		public long Length
 		{
 			get

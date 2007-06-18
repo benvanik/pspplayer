@@ -60,6 +60,14 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			}
 		}
 
+		public long LogicalBlockNumber
+		{
+			get
+			{
+				return _position;
+			}
+		}
+
 		public long Length
 		{
 			get

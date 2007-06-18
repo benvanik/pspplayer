@@ -57,7 +57,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				if( device.State == MediaState.Present )
 				{
 					path = path.Substring( colonPos + 1 );
-					return device.Root.Find( path );
+					if( path.StartsWith( "sce_lbn" ) == true )
+					{
+						Debug.Assert( device is IUmdDevice );
+						IUmdDevice umd = ( IUmdDevice )device;
+
+						// Lookup LBN/etc
+						//0x0_size0xbb141
+						int sep = path.LastIndexOf( '_' );
+						string slbn = path.Substring( 7, path.Length - sep - 7 );
+						string ssize = path.Substring( sep + 4 );
+						long lbn = long.Parse( slbn );
+						long size = long.Parse( ssize );
+						return umd.Lookup( lbn, size );
+					}
+					else
+						return device.Root.Find( path );
 				}
 				else
 				{

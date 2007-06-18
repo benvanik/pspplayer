@@ -20,6 +20,7 @@ namespace Noxa.Emulation.Psp.Media.Iso
 		protected MediaState _state;
 		protected string _hostPath;
 		protected long _capacity;
+		protected Dictionary<long, MediaFile> _lbnLookup;
 
 		protected MediaFolder _root;
 
@@ -32,6 +33,8 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			_parameters = parameters;
 
 			_state = MediaState.Ejected;
+
+			_lbnLookup = new Dictionary<long, MediaFile>( 1024 );
 		}
 
 		public UmdDevice( IEmulationInstance emulator, ComponentParameters parameters, string hostPath )
@@ -155,6 +158,8 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			FileInfo fi = new FileInfo( path );
 			_capacity = fi.Length;
 
+			_lbnLookup.Clear();
+
 			_root = ParseIsoFileSystem( path, minimalCache );
 			Debug.Assert( _root != null );
 			_root.CalculateSize();
@@ -191,6 +196,18 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			fileStream.Position = position;
 
 			return new IsoStream( fileStream, position, length );
+		}
+
+		public IMediaFile Lookup( long lbn, long size )
+		{
+			MediaFile file;
+			if( _lbnLookup.TryGetValue( lbn, out file ) == true )
+			{
+				Debug.Assert( file.Length == size );
+				return file;
+			}
+			else
+				return null;
 		}
 	}
 }

@@ -148,8 +148,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				address += _kernel.WriteTime( ( uint )address, child.AccessTime );
 				address += _kernel.WriteTime( ( uint )address, child.ModificationTime );
 
-				address += 6 * 4; // no private stat data - blank here?
 				// private[ 0 ] = start sector on disk
+				if( childFile != null )
+					_memory.WriteWord( address, 4, ( int )( uint )childFile.LogicalBlockNumber );
+				else
+					_memory.WriteWord( address, 4, 0 );
+				address += 5 * 4; // no private stat data - blank here?
 
 				int nameLength = _kernel.WriteString( ( uint )address, child.Name );
 				address += 256; // Maybe blank here?
