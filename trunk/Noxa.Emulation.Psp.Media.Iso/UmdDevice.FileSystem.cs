@@ -323,7 +323,13 @@ namespace Noxa.Emulation.Psp.Media.Iso
 									MediaItemAttributes attributes = MediaItemAttributes.Normal;
 									if( ( ne.Flags & NativeEntryFlags.Hidden ) == NativeEntryFlags.Hidden )
 										attributes |= MediaItemAttributes.Hidden;
-									MediaFile file = new MediaFile( this, current, ne.Name, attributes, ne.Timestamp, ne.FirstSector * 2048, ne.Length );
+
+									long lbn = ne.FirstSector * 2048;
+
+									MediaFile file = new MediaFile( this, current, ne.Name, attributes, ne.Timestamp, lbn, ne.Length );
+
+									// Pretty sure this is wrong, but it shouldn't matter
+									_lbnLookup.Add( lbn, file );
 								}
 							}
 							m++;

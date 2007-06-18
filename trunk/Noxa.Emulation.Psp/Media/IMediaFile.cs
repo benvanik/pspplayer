@@ -59,6 +59,14 @@ namespace Noxa.Emulation.Psp.Media
 	public interface IMediaFile : IMediaItem
 	{
 		/// <summary>
+		/// The LBN of the file on disc. Only applies to UMD-based devices.
+		/// </summary>
+		long LogicalBlockNumber
+		{
+			get;
+		}
+
+		/// <summary>
 		/// The length of the file, in bytes.
 		/// </summary>
 		long Length

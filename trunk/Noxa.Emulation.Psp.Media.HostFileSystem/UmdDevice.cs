@@ -188,5 +188,10 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 		{
 			_root = null;
 		}
+
+		public IMediaFile Lookup( long lbn, long size )
+		{
+			throw new NotSupportedException();
+		}
 	}
 }

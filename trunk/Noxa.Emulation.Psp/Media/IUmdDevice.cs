@@ -56,5 +56,13 @@ namespace Noxa.Emulation.Psp.Media
 		/// <param name="minimalCache"><c>true</c> to only cache PSP_GAME and SYSDIR.</param>
 		/// <returns><c>true</c> if the load was successful; otherwise <c>false</c>.</returns>
 		bool Load( string path, bool minimalCache );
+
+		/// <summary>
+		/// Lookup a file by LBN.
+		/// </summary>
+		/// <param name="lbn">The LBN of the file on disc.</param>
+		/// <param name="size">The size of the file on disc.</param>
+		/// <returns>The <see cref="IMediaFile"/> that corresponds to the arguments, or <c>null</c> if none matched.</returns>
+		IMediaFile Lookup( long lbn, long size );
 	}
 }
