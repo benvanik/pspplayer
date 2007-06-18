@@ -33,6 +33,9 @@ extern uint _syscallCounts[ 1024 ];
 #define LOGSYSCALLS
 #define NIRETURN		0
 
+// If defined, even syscalls with DontTrace marked will be logged
+#define LOGALLSYSCALLS
+
 #define g context->Generator
 
 void __logSyscall( int syscallId, int address, bool implemented )
@@ -43,8 +46,10 @@ void __logSyscall( int syscallId, int address, bool implemented )
 	Debug::Assert( function != nullptr );
 	if( function != nullptr )
 	{
+#ifndef LOGALLSYSCALLS
 		if( function->DontTrace == true )
 			return;
+#endif
 	
 		R4000Ctx* ctx = ( R4000Ctx* )cpu->_ctx;
 		String^ args;

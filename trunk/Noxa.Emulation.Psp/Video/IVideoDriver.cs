@@ -71,6 +71,15 @@ namespace Noxa.Emulation.Psp.Video
 		}
 
 		/// <summary>
+		/// Callback information.
+		/// </summary>
+		VideoCallbacks Callbacks
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// Resize the video context.
 		/// </summary>
 		/// <param name="width">The new width of the client area.</param>

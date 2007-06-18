@@ -111,11 +111,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			ThreadPreemptionCount = 0;
 
 			Partition = partition;
-			//StackBlock = partition.Allocate( KAllocType.High, 0, stackSize );
-			StackBlock = partition.Allocate( KAllocType.Low, 0, stackSize );
+			StackBlock = partition.Allocate( KAllocType.High, 0, stackSize );
 			Debug.Assert( StackBlock != null );
 			StackBlock.Name = string.Format( "Thread '{0}' Stack", name );
-			TlsBlock = partition.Allocate( KAllocType.Low, 0, 0x4000 ); // 16k of thread local storage --- enough?
+			TlsBlock = partition.Allocate( KAllocType.High, 0, 0x4000 ); // 16k of thread local storage --- enough?
 			Debug.Assert( TlsBlock != null );
 			TlsBlock.Name = string.Format( "Thread '{0}' TLS", name );
 		}

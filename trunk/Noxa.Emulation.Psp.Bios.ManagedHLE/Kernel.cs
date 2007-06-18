@@ -282,5 +282,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.Handles.Add( StdOut.UID, StdOut );
 			this.Handles.Add( StdErr.UID, StdErr );
 		}
+
+		[Conditional( "DEBUG" )]
+		internal void PrintMemoryInfo()
+		{
+			// Partition 2 is what we care about
+			LinkedListEntry<KMemoryBlock> e = this.Partitions[ 2 ].Blocks.HeadEntry;
+			while( e != null )
+			{
+				KMemoryBlock block = e.Value;
+				Debug.WriteLine( string.Format( "{0:X8} - {1:X8} size {2} taken: {3} - {4}", block.Address, block.UpperBound, block.Size, !block.IsFree, block.Name ) );
+				e = e.Next;
+			}
+		}
 	}
 }

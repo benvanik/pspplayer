@@ -14,7 +14,7 @@ namespace Noxa.Emulation.Psp.Bios
 	/// Marks a function as being an exported BIOS routine and defines the unique ID and
 	/// name of a BIOS function.
 	/// </summary>
-	[global::System.AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
+	[AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = false )]
 	public sealed class BiosFunctionAttribute : Attribute
 	{
 		/// <summary>

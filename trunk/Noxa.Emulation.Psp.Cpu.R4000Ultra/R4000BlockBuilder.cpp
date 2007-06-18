@@ -84,7 +84,7 @@ void __runtimeRegsPrint()
 {
 	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
 	StringBuilder^ sb = gcnew StringBuilder();
-	for( int n = 0; n < 32; n++ )
+	for( int n = 1; n < 32; n++ )
 		sb->AppendFormat( "{0}={1:X8} ", n, ctx->Registers[ n ] );
 	Debug::WriteLine( sb->ToString() );
 }
@@ -95,14 +95,12 @@ void __runtimeRegsPrint()
 void __traceRegs()
 {
 	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
-	StringBuilder^ sb = gcnew StringBuilder();
-	for( int n = 0; n < 32; n++ )
-		sb->AppendFormat( "{0}={1:X8} ", n, ctx->Registers[ n ] );
-	sb->AppendLine();
-	String^ str = sb->ToString();
-	const char* str2 = ( char* )( void* )Marshal::StringToHGlobalAnsi( str );
-	Tracer::WriteLine( str2 );
-	Marshal::FreeHGlobal( ( IntPtr )( void* )str2 );
+	char buffer[ 1024 ];
+	char* p = buffer;
+	for( int n = 1; n < 32; n++ )
+		p += sprintf_s( p, 512, "%d=%08X ", n, ctx->Registers[ n ] );
+	sprintf_s( p, 512, "\r\n" );
+	Tracer::WriteLine( buffer );
 }
 
 void __traceFpuRegs()
@@ -120,6 +118,7 @@ void __traceFpuRegs()
 
 #pragma unmanaged
 static bool traceToggle = false;
+static bool traceToggle1 = false;
 void __traceLine( int address, int code )
 {
 #ifdef TRACEAFTER
@@ -128,9 +127,22 @@ void __traceLine( int address, int code )
 	else if( traceToggle == false )
 		return;
 #endif
+#if 1
+	if( address == 0x08a635b0 )
+		traceToggle = true;
+	if( traceToggle == true )
+	{
+		if( address == 0x08a89b84 )
+			traceToggle1 = true;
+	}
+	if( traceToggle1 == false )
+		return;
+#endif
 	char buffer[ 50 ];
 	sprintf_s( buffer, 50, "[0x%08X]: %08X\r\n", address, code );
 	Tracer::WriteLine( buffer );
+	if( address == 0x08a6a8e4 )
+		__traceRegs();
 #ifdef TRACEREGISTERS
 	__traceRegs();
 #endif

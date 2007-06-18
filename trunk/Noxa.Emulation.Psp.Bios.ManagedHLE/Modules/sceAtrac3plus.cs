@@ -17,6 +17,7 @@ using Noxa.Emulation.Psp.Cpu;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
+	[BiosModuleAlias( "sceATRAC3plus_Library" )]
 	class sceAtrac3plus : Module
 	{
 		#region Properties

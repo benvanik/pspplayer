@@ -14,12 +14,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 	
 	class KMemoryBlock : KHandle
 	{
-		public KPartition Partition;
+		public readonly KPartition Partition;
 		public string Name;
 
 		public uint Address;
 		public uint Size;
-		public uint UpperBound;
+		public uint UpperBound
+		{
+			get
+			{
+				return Address + Size;
+			}
+		}
 
 		public bool IsFree;
 
@@ -27,11 +33,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			Partition = partition;
 
-			Name = null;
-
 			Address = address;
 			Size = size;
-			UpperBound = address + size;
 
 			IsFree = isFree;
 		}

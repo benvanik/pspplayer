@@ -132,8 +132,7 @@ int R4000Memory::ReadWord( int address )
 		Debugger::Break();
 #endif
 #ifdef DEBUGGING
-		CpuError^ error = gcnew CpuError( CpuErrorCode::InvalidAccess,
-			String::Format( "memory read attempt from invalid address 0x{0:X8}", rawAddress ) );
+		MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidRead, 0, rawAddress, 4 );
 		Diag::ThrowError( error );
 #endif
 		return 0;
@@ -177,8 +176,7 @@ int64 R4000Memory::ReadDoubleWord( int address )
 		Debugger::Break();
 #endif
 #ifdef DEBUGGING
-		CpuError^ error = gcnew CpuError( CpuErrorCode::InvalidAccess,
-			String::Format( "memory read attempt from invalid address 0x{0:X8}", rawAddress ) );
+		MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidRead, 0, rawAddress, 4 );
 		Diag::ThrowError( error );
 #endif
 		return 0;
@@ -318,8 +316,7 @@ void R4000Memory::WriteWord( int address, int width, int value )
 		Debugger::Break();
 #endif
 #ifdef DEBUGGING
-		CpuError^ error = gcnew CpuError( CpuErrorCode::InvalidAccess,
-			String::Format( "memory write attempt to invalid address 0x{0:X8} = 0x{1:X8} ({1}) [{2}b]", rawAddress, value, width ) );
+		MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidWrite, 0, rawAddress, ( byte )width, value );
 		Diag::ThrowError( error );
 #endif
 	}
@@ -367,8 +364,7 @@ void R4000Memory::WriteDoubleWord( int address, int64 value )
 		Debugger::Break();
 #endif
 #ifdef DEBUGGING
-		CpuError^ error = gcnew CpuError( CpuErrorCode::InvalidAccess,
-			String::Format( "memory write attempt to invalid address 0x{0:X8} = 0x{1:X8} ({1}) [8b]", rawAddress, value ) );
+		MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidWrite, 0, rawAddress, ( byte )8, value );
 		Diag::ThrowError( error );
 #endif
 	}

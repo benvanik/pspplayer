@@ -129,18 +129,30 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			string localPath = path.Substring( 0, slashIndex );
 			string subPath = path.Substring( slashIndex + 1 );
 
-			if( localPath.Length == 0 )
+			if( localPath == string.Empty )
 				return this.Find( subPath );
 
 			if( localPath == "." )
-				return this.Find( subPath );
-			if( localPath == ".." )
-				return _parent.Find( subPath );
+			{
+				if( ( subPath == null ) ||
+					( subPath == string.Empty ) )
+					return null;
+				else
+					return this.Find( subPath );
+			}
+			else if( localPath == ".." )
+			{
+				if( ( subPath == null ) ||
+					( subPath == string.Empty ) )
+					return null;
+				else
+					return _parent.Find( subPath );
+			}
 
 			IMediaFolder local = this[ localPath ] as IMediaFolder;
 			if( local == null )
 				return null;
-			if( subPath.Length == 0 )
+			if( subPath == string.Empty )
 				return local;
 			return local.Find( subPath );
 		}

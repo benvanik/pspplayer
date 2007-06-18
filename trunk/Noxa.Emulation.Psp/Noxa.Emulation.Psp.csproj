@@ -51,6 +51,7 @@
     <Compile Include="Bios\BiosFunction.cs" />
     <Compile Include="Bios\BiosFunctionAttribute.cs" />
     <Compile Include="Bios\BiosModule.cs" />
+    <Compile Include="Bios\BiosModuleAliasAttribute.cs" />
     <Compile Include="Bios\IBios.cs" />
     <Compile Include="Bios\ILoader.cs" />
     <Compile Include="Bios\IModule.cs" />
@@ -61,8 +62,11 @@
     <Compile Include="Cpu\MemorySystem.cs" />
     <Compile Include="Debugging\DebugData\IDebugDatabase.cs" />
     <Compile Include="Debugging\DebugHost.cs" />
+    <Compile Include="Debugging\DebugModel\BiosError.cs" />
     <Compile Include="Debugging\DebugModel\BiosFunctionToken.cs" />
     <Compile Include="Debugging\DebugModel\Breakpoint.cs" />
+    <Compile Include="Debugging\DebugModel\CpuError.cs" />
+    <Compile Include="Debugging\DebugModel\MemoryError.cs" />
     <Compile Include="Debugging\Hooks\IHook.cs" />
     <Compile Include="Debugging\Hooks\IVideoHook.cs" />
     <Compile Include="Debugging\IDebuggable.cs" />
@@ -111,6 +115,7 @@
     <Compile Include="Video\DisplayProperties.cs" />
     <Compile Include="Video\IVideoCapabilities.cs" />
     <Compile Include="Video\IVideoDriver.cs" />
+    <Compile Include="Video\VideoCallbacks.cs" />
     <Compile Include="Video\VideoCommand.cs" />
   </ItemGroup>
   <ItemGroup>

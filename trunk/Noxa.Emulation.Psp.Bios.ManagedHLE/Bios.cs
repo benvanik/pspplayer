@@ -170,11 +170,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				if( module == null )
 					continue;
 
+				BiosModuleAliasAttribute[] aliases = ( BiosModuleAliasAttribute[] )module.GetType().GetCustomAttributes( typeof( BiosModuleAliasAttribute ), false );
+				
 				_modules.Add( module );
 				
 				BiosModule metaModule = new BiosModule( module.Name );
 				_metaModules.Add( metaModule );
 				_metaModuleLookup.Add( metaModule.Name, metaModule );
+				foreach( BiosModuleAliasAttribute alias in aliases )
+					_metaModuleLookup.Add( alias.Alias, metaModule );
 
 				moduleCount++;
 
