@@ -124,7 +124,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 				_kernel.Schedule();
 
-				//thread.Delete();
+				thread.Delete();
 			}
 		}
 
@@ -160,6 +160,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				_kernel.RemoveHandle( thread.UID );
 
 				_kernel.Schedule();
+
+				thread.Delete();
 			}
 		}
 
