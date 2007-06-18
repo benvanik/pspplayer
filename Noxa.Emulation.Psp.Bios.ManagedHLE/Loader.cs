@@ -355,8 +355,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				//    Elf32_Phdr* phdr = ( Elf32_Phdr* )( buffer + header->e_phoff + ( header->e_phentsize * n ) );
 				//}
 
+				// 0x08900000
+				//uint defaultLoad = 0x08880000;
+				uint defaultLoad = 0x08000000;
+
 				// s-hdrs
-				uint lextents = 0x08900000;
+				uint lextents = defaultLoad;
 				uint extents = 0;
 				for( int n = 0; n < header->e_shnum; n++ )
 				{
@@ -383,12 +387,24 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				results.GlobalPointer = moduleInfo->gp;
 				results.Name = new string( &moduleInfo->name );
 
+				// See if this module is already implemented
+				BiosModule existing = _bios.FindModule( results.Name );
+				if( existing != null )
+				{
+					Log.WriteLine( Verbosity.Normal, Feature.Loader, "attempting to load module {0} with BIOS implementation; ignoring", results.Name );
+					results.Successful = true;
+					results.Ignored = true;
+					return results;
+				}
+				else
+					Log.WriteLine( Verbosity.Normal, Feature.Loader, "adding new module {0}", results.Name );
+
 				uint baseAddress = 0;
 				KMemoryBlock moduleBlock = null;
 				if( needsRelocation == true )
 				{
 					if( type == ModuleType.Boot )
-						baseAddress = 0x08900000;
+						baseAddress = defaultLoad;
 					else
 					{
 						// Find the next block in RAM

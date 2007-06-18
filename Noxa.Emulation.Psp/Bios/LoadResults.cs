@@ -21,6 +21,11 @@ namespace Noxa.Emulation.Psp.Bios
 		public bool Successful;
 
 		/// <summary>
+		/// <c>true</c> if the load was ignored (dupe, etc).
+		/// </summary>
+		public bool Ignored;
+
+		/// <summary>
 		/// The lower memory address of the module after loading.
 		/// </summary>
 		public uint LowerBounds;

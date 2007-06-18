@@ -13,6 +13,9 @@
 
 #include "CodeGenerator.h"
 
+// When true, a breakpoint will be inserted on a bad read
+#define BREAKONINVALIDACCESS
+
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::CodeGen;
@@ -27,20 +30,24 @@ void EmitAddressTranslation( R4000Generator *gen )
 	gen->and( gen->eax, 0x3FFFFFFF );
 }
 
-int __readMemoryThunk( int targetAddress )
+int __readMemoryThunk( int pc, int targetAddress )
 {
-#ifdef _DEBUG
-	int pc = _cpuCtx->PC;
+#ifdef DEBUGGING
+	R4000Ctx* ctx = _cpuCtx;
+	MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidRead, pc, targetAddress, 4 );
+	Diag::ThrowError( error );
 #endif
-	return R4000Cpu::GlobalCpu->Memory->ReadWord( targetAddress );
+	//return R4000Cpu::GlobalCpu->Memory->ReadWord( targetAddress );
+	return 0;
 }
 
-void __writeMemoryThunk( int targetAddress, int width, int value )
+void __writeMemoryThunk( uint pc, uint targetAddress, int width, uint value )
 {
-#ifdef _DEBUG
-	int pc = _cpuCtx->PC;
+#ifdef DEBUGGING
+	MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidWrite, pc, targetAddress, ( byte )width, value );
+	Diag::ThrowError( error );
 #endif
-	R4000Cpu::GlobalCpu->Memory->WriteWord( targetAddress, width, value );
+	//R4000Cpu::GlobalCpu->Memory->WriteWord( targetAddress, width, value );
 }
 
 // EAX = address, result in EAX
@@ -91,7 +98,10 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 #endif
 
 	g->push( EAX );
-
+	g->push( ( uint )( address - 4 ) );
+#ifdef BREAKONINVALIDACCESS
+	g->int3();
+#endif
 	g->mov( EBX, (int)&__readMemoryThunk );
 	g->call( EBX );
 
@@ -117,7 +127,7 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 #if 0
 	Label* skipTest = g->DefineLabel();
 	Label* hitTest = g->DefineLabel();
-	g->cmp( EAX, 0x97BFBB8 );
+	g->cmp( EAX, 0x08A58F70 );
 	g->je( hitTest );
 	/*g->cmp( EAX, 0x97BF6BD );
 	g->je( hitTest );
@@ -193,6 +203,10 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 	g->push( EBX );
 	g->push( (uint)width );
 	g->push( EAX );
+	g->push( ( uint )( address - 4 ) );
+#ifdef BREAKONINVALIDACCESS
+	g->int3();
+#endif
 	g->mov( EBX, (int)&__writeMemoryThunk );
 	g->call( EBX );
 	g->add( ESP, 12 );

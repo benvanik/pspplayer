@@ -112,12 +112,25 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						}
 						else
 						{
-							// No lower limit - pick first free block
-							targetBlock = FreeList.Head;
+							// No lower limit - pick first free block that fits
+							LinkedListEntry<KMemoryBlock> e = FreeList.HeadEntry;
+							while( e != null )
+							{
+								if( e.Value.Size >= size )
+								{
+									targetBlock = e.Value;
+									break;
+								}
+								e = e.Next;
+							}
+
 						}
 						Debug.Assert( targetBlock != null );
 						if( targetBlock == null )
-							break;
+							return null;
+						Debug.Assert( targetBlock.Size >= size );
+						if( targetBlock.Size < size )
+							return null;
 						newBlock = this.SplitBlock( targetBlock,
 							( address != 0 ) ? address : targetBlock.Address,
 							size );

@@ -14,6 +14,7 @@ using Noxa.Utilities;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Video;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
@@ -40,13 +41,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		public override void Start()
 		{
+			_driver = _kernel.Emulator.Video;
 		}
 
 		public override void Stop()
 		{
+			_driver = null;
 		}
 
 		#endregion
+
+		private IVideoDriver _driver;
 
 		// Most of these functions are really not implemented, but are inlined by
 		// the native interface and are never called here. I marked them as implemented
@@ -151,7 +156,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceGeDrawSync(int syncType);
 		public int sceGeDrawSync( int syncType ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xA4FC06A4, "sceGeSetCallback" )]
 		// SDK location: /ge/pspge.h:193
@@ -161,12 +165,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			unsafe
 			{
 				uint* pcb = ( uint* )_memorySystem.Translate( ( uint )cb );
-				//*pcb; // signal function
-				//*( pcb + 1 ); // signal arg
-				//*( pcb + 2 ); // finish function
-				//*( pcb + 3 ); // finish arg
+				VideoCallbacks cbs = new VideoCallbacks();
+				cbs.SignalFunction = *pcb;
+				cbs.SignalArgument = *( pcb + 1 );
+				cbs.FinishFunction = *( pcb + 2 );
+				cbs.FinishArgument = *( pcb + 3 );
+				if( _driver != null )
+					_driver.Callbacks = cbs;
 			}
-			return Module.NotImplementedReturn;
+			return 1;
 		}
 
 		[NotImplemented]

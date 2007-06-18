@@ -128,8 +128,11 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 	case 0xb435dec5:		// sceKernelDcacheWritebackInvalidateAll
 	case 0x3ee30821:		// sceKernelDcacheWritebackRange
 	case 0x34b9fa9e:		// sceKernelDcacheWritebackInvalidateRange
+		g->xor( EAX, EAX );
+		return true;
 	case 0x920f104a:		// sceKernelIcacheInvalidateAll
 	case 0xc2df770e:		// sceKernelIcacheInvalidateRange
+		g->int3();
 		g->xor( EAX, EAX );
 		return true;
 

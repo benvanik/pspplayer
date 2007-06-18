@@ -116,6 +116,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			
 			_kernel.AddHandle( block );
 
+#if DEBUG
+			_kernel.PrintMemoryInfo();
+#endif
+
 			return ( int )block.UID;
 		}
 

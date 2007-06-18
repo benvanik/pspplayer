@@ -49,6 +49,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
+		public const int FakeModuleUID = 0;
+
 		#region Module Loading
 
 		private int LoadModule( IMediaFile file, Stream stream, int flags, int option )
@@ -63,6 +65,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			{
 				Log.WriteLine( Verbosity.Critical, Feature.Bios, "LoadModule: loader failed" );
 				return -1;
+			}
+			if( results.Ignored == true )
+			{
+				// Faked
+				return FakeModuleUID;
 			}
 
 			// Create a local representation of the module
@@ -272,6 +279,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// status is the return from module_stop
 			// option is unused right now
 
+			if( modid == FakeModuleUID )
+			{
+				if( status != 0 )
+				{
+					unsafe
+					{
+						uint* pstatus = ( uint* )_memorySystem.Translate( ( uint )status );
+						*pstatus = 0;
+					}
+				}
+				return 0;
+			}
+
 			KModule module = _kernel.GetHandle<KModule>( modid );
 			Debug.Assert( module != null );
 			if( module == null )
@@ -346,6 +366,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// status is the return from module_stop
 			// option is unused right now
 
+			if( modid == FakeModuleUID )
+			{
+				if( status != 0 )
+				{
+					unsafe
+					{
+						uint* pstatus = ( uint* )_memorySystem.Translate( ( uint )status );
+						*pstatus = 0;
+					}
+				}
+				return 0;
+			}
+
 			KModule module = _kernel.GetHandle<KModule>( modid );
 			Debug.Assert( module != null );
 			if( module == null )
@@ -373,6 +406,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelUnloadModule(SceUID modid);
 		public int sceKernelUnloadModule( int modid )
 		{
+			if( modid == FakeModuleUID )
+				return 0;
+
 			KModule module = _kernel.GetHandle<KModule>( modid );
 			Debug.Assert( module != null );
 			if( module == null )

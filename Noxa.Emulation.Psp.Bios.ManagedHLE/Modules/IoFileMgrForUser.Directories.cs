@@ -81,7 +81,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				( offset == -1 ) )
 			{
 				int address = dir;
-				_memory.WriteWord( address, 4, 0777 );
+				_memory.WriteWord( address, 4, 0777 | 0x1000 );
 				address += 4;
 
 				uint attributes = 0x0010;
@@ -119,7 +119,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					childFile = ( IMediaFile )child;
 
 				int address = dir;
-				_memory.WriteWord( address, 4, 0777 );
+				int mode = 0777 | ( ( childFolder != null ) ? 0x1000 : 0x2000 );
+				_memory.WriteWord( address, 4, mode );
 				address += 4;
 
 				uint attributes = 0;
@@ -148,6 +149,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				address += _kernel.WriteTime( ( uint )address, child.ModificationTime );
 
 				address += 6 * 4; // no private stat data - blank here?
+				// private[ 0 ] = start sector on disk
 
 				int nameLength = _kernel.WriteString( ( uint )address, child.Name );
 				address += 256; // Maybe blank here?

@@ -81,7 +81,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 		private void LoadSettings()
 		{
 			_globalVerbosity = Verbosity.Normal;
-			_debugWrite = false;
+			_debugWrite = true;
 
 			this.UpdateGlobalVerbosity();
 			debugWriteToolStripButton.Checked = _debugWrite;

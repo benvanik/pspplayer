@@ -49,6 +49,8 @@ namespace Noxa {
 					OglStatistics^				_stats;
 					DateTime					_startTime;
 
+					VideoCallbacks^				_callbacks;
+
 					void*						_nativeInterface;
 
 					void*						_handle;
@@ -147,6 +149,18 @@ namespace Noxa {
 						virtual void set( bool value )
 						{
 							_speedLocked = value;
+						}
+					}
+
+					property VideoCallbacks^ Callbacks
+					{
+						virtual VideoCallbacks^ get()
+						{
+							return _callbacks;
+						}
+						virtual void set( VideoCallbacks^ value )
+						{
+							_callbacks = value;
 						}
 					}
 
