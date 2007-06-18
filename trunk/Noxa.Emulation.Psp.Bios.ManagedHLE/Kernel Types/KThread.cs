@@ -177,7 +177,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			StackBlock = null;
 			TlsBlock = null;
 
-			Kernel.Cpu.ReleaseContextStorage( ContextID );
+			//Kernel.Cpu.ReleaseContextStorage( ContextID );
 			ContextID = -1;
 
 			Kernel.Threads.Remove( this );

@@ -774,7 +774,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 				kernel.Schedule();
 
-				//thread.Delete();
+				thread.Delete();
 			}
 		}
 	}
