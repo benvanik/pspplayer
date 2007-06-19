@@ -42,8 +42,8 @@ int scePowerSetCpuClockFrequency( int cpuFreq );
 //int sceDisplayGetCurrentHcount(); <-- inlined
 extern int sceDisplayGetVcount();
 extern int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int syncMode );
-extern void sceDisplayWaitVblank();
-extern void sceDisplayWaitVblankStart();
+extern int sceDisplayWaitVblank();
+extern int sceDisplayWaitVblankStart();
 
 // sceGeUser -------------------------------------------
 //int sceGeEdramGetSize(); <-- inlined
@@ -162,11 +162,9 @@ bool R4000BiosStubs::EmitCall( R4000GenContext^ context, R4000Generator *g, int 
 			return true;
 		case 0x36CDFADE:		// sceDisplayWaitVblank
 			g->call( ( uint )&sceDisplayWaitVblank );
-			g->xor( EAX, EAX );
 			return true;
 		case 0x984c27e7:		// sceDisplayWaitVblankStart
 			g->call( ( uint )&sceDisplayWaitVblankStart );
-			g->xor( EAX, EAX );
 			return true;
 		case 0x9C6EAAD7:		// sceDisplayGetVcount
 			g->call( ( uint )&sceDisplayGetVcount );

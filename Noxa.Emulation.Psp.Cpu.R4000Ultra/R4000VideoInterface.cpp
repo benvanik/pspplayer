@@ -76,14 +76,16 @@ int sceDisplaySetFrameBuf( int address, int bufferWidth, int pixelFormat, int sy
 	return 0;
 }
 
-void sceDisplayWaitVblank()
+int sceDisplayWaitVblank()
 {
 	_videoApi->WaitForVsync();
+	return _videoApi->GetFrameBuffer();
 }
 
-void sceDisplayWaitVblankStart()
+int sceDisplayWaitVblankStart()
 {
 	_videoApi->WaitForVsync();
+	return _videoApi->GetFrameBuffer();
 }
 
 // sceGeUser -------------------------------------------
