@@ -42,6 +42,8 @@ HANDLE _hListSyncEvent;
 MemoryPool* _pool;
 NativeMemorySystem* _memory;
 
+int _fbAddress;
+
 #define CALLBACKHANDLERCOUNT 5
 CallbackHandlers _callbacks[ CALLBACKHANDLERCOUNT ];
 int _lastCallbackId;
@@ -139,7 +141,14 @@ uint niGetVcount()
 void niSwitchFrameBuffer( int address, int bufferWidth, int pixelFormat, int syncMode )
 {
 	// TODO: switch frame buffer
+	_fbAddress = address;
+
 	_vsyncWaiting = true;
+}
+
+int niGetFrameBuffer()
+{
+	return _fbAddress;
 }
 
 int niAddCallbackHandlers( CallbackHandlers* handlers )
@@ -367,6 +376,7 @@ void OglDriver::SetupNativeInterface()
 	ni->Cleanup = &niCleanup;
 	ni->GetVcount = &niGetVcount;
 	ni->SwitchFrameBuffer = &niSwitchFrameBuffer;
+	ni->GetFrameBuffer = &niGetFrameBuffer;
 
 	ni->AddCallbackHandlers = &niAddCallbackHandlers;
 	ni->RemoveCallbackHandlers = &niRemoveCallbackHandlers;

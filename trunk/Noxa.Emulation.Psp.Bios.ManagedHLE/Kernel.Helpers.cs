@@ -52,7 +52,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			if( colonPos >= 0 )
 			{
 				// Absolute path
-				KDevice kdevice = this.DeviceLookup[ path.Substring( 0, colonPos ) ];
+				string deviceName = path.Substring( 0, colonPos );
+				KDevice kdevice;
+				if( this.DeviceLookup.TryGetValue( deviceName, out kdevice ) == false )
+				{
+					Log.WriteLine( Verbosity.Critical, Feature.Bios, "FindPath({0}): unable to find device {1}", path, deviceName );
+					return null;
+				}
 				IMediaDevice device = kdevice.Device;
 				if( device.State == MediaState.Present )
 				{

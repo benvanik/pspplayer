@@ -229,7 +229,9 @@ listAbort:
 			PulseEvent( _hSyncEvent );
 		}
 		else
+		{
 			Sleep( 0 );
+		}
 		_vsyncWaiting = false;
 
 		if( _screenshotPending == true )

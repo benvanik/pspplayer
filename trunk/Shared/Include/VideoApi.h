@@ -42,6 +42,7 @@ namespace Noxa {
 
 						// Switch framebuffer (used to doublebuffer, etc)
 						void (*SwitchFrameBuffer)( int address, int bufferWidth, int pixelFormat, int syncMode );
+						int (*GetFrameBuffer)();
 
 						int (*AddCallbackHandlers)( CallbackHandlers* handlers );
 						void (*RemoveCallbackHandlers)( int cbid );
