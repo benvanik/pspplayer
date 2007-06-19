@@ -81,7 +81,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				( offset == -1 ) )
 			{
 				int address = dir;
-				_memory.WriteWord( address, 4, 0777 | 0x10 );
+				_memory.WriteWord( address, 4, 0777 );
 				address += 4;
 
 				uint attributes = 0x0010;
@@ -119,7 +119,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					childFile = ( IMediaFile )child;
 
 				int address = dir;
-				int mode = 0777 | ( ( childFolder != null ) ? 0x10 : 0x20 );
+				int mode = 0777;// | ( ( childFolder != null ) ? 0x10 : 0x20 );
 				_memory.WriteWord( address, 4, mode );
 				address += 4;
 
