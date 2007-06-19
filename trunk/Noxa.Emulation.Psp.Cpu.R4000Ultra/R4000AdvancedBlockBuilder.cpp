@@ -453,9 +453,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 
 			if( result == GenerationResult::Invalid )
 			{
-				Log::WriteLine( Verbosity::Critical, Feature::Cpu, "InternalBuild(0x{0:X8}): failed to generate code for [0x{1:X8}] {2:X8}", startAddress, address, code );
-				Debug::WriteLine( String::Format( "InternalBuild(0x{0:X8}): failed to generate code for [0x{1:X8}] {2:X8}", startAddress, address, code ) );
+				String^ errorMessage = String::Format( "InternalBuild(0x{0:X8}): failed to generate code for [0x{1:X8}] {2:X8}", startAddress, address, code );
+				Log::WriteLine( Verbosity::Critical, Feature::Cpu, errorMessage );
+				CpuError^ error = gcnew CpuError( CpuErrorCode::Generation, errorMessage, address );
+				Diag::ThrowError( error );
+
+				Debug::WriteLine( errorMessage );
 				Debugger::Break();
+
 				break;
 			}
 

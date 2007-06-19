@@ -107,6 +107,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				{
 					UsedBlocks.Remove( e );
 					FreeBlocks.Enqueue( e.Value );
+					e.Value.IsFree = true;
 					return this.WakeWaiter();
 				}
 				e = e.Next;
@@ -124,6 +125,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				UsedBlocks.Remove( e );
 				FreeBlocks.Enqueue( block );
+				block.IsFree = true;
 				return this.WakeWaiter();
 			}
 			else

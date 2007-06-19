@@ -136,7 +136,7 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			{
 				if( ( subPath == null ) ||
 					( subPath == string.Empty ) )
-					return null;
+					return this;
 				else
 					return this.Find( subPath );
 			}

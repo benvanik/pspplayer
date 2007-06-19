@@ -188,7 +188,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			if( ( prev != null ) &&
 				( prev.Value.IsFree == true ) )
 			{
-				// Merge in to previous (kill us )
+				// Merge in to previous (kill us)
 				Blocks.Remove( entry );
 				prev.Value.Size += block.Size;
 				merged = prev.Value;

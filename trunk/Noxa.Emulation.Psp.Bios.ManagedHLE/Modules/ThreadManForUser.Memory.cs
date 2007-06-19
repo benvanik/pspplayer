@@ -221,7 +221,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_kernel.AddHandle( pool );
 
 			// option unused?
-			Debug.Assert( opt == 0 );
+			//Debug.Assert( opt == 0 );
 
 			return ( int )pool.UID;
 		}
