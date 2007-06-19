@@ -49,7 +49,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		public const int FakeModuleUID = 0;
+		public const int FakeModuleUID = 3;
 
 		#region Module Loading
 
