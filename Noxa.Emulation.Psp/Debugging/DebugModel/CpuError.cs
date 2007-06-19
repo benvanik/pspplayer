@@ -57,9 +57,31 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// Initializes a new <see cref="CpuError"/> instance with the given parameters.
 		/// </summary>
 		/// <param name="code">The error code.</param>
+		/// <param name="pc">The current program counter.</param>
+		public CpuError( CpuErrorCode code, uint pc )
+			: this( code, null, pc )
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="CpuError"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="code">The error code.</param>
 		/// <param name="message">An optional message describing the error.</param>
 		public CpuError( CpuErrorCode code, string message )
 			: base( message )
+		{
+			this.Code = code;
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="CpuError"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="code">The error code.</param>
+		/// <param name="message">An optional message describing the error.</param>
+		/// <param name="pc">The current program counter.</param>
+		public CpuError( CpuErrorCode code, string message, uint pc )
+			: base( message, pc )
 		{
 			this.Code = code;
 		}
