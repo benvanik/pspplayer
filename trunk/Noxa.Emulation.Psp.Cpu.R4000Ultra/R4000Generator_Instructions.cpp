@@ -37,37 +37,31 @@ const char* R4000Generator::TableFpu_n[ 64 ];
 
 GenerationResult UnknownR( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function )
 {
-	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownI( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
-	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownJ( R4000GenContext^ context, int pass, int address, uint code, byte opcode, uint imm )
 {
-	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownCop0( R4000GenContext^ context, int pass, int address, uint code, byte function )
 {
-	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownSpecial3( R4000GenContext^ context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
 {
-	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
 GenerationResult UnknownFpu( R4000GenContext^ context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function )
 {
-	Debug::Assert( false );
 	return GenerationResult::Invalid;
 }
 
@@ -287,6 +281,7 @@ void R4000Generator::Setup()
 	TableSpecial3[ 3 ] = WSBW;
 	TableSpecial3[ 4 ] = INS;
 	TableSpecial3[ 16 ] = SEB;
+	TableSpecial3[ 20 ] = BITREV;
 	TableSpecial3[ 24 ] = SEH;
 
 	TableSpecial3_n[ 0 ] = "EXT";
@@ -294,6 +289,7 @@ void R4000Generator::Setup()
 	TableSpecial3_n[ 3 ] = "WSBW";
 	TableSpecial3_n[ 4 ] = "INS";
 	TableSpecial3_n[ 16 ] = "SEB";
+	TableSpecial3_n[ 20 ] = "BITREV";
 	TableSpecial3_n[ 24 ] = "SEH";
 
 	TableCopA[ 0 ] = MFCz;

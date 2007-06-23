@@ -309,6 +309,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\R4000Vfpu.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\R4000VideoInterface.cpp"
 				>
 			</File>
@@ -424,6 +428,14 @@
 			</File>
 			<File
 				RelativePath=".\R4000Statistics.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Vfpu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\R4000Vfpu_Instructions.h"
 				>
 			</File>
 			<File

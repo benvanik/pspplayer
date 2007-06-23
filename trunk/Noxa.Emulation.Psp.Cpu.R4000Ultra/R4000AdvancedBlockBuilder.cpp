@@ -15,6 +15,7 @@
 #include "R4000Cache.h"
 #include "R4000Generator.h"
 #include "R4000Hook.h"
+#include "R4000Vfpu.h"
 #include "Tracer.h"
 
 using namespace System::Diagnostics;
@@ -43,7 +44,7 @@ using namespace Noxa::Emulation::Psp::Cpu;
 // Debugging addresses
 //#define BREAKADDRESS1		0x08909ECC
 //#define BREAKADDRESS2		0x08900160
-//#define GENBREAKADDRESS		0x895c658
+//#define GENBREAKADDRESS		0x08891034
 
 extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
@@ -453,15 +454,22 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 
 			if( result == GenerationResult::Invalid )
 			{
-				String^ errorMessage = String::Format( "InternalBuild(0x{0:X8}): failed to generate code for [0x{1:X8}] {2:X8}", startAddress, address, code );
-				Log::WriteLine( Verbosity::Critical, Feature::Cpu, errorMessage );
-				CpuError^ error = gcnew CpuError( CpuErrorCode::Generation, errorMessage, address );
-				Diag::ThrowError( error );
+				// Check against VFPU
+				result = TryEmitVfpu( _ctx, pass, address + 4, code );
+				
+				// If still an error after that (means no VFPU impl found), error out
+				if( result == GenerationResult::Invalid )
+				{
+					String^ errorMessage = String::Format( "InternalBuild(0x{0:X8}): failed to generate code for [0x{1:X8}] {2:X8}", startAddress, address, code );
+					Log::WriteLine( Verbosity::Critical, Feature::Cpu, errorMessage );
+					CpuError^ error = gcnew CpuError( CpuErrorCode::Generation, errorMessage, address );
+					Diag::ThrowError( error );
 
-				Debug::WriteLine( errorMessage );
-				Debugger::Break();
+					//Debug::WriteLine( errorMessage );
+					//Debugger::Break();
 
-				break;
+					break;
+				}
 			}
 
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )

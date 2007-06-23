@@ -1006,3 +1006,63 @@ GenerationResult WSBW( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	return GenerationResult::Success;
 }
+
+GenerationResult BITREV( R4000GenContext^ context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl )
+{
+	// rd = bitrev( rt )
+
+	if( pass == 0 )
+	{
+	}
+	else if( pass == 1 )
+	{
+		// Taken from http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits
+
+		g->int3();
+
+		g->mov( EAX, MREG( CTX, rt ) );
+		g->mov( ECX, EAX );
+
+		// swap consecutive pairs
+		// v = ((v >> 2) & 0x33333333) | ((v & 0x33333333) << 2);
+		g->lea( EDX, g->dword_ptr[ ECX * 4 ] );
+		//lea         edx,[ecx*4] 
+		g->sar( EAX, 2 );
+		g->xor( EAX, EDX );
+		g->add( ECX, ECX );
+		g->and( EAX, 0x33333333 );
+		g->add( ECX, ECX );
+		g->xor( EAX, ECX ); 
+		// swap nibbles ... 
+		// v = ((v >> 4) & 0x0F0F0F0F) | ((v & 0x0F0F0F0F) << 4);
+		g->mov( ECX, EAX );
+		g->mov( EDX, EAX );
+		g->shl( EDX, 4 );
+		g->sar( ECX, 4 );
+		g->xor( ECX, EDX );
+		g->shl( EAX, 4 );
+		g->and( ECX, 0x0F0F0F0F );
+		g->xor( ECX, EAX ); 
+		// swap bytes
+		// v = ((v >> 8) & 0x00FF00FF) | ((v & 0x00FF00FF) << 8);
+		g->mov( EDX, ECX );
+		g->sar( EDX, 8 );
+		g->mov( EAX, ECX );
+		g->shl( EAX, 8 );
+		g->xor( EDX, EAX );
+		g->and( EDX, 0x0FF00FF );
+		g->shl( ECX, 8 );
+		g->xor( EDX, ECX ); 
+		// swap 2-byte long pairs
+		// v = ( v >> 16             ) | ( v               << 16);
+		g->mov( EAX, EDX );
+		g->sar( EAX, 0x10 );
+		g->shl( EDX, 0x10 );
+		g->or( EAX, EDX );
+
+		g->int3();
+
+		g->mov( MREG( CTX, rd ), EAX );
+	}
+	return GenerationResult::Success;
+}

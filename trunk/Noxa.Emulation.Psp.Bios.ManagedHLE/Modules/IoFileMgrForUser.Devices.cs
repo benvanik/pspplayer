@@ -42,8 +42,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		private KCallback _msInsertEjectCallback;
 
-		//[NotImplemented]
-		[Stateless]
 		[BiosFunction( 0x54F5FB11, "sceIoDevctl" )]
 		// SDK location: /user/pspiofilemgr.h:306
 		// SDK declaration: int sceIoDevctl(const char *dev, unsigned int cmd, void *indata, int inlen, void *outdata, int outlen);
@@ -125,7 +123,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 						{
 							Log.WriteLine( Verbosity.Normal, Feature.Bios, "Registered MemoryStick insert/eject callback: {0} ({1:X8})", _msInsertEjectCallback.Name, _msInsertEjectCallback.UID );
 
-							_kernel.AddOneShotTimer( new TimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 500 );
+							_kernel.AddOneShotTimer( new TimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 1000 );
+							//_kernel.ActiveThread.Suspend();
+							//_kernel.Schedule();
 						}
 						else
 							Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceIoDevctl: could not find callback {0} for MemoryStick insert/eject", cbid );
