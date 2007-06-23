@@ -409,6 +409,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					{
 						// Find the next block in RAM
 						moduleBlock = kernel.Partitions[ 2 ].Allocate( KAllocType.Low, 0, extents );
+						moduleBlock.Name = string.Format( "Module {0}", results.Name );
 						baseAddress = moduleBlock.Address;
 					}
 
@@ -425,7 +426,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 				// Allocate space taken by module
 				if( type == ModuleType.Boot )
+				{
+					Debug.Assert( moduleBlock == null );
 					moduleBlock = kernel.Partitions[ 2 ].Allocate( KAllocType.Specific, results.LowerBounds, results.UpperBounds - results.LowerBounds );
+					moduleBlock.Name = string.Format( "Module {0}", results.Name );
+				}
 				else
 				{
 					// Should be done above
@@ -720,6 +725,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 						// Allocate room for args
 						KMemoryBlock argsBlock = kernel.Partitions[ 2 ].Allocate( KAllocType.High, 0, 0xFF ); // 256b of args - enough?
+						argsBlock.Name = string.Format( "Module {0} args", results.Name );
 
 						// Set arguments - we put these right below user space, and right above the stack
 						uint args = 0;
