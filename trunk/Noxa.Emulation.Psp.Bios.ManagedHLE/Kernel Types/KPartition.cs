@@ -70,9 +70,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				size += 4 - ( size & 0x3 );
 
 			// Quick check to see if we have the space free
-			Debug.Assert( FreeSize >= size );
-			if( FreeSize < size )
-				return null;
+			if( type != KAllocType.Maximum )
+			{
+				Debug.Assert( FreeSize >= size );
+				if( FreeSize < size )
+					return null;
+			}
 
 			switch( type )
 			{
@@ -95,6 +98,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				case KAllocType.Low:
 					{
 						KMemoryBlock targetBlock = null;
+						uint maxContig = 0;
 						if( address != 0 )
 						{
 							// Specified lower limit, find the first block that fits
@@ -107,6 +111,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 									targetBlock = e.Value;
 									break;
 								}
+								maxContig = Math.Max( maxContig, e.Value.Size );
 								e = e.Next;
 							}
 						}
@@ -121,13 +126,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 									targetBlock = e.Value;
 									break;
 								}
+								maxContig = Math.Max( maxContig, e.Value.Size );
 								e = e.Next;
 							}
-
 						}
 						Debug.Assert( targetBlock != null );
 						if( targetBlock == null )
+						{
+							// Try again with a smaller size
+							//Log.WriteLine( Verbosity.Critical, Feature.Bios, "KPartition::Allocate could not find enough space - recalling with max contig block size {0} - this is probably wrong!", maxContig );
+							//return this.Allocate( KAllocType.Maximum, 0, maxContig );
 							return null;
+						}
 						Debug.Assert( targetBlock.Size >= size );
 						if( targetBlock.Size < size )
 							return null;
@@ -166,6 +176,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			newBlock.IsFree = false;
 			if( newBlock != null )
 				FreeSize -= size;
+			this.Kernel.PrintMemoryInfo();
 			return newBlock;
 		}
 

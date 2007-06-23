@@ -148,6 +148,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				KMemoryBlock block = partition.Allocate( KAllocType.Low, 0, blockSize );
 				Debug.Assert( block != null );
+				block.Name = string.Format( "FPL {0} block", this.Name );
 				Blocks.Enqueue( block );
 				FreeBlocks.Enqueue( block );
 			}
@@ -170,6 +171,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				KMemoryBlock block = Partition.Allocate( KAllocType.Low, 0, BlockSize );
 				Debug.Assert( block != null );
+				block.Name = string.Format( "VPL {0} block", this.Name );
 				Blocks.Enqueue( block );
 				FreeBlocks.Enqueue( block );
 			}
