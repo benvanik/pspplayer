@@ -121,30 +121,44 @@ GenerationResult BCzTL( R4000GenContext^ context, int pass, int address, uint co
 
 GenerationResult MFCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
-	Debug::Assert( opcode == 1, "Only support COP1" );
+	//Debug::Assert( opcode == 1, "Only support COP1" );
+	if( opcode != 1 )
+		Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "MFC{0} ${1} - only supports COP1!", opcode, rs );
 
 	if( pass == 0 )
 	{
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MCP1REG( CTX, rs, 0 ) );
-		g->mov( MREG( CTX, rt ), EAX );
+		if( opcode == 1 )
+		{
+			g->mov( EAX, MCP1REG( CTX, rs, 0 ) );
+			g->mov( MREG( CTX, rt ), EAX );
+		}
+		else
+			g->mov( MREG( CTX, rt ), 0 );
 	}
 	return GenerationResult::Success;
 }
 
 GenerationResult MTCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
-	Debug::Assert( opcode == 1, "Only support COP1" );
+	//Debug::Assert( opcode == 1, "Only support COP1" );
+	if( opcode != 1 )
+		Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "MTC{0} ${1} - only supports COP1!", opcode, rs );
 
 	if( pass == 0 )
 	{
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, MREG( CTX, rt ) );
-		g->mov( MCP1REG( CTX, rs, 0 ), EAX );
+		if( opcode == 1 )
+		{
+			g->mov( EAX, MREG( CTX, rt ) );
+			g->mov( MCP1REG( CTX, rs, 0 ), EAX );
+		}
+		else
+			/* nothing */;
 	}
 	return GenerationResult::Success;
 }

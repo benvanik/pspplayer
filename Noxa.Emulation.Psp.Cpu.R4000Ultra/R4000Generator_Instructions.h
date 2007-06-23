@@ -1,8 +1,8 @@
-#define DEFR( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function );
-#define DEFI( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm );
-#define DEFJ( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte opcode, uint imm );
-#define DEFSP3( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl );
-#define DEFFPU( x )	GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function );
+#define DEFR( x )		GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, byte rd, byte shamt, byte function );
+#define DEFI( x )		GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm );
+#define DEFJ( x )		GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte opcode, uint imm );
+#define DEFSP3( x )		GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte rt, byte rd, byte function, ushort bshfl );
+#define DEFFPU( x )		GenerationResult x( R4000GenContext^ context, int pass, int address, uint code, byte fmt, byte fs, byte ft, byte fd, byte function );
 
 // Arithmetic
 DEFR( SLL );
@@ -54,6 +54,7 @@ DEFR( CLZ );
 DEFR( CLO );
 DEFSP3( WSBH );
 DEFSP3( WSBW );
+DEFSP3( BITREV );
 
 // Control
 DEFR( JR );
