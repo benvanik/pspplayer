@@ -50,6 +50,60 @@ void __writeMemoryThunk( uint pc, uint targetAddress, int width, uint value )
 	//R4000Cpu::GlobalCpu->Memory->WriteWord( targetAddress, width, value );
 }
 
+// EAX = address in guest space, result in EAX
+void EmitAddressLookup( R4000GenContext^ context, int address )
+{
+	g->and( EAX, 0x3FFFFFFF );
+
+	Label* l1 = g->DefineLabel();
+	Label* l2 = g->DefineLabel();
+	Label* l3 = g->DefineLabel();
+
+	// if < 0x0800000 && > MainMemoryBound, skip and check framebuffer or do a read from method
+	g->cmp( EAX, MainMemoryBase );
+	g->jb( l1 );
+	g->cmp( EAX, MainMemoryBound );
+	g->ja( l1 );
+
+	// else, do a direct main memory read
+	g->sub( EAX, MainMemoryBase ); // get to offset in main memory
+	g->add( EAX, (int)context->MainMemory );
+	g->jmp( l3 );
+
+	// case to handle read call
+	g->MarkLabel( l1 );
+
+	// if < 0x0400000 && > VideoMemoryBound, skip and do a read from method
+	g->cmp( EAX, VideoMemoryBase );
+	g->jb( l2 );
+	// Test for shadowing? ECX = address fixed up
+	g->mov( ECX, EAX );
+	g->and( ECX, 0x041FFFFF );
+	g->cmp( ECX, VideoMemoryBound );
+	g->ja( l2 );
+
+	// else, do a direct fb read
+	g->sub( ECX, VideoMemoryBase );
+	g->add( ECX, (int)context->FrameBuffer );
+	g->mov( EAX, ECX );
+	g->jmp( l3 );
+
+	g->MarkLabel( l2 );
+
+	g->push( EAX );
+	g->push( ( uint )( address - 4 ) );
+#ifdef BREAKONINVALIDACCESS
+	g->int3();
+#endif
+	g->mov( EBX, (int)&__readMemoryThunk );
+	g->call( EBX );
+	g->add( ESP, 4 );
+	g->mov( EAX, 0 );
+
+	// done
+	g->MarkLabel( l3 );
+}
+
 // EAX = address, result in EAX
 void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 {
@@ -104,7 +158,6 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 #endif
 	g->mov( EBX, (int)&__readMemoryThunk );
 	g->call( EBX );
-
 	g->add( ESP, 4 );
 
 	// done

@@ -122,10 +122,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 						if( _msInsertEjectCallback != null )
 						{
 							Log.WriteLine( Verbosity.Normal, Feature.Bios, "Registered MemoryStick insert/eject callback: {0} ({1:X8})", _msInsertEjectCallback.Name, _msInsertEjectCallback.UID );
-
-							_kernel.AddOneShotTimer( new TimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 1000 );
-							//_kernel.ActiveThread.Suspend();
-							//_kernel.Schedule();
+							_kernel.AddOneShotTimer( new TimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 10 );
 						}
 						else
 							Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceIoDevctl: could not find callback {0} for MemoryStick insert/eject", cbid );
@@ -141,6 +138,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 						_msInsertEjectCallback = null;
 					}
 					break;
+				case 0x02425823:
+					// Unknown - guessing wait on MS insert/eject?
+					//_kernel.Schedule();
+					//break;
+					//return unchecked( ( int )0x80020325 );
+					break;
+				default:
+					return -1;
 			}
 
 			return 0;

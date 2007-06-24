@@ -14,6 +14,8 @@
 
 #include "CodeGenerator.h"
 
+#include <limits>
+
 using namespace System::Diagnostics;
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Bios;
@@ -24,6 +26,16 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 #define MCP2REG( xr, r )		g->dword_ptr[ xr + CTXCP2REGS + ( r << 4 ) ]
 
+enum VfpuWidth
+{
+	VSingle,
+	VPair,
+	VTriple,
+	VQuad,
+	V2x2,
+	V3x3,
+	V4x4,
+};
 enum VfpuConditions
 {
 	VFPU_FL,	VFPU_EQ,	VFPU_LT,	VFPU_LE,	VFPU_TR,	VFPU_NE,	VFPU_GE,	VFPU_GT,
@@ -47,6 +59,10 @@ enum VfpuAttributes
 	VFPU_NORMAL			= 0x00,
 	VFPU_BRANCH			= 0x01,
 	VFPU_BRANCH_LIKELY	= 0x02,
+	VFPU_PFXS			= 0x04,
+	VFPU_PFXT			= 0x08,
+	VFPU_PFXD			= 0x10,
+	VFPU_PFX			= 0x20,	// All PFX bits
 };
 typedef int (*VfpuImpl)( R4000Ctx* ctx, uint address, uint code );
 typedef bool (*VfpuGen)( R4000GenContext^ context, int address, uint code );
@@ -91,9 +107,9 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 #endif
 
 	GenerationResult result = GenerationResult::Success;
-	if( instr->Attributes  == VFPU_BRANCH )
+	if( ( instr->Attributes & VFPU_BRANCH ) == VFPU_BRANCH )
 		result = GenerationResult::Branch;
-	else if( instr->Attributes == VFPU_BRANCH_LIKELY )
+	else if( ( instr->Attributes & VFPU_BRANCH_LIKELY ) == VFPU_BRANCH_LIKELY )
 		result = GenerationResult::BranchAndNullifyDelay;
 	bool isBranch = ( result != GenerationResult::Success );
 
@@ -131,6 +147,24 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 			g->add( ESP, 12 );
 		}
 
+		// Clear state
+		if( ( instr->Attributes & VFPU_PFX ) == VFPU_PFX )
+		{
+			g->mov( g->dword_ptr[ CTX + CTXCP2PFX ], 0xE4 );
+			g->mov( g->dword_ptr[ CTX + CTXCP2PFX + 4 ], 0xE4 );
+			g->mov( g->dword_ptr[ CTX + CTXCP2PFX + 8 ], 0xE4 );
+			g->mov( g->dword_ptr[ CTX + CTXCP2WM ], 0x0 );
+		}
+		else
+		{
+			if( ( instr->Attributes & VFPU_PFXS ) == VFPU_PFXS )
+				g->mov( g->dword_ptr[ CTX + CTXCP2PFX ], 0xE4 );
+			if( ( instr->Attributes & VFPU_PFXT ) == VFPU_PFXT )
+				g->mov( g->dword_ptr[ CTX + CTXCP2PFX + 4 ], 0xE4 );
+			if( ( instr->Attributes & VFPU_PFXD ) == VFPU_PFXD )
+				g->mov( g->dword_ptr[ CTX + CTXCP2PFX + 8 ], 0x00 );
+		}
+
 		if( isBranch == true )
 		{
 			// EAX contains branch result (0 = no branch, 1 = branch), store it back
@@ -158,4 +192,314 @@ int VfpuImplDummy( R4000Ctx* ctx, uint address, uint code )
 {
 	// ^_^
 	return 0;
+}
+
+// Taken from ector's code
+#define VFPU_FLOAT16_EXP_MAX	0x1f
+#define VFPU_SH_FLOAT16_SIGN	15
+#define VFPU_MASK_FLOAT16_SIGN	0x1
+#define VFPU_SH_FLOAT16_EXP	10
+#define VFPU_MASK_FLOAT16_EXP	0x1f
+#define VFPU_SH_FLOAT16_FRAC	0
+#define VFPU_MASK_FLOAT16_FRAC	0x3ff
+float Float16ToFloat32( ushort l )
+{
+	union float2int {
+		uint	i;
+		float	f;
+	} float2int;
+
+	unsigned short float16 = l;
+	unsigned int sign = (float16 >> VFPU_SH_FLOAT16_SIGN) & VFPU_MASK_FLOAT16_SIGN;
+	int exponent = (float16 >> VFPU_SH_FLOAT16_EXP) & VFPU_MASK_FLOAT16_EXP;
+	unsigned int fraction = float16 & VFPU_MASK_FLOAT16_FRAC;
+
+	float signf = (sign == 1) ? -1.0f : 1.0f;
+
+	float f;
+	if (exponent == VFPU_FLOAT16_EXP_MAX)
+	{
+		if (fraction == 0)
+			f = std::numeric_limits<float>::infinity();
+		else
+			f = std::numeric_limits<float>::quiet_NaN();
+	}
+	else if (exponent == 0 && fraction == 0)
+	{
+		f=0.0f * signf;
+	}
+	else
+	{
+		if (exponent == 0)
+		{
+			do
+			{
+				fraction <<= 1;
+				exponent--;
+			}
+			while (!(fraction & (VFPU_MASK_FLOAT16_FRAC + 1)));
+
+			fraction &= VFPU_MASK_FLOAT16_FRAC;
+		}
+
+		/* Convert to 32-bit single-precision IEEE754. */
+		float2int.i = sign << 31;
+		float2int.i |= (exponent + 112) << 23;
+		float2int.i |= fraction << 13;
+		f=float2int.f;
+	}
+	return f;
+}
+
+bool VfpuGenVPFX( R4000GenContext^ context, int address, uint code )
+{
+	int set = ( code >> 24 ) & 0x3;
+	int value = ( code & 0xFFFFF );
+	g->mov( g->dword_ptr[ CTX + CTXCP2PFX + ( set << 2 ) ], value );
+	return true;
+}
+
+//011000 000 ttttttt 0 sssssss 0 ddddddd
+#define VRT( code ) ( ( code >> 16 ) & 0x7F )
+#define VRS( code ) ( ( code >> 8 ) & 0x7F )
+#define VRD( code ) ( code & 0x7F )
+#define RS( code ) ( ( code >> 31 ) & 0x1F )
+#define RT( code ) ( ( code >> 16 ) & 0x1F )
+#define VREG( xr, r ) g->dword_ptr[ xr + CTXCP2REGS + ( ( r ) << 2 ) ]
+#define VIMM( code ) ( int )( ( short )( code & 0x0000FFFF ) )
+#define VWIDTH( code ) ( VfpuWidth )( ( ( code >> 8 ) & 0x1 ) | ( ( code >> 14 ) & 0x2 ) )
+
+// EAX = address in guest space, result in EAX
+void EmitAddressLookup( R4000GenContext^ context, int address );
+
+// EmitVfpuRead and EmitVfpuWrite are taken from ector's code - they are pretty nuts :)
+
+// Reads a vector from a VFPU register to main memory - EAX = target address in main memory
+void EmitVfpuRead( R4000GenContext^ context, VfpuWidth dataWidth, int reg, int outMatrixWidth = 0 )
+{
+	int mtx = ( reg >> 2 ) & 0x7;
+	int idx = reg & 0x3;
+	int transpose = ( reg >> 5 ) & 0x1;
+
+	int fsl, k, l;
+	switch( dataWidth )
+	{
+	case VSingle:	fsl = ( reg >> 5 ) & 3;	k = 1;	l = 1;	break;
+	case VPair:		fsl = ( reg >> 5 ) & 2;	k = 2;	l = 1;	break;
+	case VTriple:	fsl = ( reg >> 6 ) & 1;	k = 3;	l = 1;	break;
+	case VQuad:		fsl = ( reg >> 5 ) & 2;	k = 4;	l = 1;	break;
+	case V2x2:		fsl = ( reg >> 5 ) & 2;	k = 2;	l = 2;	break;
+	case V3x3:		fsl = ( reg >> 6 ) & 1;	k = 3;	l = 3;	break;
+	case V4x4:		fsl = ( reg >> 5 ) & 2;	k = 4;	l = 4;	break;
+	}
+
+	for( int i = 0; i < k; i++ )
+	{
+		for( int j = 0; j < l; j++ )
+		{
+			// EAX is base address in memory
+
+			if( transpose )
+			{
+				int sourceRegister = ( mtx * 4 + ( ( idx + i ) & 3 ) + ( ( fsl + j ) & 3 ) * 32 ) << 2;
+				g->lea( EBX, g->dword_ptr[ EAX + ( ( j * outMatrixWidth + i ) << 2 ) ] );
+				g->mov( ECX, g->dword_ptr[ CTX + sourceRegister ] );
+				g->mov( g->dword_ptr[ EBX ], ECX );
+			}
+			else
+			{
+				int sourceRegister = ( mtx * 4 + ( ( idx + j ) & 3 ) + ( ( fsl + i ) & 3 ) * 32 ) << 2;
+				g->lea( EBX, g->dword_ptr[ EAX + ( ( j * outMatrixWidth + i ) << 2 ) ] );
+				g->mov( ECX, g->dword_ptr[ CTX + sourceRegister ] );
+				g->mov( g->dword_ptr[ EBX ], ECX );
+			}
+		}
+	}
+}
+
+// Writes a vector from main memory to a VFPU register - EAX = source address in main memory
+void EmitVfpuWrite( R4000GenContext^ context, VfpuWidth dataWidth, int reg, int inMatrixWidth = 0 )
+{
+	int mtx = ( reg >> 2 ) & 0x7;
+	int col = reg & 0x3;
+	int transpose = ( reg >> 5 ) & 0x1;
+
+	int row, k, l;
+	switch( dataWidth )
+	{
+	case VSingle:	row = ( reg >> 5 ) & 3;	k = 1;	l = 1;	break;
+	case VPair:		row = ( reg >> 5 ) & 2;	k = 2;	l = 1;	break;
+	case VTriple:	row = ( reg >> 6 ) & 1;	k = 3;	l = 1;	break;
+	case VQuad:		row = ( reg >> 5 ) & 2;	k = 4;	l = 1;	break;
+	case V2x2:		row = ( reg >> 5 ) & 2;	k = 2;	l = 2;	break;
+	case V3x3:		row = ( reg >> 6 ) & 1;	k = 3;	l = 3;	break;
+	case V4x4:		row = ( reg >> 5 ) & 2;	k = 4;	l = 4;	break;
+	}
+
+	for( int i = 0; i < k; i++ )
+	{
+		for( int j = 0; j < l; j++ )
+		{
+			// EAX is base address in memory
+
+			//if (!writeMask[i])
+			if( true )
+			{
+				if( transpose )
+				{
+					int destRegister = ( mtx * 4 + ( ( col + i ) & 3 ) + ( ( row + j ) & 3 ) * 32 ) << 2;
+					g->lea( EBX, g->dword_ptr[ EAX + ( ( j * inMatrixWidth + i ) << 2 ) ] );
+					g->mov( ECX, g->dword_ptr[ EBX ] );
+					g->mov( g->dword_ptr[ CTX + destRegister ], ECX );
+				}
+				else
+				{
+					int destRegister = ( mtx * 4 + ( ( col + j ) & 3 ) + ( ( row + i ) & 3 ) * 32 ) << 2;
+					g->lea( EBX, g->dword_ptr[ EAX + ( ( j * inMatrixWidth + i ) << 2 ) ] );
+					g->mov( ECX, g->dword_ptr[ EBX ] );
+					g->mov( g->dword_ptr[ CTX + destRegister ], ECX );
+				}
+			}
+		}
+	}
+}
+
+bool VfpuGenLVS( R4000GenContext^ context, int address, uint code )
+{
+	g->mov( EAX, MREG( CTX, RS( code ) ) );
+	g->add( EAX, VIMM( code ) );
+	EmitAddressLookup( context, address );
+	// EAX = address of memory start
+
+	// Perform load
+	int vt = ( ( code >> 16 ) & 0x1F ) | ( ( code & 0x3 ) << 5 );
+	EmitVfpuWrite( context, VSingle, vt );
+
+	return true;
+}
+
+bool VfpuGenLVQ( R4000GenContext^ context, int address, uint code )
+{
+	g->mov( EAX, MREG( CTX, RS( code ) ) );
+	g->add( EAX, VIMM( code ) );
+	EmitAddressLookup( context, address );
+	// EAX = address of memory start
+
+	// Perform load
+	int vt = ( ( code >> 16 ) & 0x1F ) | ( ( code & 0x3 ) << 5 );
+	EmitVfpuWrite( context, VQuad, vt );
+
+	return true;
+}
+
+bool VfpuGenSVS( R4000GenContext^ context, int address, uint code )
+{
+	g->mov( EAX, MREG( CTX, RS( code ) ) );
+	g->add( EAX, VIMM( code ) );
+	EmitAddressLookup( context, address );
+	// EAX = address of memory start
+
+	// Perform store
+	int vt = ( ( code >> 16 ) & 0x1F ) | ( ( code & 0x3 ) << 5 );
+	EmitVfpuRead( context, VSingle, vt );
+
+	return true;
+}
+
+bool VfpuGenSVQ( R4000GenContext^ context, int address, uint code )
+{
+	g->mov( EAX, MREG( CTX, RS( code ) ) );
+	g->add( EAX, VIMM( code ) );
+	EmitAddressLookup( context, address );
+	// EAX = address of memory start
+
+	// Perform store
+	int vt = ( ( code >> 16 ) & 0x1F ) | ( ( code & 0x3 ) << 5 );
+	EmitVfpuRead( context, VQuad, vt );
+
+	return true;
+}
+
+bool VfpuGenMTV( R4000GenContext^ context, int address, uint code )
+{
+	g->mov( EAX, MREG( CTX, RT( code ) ) );
+	g->mov( VREG( CTX, VRD( code ) ), EAX );
+	return true;
+}
+
+bool VfpuGenMFV( R4000GenContext^ context, int address, uint code )
+{
+	g->mov( EAX, VREG( CTX, VRD( code ) ) );
+	g->mov( MREG( CTX, RT( code ) ), EAX );
+	return true;
+}
+
+bool VfpuGenVIIM( R4000GenContext^ context, int address, uint code )
+{
+	// Note that the instruction tables don't have the p/t/d encodings!!
+	int vt = VRT( code );
+	union imm
+	{
+		int		Integer;
+		float	Float;
+	} imm;
+	imm.Float = ( float )VIMM( code );
+	VfpuWidth width = VWIDTH( code );
+	switch( width )
+	{
+	case VSingle:
+		g->mov( VREG( CTX, vt ), imm.Integer );
+		break;
+	case VPair:
+		g->mov( VREG( CTX, vt ), imm.Integer );
+		g->mov( VREG( CTX, vt + 1 ), imm.Integer );
+		break;
+	case VTriple:
+		g->mov( VREG( CTX, vt ), imm.Integer );
+		g->mov( VREG( CTX, vt + 1 ), imm.Integer );
+		g->mov( VREG( CTX, vt + 2 ), imm.Integer );
+		break;
+	case VQuad:
+		g->mov( VREG( CTX, vt ), imm.Integer );
+		g->mov( VREG( CTX, vt + 1 ), imm.Integer );
+		g->mov( VREG( CTX, vt + 2 ), imm.Integer );
+		g->mov( VREG( CTX, vt + 3 ), imm.Integer );
+		break;
+	}
+	return true;
+}
+
+bool VfpuGenVFIM( R4000GenContext^ context, int address, uint code )
+{
+	// Note that the instruction tables don't have the p/t/d encodings!!
+	int vt = VRT( code );
+	union imm
+	{
+		int		Integer;
+		float	Float;
+	} imm;
+	imm.Float = Float16ToFloat32( ( ushort )( code & 0x0000FFFF ) );
+	VfpuWidth width = VWIDTH( code );
+	switch( width )
+	{
+	case VSingle:
+		g->mov( VREG( CTX, vt ), imm.Integer );
+		break;
+	case VPair:
+		g->mov( VREG( CTX, vt ), imm.Integer );
+		g->mov( VREG( CTX, vt + 1 ), imm.Integer );
+		break;
+	case VTriple:
+		g->mov( VREG( CTX, vt ), imm.Integer );
+		g->mov( VREG( CTX, vt + 1 ), imm.Integer );
+		g->mov( VREG( CTX, vt + 2 ), imm.Integer );
+		break;
+	case VQuad:
+		g->mov( VREG( CTX, vt ), imm.Integer );
+		g->mov( VREG( CTX, vt + 1 ), imm.Integer );
+		g->mov( VREG( CTX, vt + 2 ), imm.Integer );
+		g->mov( VREG( CTX, vt + 3 ), imm.Integer );
+		break;
+	}
+	return true;
 }
