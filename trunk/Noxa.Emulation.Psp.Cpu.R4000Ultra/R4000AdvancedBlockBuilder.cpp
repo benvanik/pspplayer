@@ -231,7 +231,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 			{
 				// Instruction counter increment - note that it has to be here cause
 				// of null delay and the label marker above
-				g->add( g->dword_ptr[ &_instructionsExecuted ], 1 );
+				g->inc( g->dword_ptr[ &_instructionsExecuted ] );
 			}
 #endif
 #ifdef TRACE
