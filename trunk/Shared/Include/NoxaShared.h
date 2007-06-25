@@ -67,7 +67,7 @@ __inline int power( int base, int exponent )
 #define VideoMemoryBound		( VideoMemoryBase + VideoMemorySize )
 
 // If defined, the scratch pad memory will be supported - if it's not, things may be faster
-//#define SUPPORTSCRATCHPAD
+#define SUPPORTSCRATCHPAD
 
 #pragma unmanaged
 namespace Noxa { namespace Emulation { namespace Psp {

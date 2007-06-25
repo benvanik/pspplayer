@@ -151,7 +151,7 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 			context->BranchTarget = targetLabel;
 		}
 
-		g->int3();
+		//g->int3();
 
 		if( instr->Generate != VfpuGenDummy )
 		{

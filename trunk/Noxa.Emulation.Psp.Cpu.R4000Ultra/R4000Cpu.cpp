@@ -68,7 +68,7 @@ R4000Cpu::R4000Cpu( IEmulationInstance^ emulator, ComponentParameters^ parameter
 	_hasExecuted = false;
 
 	R4000Generator* gen = new R4000Generator();
-	_context = gcnew R4000GenContext( gen, _memory->MainMemory, _memory->VideoMemory );
+	_context = gcnew R4000GenContext( gen, _memory->NativeSystem );
 	_builder = gcnew R4000AdvancedBlockBuilder( this, _core0 );
 	_biosStubs = gcnew R4000BiosStubs();
 	_videoInterface = gcnew R4000VideoInterface( this );
