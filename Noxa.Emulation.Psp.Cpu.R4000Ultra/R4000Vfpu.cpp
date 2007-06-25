@@ -151,6 +151,8 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 			context->BranchTarget = targetLabel;
 		}
 
+		g->int3();
+
 		if( instr->Generate != VfpuGenDummy )
 		{
 			// Emit code
@@ -162,7 +164,7 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 			g->push( code );
 			g->push( ( uint )address );
 			g->push( ( uint )CTX );
-			g->call( instr->Execute );
+			g->call( ( uint )instr->Execute );
 			g->add( ESP, 12 );
 		}
 
@@ -205,12 +207,6 @@ bool VfpuGenDummy( R4000GenContext^ context, int address, uint code )
 {
 	// ^_^
 	return true;
-}
-
-int VfpuImplDummy( R4000Ctx* ctx, uint address, uint code )
-{
-	// ^_^
-	return 0;
 }
 
 // Taken from ector's code
@@ -282,11 +278,11 @@ bool VfpuGenVPFX( R4000GenContext^ context, int address, uint code )
 #define VRT( code ) ( ( code >> 16 ) & 0x7F )
 #define VRS( code ) ( ( code >> 8 ) & 0x7F )
 #define VRD( code ) ( code & 0x7F )
-#define RS( code ) ( ( code >> 31 ) & 0x1F )
+#define RS( code ) ( ( code >> 21 ) & 0x1F )
 #define RT( code ) ( ( code >> 16 ) & 0x1F )
 #define VREG( xr, r ) g->dword_ptr[ xr + CTXCP2REGS + ( ( r ) << 2 ) ]
 #define VIMM( code ) ( int )( ( short )( code & 0x0000FFFF ) )
-#define VWIDTH( code ) ( VfpuWidth )( ( ( code >> 8 ) & 0x1 ) | ( ( code >> 14 ) & 0x2 ) )
+#define VWIDTH( code ) ( VfpuWidth )( ( ( code >> 7 ) & 0x1 ) + ( ( ( code >> 15 ) & 0x1 ) << 1 ) )
 
 // EAX = address in guest space, result in EAX
 void EmitAddressLookup( R4000GenContext^ context, int address );
@@ -318,18 +314,19 @@ void EmitVfpuRead( R4000GenContext^ context, VfpuWidth dataWidth, int reg, int o
 		{
 			// EAX is base address in memory
 
+			int sourceRegister;
 			if( transpose )
-			{
-				int sourceRegister = ( mtx * 4 + ( ( idx + i ) & 3 ) + ( ( fsl + j ) & 3 ) * 32 ) << 2;
-				g->lea( EBX, g->dword_ptr[ EAX + ( ( j * outMatrixWidth + i ) << 2 ) ] );
-				g->mov( ECX, g->dword_ptr[ CTX + sourceRegister ] );
-				g->mov( g->dword_ptr[ EBX ], ECX );
-			}
+				sourceRegister = ( mtx * 4 + ( ( idx + i ) & 3 ) + ( ( fsl + j ) & 3 ) * 32 );
+			else
+				sourceRegister = ( mtx * 4 + ( ( idx + j ) & 3 ) + ( ( fsl + i ) & 3 ) * 32 );
+			
+			g->mov( ECX, VREG( CTX, sourceRegister ) );
+			int dest = ( ( j * outMatrixWidth + i ) << 2 );
+			if( dest == 0 )
+				g->mov( g->dword_ptr[ EAX ], ECX );
 			else
 			{
-				int sourceRegister = ( mtx * 4 + ( ( idx + j ) & 3 ) + ( ( fsl + i ) & 3 ) * 32 ) << 2;
-				g->lea( EBX, g->dword_ptr[ EAX + ( ( j * outMatrixWidth + i ) << 2 ) ] );
-				g->mov( ECX, g->dword_ptr[ CTX + sourceRegister ] );
+				g->lea( EBX, g->dword_ptr[ EAX + dest ] );
 				g->mov( g->dword_ptr[ EBX ], ECX );
 			}
 		}
@@ -363,20 +360,20 @@ void EmitVfpuWrite( R4000GenContext^ context, VfpuWidth dataWidth, int reg, int 
 			//if (!writeMask[i])
 			if( true )
 			{
+				int destRegister;
 				if( transpose )
-				{
-					int destRegister = ( mtx * 4 + ( ( col + i ) & 3 ) + ( ( row + j ) & 3 ) * 32 ) << 2;
-					g->lea( EBX, g->dword_ptr[ EAX + ( ( j * inMatrixWidth + i ) << 2 ) ] );
-					g->mov( ECX, g->dword_ptr[ EBX ] );
-					g->mov( g->dword_ptr[ CTX + destRegister ], ECX );
-				}
+					destRegister = ( mtx * 4 + ( ( col + i ) & 3 ) + ( ( row + j ) & 3 ) * 32 );
+				else
+					destRegister = ( mtx * 4 + ( ( col + j ) & 3 ) + ( ( row + i ) & 3 ) * 32 );
+				int src = ( ( j * inMatrixWidth + i ) << 2 );
+				if( src == 0 )
+					g->mov( ECX, g->dword_ptr[ EAX ] );
 				else
 				{
-					int destRegister = ( mtx * 4 + ( ( col + j ) & 3 ) + ( ( row + i ) & 3 ) * 32 ) << 2;
-					g->lea( EBX, g->dword_ptr[ EAX + ( ( j * inMatrixWidth + i ) << 2 ) ] );
+					g->lea( EBX, g->dword_ptr[ EAX + src ] );
 					g->mov( ECX, g->dword_ptr[ EBX ] );
-					g->mov( g->dword_ptr[ CTX + destRegister ], ECX );
 				}
+				g->mov( VREG( CTX, destRegister ), ECX );
 			}
 		}
 	}
@@ -385,13 +382,15 @@ void EmitVfpuWrite( R4000GenContext^ context, VfpuWidth dataWidth, int reg, int 
 bool VfpuGenLVS( R4000GenContext^ context, int address, uint code )
 {
 	g->mov( EAX, MREG( CTX, RS( code ) ) );
-	g->add( EAX, VIMM( code ) );
+	int imm = ( int )( ( short )( code & 0x0000FFFF ) );
+	if( imm != 0 )
+		g->add( EAX, imm );
 	EmitAddressLookup( context, address );
 	// EAX = address of memory start
 
 	// Perform load
 	int vt = ( ( code >> 16 ) & 0x1F ) | ( ( code & 0x3 ) << 5 );
-	EmitVfpuWrite( context, VSingle, vt );
+	EmitVfpuWrite( context, VSingle, vt, 4 );
 
 	return true;
 }
@@ -399,7 +398,9 @@ bool VfpuGenLVS( R4000GenContext^ context, int address, uint code )
 bool VfpuGenLVQ( R4000GenContext^ context, int address, uint code )
 {
 	g->mov( EAX, MREG( CTX, RS( code ) ) );
-	g->add( EAX, VIMM( code ) );
+	int imm = ( int )( ( short )( code & 0x0000FFFF ) );
+	if( imm != 0 )
+		g->add( EAX, imm );
 	EmitAddressLookup( context, address );
 	// EAX = address of memory start
 
@@ -413,7 +414,9 @@ bool VfpuGenLVQ( R4000GenContext^ context, int address, uint code )
 bool VfpuGenSVS( R4000GenContext^ context, int address, uint code )
 {
 	g->mov( EAX, MREG( CTX, RS( code ) ) );
-	g->add( EAX, VIMM( code ) );
+	int imm = ( int )( ( short )( code & 0x0000FFFF ) );
+	if( imm != 0 )
+		g->add( EAX, imm );
 	EmitAddressLookup( context, address );
 	// EAX = address of memory start
 
@@ -427,7 +430,9 @@ bool VfpuGenSVS( R4000GenContext^ context, int address, uint code )
 bool VfpuGenSVQ( R4000GenContext^ context, int address, uint code )
 {
 	g->mov( EAX, MREG( CTX, RS( code ) ) );
-	g->add( EAX, VIMM( code ) );
+	int imm = ( int )( ( short )( code & 0x0000FFFF ) );
+	if( imm != 0 )
+		g->add( EAX, imm );
 	EmitAddressLookup( context, address );
 	// EAX = address of memory start
 
@@ -526,6 +531,12 @@ bool VfpuGenVFIM( R4000GenContext^ context, int address, uint code )
 // Everything below here is unmanaged!
 #pragma unmanaged
 
+int VfpuImplDummy( R4000Ctx* ctx, uint address, uint code )
+{
+	// ^_^
+	return 0;
+}
+
 void VfpuGetVector( R4000Ctx* ctx, VfpuWidth dataWidth, int reg, float* p, int matrixWidth = 0 )
 {
 	int mtx = ( reg >> 2 ) & 0x7;
@@ -550,13 +561,13 @@ void VfpuGetVector( R4000Ctx* ctx, VfpuWidth dataWidth, int reg, float* p, int m
 		{
 			if( transpose )
 			{
-				int sourceRegister = ( mtx * 4 + ( ( idx + i ) & 3 ) + ( ( fsl + j ) & 3 ) * 32 ) << 2;
-				p[ ( ( j * matrixWidth + i ) << 2 ) ] = ctx->Cp2Registers[ sourceRegister ];
+				int sourceRegister = ( mtx * 4 + ( ( idx + i ) & 3 ) + ( ( fsl + j ) & 3 ) * 32 );
+				p[ ( j * matrixWidth + i ) ] = ctx->Cp2Registers[ sourceRegister ];
 			}
 			else
 			{
-				int sourceRegister = ( mtx * 4 + ( ( idx + j ) & 3 ) + ( ( fsl + i ) & 3 ) * 32 ) << 2;
-				p[ ( ( j * matrixWidth + i ) << 2 ) ] = ctx->Cp2Registers[ sourceRegister ];
+				int sourceRegister = ( mtx * 4 + ( ( idx + j ) & 3 ) + ( ( fsl + i ) & 3 ) * 32 );
+				p[ ( j * matrixWidth + i ) ] = ctx->Cp2Registers[ sourceRegister ];
 			}
 		}
 	}
@@ -591,13 +602,13 @@ void VfpuSetVector( R4000Ctx* ctx, VfpuWidth dataWidth, int reg, float* p, int m
 			{
 				if( transpose )
 				{
-					int destRegister = ( mtx * 4 + ( ( col + i ) & 3 ) + ( ( row + j ) & 3 ) * 32 ) << 2;
-					ctx->Cp2Registers[ destRegister ] = p[ ( ( j * matrixWidth + i ) << 2 ) ];
+					int destRegister = ( mtx * 4 + ( ( col + i ) & 3 ) + ( ( row + j ) & 3 ) * 32 );
+					ctx->Cp2Registers[ destRegister ] = p[ ( j * matrixWidth + i ) ];
 				}
 				else
 				{
-					int destRegister = ( mtx * 4 + ( ( col + j ) & 3 ) + ( ( row + i ) & 3 ) * 32 ) << 2;
-					ctx->Cp2Registers[ destRegister ] = p[ ( ( j * matrixWidth + i ) << 2 ) ];
+					int destRegister = ( mtx * 4 + ( ( col + j ) & 3 ) + ( ( row + i ) & 3 ) * 32 );
+					ctx->Cp2Registers[ destRegister ] = p[ ( j * matrixWidth + i ) ];
 				}
 			}
 		}
@@ -637,6 +648,9 @@ void VfpuApplyPrefix( R4000Ctx* ctx, VfpuPfx pfx, VfpuWidth dataWidth, float* p 
 	else
 	{
 		// VPFXD
+		// If 0, nothing
+		if( pfxValue == 0 )
+			return;
 		for( int n = 0; n < _vfpuSizes[ dataWidth ]; n++ )
 		{
 			//int mask = (pfxValue>>(8+i))&1;
@@ -667,19 +681,19 @@ int VfpuImplVSCL( R4000Ctx* ctx, uint address, uint code )
 	switch( width )
 	{
 	case VPair:
-		s[ 0 ] = s[ 0 ] * scale;
-		s[ 1 ] = s[ 1 ] * scale;
+		s[ 0 ] *= scale;
+		s[ 1 ] *= scale;
 		break;
 	case VTriple:
-		s[ 0 ] = s[ 0 ] * scale;
-		s[ 1 ] = s[ 1 ] * scale;
-		s[ 2 ] = s[ 2 ] * scale;
+		s[ 0 ] *= scale;
+		s[ 1 ] *= scale;
+		s[ 2 ] *= scale;
 		break;
 	case VQuad:
-		s[ 0 ] = s[ 0 ] * scale;
-		s[ 1 ] = s[ 1 ] * scale;
-		s[ 2 ] = s[ 2 ] * scale;
-		s[ 3 ] = s[ 3 ] * scale;
+		s[ 0 ] *= scale;
+		s[ 1 ] *= scale;
+		s[ 2 ] *= scale;
+		s[ 3 ] *= scale;
 		break;
 	}
 	VfpuApplyPrefix( ctx, VPFXD, width, s );
