@@ -24,7 +24,18 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 #define g context->Generator
 
-#define MCP2REG( xr, r )		g->dword_ptr[ xr + CTXCP2REGS + ( r << 4 ) ]
+// http://wiki.fx-world.org/doku.php?id=start&idx=ops
+// http://forums.ps2dev.org/viewtopic.php?t=6929&postdays=0&postorder=asc&start=0
+// Invaluable!
+
+#ifndef max
+#define max(a,b)            (((a) > (b)) ? (a) : (b))
+#endif
+#ifndef min
+#define min(a,b)            (((a) < (b)) ? (a) : (b))
+#endif
+
+#define MCP2REG( xr, r )		g->dword_ptr[ xr + CTXCP2REGS + ( r << 2 ) ]
 
 enum VfpuWidth
 {
@@ -35,6 +46,14 @@ enum VfpuWidth
 	V2x2,
 	V3x3,
 	V4x4,
+};
+static const int _vfpuSizes[ 7 ] = { 1, 2, 3, 4, 4, 9, 16 };
+static const float _vfpuConstants[ 8 ] = { 0.0f, 1.0f, 2.0f, 0.5f, 3.0f, 1.0f/3.0f, 1.0f/4.0f, 1.0f/6.0f };
+enum VfpuPfx
+{
+	VPFXS = 0,
+	VPFXT = 1,
+	VPFXD = 2,
 };
 enum VfpuConditions
 {
@@ -316,7 +335,6 @@ void EmitVfpuRead( R4000GenContext^ context, VfpuWidth dataWidth, int reg, int o
 		}
 	}
 }
-
 // Writes a vector from main memory to a VFPU register - EAX = source address in main memory
 void EmitVfpuWrite( R4000GenContext^ context, VfpuWidth dataWidth, int reg, int inMatrixWidth = 0 )
 {
@@ -503,3 +521,206 @@ bool VfpuGenVFIM( R4000GenContext^ context, int address, uint code )
 	}
 	return true;
 }
+
+// ----------------------------------- BEGIN IMPL -----------------------------------------------------------
+// Everything below here is unmanaged!
+#pragma unmanaged
+
+void VfpuGetVector( R4000Ctx* ctx, VfpuWidth dataWidth, int reg, float* p, int matrixWidth = 0 )
+{
+	int mtx = ( reg >> 2 ) & 0x7;
+	int idx = reg & 0x3;
+	int transpose = ( reg >> 5 ) & 0x1;
+
+	int fsl, k, l;
+	switch( dataWidth )
+	{
+	case VSingle:	fsl = ( reg >> 5 ) & 3;	k = 1;	l = 1;	break;
+	case VPair:		fsl = ( reg >> 5 ) & 2;	k = 2;	l = 1;	break;
+	case VTriple:	fsl = ( reg >> 6 ) & 1;	k = 3;	l = 1;	break;
+	case VQuad:		fsl = ( reg >> 5 ) & 2;	k = 4;	l = 1;	break;
+	case V2x2:		fsl = ( reg >> 5 ) & 2;	k = 2;	l = 2;	break;
+	case V3x3:		fsl = ( reg >> 6 ) & 1;	k = 3;	l = 3;	break;
+	case V4x4:		fsl = ( reg >> 5 ) & 2;	k = 4;	l = 4;	break;
+	}
+
+	for( int i = 0; i < k; i++ )
+	{
+		for( int j = 0; j < l; j++ )
+		{
+			if( transpose )
+			{
+				int sourceRegister = ( mtx * 4 + ( ( idx + i ) & 3 ) + ( ( fsl + j ) & 3 ) * 32 ) << 2;
+				p[ ( ( j * matrixWidth + i ) << 2 ) ] = ctx->Cp2Registers[ sourceRegister ];
+			}
+			else
+			{
+				int sourceRegister = ( mtx * 4 + ( ( idx + j ) & 3 ) + ( ( fsl + i ) & 3 ) * 32 ) << 2;
+				p[ ( ( j * matrixWidth + i ) << 2 ) ] = ctx->Cp2Registers[ sourceRegister ];
+			}
+		}
+	}
+}
+
+void VfpuSetVector( R4000Ctx* ctx, VfpuWidth dataWidth, int reg, float* p, int matrixWidth = 0 )
+{
+	int mtx = ( reg >> 2 ) & 0x7;
+	int col = reg & 0x3;
+	int transpose = ( reg >> 5 ) & 0x1;
+
+	int row, k, l;
+	switch( dataWidth )
+	{
+	case VSingle:	row = ( reg >> 5 ) & 3;	k = 1;	l = 1;	break;
+	case VPair:		row = ( reg >> 5 ) & 2;	k = 2;	l = 1;	break;
+	case VTriple:	row = ( reg >> 6 ) & 1;	k = 3;	l = 1;	break;
+	case VQuad:		row = ( reg >> 5 ) & 2;	k = 4;	l = 1;	break;
+	case V2x2:		row = ( reg >> 5 ) & 2;	k = 2;	l = 2;	break;
+	case V3x3:		row = ( reg >> 6 ) & 1;	k = 3;	l = 3;	break;
+	case V4x4:		row = ( reg >> 5 ) & 2;	k = 4;	l = 4;	break;
+	}
+
+	for( int i = 0; i < k; i++ )
+	{
+		for( int j = 0; j < l; j++ )
+		{
+			// EAX is base address in memory
+
+			//if (!writeMask[i])
+			if( true )
+			{
+				if( transpose )
+				{
+					int destRegister = ( mtx * 4 + ( ( col + i ) & 3 ) + ( ( row + j ) & 3 ) * 32 ) << 2;
+					ctx->Cp2Registers[ destRegister ] = p[ ( ( j * matrixWidth + i ) << 2 ) ];
+				}
+				else
+				{
+					int destRegister = ( mtx * 4 + ( ( col + j ) & 3 ) + ( ( row + i ) & 3 ) * 32 ) << 2;
+					ctx->Cp2Registers[ destRegister ] = p[ ( ( j * matrixWidth + i ) << 2 ) ];
+				}
+			}
+		}
+	}
+}
+
+void VfpuApplyPrefix( R4000Ctx* ctx, VfpuPfx pfx, VfpuWidth dataWidth, float* p )
+{
+	int pfxValue = ctx->Cp2Pfx[ pfx ];
+	if( ( pfx == VPFXS ) || ( pfx == VPFXT ) )
+	{
+		// A value of E4 indicates a passthrough
+		if( pfxValue == 0xE4 )
+			return;
+		for( int n = 0; n < _vfpuSizes[ dataWidth ]; n++ )
+		{
+			int abs = ( ( pfxValue >> ( 8 + n ) ) & 1 );
+			if( ( ( pfxValue >> ( 12 + n ) ) & 1 ) == 0 )
+			{
+				// Source from input vector - which is already set
+				if( abs == 1 )
+					p[ n ] = fabs( p[ n ] );
+			}
+			else
+			{
+				// Source from constant
+				p[ n ] = _vfpuConstants[ ( ( pfxValue >> ( n * 2 ) ) & 3 ) + ( abs << 2 ) ];
+			}
+
+			if( ( ( pfxValue >> ( 16 + n ) ) & 1 ) == 1 )
+			{
+				// Negate result
+				p[ n ] = -p[ n ];
+			}
+		}
+	}
+	else
+	{
+		// VPFXD
+		for( int n = 0; n < _vfpuSizes[ dataWidth ]; n++ )
+		{
+			//int mask = (pfxValue>>(8+i))&1;
+			//writeMask[i] = mask ? true : false;
+			int sat = ( pfxValue >> ( n * 2 ) ) & 3;
+			if( sat == 1 )
+			{
+				// [0:1]
+				p[ n ] = max( 0.0f, min( 1.0f, p[ n ] ) );
+			}
+			else if( sat == 3 )
+			{
+				// [-1:1]
+				p[ n ] = max( -1.0f, min( 1.0f, p[ n ] ) );
+			}
+			// If sat == 0, we pass-through
+		}
+	}
+}
+
+int VfpuImplVSCL( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	float scale = ctx->Cp2Registers[ VRT( code ) ];
+	switch( width )
+	{
+	case VPair:
+		s[ 0 ] = s[ 0 ] * scale;
+		s[ 1 ] = s[ 1 ] * scale;
+		break;
+	case VTriple:
+		s[ 0 ] = s[ 0 ] * scale;
+		s[ 1 ] = s[ 1 ] * scale;
+		s[ 2 ] = s[ 2 ] * scale;
+		break;
+	case VQuad:
+		s[ 0 ] = s[ 0 ] * scale;
+		s[ 1 ] = s[ 1 ] * scale;
+		s[ 2 ] = s[ 2 ] * scale;
+		s[ 3 ] = s[ 3 ] * scale;
+		break;
+	}
+	VfpuApplyPrefix( ctx, VPFXD, width, s );
+	VfpuSetVector( ctx, width, VRD( code ), s );
+	
+	return 0;
+}
+
+// A lot of these could be generated inline or at least use SSE for big speedups
+#define F_PI_2 ( ( float )1.57079632679489661923132169164 )
+#pragma intrinsic( fabs )
+int VfpuImplArith( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+	{
+		switch( ( code >> 16 ) & 0x1F )
+		{
+		/* vmov  */ case 0:		s[ n ] = s[ n ];							break;
+		/* vabs  */ case 1:		s[ n ] = fabs( s[ n ] );					break;
+		/* vneg  */ case 2:		s[ n ] = -s[ n ];							break;
+		/* vsat0 */ case 4:		s[ n ] = max( 0.0f, min( s[ n ], 1.0f ) );	break;
+		/* vsat1 */ case 5:		s[ n ] = max( -1.0f, min( s[ n ], 1.0f ) );	break;
+		/* vrcp  */ case 16:	s[ n ] = 1.0f / s[ n ];						break;
+		/* vrsq  */ case 17:	s[ n ] = 1.0f / sqrt( s[ n ] );				break;
+		/* vsin  */ case 18:	s[ n ] = sin( F_PI_2 * s[ n ] );			break;
+		/* vcos  */ case 19:	s[ n ] = cos( F_PI_2 * s[ n ] );			break;
+		/* vexp2 */ case 20:	s[ n ] = powf( 2.0f, s[ n ] );				break;
+		/* vlog2 */ case 21:	s[ n ] = log( s[ n ] ) / log( 2.0f );		break;
+		/* vsqrt */ case 22:	s[ n ] = sqrt( s[ n ] );					break;
+		default:
+			assert( false );
+			break;
+		}
+	}
+	VfpuApplyPrefix( ctx, VPFXD, width, s );
+	VfpuSetVector( ctx, width, VRD( code ), s );
+	return 0;
+}
+
+#pragma managed
