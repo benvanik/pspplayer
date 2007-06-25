@@ -37,12 +37,16 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager( typeof( CodeView ) );
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.registersToolStrip = new System.Windows.Forms.ToolStrip();
+			this.disassemblyControl1 = new Noxa.Emulation.Psp.RemoteDebugger.Tools.DisassemblyControl();
 			this.codeToolStrip = new System.Windows.Forms.ToolStrip();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
 			this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
 			this.hexToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.disassemblyControl1 = new Noxa.Emulation.Psp.RemoteDebugger.Tools.DisassemblyControl();
+			this.registersListView = new System.Windows.Forms.ListView();
+			this.registerNameHeader = new System.Windows.Forms.ColumnHeader();
+			this.registerValuePrettyHeader = new System.Windows.Forms.ColumnHeader();
+			this.registerValueRawHeader = new System.Windows.Forms.ColumnHeader();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
@@ -58,6 +62,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add( this.registersListView );
 			this.splitContainer1.Panel1.Controls.Add( this.registersToolStrip );
 			// 
 			// splitContainer1.Panel2
@@ -75,6 +80,18 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.registersToolStrip.Size = new System.Drawing.Size( 207, 25 );
 			this.registersToolStrip.TabIndex = 0;
 			this.registersToolStrip.Text = "Register Tools";
+			// 
+			// disassemblyControl1
+			// 
+			this.disassemblyControl1.DisplayHex = true;
+			this.disassemblyControl1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.disassemblyControl1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+			this.disassemblyControl1.FormattingEnabled = true;
+			this.disassemblyControl1.Location = new System.Drawing.Point( 0, 25 );
+			this.disassemblyControl1.Name = "disassemblyControl1";
+			this.disassemblyControl1.ScrollAlwaysVisible = true;
+			this.disassemblyControl1.Size = new System.Drawing.Size( 583, 602 );
+			this.disassemblyControl1.TabIndex = 2;
 			// 
 			// codeToolStrip
 			// 
@@ -121,17 +138,37 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.hexToolStripButton.Text = "Hex";
 			this.hexToolStripButton.Click += new System.EventHandler( this.hexToolStripButton_Click );
 			// 
-			// disassemblyControl1
+			// registersListView
 			// 
-			this.disassemblyControl1.DisplayHex = true;
-			this.disassemblyControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.disassemblyControl1.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-			this.disassemblyControl1.FormattingEnabled = true;
-			this.disassemblyControl1.Location = new System.Drawing.Point( 0, 25 );
-			this.disassemblyControl1.Name = "disassemblyControl1";
-			this.disassemblyControl1.ScrollAlwaysVisible = true;
-			this.disassemblyControl1.Size = new System.Drawing.Size( 583, 602 );
-			this.disassemblyControl1.TabIndex = 2;
+			this.registersListView.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+						| System.Windows.Forms.AnchorStyles.Left )
+						| System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.registersListView.Columns.AddRange( new System.Windows.Forms.ColumnHeader[] {
+            this.registerNameHeader,
+            this.registerValuePrettyHeader,
+            this.registerValueRawHeader} );
+			this.registersListView.FullRowSelect = true;
+			this.registersListView.GridLines = true;
+			this.registersListView.Location = new System.Drawing.Point( 3, 25 );
+			this.registersListView.Name = "registersListView";
+			this.registersListView.Size = new System.Drawing.Size( 201, 605 );
+			this.registersListView.TabIndex = 1;
+			this.registersListView.UseCompatibleStateImageBehavior = false;
+			this.registersListView.View = System.Windows.Forms.View.Details;
+			// 
+			// registerNameHeader
+			// 
+			this.registerNameHeader.Text = "";
+			this.registerNameHeader.Width = 49;
+			// 
+			// registerValuePrettyHeader
+			// 
+			this.registerValuePrettyHeader.Text = "Value";
+			this.registerValuePrettyHeader.Width = 73;
+			// 
+			// registerValueRawHeader
+			// 
+			this.registerValueRawHeader.Text = "";
 			// 
 			// CodeView
 			// 
@@ -164,5 +201,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
 		private System.Windows.Forms.ToolStripLabel toolStripLabel1;
 		private System.Windows.Forms.ToolStripButton hexToolStripButton;
+		private System.Windows.Forms.ListView registersListView;
+		private System.Windows.Forms.ColumnHeader registerNameHeader;
+		private System.Windows.Forms.ColumnHeader registerValuePrettyHeader;
+		private System.Windows.Forms.ColumnHeader registerValueRawHeader;
 	}
 }

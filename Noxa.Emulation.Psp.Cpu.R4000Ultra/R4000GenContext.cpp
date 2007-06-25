@@ -13,12 +13,13 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::CodeGen;
 using namespace Noxa::Emulation::Psp::Cpu;
 
-R4000GenContext::R4000GenContext( R4000Generator* generator, byte* mainMemory, byte* frameBuffer )
+R4000GenContext::R4000GenContext( R4000Generator* generator, NativeMemorySystem* memory )
 {
 	Generator = generator;
 
-	MainMemory = mainMemory;
-	FrameBuffer = frameBuffer;
+	MainMemory = memory->MainMemory;
+	FrameBuffer = memory->VideoMemory;
+	ScratchPad = memory->ScratchPad;
 
 	BranchLabels = gcnew Dictionary<int, LabelMarker^>();
 }
