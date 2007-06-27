@@ -70,6 +70,12 @@
     <Compile Include="Model\MethodBody.cs" />
     <Compile Include="Model\RegisterBanks.cs" />
     <Compile Include="Model\TableEntry.cs" />
+    <Compile Include="Tools\CallstackViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Tools\CallstackViewer.Designer.cs">
+      <DependentUpon>CallstackViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tools\DisassemblyControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -96,6 +102,10 @@
       <SubType>Designer</SubType>
       <DependentUpon>DebugView.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Tools\CallstackViewer.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>CallstackViewer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Tools\DisassemblyControl.resx">
       <DependentUpon>DisassemblyControl.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -116,6 +126,10 @@
     <EmbeddedResource Include="Tools\ToolPane.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ToolPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tools\VfpuDisplay.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>VfpuDisplay.cs</DependentUpon>
     </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -142,6 +156,12 @@
     </Compile>
     <Compile Include="Tools\ToolPane.Designer.cs">
       <DependentUpon>ToolPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\VfpuDisplay.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tools\VfpuDisplay.Designer.cs">
+      <DependentUpon>VfpuDisplay.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
