@@ -36,20 +36,28 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager( typeof( CodeView ) );
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.registersListView = new System.Windows.Forms.ListView();
+			this.registerNameHeader = new System.Windows.Forms.ColumnHeader();
+			this.registerValuePrettyHeader = new System.Windows.Forms.ColumnHeader();
+			this.registerValueRawHeader = new System.Windows.Forms.ColumnHeader();
+			this.pcLabel = new System.Windows.Forms.Label();
 			this.registersToolStrip = new System.Windows.Forms.ToolStrip();
+			this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripSplitButton();
+			this.generalRegistersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.fPURegistersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.vFPURegistersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.disassemblyControl1 = new Noxa.Emulation.Psp.RemoteDebugger.Tools.DisassemblyControl();
 			this.codeToolStrip = new System.Windows.Forms.ToolStrip();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
 			this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
 			this.hexToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.registersListView = new System.Windows.Forms.ListView();
-			this.registerNameHeader = new System.Windows.Forms.ColumnHeader();
-			this.registerValuePrettyHeader = new System.Windows.Forms.ColumnHeader();
-			this.registerValueRawHeader = new System.Windows.Forms.ColumnHeader();
+			this.vfpuDisplay = new Noxa.Emulation.Psp.RemoteDebugger.Tools.VfpuDisplay();
+			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
+			this.registersToolStrip.SuspendLayout();
 			this.codeToolStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -62,8 +70,11 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add( this.textBox1 );
 			this.splitContainer1.Panel1.Controls.Add( this.registersListView );
+			this.splitContainer1.Panel1.Controls.Add( this.pcLabel );
 			this.splitContainer1.Panel1.Controls.Add( this.registersToolStrip );
+			this.splitContainer1.Panel1.Controls.Add( this.vfpuDisplay );
 			// 
 			// splitContainer1.Panel2
 			// 
@@ -73,13 +84,94 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.splitContainer1.SplitterDistance = 207;
 			this.splitContainer1.TabIndex = 1;
 			// 
+			// registersListView
+			// 
+			this.registersListView.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+						| System.Windows.Forms.AnchorStyles.Left )
+						| System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.registersListView.Columns.AddRange( new System.Windows.Forms.ColumnHeader[] {
+            this.registerNameHeader,
+            this.registerValuePrettyHeader,
+            this.registerValueRawHeader} );
+			this.registersListView.Font = new System.Drawing.Font( "Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
+			this.registersListView.FullRowSelect = true;
+			this.registersListView.GridLines = true;
+			this.registersListView.LabelEdit = true;
+			this.registersListView.LabelWrap = false;
+			this.registersListView.Location = new System.Drawing.Point( 3, 48 );
+			this.registersListView.Name = "registersListView";
+			this.registersListView.Size = new System.Drawing.Size( 201, 582 );
+			this.registersListView.TabIndex = 3;
+			this.registersListView.UseCompatibleStateImageBehavior = false;
+			this.registersListView.View = System.Windows.Forms.View.Details;
+			// 
+			// registerNameHeader
+			// 
+			this.registerNameHeader.Text = "";
+			this.registerNameHeader.Width = 49;
+			// 
+			// registerValuePrettyHeader
+			// 
+			this.registerValuePrettyHeader.Text = "Value";
+			this.registerValuePrettyHeader.Width = 73;
+			// 
+			// registerValueRawHeader
+			// 
+			this.registerValueRawHeader.Text = "";
+			// 
+			// pcLabel
+			// 
+			this.pcLabel.Font = new System.Drawing.Font( "Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
+			this.pcLabel.Location = new System.Drawing.Point( 82, 29 );
+			this.pcLabel.Name = "pcLabel";
+			this.pcLabel.Size = new System.Drawing.Size( 30, 15 );
+			this.pcLabel.TabIndex = 2;
+			this.pcLabel.Text = "PC:";
+			this.pcLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// registersToolStrip
 			// 
+			this.registersToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripSplitButton1} );
 			this.registersToolStrip.Location = new System.Drawing.Point( 0, 0 );
 			this.registersToolStrip.Name = "registersToolStrip";
 			this.registersToolStrip.Size = new System.Drawing.Size( 207, 25 );
 			this.registersToolStrip.TabIndex = 0;
 			this.registersToolStrip.Text = "Register Tools";
+			// 
+			// toolStripSplitButton1
+			// 
+			this.toolStripSplitButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.toolStripSplitButton1.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.generalRegistersToolStripMenuItem,
+            this.fPURegistersToolStripMenuItem,
+            this.vFPURegistersToolStripMenuItem} );
+			this.toolStripSplitButton1.Image = ( ( System.Drawing.Image )( resources.GetObject( "toolStripSplitButton1.Image" ) ) );
+			this.toolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripSplitButton1.Name = "toolStripSplitButton1";
+			this.toolStripSplitButton1.Size = new System.Drawing.Size( 45, 22 );
+			this.toolStripSplitButton1.Text = "GPR";
+			// 
+			// generalRegistersToolStripMenuItem
+			// 
+			this.generalRegistersToolStripMenuItem.Name = "generalRegistersToolStripMenuItem";
+			this.generalRegistersToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D1 ) ) );
+			this.generalRegistersToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.generalRegistersToolStripMenuItem.Text = "&General Registers";
+			// 
+			// fPURegistersToolStripMenuItem
+			// 
+			this.fPURegistersToolStripMenuItem.Name = "fPURegistersToolStripMenuItem";
+			this.fPURegistersToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D2 ) ) );
+			this.fPURegistersToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.fPURegistersToolStripMenuItem.Text = "&FPU Registers";
+			// 
+			// vFPURegistersToolStripMenuItem
+			// 
+			this.vFPURegistersToolStripMenuItem.Name = "vFPURegistersToolStripMenuItem";
+			this.vFPURegistersToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D3 ) ) );
+			this.vFPURegistersToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.vFPURegistersToolStripMenuItem.Text = "&VFPU Registers";
 			// 
 			// disassemblyControl1
 			// 
@@ -138,37 +230,25 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.hexToolStripButton.Text = "Hex";
 			this.hexToolStripButton.Click += new System.EventHandler( this.hexToolStripButton_Click );
 			// 
-			// registersListView
+			// vfpuDisplay
 			// 
-			this.registersListView.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+			this.vfpuDisplay.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
 						| System.Windows.Forms.AnchorStyles.Left )
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.registersListView.Columns.AddRange( new System.Windows.Forms.ColumnHeader[] {
-            this.registerNameHeader,
-            this.registerValuePrettyHeader,
-            this.registerValueRawHeader} );
-			this.registersListView.FullRowSelect = true;
-			this.registersListView.GridLines = true;
-			this.registersListView.Location = new System.Drawing.Point( 3, 25 );
-			this.registersListView.Name = "registersListView";
-			this.registersListView.Size = new System.Drawing.Size( 201, 605 );
-			this.registersListView.TabIndex = 1;
-			this.registersListView.UseCompatibleStateImageBehavior = false;
-			this.registersListView.View = System.Windows.Forms.View.Details;
+			this.vfpuDisplay.Location = new System.Drawing.Point( 3, 48 );
+			this.vfpuDisplay.Name = "vfpuDisplay";
+			this.vfpuDisplay.Size = new System.Drawing.Size( 201, 582 );
+			this.vfpuDisplay.TabIndex = 4;
 			// 
-			// registerNameHeader
+			// textBox1
 			// 
-			this.registerNameHeader.Text = "";
-			this.registerNameHeader.Width = 49;
-			// 
-			// registerValuePrettyHeader
-			// 
-			this.registerValuePrettyHeader.Text = "Value";
-			this.registerValuePrettyHeader.Width = 73;
-			// 
-			// registerValueRawHeader
-			// 
-			this.registerValueRawHeader.Text = "";
+			this.textBox1.Font = new System.Drawing.Font( "Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
+			this.textBox1.Location = new System.Drawing.Point( 118, 28 );
+			this.textBox1.Name = "textBox1";
+			this.textBox1.Size = new System.Drawing.Size( 86, 18 );
+			this.textBox1.TabIndex = 5;
+			this.textBox1.Text = "0x00000000";
+			this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// CodeView
 			// 
@@ -185,6 +265,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.splitContainer1.Panel2.ResumeLayout( false );
 			this.splitContainer1.Panel2.PerformLayout();
 			this.splitContainer1.ResumeLayout( false );
+			this.registersToolStrip.ResumeLayout( false );
+			this.registersToolStrip.PerformLayout();
 			this.codeToolStrip.ResumeLayout( false );
 			this.codeToolStrip.PerformLayout();
 			this.ResumeLayout( false );
@@ -201,9 +283,16 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
 		private System.Windows.Forms.ToolStripLabel toolStripLabel1;
 		private System.Windows.Forms.ToolStripButton hexToolStripButton;
+		private System.Windows.Forms.Label pcLabel;
+		private System.Windows.Forms.ToolStripSplitButton toolStripSplitButton1;
+		private System.Windows.Forms.ToolStripMenuItem generalRegistersToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem fPURegistersToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem vFPURegistersToolStripMenuItem;
 		private System.Windows.Forms.ListView registersListView;
 		private System.Windows.Forms.ColumnHeader registerNameHeader;
 		private System.Windows.Forms.ColumnHeader registerValuePrettyHeader;
 		private System.Windows.Forms.ColumnHeader registerValueRawHeader;
+		private Noxa.Emulation.Psp.RemoteDebugger.Tools.VfpuDisplay vfpuDisplay;
+		private System.Windows.Forms.TextBox textBox1;
 	}
 }
