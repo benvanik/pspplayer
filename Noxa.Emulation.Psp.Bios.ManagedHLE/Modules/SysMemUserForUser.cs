@@ -54,8 +54,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: SceSize sceKernelMaxFreeMemSize();
 		public int sceKernelMaxFreeMemSize()
 		{
-			// This is wrong?!
-			return ( int )_kernel.Partitions[ 2 ].FreeSize / 2;
+			uint maxSize = 0;
+			LinkedListEntry<KMemoryBlock> e = _kernel.Partitions[ 2 ].FreeList.HeadEntry;
+			while( e != null )
+			{
+				maxSize = Math.Max( maxSize, e.Value.Size );
+				e = e.Next;
+			}
+			return ( int )maxSize;
 		}
 
 		[Stateless]
@@ -64,7 +70,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: SceSize sceKernelTotalFreeMemSize();
 		public int sceKernelTotalFreeMemSize()
 		{
-			// This is wrong!
 			return ( int )_kernel.Partitions[ 2 ].FreeSize;
 		}
 

@@ -218,6 +218,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFixedPool pool = new KFixedPool( _kernel, partition,
 				_kernel.ReadString( ( uint )name ),
 				( uint )attr, ( uint )size, blocks );
+			if( pool.AllocateFplBlocks() == false )
+			{
+				Debug.Assert( false );
+				pool.Dispose();
+				//0x800200E0
+				return -1;
+			}
 			_kernel.AddHandle( pool );
 
 			// option unused?

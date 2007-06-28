@@ -107,7 +107,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				{
 					UsedBlocks.Remove( e );
 					FreeBlocks.Enqueue( e.Value );
-					e.Value.IsFree = true;
 					return this.WakeWaiter();
 				}
 				e = e.Next;
@@ -125,7 +124,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				UsedBlocks.Remove( e );
 				FreeBlocks.Enqueue( block );
-				block.IsFree = true;
 				return this.WakeWaiter();
 			}
 			else
@@ -140,18 +138,28 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 	class KFixedPool : KPool
 	{
+		public readonly int BlockCount;
+
 		public KFixedPool( Kernel kernel, KPartition partition, string name, uint attributes, uint blockSize, int blockCount )
 			: base( kernel, partition, name, attributes, blockSize )
 		{
 			Debug.Assert( blockCount > 0 );
-			for( int n = 0; n < blockCount; n++ )
+			Debug.Assert( blockSize > 0 );
+			this.BlockCount = blockCount;
+		}
+
+		public bool AllocateFplBlocks()
+		{
+			for( int n = 0; n < this.BlockCount; n++ )
 			{
-				KMemoryBlock block = partition.Allocate( KAllocType.Low, 0, blockSize );
-				Debug.Assert( block != null );
+				KMemoryBlock block = this.Partition.Allocate( KAllocType.Low, 0, this.BlockSize );
+				if( block == null )
+					return false;
 				block.Name = string.Format( "FPL {0} block", this.Name );
 				Blocks.Enqueue( block );
 				FreeBlocks.Enqueue( block );
 			}
+			return true;
 		}
 	}
 
@@ -170,7 +178,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			for( int n = 0; n < GrowthCount; n++ )
 			{
 				KMemoryBlock block = Partition.Allocate( KAllocType.Low, 0, BlockSize );
-				Debug.Assert( block != null );
+				if( block == null )
+					throw new Exception();
 				block.Name = string.Format( "VPL {0} block", this.Name );
 				Blocks.Enqueue( block );
 				FreeBlocks.Enqueue( block );
