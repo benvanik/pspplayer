@@ -205,6 +205,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public void OnStepComplete( uint address )
 		{
 			this.ShowSourceView( address );
+			Debugger.Break();
 		}
 
 		public void OnBreakpointHit( int id )
@@ -217,6 +218,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 				return;
 			}
 			this.ShowSourceView( bp.Address );
+			Debugger.Break();
 		}
 
 		public void OnEvent( Event biosEvent )

@@ -76,6 +76,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			*pres = handle.Result;
 			handle.Result = 0;
 
+			if( handle.PendingClose == true )
+				_kernel.Handles.Remove( handle.UID );
+
 			return 0;
 		}
 
