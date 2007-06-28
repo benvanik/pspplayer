@@ -66,8 +66,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			KMemoryBlock newBlock = null;
 
 			// Round size up to the next word
-			if( ( size & 0x3 ) != 0 )
-				size += 4 - ( size & 0x3 );
+			//if( ( size & 0x3 ) != 0 )
+			//    size += 4 - ( size & 0x3 );
 
 			// Quick check to see if we have the space free
 			if( type != KAllocType.Maximum )
