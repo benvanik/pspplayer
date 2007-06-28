@@ -36,11 +36,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public CodeView Code;
 		public LogViewer Log;
 		public StatisticsViewer Statistics;
+		public CallstackViewer CallStack;
 
 		public BreakpointManager Breakpoints;
 
 		public bool IsConnected;
-		public bool CallstacksEnabled;
+		public bool CallStacksEnabled;
 
 		public ILogger Logger
 		{
@@ -63,6 +64,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			bool setupOk = this.SetupRemoting();
 			Debug.Assert( setupOk == true );
 
+			this.CallStacksEnabled = true;
+
 			this.Breakpoints = new BreakpointManager( this );
 
 			this.View = new DebugView( this );
@@ -80,10 +83,13 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			{
 				this.Code = new CodeView( this );
 				this.Statistics = new StatisticsViewer( this );
+				this.CallStack = new CallstackViewer( this );
 
 				this.Code.Show( this.View.DockPanel );
 				this.Log.Show( this.View.DockPanel );
 				this.Statistics.Show( this.View.DockPanel );
+				if( this.CallStacksEnabled == true )
+					this.CallStack.Show( this.View.DockPanel );
 			}
 			else
 				Environment.Exit( 0 );
@@ -170,22 +176,47 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		private Frame[] GetCallstack()
 		{
-			if( this.CallstacksEnabled == true )
+			if( this.CallStacksEnabled == true )
 				return this.Host.CpuHook.GetCallstack();
 			else
 				return null;
 		}
 
-		public void OnStepComplete( int address )
+		private delegate void ShowSourceViewDelegate( uint address );
+		private void ShowSourceView( uint address )
 		{
-			Frame[] stack = this.GetCallstack();
-			Debugger.Break();
+			ShowSourceViewDelegate del = delegate
+			{
+				this.Code.BringToFront();
+				this.Code.Activate();
+				this.Code.Show( this.View.DockPanel );
+
+				// Jump in code
+
+				if( this.CallStacksEnabled == true )
+				{
+					Frame[] stack = this.GetCallstack();
+					this.CallStack.SetCallstack( stack );
+				}
+			};
+			this.View.Invoke( del, address );
+		}
+
+		public void OnStepComplete( uint address )
+		{
+			this.ShowSourceView( address );
 		}
 
 		public void OnBreakpointHit( int id )
 		{
-			Frame[] stack = this.GetCallstack();
-			Debugger.Break();
+			Breakpoint bp = this.Breakpoints[ id ];
+			Debug.Assert( bp != null );
+			if( bp == null )
+			{
+				// Not found?
+				return;
+			}
+			this.ShowSourceView( bp.Address );
 		}
 
 		public void OnEvent( Event biosEvent )
@@ -196,7 +227,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		public bool OnError( Error error )
 		{
-			Frame[] stack = this.GetCallstack();
+			this.ShowSourceView( error.PC );
 			Debugger.Break();
 
 			return true;
