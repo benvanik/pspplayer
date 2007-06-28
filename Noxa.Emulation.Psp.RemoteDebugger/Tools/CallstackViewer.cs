@@ -18,9 +18,20 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 {
 	internal partial class CallstackViewer : Noxa.Emulation.Psp.RemoteDebugger.Tools.ToolPane
 	{
+		public readonly EmuDebugger Debugger;
+
 		public CallstackViewer()
 		{
 			InitializeComponent();
+		}
+
+		public CallstackViewer( EmuDebugger debugger )
+			: this()
+		{
+			this.Debugger = debugger;
+
+			Bitmap image = Properties.Resources.CallstackIcon as Bitmap;
+			this.Icon = Icon.FromHandle( image.GetHicon() );
 		}
 
 		public void Clear()
@@ -35,9 +46,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 		{
 			this.callView.BeginUpdate();
 			this.callView.Items.Clear();
-			for( int n = callStack.Length - 1; n >= 0; n-- )
+			foreach( Frame frame in callStack )
 			{
-				Frame frame = callStack[ n ];
 				string pretty;
 				bool grey = false;
 				switch( frame.Type )
@@ -61,7 +71,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 						break;
 				}
 				ListViewItem item = new ListViewItem( new string[]{
-					"", pretty, string.Format( "0x{0:X8}", frame.Address ) } );
+					"", pretty,
+					grey ? "" : string.Format( "0x{0:X8}", frame.Address ) } );
 				item.Tag = frame;
 				item.UseItemStyleForSubItems = true;
 				if( grey == true )

@@ -74,7 +74,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		private void callstackToolStripButton_Click( object sender, EventArgs e )
 		{
-
+			this.Debugger.CallStack.Show( this.dockPanel1 );
 		}
 
 		private void biosToolStripButton_Click( object sender, EventArgs e )

@@ -22,7 +22,7 @@ namespace Noxa.Emulation.Psp.Debugging.Protocol
 		/// Handle a stop after a step operation.
 		/// </summary>
 		/// <param name="address">The address of the next instruction that will be executed.</param>
-		void OnStepComplete( int address );
+		void OnStepComplete( uint address );
 
 		/// <summary>
 		/// Handle a breakpoint that has been hit.
