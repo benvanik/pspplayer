@@ -106,6 +106,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			ExitWaiters = new FastLinkedList<KThread>();
 
+			//if( stackSize < 65535 )
+			//{
+			//    Log.WriteLine( Verbosity.Normal, Feature.Bios, "KThread: attempt to allocate thread with a stack of {0} - forcing up to the minimum of 64K", stackSize );
+			//    stackSize = 65535;
+			//}
+
 			RunClocks = 0;
 			InterruptPreemptionCount = 0;
 			ThreadPreemptionCount = 0;

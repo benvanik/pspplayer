@@ -149,9 +149,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				case KAllocType.High:
 					{
 						Debug.Assert( address == 0 );
-						KMemoryBlock targetBlock = FreeList.Tail;
-						if( targetBlock == null )
-							break;
+						KMemoryBlock targetBlock = null;
+						LinkedListEntry<KMemoryBlock> e = FreeList.TailEntry;
+						while( e != null )
+						{
+							if( e.Value.Size >= size )
+							{
+								targetBlock = e.Value;
+								break;
+							}
+							e = e.Previous;
+						}
+						Debug.Assert( targetBlock != null );
+						Debug.Assert( ( int )targetBlock.UpperBound - ( int )size >= 0 );
 						newBlock = this.SplitBlock( targetBlock, targetBlock.UpperBound - size, size );
 					}
 					break;
@@ -302,6 +312,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					Blocks.InsertAfter( newBlock, blockEntry );
 				}
 			}
+
+			Debug.Assert( block.Size >= 0 );
 
 			// Remove old block if dead
 			if( block.Size == 0 )

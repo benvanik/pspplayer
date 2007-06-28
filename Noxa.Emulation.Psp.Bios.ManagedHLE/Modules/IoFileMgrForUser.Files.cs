@@ -45,7 +45,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xFF5940B6, "sceIoCloseAsync" )]
 		// SDK location: /user/pspiofilemgr.h:93
@@ -53,7 +52,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceIoCloseAsync( int fd )
 		{
 			// Need to keep the handle alive until the poll somehow
-			return Module.NotImplementedReturn;
+			KFile handle = _kernel.GetHandle<KFile>( fd );
+			if( handle == null )
+			{
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoCloseAsync: kernel file handle not found: {0}", fd );
+				return -1;
+			}
+
+			Debug.Assert( handle.IsOpen == true );
+
+			if( handle.Stream != null )
+				handle.Stream.Close();
+			handle.IsOpen = false;
+			handle.Result = 0;
+
+			handle.PendingClose = true;
+
+			return 0;
 		}
 
 		[Stateless]
