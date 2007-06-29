@@ -78,7 +78,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceKernelCreateThread( int name, int entry, int initPriority, int stackSize, int attr, int option )
 		{
 			KThread thread = new KThread( _kernel,
-				_kernel.Partitions[ 2 ],
+				_kernel.Partitions[ 6 ],
 				_kernel.ReadString( ( uint )name ),
 				( uint )entry,
 				initPriority,

@@ -97,7 +97,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			}
 
 			// Create a thread
-			KThread thread = new KThread( _kernel, _kernel.Partitions[ 2 ], "module_start_thread", module.ModuleStart, 0, KThreadAttributes.User, 0x4000 );
+			KThread thread = new KThread( _kernel, _kernel.Partitions[ 6 ], "module_start_thread", module.ModuleStart, 0, KThreadAttributes.User, 0x4000 );
 			_kernel.AddHandle( thread );
 			thread.Start( ( uint )args, ( uint )argp );
 
@@ -134,7 +134,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return;
 
 			// Create a thread
-			KThread thread = new KThread( _kernel, _kernel.Partitions[ 2 ], "module_stop_thread", module.ModuleStop, 0, KThreadAttributes.User, 0x4000 );
+			KThread thread = new KThread( _kernel, _kernel.Partitions[ 6 ], "module_stop_thread", module.ModuleStop, 0, KThreadAttributes.User, 0x4000 );
 			_kernel.AddHandle( thread );
 			thread.Start( ( uint )args, ( uint )argp );
 
