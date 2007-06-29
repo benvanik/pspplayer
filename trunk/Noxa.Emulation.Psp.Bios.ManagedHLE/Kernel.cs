@@ -110,11 +110,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Partitions = new KPartition[]{
 				new KPartition( this, 0x00000000, 0x00000000 ), // dummy
 				new KPartition( this, 0x08000000, 0x00300000 ), // kernel 1 (0x8...)
-				new KPartition( this, 0x08000000, 0x01FFFFFF ), // user
+				new KPartition( this, 0x08000000, 0x01B00000 ), // user
 				new KPartition( this, 0x08000000, 0x00300000 ), // kernel 1
 				new KPartition( this, 0x08300000, 0x00100000 ), // kernel 2 (0x8...)
 				new KPartition( this, 0x08400000, 0x00400000 ), // kernel 3 (0x8...)
-				new KPartition( this, 0x08800000, 0x01800000 ), // user
+				new KPartition( this, 0x09B00000, 0x004FFFFF ), // user (stack) ?
 			};
 
 			Devices = new KDevice[]{
@@ -286,14 +286,26 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		[Conditional( "DEBUG" )]
 		internal void PrintMemoryInfo()
 		{
-			// Partition 2 is what we care about
-			LinkedListEntry<KMemoryBlock> e = this.Partitions[ 2 ].Blocks.HeadEntry;
-			while( e != null )
+			// Partition 2 and 6 are what we care about
+			StringBuilder sb = new StringBuilder();
+			sb.Append( "=== Memory Info ===" );
+			sb.Append( Environment.NewLine );
+			int[] partitions = new int[] { 2, 6 };
+			for( int n = 0; n < partitions.Length; n++ )
 			{
-				KMemoryBlock block = e.Value;
-				Debug.WriteLine( string.Format( "{0:X8} - {1:X8} size {2} taken: {3} - {4}", block.Address, block.UpperBound, block.Size, !block.IsFree, block.Name ) );
-				e = e.Next;
+				KPartition partition = this.Partitions[ partitions[ n ] ];
+				sb.AppendFormat( "-- [{0}] -- {1:X8}-{2:X8} - {3}b/{4}b ({5}b free)", partitions[ n ], partition.BaseAddress, partition.UpperBound, partition.Size - partition.FreeSize, partition.Size, partition.FreeSize );
+				sb.Append( Environment.NewLine );
+				LinkedListEntry<KMemoryBlock> e = partition.Blocks.HeadEntry;
+				while( e != null )
+				{
+					KMemoryBlock block = e.Value;
+					sb.AppendFormat( "   {0:X8}-{1:X8} - {2,10}b taken: {3} - {4}", block.Address, block.UpperBound, block.Size, !block.IsFree ? 1 : 0, block.Name );
+					sb.Append( Environment.NewLine );
+					e = e.Next;
+				}
 			}
+			Debug.WriteLine( sb.ToString() );
 		}
 	}
 }
