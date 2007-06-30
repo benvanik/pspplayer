@@ -77,7 +77,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: SceUID sceKernelCreateThread(const char *name, SceKernelThreadEntry entry, int initPriority, int stackSize, SceUInt attr, SceKernelThreadOptParam *option);
 		public int sceKernelCreateThread( int name, int entry, int initPriority, int stackSize, int attr, int option )
 		{
+			KModule module = _kernel.ActiveThread.Module;
+
 			KThread thread = new KThread( _kernel,
+				module,
 				_kernel.Partitions[ 6 ],
 				_kernel.ReadString( ( uint )name ),
 				( uint )entry,

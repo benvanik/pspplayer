@@ -741,7 +741,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						// NOTE: If we are a PRX, the entry address will correspond to module_start, so we don't need to do anything!
 
 						// Create a thread
-						KThread thread = new KThread( kernel, kernel.Partitions[ 6 ], "kmodule_thread", results.EntryAddress, 0, KThreadAttributes.User, 0x4000 );
+						KThread thread = new KThread( kernel,
+							module,
+							kernel.Partitions[ 6 ],
+							"kmodule_thread",
+							results.EntryAddress,
+							0,
+							KThreadAttributes.User,
+							0x4000 );
 						thread.GlobalPointer = results.GlobalPointer;
 						kernel.AddHandle( thread );
 						thread.Start( args, argp );
