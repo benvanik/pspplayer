@@ -60,6 +60,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public int InitialPriority;
 		public int Priority;			// 0-32 - lower = higher
 		public KThreadAttributes Attributes;
+		public KModule Module;
 
 		public KThreadState State;
 		public bool Suspended;
@@ -90,7 +91,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public uint WaitArgument;
 		public uint WaitAddress;			// For output parameters
 
-		public KThread( Kernel kernel, KPartition partition, string name, uint entryAddress, int priority, KThreadAttributes attributes, uint stackSize )
+		public KThread( Kernel kernel, KModule module, KPartition partition, string name, uint entryAddress, int priority, KThreadAttributes attributes, uint stackSize )
 		{
 			Debug.Assert( partition != null );
 
@@ -101,6 +102,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			InitialPriority = priority;
 			Priority = priority;
 			Attributes = attributes;
+			Module = module;
 			
 			State = KThreadState.Stopped;
 
