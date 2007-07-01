@@ -6,24 +6,33 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Noxa
 {
 	public struct Range
 	{
-		public int Location;
-		public int Length;
-
-		public Range( int location, int length )
+		public readonly int Offset;
+		public readonly int Size;
+		public readonly int Extents;
+		
+		public Range( int offset, int size )
 		{
-			this.Location = location;
-			this.Length = length;
+			Debug.Assert( size >= 0 );
+			this.Offset = offset;
+			this.Size = size;
+			this.Extents = offset + size;
 		}
-
+		
+		public bool Contains( int index )
+		{
+			return ( index >= Offset ) && ( index < Extents );
+		}
+		
 		public override string ToString()
 		{
-			return string.Format( "{0}-{1} ({2})", Location, Location + Length, Length );
+			return string.Format( "{0}-{1} ({2})", this.Offset, this.Extents, this.Size );
 		}
 
 		public static Range Empty

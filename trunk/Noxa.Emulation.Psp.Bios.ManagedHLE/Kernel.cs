@@ -184,6 +184,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			LoadParameters loadParams = new LoadParameters();
 			loadParams.Path = Bios.Game.Folder;
+#if DEBUG
+			loadParams.AppendDatabase = true;
+#endif
 			LoadResults results = Bios.Loader.LoadModule( ModuleType.Boot, Bios.BootStream, loadParams );
 
 			Debug.Assert( results.Successful == true );
