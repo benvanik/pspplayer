@@ -588,6 +588,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				if( parameters.AppendDatabase == true )
 				{
 					Debug.Assert( Diag.Instance.Database != null );
+
+					// Find symbol table
+					Elf32_Shdr* symtabShdr = FindSection( buffer, ".symtab" );
+					if( symtabShdr != null )
+					{
+						byte* symtab = buffer + symtabShdr->sh_offset;
+					}
 				}
 
 				// Get exports
