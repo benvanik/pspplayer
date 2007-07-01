@@ -270,6 +270,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			_emulator = emulator;
 			_parameters = parameters;
 
+			Diag.Instance.Database = new DebugDatabase();
+
 			_kernel = new Kernel( this );
 			_loader = new Loader( this );
 

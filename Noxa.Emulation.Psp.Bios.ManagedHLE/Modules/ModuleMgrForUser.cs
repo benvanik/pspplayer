@@ -59,6 +59,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			LoadParameters loadParams = new LoadParameters();
 			if( file != null )
 				loadParams.Path = file.Parent;
+#if DEBUG
+			loadParams.AppendDatabase = true;
+#endif
 			LoadResults results = _kernel.Bios._loader.LoadModule( ModuleType.Prx, stream, loadParams );
 			Debug.Assert( results.Successful == true );
 			if( results.Successful == false )

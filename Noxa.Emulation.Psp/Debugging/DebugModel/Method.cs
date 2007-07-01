@@ -76,7 +76,7 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 			Address = address;
 			Length = length;
 
-			Debug.Assert( address % 4 == 0 );
+			//Debug.Assert( address % 4 == 0 );
 			Debug.Assert( length % 4 == 0 );
 
 			Breakpoints = new List<int>();
@@ -114,11 +114,11 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		public override string ToString()
 		{
 			if( this.Function != null )
-				return string.Format( "0x{0:X8}-0x{1:X8} ({2,-5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Function.ToString() );
+				return string.Format( "0x{0:X8}-0x{1:X8} ({2,5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Function.ToString() );
 			else if( this.Name != null )
-				return string.Format( "0x{0:X8}-0x{1:X8} ({2,-5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Name );
+				return string.Format( "0x{0:X8}-0x{1:X8} ({2,5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Name );
 			else
-				return string.Format( "0x{0:X8}-0x{1:X8} ({2,-5}b)", this.Address, this.Address + this.Length, this.Length );
+				return string.Format( "0x{0:X8}-0x{1:X8} ({2,5}b)", this.Address, this.Address + this.Length, this.Length );
 		}
 	}
 }
