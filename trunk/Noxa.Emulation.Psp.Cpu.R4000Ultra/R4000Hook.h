@@ -55,7 +55,7 @@ namespace Noxa {
 
 					virtual array<uint>^ SearchMemory( uint64 value, int width );
 					virtual uint Checksum( uint startAddress, int length );
-					virtual array<byte>^ GetMethodBody( Method^ method );
+					virtual array<uint>^ GetMethodBody( Method^ method );
 
 				public:
 					Dictionary<uint, int>^	BreakpointLookup;

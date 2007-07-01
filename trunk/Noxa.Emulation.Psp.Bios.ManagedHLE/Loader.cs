@@ -11,6 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Media;
 
@@ -582,6 +583,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					}
 				}
 
+				// If symbols are present, use those to add methods and variables
+				// Otherwise, we need to try to figure them out (good luck!)
+				if( parameters.AppendDatabase == true )
+				{
+					Debug.Assert( Diag.Instance.Database != null );
+				}
+
 				// Get exports
 				uint PspModuleExportSize = ( uint )sizeof( PspModuleExport );
 				uint pexports = moduleInfo->exports + ( ( needsRelocation == true ) ? baseAddress : 0 );
@@ -694,6 +702,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						{
 							uint syscall = cpu.RegisterSyscall( nid );
 							*( pcode + 1 ) = ( uint )( ( syscall << 6 ) | 0xC );
+						}
+
+						// Add to debug database
+						if( parameters.AppendDatabase == true )
+						{
+							Debug.Assert( Diag.Instance.Database != null );
+							Method method = new Method( MethodType.Bios, function.StubAddress, 8, stubImport.Function );
+							Diag.Instance.Database.AddMethod( method );
 						}
 					}
 				}

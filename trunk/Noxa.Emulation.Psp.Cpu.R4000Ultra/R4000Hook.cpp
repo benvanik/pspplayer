@@ -234,8 +234,19 @@ uint R4000Hook::Checksum( uint startAddress, int length )
 	return 0;
 }
 
-array<byte>^ R4000Hook::GetMethodBody( Method^ method )
+array<uint>^ R4000Hook::GetMethodBody( Method^ method )
 {
 	Debug::Assert( method != nullptr );
-	return this->Cpu->_memory->ReadBytes( method->EntryAddress, method->Length );
+	array<uint>^ body = gcnew array<uint>( method->Length / 4 );
+	byte* p = this->Cpu->_memory->NativeSystem->Translate( method->Address );
+	for( int n = 0; n < method->Length / 4; n++ )
+	{
+		body[ n ] =
+			( ( uint )p[ 0 ] ) |
+			( ( uint )p[ 1 ] << 8 ) |
+			( ( uint )p[ 2 ] << 16 ) |
+			( ( uint )p[ 3 ] << 24 );
+		p += 4;
+	}
+	return body;
 }
