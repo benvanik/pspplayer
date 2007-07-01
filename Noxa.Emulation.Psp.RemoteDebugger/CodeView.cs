@@ -68,12 +68,20 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			IDebugDatabase db = Debugger.Host.Database;
 			Debug.Assert( db != null );
 
-			Method method = null;
+			Method method = db.FindMethod( address );
+			Debug.Assert( method != null );
+			MethodBody methodBody = this.BuildMethodBody( method );
+			Debug.Assert( methodBody != null );
 
+			this.disassemblyControl1.SetMethod( methodBody );
+		}
+
+		private MethodBody BuildMethodBody( Method method )
+		{
 			Debug.Assert( Debugger.Host.CpuHook != null );
 			uint[] codes = Debugger.Host.CpuHook.GetMethodBody( method );
 
-			uint instrAddress = address;
+			uint instrAddress = method.Address;
 			List<Instruction> instrs = new List<Instruction>( ( int )method.Length / 4 );
 			for( int n = 0; n < codes.Length; n++ )
 			{
@@ -81,9 +89,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 				instrs.Add( instr );
 				instrAddress += 4;
 			}
-			MethodBody methodBody = new MethodBody( address, 4 * ( uint )method.Length, instrs.ToArray() );
+			MethodBody methodBody = new MethodBody( method.Address, 4 * ( uint )method.Length, instrs.ToArray() );
 
-			this.disassemblyControl1.SetMethod( methodBody );
+			return methodBody;
 		}
 
 		private void TestData()
