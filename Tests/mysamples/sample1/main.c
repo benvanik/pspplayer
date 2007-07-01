@@ -7,7 +7,7 @@
 #include <pspkernel.h>
 #include <pspdebug.h>
 #include <stdio.h>
-#include <zlib.h>
+//#include <zlib.h>
 #include <string.h>
 
 PSP_MODULE_INFO( "sample1", 0, 1, 1 );
@@ -18,8 +18,8 @@ int main( int argc, char *argv[] )
 	//pspDebugScreenInit();
 	//pspDebugScreenPrintf( "Hello World\n" );
 
-	int sz = sceKernelMaxFreeMemSize();
-	fprintf( stderr, "sceKernelMaxFreeMemSize: %d", sz );
+	//int sz = sceKernelMaxFreeMemSize();
+	//fprintf( stderr, "sceKernelMaxFreeMemSize: %d", sz );
 
 	/*unsigned char xx[] = { 0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x40, 0x08, 0x06, 0x00, 0x00, 0x00 };
 	unsigned char *p = &xx[0];

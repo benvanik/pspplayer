@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
+using Noxa.Emulation.Psp.Bios;
+
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
 	/// <summary>
@@ -40,17 +42,22 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// The start address of the method.
 		/// </summary>
-		public readonly int EntryAddress;
+		public readonly uint Address;
 
 		/// <summary>
 		/// The length, in bytes, of the method.
 		/// </summary>
-		public readonly int Length;
+		public readonly uint Length;
 
 		/// <summary>
 		/// The name of the method, if available.
 		/// </summary>
 		public readonly string Name;
+
+		/// <summary>
+		/// The BIOS function the method points to, if available.
+		/// </summary>
+		public readonly BiosFunction Function;
 
 		/// <summary>
 		/// A list of breakpoint IDs defined inside the method.
@@ -61,19 +68,44 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// Initializes a new <see cref="Method"/> instance with the given parameters.
 		/// </summary>
 		/// <param name="type">The type of the method.</param>
-		/// <param name="entryAddress">The start address of the method.</param>
+		/// <param name="address">The start address of the method.</param>
 		/// <param name="length">The length of the method, in bytes.</param>
-		/// <param name="name">The name of the method, if available.</param>
-		public Method( MethodType type, int entryAddress, int length, string name )
+		public Method( MethodType type, uint address, uint length )
 		{
 			Type = type;
-			EntryAddress = entryAddress;
+			Address = address;
 			Length = length;
-			Name = name;
 
+			Debug.Assert( address % 4 == 0 );
 			Debug.Assert( length % 4 == 0 );
 
 			Breakpoints = new List<int>();
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="Method"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="type">The type of the method.</param>
+		/// <param name="address">The start address of the method.</param>
+		/// <param name="length">The length of the method, in bytes.</param>
+		/// <param name="name">The name of the method, if available.</param>
+		public Method( MethodType type, uint address, uint length, string name )
+			: this( type, address, length )
+		{
+			Name = name;
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="Method"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="type">The type of the method.</param>
+		/// <param name="address">The start address of the method.</param>
+		/// <param name="length">The length of the method, in bytes.</param>
+		/// <param name="function">The BIOS function, if available.</param>
+		public Method( MethodType type, uint address, uint length, BiosFunction function )
+			: this( type, address, length )
+		{
+			Function = function;
 		}
 
 		/// <summary>
@@ -81,7 +113,12 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// </summary>
 		public override string ToString()
 		{
-			return string.Format( "{0} (0x{1:X8})", this.Name, this.EntryAddress );
+			if( this.Function != null )
+				return string.Format( "0x{0:X8}-0x{1:X8} ({2,-5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Function.ToString() );
+			else if( this.Name != null )
+				return string.Format( "0x{0:X8}-0x{1:X8} ({2,-5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Name );
+			else
+				return string.Format( "0x{0:X8}-0x{1:X8} ({2,-5}b)", this.Address, this.Address + this.Length, this.Length );
 		}
 	}
 }

@@ -30,5 +30,10 @@ namespace Noxa.Emulation.Psp.Bios
 		/// <c>true</c> to find imports only and not load the module.
 		/// </summary>
 		public bool ImportsOnly;
+
+		/// <summary>
+		/// <c>true</c> to add the methods found to the debug database.
+		/// </summary>
+		public bool AppendDatabase;
 	}
 }

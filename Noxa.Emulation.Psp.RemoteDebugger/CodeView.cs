@@ -8,12 +8,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 
 using Noxa.Emulation.Psp.RemoteDebugger.Model;
+using Noxa.Emulation.Psp.Debugging.DebugData;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp.RemoteDebugger
 {
@@ -33,8 +36,58 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 			this.LoadSettings();
 
-			//this.disassemblyControl1.Enabled = false;
+			this.disassemblyControl1.Enabled = false;
+		}
 
+		private void LoadSettings()
+		{
+			// Hex by default
+			this.hexToolStripButton.Checked = false;
+			this.hexToolStripButton_Click( this, EventArgs.Empty );
+		}
+
+		private void SaveSettings()
+		{
+		}
+
+		private void hexToolStripButton_Click( object sender, EventArgs e )
+		{
+			this.hexToolStripButton.Checked = !this.hexToolStripButton.Checked;
+			this.disassemblyControl1.DisplayHex = hexToolStripButton.Checked;
+		}
+
+		public void Disable()
+		{
+			this.disassemblyControl1.Enabled = false;
+		}
+
+		public void SetAddress( uint address )
+		{
+			this.disassemblyControl1.Enabled = true;
+
+			IDebugDatabase db = Debugger.Host.Database;
+			Debug.Assert( db != null );
+
+			Method method = null;
+
+			Debug.Assert( Debugger.Host.CpuHook != null );
+			uint[] codes = Debugger.Host.CpuHook.GetMethodBody( method );
+
+			uint instrAddress = address;
+			List<Instruction> instrs = new List<Instruction>( ( int )method.Length / 4 );
+			for( int n = 0; n < codes.Length; n++ )
+			{
+				Instruction instr = new Instruction( instrAddress, codes[ n ] );
+				instrs.Add( instr );
+				instrAddress += 4;
+			}
+			MethodBody methodBody = new MethodBody( address, 4 * ( uint )method.Length, instrs.ToArray() );
+
+			this.disassemblyControl1.SetMethod( methodBody );
+		}
+
+		private void TestData()
+		{
 			uint[] codes = new uint[]{
 				0x49170001,
 				0xde00083f,
@@ -82,23 +135,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			MethodBody b = new MethodBody( address, 4 * ( uint )instrs.Count, instrs.ToArray() );
 
 			this.disassemblyControl1.SetMethod( b );
-		}
-
-		private void LoadSettings()
-		{
-			// Hex by default
-			this.hexToolStripButton.Checked = false;
-			this.hexToolStripButton_Click( this, EventArgs.Empty );
-		}
-
-		private void SaveSettings()
-		{
-		}
-
-		private void hexToolStripButton_Click( object sender, EventArgs e )
-		{
-			this.hexToolStripButton.Checked = !this.hexToolStripButton.Checked;
-			this.disassemblyControl1.DisplayHex = hexToolStripButton.Checked;
 		}
 	}
 }

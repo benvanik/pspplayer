@@ -131,9 +131,9 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		/// <summary>
 		/// Get the body of the given method.
 		/// </summary>
-		/// <param name="method"></param>
-		/// <returns></returns>
-		byte[] GetMethodBody( Method method );
+		/// <param name="method">The method to retreive.</param>
+		/// <returns>The words that make up the body of the method.</returns>
+		uint[] GetMethodBody( Method method );
 
 		#endregion
 	}

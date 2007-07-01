@@ -192,6 +192,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 				this.Code.Show( this.View.DockPanel );
 
 				// Jump in code
+				this.Code.SetAddress( address );
 
 				if( this.CallStacksEnabled == true )
 				{

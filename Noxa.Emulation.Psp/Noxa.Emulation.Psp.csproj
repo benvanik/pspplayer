@@ -68,6 +68,7 @@
     <Compile Include="Debugging\DebugModel\Breakpoint.cs" />
     <Compile Include="Debugging\DebugModel\CpuError.cs" />
     <Compile Include="Debugging\DebugModel\MemoryError.cs" />
+    <Compile Include="Debugging\DebugModel\Variable.cs" />
     <Compile Include="Debugging\Hooks\IHook.cs" />
     <Compile Include="Debugging\Hooks\IVideoHook.cs" />
     <Compile Include="Debugging\IDebuggable.cs" />
