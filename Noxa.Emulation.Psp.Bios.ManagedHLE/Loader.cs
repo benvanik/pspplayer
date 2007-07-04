@@ -11,6 +11,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
+using Noxa.Emulation.Psp.Debugging.DebugData;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Media;
@@ -262,6 +263,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 
 			return null;
+		}
+
+		private byte* FindSectionAddress( byte* buffer, uint index )
+		{
+			Elf32_Ehdr* header = ( Elf32_Ehdr* )buffer;
+			Elf32_Shdr* shdr = ( Elf32_Shdr* )( buffer + header->e_shoff + ( header->e_shentsize * index ) );
+			return buffer + shdr->sh_offset;
 		}
 
 		private byte* GetStrTab( byte* buffer )
@@ -583,20 +591,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					}
 				}
 
-				// If symbols are present, use those to add methods and variables
-				// Otherwise, we need to try to figure them out (good luck!)
-				if( parameters.AppendDatabase == true )
-				{
-					Debug.Assert( Diag.Instance.Database != null );
-
-					// Find symbol table
-					Elf32_Shdr* symtabShdr = FindSection( buffer, ".symtab" );
-					if( symtabShdr != null )
-					{
-						byte* symtab = buffer + symtabShdr->sh_offset;
-					}
-				}
-
 				// Get exports
 				uint PspModuleExportSize = ( uint )sizeof( PspModuleExport );
 				uint pexports = moduleInfo->exports + ( ( needsRelocation == true ) ? baseAddress : 0 );
@@ -719,6 +713,53 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							Diag.Instance.Database.AddMethod( method );
 						}
 					}
+				}
+
+				// If symbols are present, use those to add methods and variables
+				// Otherwise, we need to try to figure them out (good luck!)
+				if( parameters.AppendDatabase == true )
+				{
+/*
+					Debug.Assert( Diag.Instance.Database != null );
+					IDebugDatabase db = Diag.Instance.Database;
+
+					// Find symbol table
+					Elf32_Shdr* symtabShdr = FindSection( buffer, ".symtab" );
+					if( symtabShdr != null )
+					{
+						byte* strtab = FindSectionAddress( buffer, symtabShdr->sh_link );
+
+						int symbolCount = ( int )symtabShdr->sh_size / sizeof( Elf32_Sym );
+						byte* symtab = buffer + symtabShdr->sh_offset;
+						byte* p = symtab;
+						for( int n = 0; n < symbolCount; n++, p += sizeof( Elf32_Sym ) )
+						{
+							Elf32_Sym* sym = ( Elf32_Sym* )p;
+							uint symType = sym->st_info & ( uint )0xF;
+							if( ( symType != 0x1 ) && ( symType != 0x2 ) )
+								continue;
+
+							string name = null;
+							if( sym->st_name != 0 )
+								name = this.GetName( strtab, ( int )sym->st_name );
+							uint address = baseAddress + sym->st_value;
+							if( symType == 0x1 )
+							{
+								// OBJECT
+								db.AddVariable( new Variable( address, sym->st_size, name ) );
+							}
+							else if( symType == 0x2 )
+							{
+								// FUNC
+								// Only add if it hasn't already been
+								if( db.FindMethod( address ) == null )
+									db.AddMethod( new Method( MethodType.User, address, sym->st_size, name ) );
+							}
+						}
+
+						results.HadSymbols = true;
+					}
+*/
 				}
 
 #if DEBUG

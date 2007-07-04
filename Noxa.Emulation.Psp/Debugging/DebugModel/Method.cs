@@ -60,11 +60,6 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		public readonly BiosFunction Function;
 
 		/// <summary>
-		/// A list of breakpoint IDs defined inside the method.
-		/// </summary>
-		public List<int> Breakpoints;
-
-		/// <summary>
 		/// Initializes a new <see cref="Method"/> instance with the given parameters.
 		/// </summary>
 		/// <param name="type">The type of the method.</param>
@@ -78,8 +73,6 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 
 			//Debug.Assert( address % 4 == 0 );
 			Debug.Assert( length % 4 == 0 );
-
-			Breakpoints = new List<int>();
 		}
 
 		/// <summary>
