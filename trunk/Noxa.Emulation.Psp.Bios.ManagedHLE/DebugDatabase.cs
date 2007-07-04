@@ -42,7 +42,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public void AddMethod( Method method )
 		{
 			_methods.Add( method );
-			_methodLookup.Add( new Range( ( int )( method.Address - MemorySystem.MainMemoryBase ), ( int )method.Length ), method );
+			_methodLookup.Add( new Range( ( int )method.Address, ( int )method.Length ), method );
 		}
 
 		public Method[] GetMethods()
@@ -57,7 +57,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public Method FindMethod( uint address )
 		{
-			return _methodLookup[ ( int )( address - MemorySystem.MainMemoryBase ) ];
+			return _methodLookup[ ( int )address ];
 		}
 
 		#endregion
@@ -67,7 +67,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public void AddVariable( Variable variable )
 		{
 			_variables.Add( variable );
-			_variableLookup.Add( new Range( ( int )( variable.Address - MemorySystem.MainMemoryBase ), ( int )variable.Length ), variable );
+			_variableLookup.Add( new Range( ( int )variable.Address, ( int )variable.Length ), variable );
 		}
 
 		public Variable[] GetVariables()
@@ -77,7 +77,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public Variable FindVariable( uint address )
 		{
-			return _variableLookup[ ( int )( address - MemorySystem.MainMemoryBase ) ];
+			return _variableLookup[ ( int )address ];
 		}
 
 		#endregion

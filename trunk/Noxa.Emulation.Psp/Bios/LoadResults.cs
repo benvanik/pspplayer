@@ -64,6 +64,11 @@ namespace Noxa.Emulation.Psp.Bios
 		/// Used internally to preserve important information. Only present if requested in <see cref="LoadParameters"/>.
 		/// </summary>
 		public IntPtr PreservedData;
+
+		/// <summary>
+		/// If <c>true</c>, the module had symbols. If asked in the <see cref="LoadParameters"/>, they were appened to the database.
+		/// </summary>
+		public bool HadSymbols;
 	}
 
 	/// <summary>

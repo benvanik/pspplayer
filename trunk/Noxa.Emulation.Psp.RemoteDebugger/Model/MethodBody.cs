@@ -260,7 +260,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Model
 			if( transpose && c == 'M' )
 				c = 'E';
 			return string.Format( "{0}{1}{2}{3}", c, mtx, idx, fsl );
-			//sprintf(hej[yo],"%c%i%i%i",c,mtx,idx,fsl);
 		}
 
 		// Could be:
