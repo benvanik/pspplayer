@@ -265,6 +265,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			return null;
 		}
 
+		private Elf32_Shdr* FindSection( byte* buffer, uint index )
+		{
+			Elf32_Ehdr* header = ( Elf32_Ehdr* )buffer;
+			Elf32_Shdr* shdr = ( Elf32_Shdr* )( buffer + header->e_shoff + ( header->e_shentsize * index ) );
+			return shdr;
+		}
+
 		private byte* FindSectionAddress( byte* buffer, uint index )
 		{
 			Elf32_Ehdr* header = ( Elf32_Ehdr* )buffer;
@@ -731,6 +738,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					// Find symbol table
 					Elf32_Shdr* symtabShdr = FindSection( buffer, ".symtab" );
 					if( symtabShdr != null )
+					//if( false )
 					{
 						byte* strtab = FindSectionAddress( buffer, symtabShdr->sh_link );
 
@@ -743,11 +751,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							uint symType = sym->st_info & ( uint )0xF;
 							if( ( symType != 0x1 ) && ( symType != 0x2 ) )
 								continue;
+							if( sym->st_size == 0 )
+								continue;
+
+							Elf32_Shdr* shdr = FindSection( buffer, sym->st_shndx );
+							Debug.Assert( shdr != null );
 
 							string name = null;
 							if( sym->st_name != 0 )
 								name = this.GetName( strtab, ( int )sym->st_name );
-							uint address = baseAddress + sym->st_value;
+							uint address = baseAddress + shdr->sh_addr + sym->st_value;
 							Symbol symbol = null;
 							if( symType == 0x1 )
 							{
@@ -757,7 +770,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							else if( symType == 0x2 )
 							{
 								// FUNC
-								symbol = new Method( MethodType.User, address, sym->st_size, name );
+								symbol = new Method( MethodType.User, address, sym->st_size );//, name );
 							}
 							if( symbol != null )
 								db.AddSymbol( symbol );
@@ -770,12 +783,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						// No symbol table found - try to build the symbols
 						Elf32_Shdr* textShdr = FindSection( buffer, ".text" );
 						Debug.Assert( textShdr != null );
-						byte* text = buffer + textShdr->sh_offset;
-						this.Analyze( db, text, textShdr->sh_size, baseAddress + textShdr->sh_addr );
+						uint textAddress = baseAddress + textShdr->sh_addr;
+						byte* text = memory.TranslateMainMemory( ( int )textAddress );
+						uint size = textShdr->sh_size;
+						this.Analyze( db, text, size, textAddress );
 					}
 
 					// End update, started above
 					Diag.Instance.Database.EndUpdate();
+
+					foreach( Method method in db.GetMethods() )
+					{
+						Debug.WriteLine( method.ToString() );
+					}
 				}
 
 #if DEBUG

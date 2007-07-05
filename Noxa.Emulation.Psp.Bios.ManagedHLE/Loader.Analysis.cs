@@ -62,7 +62,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					//}
 
 					// End method
-					Method method = new Method( MethodType.User, methodStart, address - methodStart );
+					Method method = new Method( MethodType.User, methodStart, address - methodStart + 4 );
 					db.AddSymbol( method );
 					methodStart = address + 4;
 					lastBranchTarget = 0;
@@ -104,11 +104,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				db.AddSymbol( method );
 				Log.WriteLine( Verbosity.Normal, Feature.Loader, "Analyze didn't finish .text cleanly - last method: {0}", method.ToString() );
 			}
-
-			//foreach( Method method in db.GetMethods() )
-			//{
-			//    Debug.WriteLine( method.ToString() );
-			//}
 		}
 
 		#region Instructions

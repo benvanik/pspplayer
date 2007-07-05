@@ -55,6 +55,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				return x.Address.CompareTo( y.Address );
 			} );
+			_methods.Sort( delegate( Method x, Method y )
+			{
+				return x.Address.CompareTo( y.Address );
+			} );
 			_updating = false;
 		}
 
