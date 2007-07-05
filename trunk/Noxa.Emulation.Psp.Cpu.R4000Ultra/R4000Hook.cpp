@@ -239,7 +239,7 @@ array<uint>^ R4000Hook::GetMethodBody( Method^ method )
 	Debug::Assert( method != nullptr );
 	array<uint>^ body = gcnew array<uint>( method->Length / 4 );
 	byte* p = this->Cpu->_memory->NativeSystem->Translate( method->Address );
-	for( int n = 0; n < method->Length / 4; n++ )
+	for( int n = 0; n < ( int )method->Length / 4; n++ )
 	{
 		body[ n ] =
 			( ( uint )p[ 0 ] ) |

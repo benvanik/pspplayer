@@ -11,14 +11,14 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
+using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Debugging.DebugData;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
-using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 {
-	unsafe class Loader : ILoader
+	unsafe partial class Loader : ILoader
 	{
 		private Bios _bios;
 
@@ -591,6 +591,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					}
 				}
 
+				if( parameters.AppendDatabase == true )
+				{
+					Debug.Assert( Diag.Instance.Database != null );
+					Diag.Instance.Database.BeginUpdate();
+				}
+
 				// Get exports
 				uint PspModuleExportSize = ( uint )sizeof( PspModuleExport );
 				uint pexports = moduleInfo->exports + ( ( needsRelocation == true ) ? baseAddress : 0 );
@@ -697,7 +703,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						stubImport.Address = ( uint )pcode;
 						results.Imports.Add( stubImport );
 
-						function.StubAddress = ( uint )( im->funcs + ( m * 2 ) );
+						function.StubAddress = ( uint )( im->funcs + ( m * 2 ) * 4 );
 
 						// Perform fixup
 						{
@@ -710,7 +716,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						{
 							Debug.Assert( Diag.Instance.Database != null );
 							Method method = new Method( MethodType.Bios, function.StubAddress, 8, stubImport.Function );
-							Diag.Instance.Database.AddMethod( method );
+							Diag.Instance.Database.AddSymbol( method );
 						}
 					}
 				}
@@ -719,7 +725,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				// Otherwise, we need to try to figure them out (good luck!)
 				if( parameters.AppendDatabase == true )
 				{
-/*
 					Debug.Assert( Diag.Instance.Database != null );
 					IDebugDatabase db = Diag.Instance.Database;
 
@@ -743,23 +748,34 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							if( sym->st_name != 0 )
 								name = this.GetName( strtab, ( int )sym->st_name );
 							uint address = baseAddress + sym->st_value;
+							Symbol symbol = null;
 							if( symType == 0x1 )
 							{
 								// OBJECT
-								db.AddVariable( new Variable( address, sym->st_size, name ) );
+								symbol = new Variable( address, sym->st_size, name );
 							}
 							else if( symType == 0x2 )
 							{
 								// FUNC
-								// Only add if it hasn't already been
-								if( db.FindMethod( address ) == null )
-									db.AddMethod( new Method( MethodType.User, address, sym->st_size, name ) );
+								symbol = new Method( MethodType.User, address, sym->st_size, name );
 							}
+							if( symbol != null )
+								db.AddSymbol( symbol );
 						}
 
 						results.HadSymbols = true;
 					}
-*/
+					else
+					{
+						// No symbol table found - try to build the symbols
+						Elf32_Shdr* textShdr = FindSection( buffer, ".text" );
+						Debug.Assert( textShdr != null );
+						byte* text = buffer + textShdr->sh_offset;
+						this.Analyze( db, text, textShdr->sh_size, baseAddress + textShdr->sh_addr );
+					}
+
+					// End update, started above
+					Diag.Instance.Database.EndUpdate();
 				}
 
 #if DEBUG

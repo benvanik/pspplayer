@@ -59,6 +59,7 @@
     <Compile Include="Kernel.Scheduling.cs" />
     <Compile Include="Kernel.Timers.cs" />
     <Compile Include="Bios.cs" />
+    <Compile Include="Loader.Analysis.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="ManagedHLE.cs" />
     <Compile Include="Module.cs" />

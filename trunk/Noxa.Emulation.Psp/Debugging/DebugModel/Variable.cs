@@ -15,18 +15,8 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 	/// Represents a variable inside of a program debug database.
 	/// </summary>
 	[Serializable]
-	public class Variable
+	public class Variable : Symbol
 	{
-		/// <summary>
-		/// The start address of the variable.
-		/// </summary>
-		public readonly uint Address;
-
-		/// <summary>
-		/// The length, in bytes, of the variable.
-		/// </summary>
-		public readonly uint Length;
-
 		/// <summary>
 		/// The name of the variable, if available.
 		/// </summary>
@@ -39,10 +29,20 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <param name="length">The length of the variable, in bytes.</param>
 		/// <param name="name">The name of the method, if available.</param>
 		public Variable( uint address, uint length, string name )
+			: base( address, length )
 		{
-			Address = address;
-			Length = length;
 			Name = name;
+		}
+
+		/// <summary>
+		/// Returns a <see cref="String"/> that represents the current <see cref="Method"/>.
+		/// </summary>
+		public override string ToString()
+		{
+			if( this.Name != null )
+				return string.Format( "V 0x{0:X8}-0x{1:X8} ({2,5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Name );
+			else
+				return string.Format( "V 0x{0:X8}-0x{1:X8} ({2,5}b)", this.Address, this.Address + this.Length, this.Length );
 		}
 	}
 }
