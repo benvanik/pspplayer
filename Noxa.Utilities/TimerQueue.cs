@@ -427,7 +427,7 @@ namespace Noxa
 				e = e.Next;
 				_searchCount++;
 			}
-			Debug.Assert( timer != null );
+			//Debug.Assert( timer != null );
 			if( timer == null )
 				return;
 

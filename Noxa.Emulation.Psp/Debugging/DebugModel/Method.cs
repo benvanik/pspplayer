@@ -32,22 +32,12 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 	/// Represents a method inside of a program debug database.
 	/// </summary>
 	[Serializable]
-	public class Method
+	public class Method : Symbol
 	{
 		/// <summary>
 		/// The type of the method.
 		/// </summary>
 		public readonly MethodType Type;
-
-		/// <summary>
-		/// The start address of the method.
-		/// </summary>
-		public readonly uint Address;
-
-		/// <summary>
-		/// The length, in bytes, of the method.
-		/// </summary>
-		public readonly uint Length;
 
 		/// <summary>
 		/// The name of the method, if available.
@@ -66,11 +56,10 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <param name="address">The start address of the method.</param>
 		/// <param name="length">The length of the method, in bytes.</param>
 		public Method( MethodType type, uint address, uint length )
+			: base( address, length )
 		{
 			Type = type;
-			Address = address;
-			Length = length;
-
+			
 			//Debug.Assert( address % 4 == 0 );
 			Debug.Assert( length % 4 == 0 );
 		}
@@ -107,11 +96,11 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		public override string ToString()
 		{
 			if( this.Function != null )
-				return string.Format( "0x{0:X8}-0x{1:X8} ({2,5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Function.ToString() );
+				return string.Format( "M 0x{0:X8}-0x{1:X8} ({2,5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Function.ToString() );
 			else if( this.Name != null )
-				return string.Format( "0x{0:X8}-0x{1:X8} ({2,5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Name );
+				return string.Format( "M 0x{0:X8}-0x{1:X8} ({2,5}b) {3}", this.Address, this.Address + this.Length, this.Length, this.Name );
 			else
-				return string.Format( "0x{0:X8}-0x{1:X8} ({2,5}b)", this.Address, this.Address + this.Length, this.Length );
+				return string.Format( "M 0x{0:X8}-0x{1:X8} ({2,5}b)", this.Address, this.Address + this.Length, this.Length );
 		}
 	}
 }

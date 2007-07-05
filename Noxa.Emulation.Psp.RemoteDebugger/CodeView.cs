@@ -68,7 +68,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			IDebugDatabase db = Debugger.Host.Database;
 			Debug.Assert( db != null );
 
-			Method method = db.FindMethod( address );
+			Method method = db.FindSymbol( address ) as Method;
 			Debug.Assert( method != null );
 			MethodBody methodBody = this.BuildMethodBody( method );
 			Debug.Assert( methodBody != null );

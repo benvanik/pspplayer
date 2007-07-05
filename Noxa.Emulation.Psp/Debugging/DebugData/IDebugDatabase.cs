@@ -23,10 +23,27 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 		void Clear();
 
 		/// <summary>
-		/// Add a <see cref="Method"/> to the debug database.
+		/// Begin batch addition of symbols.
 		/// </summary>
-		/// <param name="method">The <see cref="Method"/> to add.</param>
-		void AddMethod( Method method );
+		void BeginUpdate();
+
+		/// <summary>
+		/// End batch addition of symbols.
+		/// </summary>
+		void EndUpdate();
+
+		/// <summary>
+		/// Add a <see cref="Symbol"/> to the debug database.
+		/// </summary>
+		/// <param name="symbol">The <see cref="Symbol"/> to add.</param>
+		void AddSymbol( Symbol symbol );
+
+		/// <summary>
+		/// Find a specific <see cref="Symbol"/> containing the given address.
+		/// </summary>
+		/// <param name="address">An address contained within the <see cref="Symbol"/> to find.</param>
+		/// <returns>The <see cref="Symbol"/> if found, otherwise <c>null</c>.</returns>
+		Symbol FindSymbol( uint address );
 
 		/// <summary>
 		/// Get a list of all <see cref="Method"/> instances in the database.
@@ -42,29 +59,9 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 		Method[] GetMethods( MethodType methodType );
 
 		/// <summary>
-		/// Find a specific <see cref="Method"/> containing the given address.
-		/// </summary>
-		/// <param name="address">An address contained within the <see cref="Method"/> to find.</param>
-		/// <returns>The <see cref="Method"/> if found, otherwise <c>null</c>.</returns>
-		Method FindMethod( uint address );
-
-		/// <summary>
-		/// Add a <see cref="Variable"/> to the debug database.
-		/// </summary>
-		/// <param name="variable">The <see cref="Variable"/> to add.</param>
-		void AddVariable( Variable variable );
-
-		/// <summary>
 		/// Get a list of all <see cref="Variable"/> instances in the database.
 		/// </summary>
 		/// <returns>A list of <see cref="Variable"/> instances.</returns>
 		Variable[] GetVariables();
-
-		/// <summary>
-		/// Find a specific <see cref="Variable"/> containing the given address.
-		/// </summary>
-		/// <param name="address">An address contained within the <see cref="Variable"/> to find.</param>
-		/// <returns>The <see cref="Variable"/> if found, otherwise <c>null</c>.</returns>
-		Variable FindVariable( uint address );
 	}
 }
