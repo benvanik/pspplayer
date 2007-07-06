@@ -737,8 +737,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 					// Find symbol table
 					Elf32_Shdr* symtabShdr = FindSection( buffer, ".symtab" );
-					if( symtabShdr != null )
-					//if( false )
+					if( ( symtabShdr != null ) &&
+						( symtabShdr->sh_size > 0x100 ) )
 					{
 						byte* strtab = FindSectionAddress( buffer, symtabShdr->sh_link );
 
@@ -777,6 +777,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						}
 
 						results.HadSymbols = true;
+
+						Log.WriteLine( Verbosity.Verbose, Feature.Loader, "Found {0} methods and {1} variables in the symbol table", db.MethodCount, db.VariableCount );
 					}
 					else
 					{
@@ -787,15 +789,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						byte* text = memory.TranslateMainMemory( ( int )textAddress );
 						uint size = textShdr->sh_size;
 						this.Analyze( db, text, size, textAddress );
+
+						Log.WriteLine( Verbosity.Verbose, Feature.Loader, "Found {0} methods by analysis", db.MethodCount );
 					}
 
 					// End update, started above
 					Diag.Instance.Database.EndUpdate();
 
-					foreach( Method method in db.GetMethods() )
-					{
-						Debug.WriteLine( method.ToString() );
-					}
+					//foreach( Method method in db.GetMethods() )
+					//    Debug.WriteLine( method.ToString() );
 				}
 
 #if DEBUG

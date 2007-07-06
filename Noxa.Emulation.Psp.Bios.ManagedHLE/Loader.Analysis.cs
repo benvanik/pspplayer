@@ -28,6 +28,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			bool inDelay = false;
 			uint lastBranchTarget = 0;
 			InstructionType lastJumpType = InstructionType.Normal;
+			uint previousTarget = 0;
 			bool lastJumpRegister = false;
 			//bool hasSpMod = false;
 
@@ -55,6 +56,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						continue;
 					if( lastBranchTarget > address )
 						continue;
+					// If it's a jump and it's back in to us, don't count it
+					//if( ( lastJumpType == InstructionType.Jump ) &&
+					//    ( previousTarget >= methodStart ) &&
+					//    ( previousTarget < address ) )
+					//    continue;
 					//if( ( isSpMod == true ) &&
 					//    ( lastJumpType == InstructionType.Jump ) &&
 					//    ( lastJumpRegister == false ) )
@@ -93,6 +99,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					case InstructionType.JumpAndLink:
 						break;
 				}
+				previousTarget = target;
 				inDelay = ( type != InstructionType.Normal );
 				lastJumpType = type;
 			}

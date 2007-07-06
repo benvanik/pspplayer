@@ -28,6 +28,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			_variables = new List<Variable>( 1024 );
 		}
 
+		public int MethodCount
+		{
+			get
+			{
+				return _methods.Count;
+			}
+		}
+
+		public int VariableCount
+		{
+			get
+			{
+				return _variables.Count;
+			}
+		}
+
 		public void Clear()
 		{
 			_methods.Clear();

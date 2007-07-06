@@ -246,7 +246,10 @@ namespace Noxa.Emulation.Psp.Bios
 		/// <returns>A <see cref="String"/> representing the function.</returns>
 		public override string ToString()
 		{
-			return string.Format( "[{0:X8}] {1}::{2}", this.NID, this.Module.Name, this.Name );
+			if( this.Module != null )
+				return string.Format( "[{0:X8}] {1}::{2}", this.NID, this.Module.Name, this.Name );
+			else
+				return string.Format( "[{0:X8}] {1}", this.NID, this.Name );
 		}
 	}
 }

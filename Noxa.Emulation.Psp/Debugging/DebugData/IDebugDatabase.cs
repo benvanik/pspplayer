@@ -18,6 +18,22 @@ namespace Noxa.Emulation.Psp.Debugging.DebugData
 	public interface IDebugDatabase
 	{
 		/// <summary>
+		/// The number of methods in the database.
+		/// </summary>
+		int MethodCount
+		{
+			get;
+		}
+
+		/// <summary>
+		/// The number of variables in the database.
+		/// </summary>
+		int VariableCount
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Clear the debug database.
 		/// </summary>
 		void Clear();
