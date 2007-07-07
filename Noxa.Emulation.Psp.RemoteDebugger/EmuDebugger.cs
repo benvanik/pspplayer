@@ -29,6 +29,26 @@ using Noxa.Emulation.Psp.RemoteDebugger.Tools;
 
 namespace Noxa.Emulation.Psp.RemoteDebugger
 {
+	enum DebuggerState
+	{
+		/// <summary>
+		/// The debugger is not attached.
+		/// </summary>
+		Detached,
+		/// <summary>
+		/// The debugger is idle, waiting to start.
+		/// </summary>
+		Idle,
+		/// <summary>
+		/// The debugger is running code.
+		/// </summary>
+		Running,
+		/// <summary>
+		/// The debugger is stopped in the middle of execution.
+		/// </summary>
+		Broken,
+	}
+
 	class EmuDebugger : MarshalByRefObject, IDebugger, IDebugHandler
 	{
 		public DebugHost Host;
@@ -42,6 +62,20 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 		public bool IsConnected;
 		public bool CallStacksEnabled;
+
+		private DebuggerState _state = DebuggerState.Detached;
+		public event EventHandler StateChanged;
+		public DebuggerState State
+		{
+			get
+			{
+				return _state;
+			}
+			set
+			{
+				_state = value;
+			}
+		}
 
 		public ILogger Logger
 		{
@@ -72,6 +106,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 			// Log is created here because it is special
 			this.Log = new LogViewer( this );
+
+			this.OnStateChanged();
 		}
 
 		public void StartConnection()
@@ -152,12 +188,15 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 				this.Statistics.OnStarted();
 
 				this.View.SetStatusText( Verbosity.Normal, "Connection to emulator {0} established.", this.Host.HostString );
+
+				this.State = DebuggerState.Running;
+				this.OnStateChanged();
 			};
 			this.View.Invoke( del );
 
 			// TEST
-			Breakpoint bp = new Breakpoint( BreakpointType.CodeExecute, 0x0890003c );
-			//this.Host.CpuHook.AddBreakpoint( bp );
+			Breakpoint bp = new Breakpoint( BreakpointType.CodeExecute, 0x08900334 );
+			//this.Breakpoints.Add( bp );
 		}
 
 		public void OnStopped()
@@ -166,6 +205,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			{
 				this.Log.OnStopped();
 				this.Statistics.OnStopped();
+
+				this.State = DebuggerState.Detached;
+				this.OnStateChanged();
 			};
 			this.View.Invoke( del );
 		}
@@ -199,6 +241,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 					Frame[] stack = this.GetCallstack();
 					this.CallStack.SetCallstack( stack );
 				}
+
+				this.State = DebuggerState.Broken;
+				this.OnStateChanged();
 			};
 			this.View.Invoke( del, address );
 		}
@@ -219,7 +264,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 				return;
 			}
 			this.ShowSourceView( bp.Address );
-			Debugger.Break();
 		}
 
 		public void OnEvent( Event biosEvent )
@@ -247,6 +291,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.OnStopped();
 
 			this.View.SetStatusText( Verbosity.Critical, "Connection to emulator lost!" );
+		}
+
+		private void OnStateChanged()
+		{
+			if( this.StateChanged != null )
+				this.StateChanged( this, EventArgs.Empty );
 		}
 	}
 }

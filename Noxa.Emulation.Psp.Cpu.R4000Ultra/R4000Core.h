@@ -33,7 +33,7 @@ namespace Noxa {
 					R4000Cp2^			Cp2;
 
 					int*		PC;
-					int*		Registers;
+					uint*		Registers;
 					int*		HI;
 					int*		LO;
 					int*		LL;

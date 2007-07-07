@@ -106,11 +106,11 @@ int __debugHandlerM( int breakpointId )
 				Diag::Instance->Client->Handler->OnStepComplete( breakpoint->Address );
 				break;
 			default:
-				//Diag::Instance->Client->Handler->OnBreakpointHit( breakpoint->ID );
+				Diag::Instance->Client->Handler->OnBreakpointHit( breakpoint->ID );
 				break;
 			}
 
-			//WaitForSingleObject( _debugHandle, INFINITE );
+			WaitForSingleObject( _debugHandle, INFINITE );
 			_debugResumeMode = DEBUG_RESUME_CONTINUE;
 
 			switch( _debugResumeMode )

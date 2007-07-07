@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Noxa.Emulation.Psp.Bios;
 
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
@@ -49,6 +50,17 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		{
 			this.ModuleName = moduleName;
 			this.MethodName = methodName;
+		}
+
+		/// <summary>
+		/// Initializes a new <see cref="BiosFunctionToken"/> instance with the given parameters.
+		/// </summary>
+		/// <param name="function">The source <see cref="BiosFunction"/> to take on.</param>
+		public BiosFunctionToken( BiosFunction function )
+		{
+			this.NID = function.NID;
+			this.ModuleName = function.Module.Name;
+			this.MethodName = function.Name;
 		}
 
 		/// <summary>

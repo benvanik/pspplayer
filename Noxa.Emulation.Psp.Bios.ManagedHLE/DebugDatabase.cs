@@ -15,7 +15,7 @@ using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 {
-	class DebugDatabase : IDebugDatabase
+	class DebugDatabase : MarshalByRefObject, IDebugDatabase
 	{
 		private List<Method> _methods;
 		private List<Variable> _variables;
@@ -98,10 +98,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				Symbol symbol = _symbols[ middle ];
 				if( symbol.Address < address )
 					first = middle + 1;
-				else if( symbol.Address + symbol.Length > address )
-					last = middle - 1;
-				else
+				else if( ( address >= symbol.Address ) &&
+					( address < symbol.Address + symbol.Length ) )
 					return symbol;
+				else
+					last = middle - 1;
 			}
 			return null;
 		}

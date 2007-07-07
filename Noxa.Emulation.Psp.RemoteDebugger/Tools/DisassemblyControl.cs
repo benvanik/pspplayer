@@ -11,9 +11,12 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 
+using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.Hooks;
 using Noxa.Emulation.Psp.RemoteDebugger.Model;
 
 namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
@@ -21,6 +24,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 	partial class DisassemblyControl : ListBox
 	{
 		public bool _displayHex = true;
+		public EmuDebugger Debugger;
 
 		public DisassemblyControl()
 		{
@@ -514,10 +518,15 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 		private void ClearHovered()
 		{
 			this.toolTip1.SetToolTip( this, null );
-			_hoveredIndex = -1;
-			_hoveredColumn = Column.None;
-			_hoveredValue = null;
-			this.Invalidate();
+			if( ( _hoveredIndex >= 0 ) ||
+				( _hoveredColumn != Column.None ) ||
+				( _hoveredValue != null ) )
+			{
+				_hoveredIndex = -1;
+				_hoveredColumn = Column.None;
+				_hoveredValue = null;
+				this.Invalidate();
+			}
 		}
 
 		protected override void OnMouseWheel( MouseEventArgs e )
@@ -725,7 +734,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 
 			if( this.valueToolStripTextBox.Modified == true )
 			{
-				Debug.WriteLine( "changed " + valueToolStripTextBox.Text );
+				//Debug.WriteLine( "changed " + valueToolStripTextBox.Text );
 				this.UpdateOperandValue( instr, _contextOperand, this.valueToolStripTextBox.Text );
 			}
 		}
@@ -879,25 +888,25 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 						if( full == true )
 						{
 							if( _displayHex == true )
-								return string.Format( "0x{0:X8} ({0})", this.GetRegisterI( op.Register ) );
+								return string.Format( "0x{0:X8} ({0})", this.GetRegister<uint>( op.Register ) );
 							else
-								return this.GetRegisterI( op.Register ).ToString();
+								return this.GetRegister<uint>( op.Register ).ToString();
 						}
 						else
-							return string.Format( _displayHex ? "0x{0:X8}" : "{0}", this.GetRegisterI( op.Register ) );
+							return string.Format( _displayHex ? "0x{0:X8}" : "{0}", this.GetRegister<uint>( op.Register ) );
 					}
 					else
-						return string.Format( "{0}", this.GetRegisterF( op.Register ) );
+						return string.Format( "{0}", this.GetRegister<float>( op.Register ) );
 				case OperandType.VfpuRegister:
-					return string.Format( "{0}", this.GetRegisterF( op.Register ) );
+					return string.Format( "{0}", this.GetRegister<float>( op.Register ) );
 				case OperandType.MemoryAccess:
 					if( full == true )
 					{
-						uint reg = this.GetRegisterI( op.Register );
+						uint reg = this.GetRegister<uint>( op.Register );
 						return string.Format( "0x{0:X8} (0x{1:X8}{3}{2})", reg + op.Immediate, reg, op.Immediate, op.Immediate < 0 ? "" : "+" );
 					}
 					else
-						return string.Format( "0x{0:X8}", this.GetRegisterI( op.Register ) + op.Immediate );
+						return string.Format( "0x{0:X8}", this.GetRegister<uint>( op.Register ) + op.Immediate );
 				case OperandType.BranchTarget:
 					uint branchTarget = ( uint )( instruction.Address + op.Immediate + 4 );
 					if( full == true )
@@ -910,7 +919,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 					if( op.Register == null )
 						return string.Format( "0x{0:X8}", op.Immediate );
 					else
-						return string.Format( "0x{0:X8}", this.GetRegisterI( op.Register ) );
+						return string.Format( "0x{0:X8}", this.GetRegister<uint>( op.Register ) );
 			}
 		}
 
@@ -921,22 +930,37 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 				case OperandType.Annotation:
 				case OperandType.Immediate:
 				case OperandType.ImmediateFloat:
-				case OperandType.JumpTarget:
 					Debug.Assert( false );
 					break;
 
+				case OperandType.JumpTarget:
 				case OperandType.Register:
-					if( op.Register.Format == RegisterFormat.Integer )
+					Debug.Assert( op.Register != null );
+					if( op.Register != null )
 					{
-						int ivalue;
-						if( int.TryParse( value, out ivalue ) == true )
-							this.SetRegister( op.Register, ( uint )ivalue );
-					}
-					else
-					{
-						float fvalue;
-						if( float.TryParse( value, out fvalue ) == true )
-							this.SetRegister( op.Register, fvalue );
+						if( op.Register.Format == RegisterFormat.Integer )
+						{
+							int ivalue;
+							NumberStyles ns = NumberStyles.Integer;
+							if( value.StartsWith( "0x" ) )
+							{
+								ns = NumberStyles.HexNumber;
+								value = value.Substring( 2 );
+							}
+							else if( value.EndsWith( "h" ) )
+							{
+								ns = NumberStyles.HexNumber;
+								value = value.Substring( 0, value.Length - 2 );
+							}
+							if( int.TryParse( value, ns, CultureInfo.InvariantCulture, out ivalue ) == true )
+								this.SetRegister<uint>( op.Register, ( uint )ivalue );
+						}
+						else
+						{
+							float fvalue;
+							if( float.TryParse( value, NumberStyles.Float, CultureInfo.InvariantCulture, out fvalue ) == true )
+								this.SetRegister<float>( op.Register, fvalue );
+						}
 					}
 					break;
 				case OperandType.VfpuRegister:
@@ -949,22 +973,14 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			}
 		}
 
-		private uint GetRegisterI( Register register )
+		private T GetRegister<T>( Register register )
 		{
-			return 0;
+			return this.Debugger.Host.CpuHook.GetRegister<T>( register.Bank.Set, register.Ordinal );
 		}
 
-		private float GetRegisterF( Register register )
+		private void SetRegister<T>( Register register, T value )
 		{
-			return 0.0f;
-		}
-
-		private void SetRegister( Register register, uint value )
-		{
-		}
-
-		private void SetRegister( Register register, float value )
-		{
+			this.Debugger.Host.CpuHook.SetRegister<T>( register.Bank.Set, register.Ordinal, value );
 		}
 	}
 }

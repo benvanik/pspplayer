@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -48,6 +49,13 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.toolStripContainer1.TopToolStripPanel.Controls.Add( this.locationToolStrip );
 			this.toolStripContainer1.TopToolStripPanel.Controls.Add( this.windowsToolStrip );
 			this.toolStripContainer1.TopToolStripPanel.Controls.Add( this.controlToolStrip );
+
+			this.Debugger.StateChanged += new EventHandler( Debugger_StateChanged );
+		}
+
+		private void Debugger_StateChanged( object sender, EventArgs e )
+		{
+			Debug.WriteLine( "debug state changed: " + this.Debugger.State.ToString() );
 		}
 
 		private void DebugView_Load( object sender, EventArgs e )

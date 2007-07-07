@@ -8,18 +8,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
+using Noxa.Emulation.Psp.Debugging.Hooks;
+
 namespace Noxa.Emulation.Psp.RemoteDebugger.Model
 {
 	class RegisterBank
 	{
 		public readonly string Name;
+		public readonly RegisterSet Set;
 		public readonly Register[] Registers;
 
 		public bool UseAltNames = false;
 
-		public RegisterBank( string name, Register[] registers )
+		public RegisterBank( string name, RegisterSet set, Register[] registers )
 		{
 			this.Name = name;
+			this.Set = set;
 			this.Registers = registers;
 			foreach( Register register in registers )
 				register.Bank = this;
@@ -72,7 +76,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Model
 
 		static RegisterBanks()
 		{
-			General = new RegisterBank( "General", new Register[]{
+			General = new RegisterBank( "General", RegisterSet.Gpr, new Register[]{
 				new Register( 0, "zero", "$0", RegisterFormat.Integer, true ),
 				new Register( 1, "at", "$1", RegisterFormat.Integer ),
 				new Register( 2, "v0", "$2", RegisterFormat.Integer ),
@@ -110,12 +114,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Model
 			Register[] fpu = new Register[ 32 ];
 			for( int n = 0; n < fpu.Length; n++ )
 				fpu[ n ] = new Register( n, string.Format( "f{0}", n ), string.Format( "$f{0}", n ), RegisterFormat.Single );
-			Fpu = new RegisterBank( "FPU", fpu );
+			Fpu = new RegisterBank( "FPU", RegisterSet.Fpu, fpu );
 
 			Register[] vfpu = new Register[ 128 ];
 			for( int n = 0; n < vfpu.Length; n++ )
 				vfpu[ n ] = new Register( n, string.Format( "v{0:000}", n ), string.Format( "$v{0}", n ), RegisterFormat.Single );
-			Vfpu = new RegisterBank( "VFPU", vfpu );
+			Vfpu = new RegisterBank( "VFPU", RegisterSet.Vfpu, vfpu );
 		}
 	}
 }
