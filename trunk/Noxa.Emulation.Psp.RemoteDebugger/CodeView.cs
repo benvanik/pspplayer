@@ -36,6 +36,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 			this.LoadSettings();
 
+			this.disassemblyControl1.Debugger = debugger;
 			this.disassemblyControl1.Enabled = false;
 		}
 

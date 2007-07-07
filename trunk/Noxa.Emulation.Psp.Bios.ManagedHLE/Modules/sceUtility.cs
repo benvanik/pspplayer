@@ -23,7 +23,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		private enum Language
 		{
-			// ?? same as PBP I imagine
 			Japanese = 0,
 			English = 1,
 			French = 2,
@@ -32,7 +31,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Italian = 5,
 			Dutch = 6,
 			Portuguese = 7,
-			Korean = 8,
+			Russian = 8,
+			Korean = 9,
+			ChineseTraditional = 10,
+			ChineseSimplified = 11,
 		}
 
 		private enum UtilityStatus

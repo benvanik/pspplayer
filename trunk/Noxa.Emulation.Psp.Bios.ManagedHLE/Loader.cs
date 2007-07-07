@@ -722,7 +722,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						if( parameters.AppendDatabase == true )
 						{
 							Debug.Assert( Diag.Instance.Database != null );
-							Method method = new Method( MethodType.Bios, function.StubAddress, 8, stubImport.Function );
+							Method method = new Method( MethodType.Bios, function.StubAddress, 8, new BiosFunctionToken( stubImport.Function ) );
 							Diag.Instance.Database.AddSymbol( method );
 						}
 					}
@@ -760,7 +760,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							string name = null;
 							if( sym->st_name != 0 )
 								name = this.GetName( strtab, ( int )sym->st_name );
-							uint address = baseAddress + shdr->sh_addr + sym->st_value;
+							uint address = baseAddress + sym->st_value;
+							if( needsRelocation == true )
+								address += shdr->sh_addr;
 							Symbol symbol = null;
 							if( symType == 0x1 )
 							{

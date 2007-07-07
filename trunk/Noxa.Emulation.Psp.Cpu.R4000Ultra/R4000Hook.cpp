@@ -15,6 +15,8 @@ using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Cpu;
 using namespace Noxa::Emulation::Psp::Debugging;
 
+extern R4000Ctx* _cpuCtx;
+
 #ifdef DEBUGGING
 // In R4000Controller
 void SetBreakpoint( Breakpoint^ breakpoint );
@@ -182,6 +184,44 @@ CoreState^ R4000Hook::GetCoreState( int core )
 
 void R4000Hook::SetCoreState( int core, CoreState^ state )
 {
+}
+
+generic<typename T>
+T R4000Hook::GetRegister( RegisterSet set, int ordinal )
+{
+	switch( set )
+	{
+	case RegisterSet::Gpr:
+		Debug::Assert( ( T::typeid == uint::typeid ) || ( T::typeid == int::typeid ) );
+		return ( T )( uint )_cpuCtx->Registers[ ordinal ];
+	case RegisterSet::Fpu:
+		Debug::Assert( T::typeid == float::typeid );
+		return ( T )_cpuCtx->Cp1Registers[ ordinal ];
+	case RegisterSet::Vfpu:
+		Debug::Assert( T::typeid == float::typeid );
+		return ( T )_cpuCtx->Cp2Registers[ ordinal ];
+	}
+	return ( T )0;
+}
+
+generic<typename T>
+void R4000Hook::SetRegister( RegisterSet set, int ordinal, T value )
+{
+	switch( set )
+	{
+	case RegisterSet::Gpr:
+		Debug::Assert( ( T::typeid == uint::typeid ) || ( T::typeid == int::typeid ) );
+		_cpuCtx->Registers[ ordinal ] = ( uint )value;
+		break;
+	case RegisterSet::Fpu:
+		Debug::Assert( T::typeid == float::typeid );
+		_cpuCtx->Cp1Registers[ ordinal ] = ( float )value;
+		break;
+	case RegisterSet::Vfpu:
+		Debug::Assert( T::typeid == float::typeid );
+		_cpuCtx->Cp2Registers[ ordinal ] = ( float )value;
+		break;
+	}
 }
 
 int pspDebugGetStackTrace(unsigned int *results, int max);

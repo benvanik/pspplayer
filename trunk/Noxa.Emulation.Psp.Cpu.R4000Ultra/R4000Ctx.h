@@ -68,7 +68,7 @@ namespace Noxa {
 				typedef struct R4000Ctx_t
 				{
 													// Start offset
-					int				Registers[ 32 ];		// +0 (128)
+					uint			Registers[ 32 ];		// +0 (128)
 					int				LO;						// +128
 					int				HI;						// +132
 					int				NullifyDelay;			// +136

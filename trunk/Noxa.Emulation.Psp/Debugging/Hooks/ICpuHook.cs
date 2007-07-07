@@ -32,6 +32,25 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 	}
 
 	/// <summary>
+	/// Defines the location of a register.
+	/// </summary>
+	public enum RegisterSet
+	{
+		/// <summary>
+		/// The general purpose registers.
+		/// </summary>
+		Gpr,
+		/// <summary>
+		/// The floating-point coprocessor registers.
+		/// </summary>
+		Fpu,
+		/// <summary>
+		/// The vector floating-point coprocessor registers.
+		/// </summary>
+		Vfpu,
+	}
+
+	/// <summary>
 	/// Hook inside of the CPU that allows the debugger to extract information.
 	/// </summary>
 	public interface ICpuHook : IHook
@@ -84,6 +103,28 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		/// <param name="core">Core ordinal.</param>
 		/// <param name="state">State information for the given core.</param>
 		void SetCoreState( int core, CoreState state );
+
+		#region Register Accessors
+
+		/// <summary>
+		/// Get the value of the given register in the given set.
+		/// </summary>
+		/// <typeparam name="T"><c>uint</c> for GPR and <c>float</c> for FPU/VFPU.</typeparam>
+		/// <param name="set">The register set that the register is in.</param>
+		/// <param name="ordinal">The ordinal of the register within its set.</param>
+		/// <returns>The value of the register.</returns>
+		T GetRegister<T>( RegisterSet set, int ordinal );
+
+		/// <summary>
+		/// Set the value of the given register in the given set.
+		/// </summary>
+		/// <typeparam name="T"><c>uint</c> for GPR and <c>float</c> for FPU/VFPU.</typeparam>
+		/// <param name="set">The register set that the register is in.</param>
+		/// <param name="ordinal">The ordinal of the register within its set.</param>
+		/// <param name="value">The new value of the register.</param>
+		void SetRegister<T>( RegisterSet set, int ordinal, T value );
+
+		#endregion
 
 		/// <summary>
 		/// Attempt to extract the callstack if frame tracking is enabled.

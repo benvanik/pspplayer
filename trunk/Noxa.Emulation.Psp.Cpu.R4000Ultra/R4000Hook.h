@@ -45,6 +45,11 @@ namespace Noxa {
 
 					virtual CoreState^ GetCoreState( int core );
 					virtual void SetCoreState( int core, CoreState^ state );
+					
+					generic<typename T>
+					virtual T GetRegister( RegisterSet set, int ordinal );
+					generic<typename T>
+					virtual void SetRegister( RegisterSet set, int ordinal, T value );
 
 					virtual array<Frame^>^ GetCallstack();
 

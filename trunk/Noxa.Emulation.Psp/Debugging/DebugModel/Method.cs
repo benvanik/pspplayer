@@ -47,7 +47,7 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// The BIOS function the method points to, if available.
 		/// </summary>
-		public readonly BiosFunction Function;
+		public readonly BiosFunctionToken Function;
 
 		/// <summary>
 		/// Initializes a new <see cref="Method"/> instance with the given parameters.
@@ -84,7 +84,7 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <param name="address">The start address of the method.</param>
 		/// <param name="length">The length of the method, in bytes.</param>
 		/// <param name="function">The BIOS function, if available.</param>
-		public Method( MethodType type, uint address, uint length, BiosFunction function )
+		public Method( MethodType type, uint address, uint length, BiosFunctionToken function )
 			: this( type, address, length )
 		{
 			Function = function;
