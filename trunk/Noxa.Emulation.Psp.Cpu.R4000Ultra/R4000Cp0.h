@@ -19,8 +19,8 @@ namespace Noxa {
 				ref class R4000Cp0
 				{
 				internal:
-					array<int>^			Registers;
-					array<int>^			Control;
+					array<uint>^		Registers;
+					array<uint>^		Control;
 
 				protected:
 					int					_coreId;
@@ -31,8 +31,8 @@ namespace Noxa {
 					ref class R4000Cp0Context
 					{
 					public:
-						array<int>^ GeneralRegisters;
-						array<int>^ ControlRegisters;
+						array<uint>^ GeneralRegisters;
+						array<uint>^ ControlRegisters;
 						bool ConditionBit;
 					};
 
@@ -41,8 +41,8 @@ namespace Noxa {
 					R4000Cp0( R4000Ctx* ctx, int coreId )
 					{
 						_coreId = coreId;
-						Registers = gcnew array<int>( 32 );
-						Control = gcnew array<int>( 32 );
+						Registers = gcnew array<uint>( 32 );
+						Control = gcnew array<uint>( 32 );
 					}
 
 					property Object^ Context
@@ -50,16 +50,16 @@ namespace Noxa {
 						virtual Object^ get()
 						{
 							R4000Cp0Context^ context = gcnew R4000Cp0Context();
-							context->GeneralRegisters = ( array<int>^ )Registers->Clone();
-							context->ControlRegisters = ( array<int>^ )Control->Clone();
+							context->GeneralRegisters = ( array<uint>^ )Registers->Clone();
+							context->ControlRegisters = ( array<uint>^ )Control->Clone();
 							context->ConditionBit = _conditionBit;
 							return context;
 						}
 						virtual void set( Object^ value )
 						{
 							R4000Cp0Context^ context = ( R4000Cp0Context^ )value;
-							Registers = ( array<int>^ )context->GeneralRegisters->Clone();
-							Control = ( array<int>^ )context->ControlRegisters->Clone();
+							Registers = ( array<uint>^ )context->GeneralRegisters->Clone();
+							Control = ( array<uint>^ )context->ControlRegisters->Clone();
 							_conditionBit = context->ConditionBit;
 						}
 					}

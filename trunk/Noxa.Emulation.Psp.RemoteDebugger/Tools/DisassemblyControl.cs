@@ -26,6 +26,11 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 		public bool _displayHex = true;
 		public EmuDebugger Debugger;
 
+		public MethodBody MethodBody;
+		public uint CurrentAddress;
+
+		public event EventHandler RegisterValueChanged;
+
 		public DisassemblyControl()
 		{
 			InitializeComponent();
@@ -118,30 +123,43 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 
 		#endregion
 
-		public MethodBody MethodBody;
 		private Dictionary<int, CachedFormatting> _formatCache;
 
 		public void SetMethod( MethodBody methodBody )
 		{
 			this.MethodBody = methodBody;
+			this.CurrentAddress = 0;
 
 			this.BeginUpdate();
 
 			this.Items.Clear();
-			using( Graphics g = Graphics.FromHwnd( this.Handle ) )
+			if( methodBody != null )
 			{
-				Instruction[] instructions = this.MethodBody.Instructions;
-				_formatCache = new Dictionary<int, CachedFormatting>( instructions.Length );
-				for( int n = 0; n < instructions.Length; n++ )
+				using( Graphics g = Graphics.FromHwnd( this.Handle ) )
 				{
-					Instruction instr = instructions[ n ];
-					int index = this.Items.Add( instr );
-					Rectangle itemBounds = this.GetItemRectangle( index );
-					_formatCache.Add( n, new CachedFormatting( this, g, itemBounds.X + _instrLeft, itemBounds.Y, itemBounds.Height, instr ) );
+					Instruction[] instructions = this.MethodBody.Instructions;
+					_formatCache = new Dictionary<int, CachedFormatting>( instructions.Length );
+					for( int n = 0; n < instructions.Length; n++ )
+					{
+						Instruction instr = instructions[ n ];
+						int index = this.Items.Add( instr );
+						Rectangle itemBounds = this.GetItemRectangle( index );
+						_formatCache.Add( n, new CachedFormatting( this, g, itemBounds.X + _instrLeft, itemBounds.Y, itemBounds.Height, instr ) );
+					}
 				}
 			}
 
 			this.EndUpdate();
+		}
+
+		public void SetAddress( uint address )
+		{
+			this.CurrentAddress = address;
+
+			uint offset = ( address - this.MethodBody.Address ) >> 2;
+			this.SelectedIndex = ( int )offset;
+
+			this.Invalidate();
 		}
 
 		#region Drawing
@@ -251,6 +269,13 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 					Image icon = _breakpointOnIcon;
 					g.DrawImage( icon, x, y - 1, 14, 14 );
 				}
+
+				// Show icons for address state (such as dead/parent)
+				if( this.CurrentAddress == instr.Address )
+				{
+					Image icon = _statementIcon;
+					g.DrawImage( icon, x, y - 1, 14, 14 );
+				}
 			}
 			x += _gutterWidth;
 
@@ -357,19 +382,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 		}
 
 		#endregion
-
-		protected override void OnSelectedIndexChanged( EventArgs e )
-		{
-			int oldIndex = this.SelectedIndex;
-
-			base.OnSelectedIndexChanged( e );
-
-			if( oldIndex >= 0 )
-			{
-				Rectangle oldBounds = this.GetItemRectangle( oldIndex );
-				this.Invalidate();
-			}
-		}
 
 		#region Tips / Hovering
 
@@ -550,6 +562,19 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 		}
 
 		#endregion
+
+		protected override void OnSelectedIndexChanged( EventArgs e )
+		{
+			int oldIndex = this.SelectedIndex;
+
+			base.OnSelectedIndexChanged( e );
+
+			if( oldIndex >= 0 )
+			{
+				Rectangle oldBounds = this.GetItemRectangle( oldIndex );
+				this.Invalidate();
+			}
+		}
 
 		protected override void OnMouseUp( MouseEventArgs e )
 		{
@@ -981,6 +1006,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 		private void SetRegister<T>( Register register, T value )
 		{
 			this.Debugger.Host.CpuHook.SetRegister<T>( register.Bank.Set, register.Ordinal, value );
+
+			if( this.RegisterValueChanged != null )
+				this.RegisterValueChanged( this, EventArgs.Empty );
 		}
 	}
 }

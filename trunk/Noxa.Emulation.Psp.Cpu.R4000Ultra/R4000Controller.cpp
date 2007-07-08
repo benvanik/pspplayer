@@ -55,6 +55,35 @@ R4000Controller::~R4000Controller()
 	_debugHandle = NULL;
 }
 
+void R4000Controller::Run()
+{
+	PulseEvent( _debugHandle );
+}
+
+void R4000Controller::RunUntil( uint address )
+{
+}
+
+void R4000Controller::Break()
+{
+}
+
+void R4000Controller::SetNext( uint address )
+{
+}
+
+void R4000Controller::Step()
+{
+}
+
+void R4000Controller::StepOver()
+{
+}
+
+void R4000Controller::StepOut()
+{
+}
+
 int __debugHandlerM( int breakpointId )
 {
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
@@ -112,6 +141,8 @@ int __debugHandlerM( int breakpointId )
 
 			WaitForSingleObject( _debugHandle, INFINITE );
 			_debugResumeMode = DEBUG_RESUME_CONTINUE;
+
+			Diag::Instance->Client->Handler->OnContinue();
 
 			switch( _debugResumeMode )
 			{

@@ -69,11 +69,11 @@ namespace Noxa {
 				{
 													// Start offset
 					uint			Registers[ 32 ];		// +0 (128)
-					int				LO;						// +128
-					int				HI;						// +132
+					uint			LO;						// +128
+					uint			HI;						// +132
 					int				NullifyDelay;			// +136
 					int				PCValid;				// +140
-					int				PC;						// +144
+					uint			PC;						// +144
 					int				InterruptMask;			// +148
 					int				LL;						// +152
 					int				Cp1ConditionBit;		// +156

@@ -19,6 +19,11 @@ namespace Noxa.Emulation.Psp.Debugging.Protocol
 	public interface IDebugHandler
 	{
 		/// <summary>
+		/// Handle a continue after a break.
+		/// </summary>
+		void OnContinue();
+
+		/// <summary>
 		/// Handle a stop after a step operation.
 		/// </summary>
 		/// <param name="address">The address of the next instruction that will be executed.</param>

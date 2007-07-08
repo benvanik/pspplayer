@@ -18,21 +18,22 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 	[Serializable]
 	public class CoreState
 	{
-		public int ProgramCounter;
-		public int[] GeneralRegisters;
-		public int Hi;
-		public int Lo;
+		public uint ProgramCounter;
+		public uint[] GeneralRegisters;
+		public uint Hi;
+		public uint Lo;
 		public bool LL;
 
-		public int[] Cp0Registers;
-		public int[] Cp0ControlRegisters;
+		public uint[] Cp0Registers;
+		public uint[] Cp0ControlRegisters;
 		public bool Cp0ConditionBit;
 
 		public uint FpuControlRegister;
+		public bool FpuConditionBit;
 		public float[] FpuRegisters;
 
-		//public uint VfpuControlRegister;
-		//public float[] VfpuRegisters;
+		public uint VfpuControlRegister;
+		public float[] VfpuRegisters;
 		
 		//bool InDelaySlot;
 		//int DelayPc;

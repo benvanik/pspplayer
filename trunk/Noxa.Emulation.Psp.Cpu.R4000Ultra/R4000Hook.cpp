@@ -161,8 +161,8 @@ CoreState^ R4000Hook::GetCoreState( int core )
 
 		state->ProgramCounter = *core->PC;
 		state->GeneralRegisters = core->GeneralRegisters;
-		state->Hi = *core->HI;
-		state->Lo = *core->LO;
+		state->Hi = ( uint )*core->HI;
+		state->Lo = ( uint )*core->LO;
 		state->LL = ( *core->LL == 1 ) ? true : false;
 
 		state->Cp0ControlRegisters = core->Cp0->Control;
@@ -170,9 +170,13 @@ CoreState^ R4000Hook::GetCoreState( int core )
 		state->Cp0ConditionBit = core->Cp0->ConditionBit;
 
 		state->FpuControlRegister = core->Cp1->Control;
+		state->FpuConditionBit = core->Cp1->ConditionBit;
 		state->FpuRegisters = core->Cp1->Registers;
 
-		// VFPU
+		state->VfpuRegisters = gcnew array<float>( 128 );
+		for( int n = 0; n < 128; n++ )
+			state->VfpuRegisters[ n ] = _cpuCtx->Cp2Registers[ n ];
+		//state->VfpuControlRegister
 
 		return state;
 	}

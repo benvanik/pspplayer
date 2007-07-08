@@ -32,10 +32,10 @@ namespace Noxa {
 					R4000Cp1^			Cp1;
 					R4000Cp2^			Cp2;
 
-					int*		PC;
+					uint*		PC;
 					uint*		Registers;
-					int*		HI;
-					int*		LO;
+					uint*		HI;
+					uint*		LO;
 					int*		LL;
 
 					int*		InterruptState;
@@ -90,24 +90,24 @@ namespace Noxa {
 						}
 					}
 
-					property int ProgramCounter
+					property uint ProgramCounter
 					{
-						virtual int get()
+						virtual uint get()
 						{
 							return *PC;
 						}
-						virtual void set( int value )
+						virtual void set( uint value )
 						{
 							*PC = value;
 						}
 					}
 
-					property array<int>^ GeneralRegisters
+					property array<uint>^ GeneralRegisters
 					{
-						virtual array<int>^ get()
+						virtual array<uint>^ get()
 						{
-							array<int>^ ret = gcnew array<int>( RegisterCount );
-							pin_ptr<int> ptr = &ret[ 0 ];
+							array<uint>^ ret = gcnew array<uint>( RegisterCount );
+							pin_ptr<uint> ptr = &ret[ 0 ];
 							memcpy( ptr, Registers, RegistersSize );
 							return ret;
 						}
@@ -122,10 +122,10 @@ namespace Noxa {
 					ref class R4000CoreContext
 					{
 					public:
-						int PC;
-						int* Registers;
-						int HI;
-						int LO;
+						uint PC;
+						uint* Registers;
+						uint HI;
+						uint LO;
 						bool LL;
 						int InterruptState;
 
@@ -142,7 +142,7 @@ namespace Noxa {
 							R4000CoreContext^ context = gcnew R4000CoreContext();
 	
 							context->PC = *PC;
-							context->Registers = ( int* )malloc( RegistersSize );
+							context->Registers = ( uint* )malloc( RegistersSize );
 							for( int n = 0; n < RegisterCount; n++ )
 								context->Registers[ n ] = Registers[ n ];
 							context->HI = *HI;

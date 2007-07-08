@@ -30,15 +30,15 @@ namespace Noxa {
 					R4000Controller( R4000Cpu^ cpu );
 					~R4000Controller();
 
-					virtual void Run(){}
-					virtual void RunUntil( uint address ){}
-					virtual void Break(){}
+					virtual void Run();
+					virtual void RunUntil( uint address );
+					virtual void Break();
 
-					virtual void SetNext( uint address ){}
+					virtual void SetNext( uint address );
 
-					virtual void Step(){}
-					virtual void StepOver(){}
-					virtual void StepOut(){}
+					virtual void Step();
+					virtual void StepOver();
+					virtual void StepOut();
 				};
 
 			}
