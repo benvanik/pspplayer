@@ -17,12 +17,15 @@ using WeifenLuo.WinFormsUI.Docking;
 using Noxa.Emulation.Psp.RemoteDebugger.Model;
 using Noxa.Emulation.Psp.Debugging.DebugData;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.Debugging.Hooks;
 
 namespace Noxa.Emulation.Psp.RemoteDebugger
 {
 	partial class CodeView : DockContent
 	{
 		public EmuDebugger Debugger;
+
+		public RegisterSet CurrentRegisterSet = RegisterSet.Gpr;
 
 		public CodeView()
 		{
@@ -37,7 +40,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.LoadSettings();
 
 			this.disassemblyControl1.Debugger = debugger;
-			this.disassemblyControl1.Enabled = false;
+			this.disassemblyControl1.RegisterValueChanged += new EventHandler( disassemblyControl1_RegisterValueChanged );
+
+			this.Disable();
 		}
 
 		private void LoadSettings()
@@ -60,21 +65,40 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public void Disable()
 		{
 			this.disassemblyControl1.Enabled = false;
+			this.disassemblyControl1.SetMethod( null );
+			this.registersListView.Items.Clear();
+			this.splitContainer1.Panel1.Enabled = false;
+			this.splitContainer1.Panel2.Enabled = false;
 		}
 
 		public void SetAddress( uint address )
 		{
 			this.disassemblyControl1.Enabled = true;
+			this.splitContainer1.Panel1.Enabled = true;
+			this.splitContainer1.Panel2.Enabled = true;
 
 			IDebugDatabase db = Debugger.Host.Database;
 			Debug.Assert( db != null );
 
 			Method method = db.FindSymbol( address ) as Method;
 			Debug.Assert( method != null );
-			MethodBody methodBody = this.BuildMethodBody( method );
-			Debug.Assert( methodBody != null );
 
-			this.disassemblyControl1.SetMethod( methodBody );
+			if( ( this.disassemblyControl1.Enabled == true ) &&
+				( this.disassemblyControl1.MethodBody != null ) &&
+				( this.disassemblyControl1.MethodBody.Address == method.Address ) )
+			{
+				this.disassemblyControl1.SetAddress( address );
+			}
+			else
+			{
+				MethodBody methodBody = this.BuildMethodBody( method );
+				Debug.Assert( methodBody != null );
+
+				this.disassemblyControl1.SetMethod( methodBody );
+				this.disassemblyControl1.SetAddress( address );
+
+				this.ShowRegisters( this.CurrentRegisterSet );
+			}
 		}
 
 		private MethodBody BuildMethodBody( Method method )
@@ -94,6 +118,116 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 			return methodBody;
 		}
+
+		public void ShowNextStatement()
+		{
+			CoreState state = this.Debugger.Host.CpuHook.GetCoreState( 0 );
+			this.SetAddress( state.ProgramCounter );
+		}
+
+		#region Registers
+
+		private void ShowRegisters( RegisterSet set )
+		{
+			CoreState state = this.Debugger.Host.CpuHook.GetCoreState( 0 );
+			this.pcTextBox.Text = string.Format( "0x{0:X8}", state.ProgramCounter );
+
+			if( this.CurrentRegisterSet != set )
+			{
+				this.CurrentRegisterSet = set;
+				switch( set )
+				{
+					case RegisterSet.Gpr:
+						this.registerToggleToolStripSplitButton.Text = "GPR";
+						break;
+					case RegisterSet.Fpu:
+						this.registerToggleToolStripSplitButton.Text = "FPU";
+						break;
+					case RegisterSet.Vfpu:
+						this.registerToggleToolStripSplitButton.Text = "VFPU";
+						break;
+				}
+			}
+
+			RegisterBank bank;
+			switch( set )
+			{
+				default:
+				case RegisterSet.Gpr:
+					bank = RegisterBanks.General;
+					break;
+				case RegisterSet.Fpu:
+					bank = RegisterBanks.Fpu;
+					break;
+				case RegisterSet.Vfpu:
+					bank = RegisterBanks.Vfpu;
+					break;
+			}
+
+			this.registersListView.BeginUpdate();
+			this.registersListView.Items.Clear();
+			foreach( Register register in bank.Registers )
+			{
+				string prettyValue = string.Empty;
+				string rawValue = string.Empty;
+				switch( set )
+				{
+					case RegisterSet.Gpr:
+						uint uv = this.Debugger.Host.CpuHook.GetRegister<uint>( set, register.Ordinal );
+						prettyValue = uv.ToString();
+						rawValue = string.Format( "{0:X8}", uv );
+						break;
+					case RegisterSet.Fpu:
+					case RegisterSet.Vfpu:
+						float fv = this.Debugger.Host.CpuHook.GetRegister<float>( set, register.Ordinal );
+						prettyValue = fv.ToString();
+						break;
+				}
+				ListViewItem item = new ListViewItem( new string[]{
+					register.ToString(), prettyValue, rawValue,
+				} );
+				this.registersListView.Items.Add( item );
+			}
+			this.registersListView.EndUpdate();
+		}
+
+		private void disassemblyControl1_RegisterValueChanged( object sender, EventArgs e )
+		{
+			this.ShowRegisters( this.CurrentRegisterSet );
+		}
+
+		private void registerToggleToolStripSplitButton_ButtonClick( object sender, EventArgs e )
+		{
+			switch( this.CurrentRegisterSet )
+			{
+				case RegisterSet.Gpr:
+					this.ShowRegisters( RegisterSet.Fpu );
+					break;
+				case RegisterSet.Fpu:
+					this.ShowRegisters( RegisterSet.Vfpu );
+					break;
+				case RegisterSet.Vfpu:
+					this.ShowRegisters( RegisterSet.Gpr );
+					break;
+			}
+		}
+
+		private void generalRegistersToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.ShowRegisters( RegisterSet.Gpr );
+		}
+
+		private void fPURegistersToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.ShowRegisters( RegisterSet.Fpu );
+		}
+
+		private void vFPURegistersToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.ShowRegisters( RegisterSet.Vfpu );
+		}
+
+		#endregion
 
 		private void TestData()
 		{

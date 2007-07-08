@@ -73,6 +73,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			debugWriteToolStripButton.Visible = _debugEnabled;
 			toolStripSeparator3.Visible = _debugEnabled;
 
+			Bitmap image = Properties.Resources.OutputIcon as Bitmap;
+			this.Icon = Icon.FromHandle( image.GetHicon() );
+
 			this.LoadSettings();
 
 			this.Refilter();

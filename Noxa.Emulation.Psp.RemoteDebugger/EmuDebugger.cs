@@ -248,6 +248,18 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.View.Invoke( del, address );
 		}
 
+		public void OnContinue()
+		{
+			DummyDelegate del = delegate
+			{
+				this.Code.Disable();
+
+				this.State = DebuggerState.Running;
+				this.OnStateChanged();
+			};
+			this.View.Invoke( del );
+		}
+
 		public void OnStepComplete( uint address )
 		{
 			this.ShowSourceView( address );

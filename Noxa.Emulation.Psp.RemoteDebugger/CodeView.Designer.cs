@@ -36,24 +36,24 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager( typeof( CodeView ) );
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.pcTextBox = new System.Windows.Forms.TextBox();
 			this.registersListView = new System.Windows.Forms.ListView();
 			this.registerNameHeader = new System.Windows.Forms.ColumnHeader();
 			this.registerValuePrettyHeader = new System.Windows.Forms.ColumnHeader();
 			this.registerValueRawHeader = new System.Windows.Forms.ColumnHeader();
 			this.pcLabel = new System.Windows.Forms.Label();
 			this.registersToolStrip = new System.Windows.Forms.ToolStrip();
-			this.toolStripSplitButton1 = new System.Windows.Forms.ToolStripSplitButton();
+			this.registerToggleToolStripSplitButton = new System.Windows.Forms.ToolStripSplitButton();
 			this.generalRegistersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fPURegistersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.vFPURegistersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.vfpuDisplay = new Noxa.Emulation.Psp.RemoteDebugger.Tools.VfpuDisplay();
 			this.disassemblyControl1 = new Noxa.Emulation.Psp.RemoteDebugger.Tools.DisassemblyControl();
 			this.codeToolStrip = new System.Windows.Forms.ToolStrip();
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
 			this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
 			this.hexToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.vfpuDisplay = new Noxa.Emulation.Psp.RemoteDebugger.Tools.VfpuDisplay();
-			this.textBox1 = new System.Windows.Forms.TextBox();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
@@ -70,19 +70,30 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			// 
 			// splitContainer1.Panel1
 			// 
-			this.splitContainer1.Panel1.Controls.Add( this.textBox1 );
+			this.splitContainer1.Panel1.Controls.Add( this.pcTextBox );
 			this.splitContainer1.Panel1.Controls.Add( this.registersListView );
 			this.splitContainer1.Panel1.Controls.Add( this.pcLabel );
 			this.splitContainer1.Panel1.Controls.Add( this.registersToolStrip );
 			this.splitContainer1.Panel1.Controls.Add( this.vfpuDisplay );
+			this.splitContainer1.Panel1MinSize = 226;
 			// 
 			// splitContainer1.Panel2
 			// 
 			this.splitContainer1.Panel2.Controls.Add( this.disassemblyControl1 );
 			this.splitContainer1.Panel2.Controls.Add( this.codeToolStrip );
 			this.splitContainer1.Size = new System.Drawing.Size( 794, 633 );
-			this.splitContainer1.SplitterDistance = 207;
+			this.splitContainer1.SplitterDistance = 226;
 			this.splitContainer1.TabIndex = 1;
+			// 
+			// pcTextBox
+			// 
+			this.pcTextBox.Font = new System.Drawing.Font( "Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
+			this.pcTextBox.Location = new System.Drawing.Point( 118, 28 );
+			this.pcTextBox.Name = "pcTextBox";
+			this.pcTextBox.Size = new System.Drawing.Size( 86, 18 );
+			this.pcTextBox.TabIndex = 5;
+			this.pcTextBox.Text = "0x00000000";
+			this.pcTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
 			// 
 			// registersListView
 			// 
@@ -100,7 +111,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.registersListView.LabelWrap = false;
 			this.registersListView.Location = new System.Drawing.Point( 3, 48 );
 			this.registersListView.Name = "registersListView";
-			this.registersListView.Size = new System.Drawing.Size( 201, 582 );
+			this.registersListView.Size = new System.Drawing.Size( 220, 582 );
 			this.registersListView.TabIndex = 3;
 			this.registersListView.UseCompatibleStateImageBehavior = false;
 			this.registersListView.View = System.Windows.Forms.View.Details;
@@ -108,16 +119,17 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			// registerNameHeader
 			// 
 			this.registerNameHeader.Text = "";
-			this.registerNameHeader.Width = 49;
+			this.registerNameHeader.Width = 40;
 			// 
 			// registerValuePrettyHeader
 			// 
 			this.registerValuePrettyHeader.Text = "Value";
-			this.registerValuePrettyHeader.Width = 73;
+			this.registerValuePrettyHeader.Width = 83;
 			// 
 			// registerValueRawHeader
 			// 
 			this.registerValueRawHeader.Text = "";
+			this.registerValueRawHeader.Width = 69;
 			// 
 			// pcLabel
 			// 
@@ -132,25 +144,26 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			// registersToolStrip
 			// 
 			this.registersToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripSplitButton1} );
+            this.registerToggleToolStripSplitButton} );
 			this.registersToolStrip.Location = new System.Drawing.Point( 0, 0 );
 			this.registersToolStrip.Name = "registersToolStrip";
-			this.registersToolStrip.Size = new System.Drawing.Size( 207, 25 );
+			this.registersToolStrip.Size = new System.Drawing.Size( 226, 25 );
 			this.registersToolStrip.TabIndex = 0;
 			this.registersToolStrip.Text = "Register Tools";
 			// 
-			// toolStripSplitButton1
+			// registerToggleToolStripSplitButton
 			// 
-			this.toolStripSplitButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-			this.toolStripSplitButton1.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
+			this.registerToggleToolStripSplitButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.registerToggleToolStripSplitButton.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
             this.generalRegistersToolStripMenuItem,
             this.fPURegistersToolStripMenuItem,
             this.vFPURegistersToolStripMenuItem} );
-			this.toolStripSplitButton1.Image = ( ( System.Drawing.Image )( resources.GetObject( "toolStripSplitButton1.Image" ) ) );
-			this.toolStripSplitButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripSplitButton1.Name = "toolStripSplitButton1";
-			this.toolStripSplitButton1.Size = new System.Drawing.Size( 45, 22 );
-			this.toolStripSplitButton1.Text = "GPR";
+			this.registerToggleToolStripSplitButton.Image = ( ( System.Drawing.Image )( resources.GetObject( "registerToggleToolStripSplitButton.Image" ) ) );
+			this.registerToggleToolStripSplitButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.registerToggleToolStripSplitButton.Name = "registerToggleToolStripSplitButton";
+			this.registerToggleToolStripSplitButton.Size = new System.Drawing.Size( 45, 22 );
+			this.registerToggleToolStripSplitButton.Text = "GPR";
+			this.registerToggleToolStripSplitButton.ButtonClick += new System.EventHandler( this.registerToggleToolStripSplitButton_ButtonClick );
 			// 
 			// generalRegistersToolStripMenuItem
 			// 
@@ -158,6 +171,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.generalRegistersToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D1 ) ) );
 			this.generalRegistersToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
 			this.generalRegistersToolStripMenuItem.Text = "&General Registers";
+			this.generalRegistersToolStripMenuItem.Click += new System.EventHandler( this.generalRegistersToolStripMenuItem_Click );
 			// 
 			// fPURegistersToolStripMenuItem
 			// 
@@ -165,6 +179,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.fPURegistersToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D2 ) ) );
 			this.fPURegistersToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
 			this.fPURegistersToolStripMenuItem.Text = "&FPU Registers";
+			this.fPURegistersToolStripMenuItem.Click += new System.EventHandler( this.fPURegistersToolStripMenuItem_Click );
 			// 
 			// vFPURegistersToolStripMenuItem
 			// 
@@ -172,6 +187,17 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.vFPURegistersToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D3 ) ) );
 			this.vFPURegistersToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
 			this.vFPURegistersToolStripMenuItem.Text = "&VFPU Registers";
+			this.vFPURegistersToolStripMenuItem.Click += new System.EventHandler( this.vFPURegistersToolStripMenuItem_Click );
+			// 
+			// vfpuDisplay
+			// 
+			this.vfpuDisplay.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+						| System.Windows.Forms.AnchorStyles.Left )
+						| System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.vfpuDisplay.Location = new System.Drawing.Point( 3, 48 );
+			this.vfpuDisplay.Name = "vfpuDisplay";
+			this.vfpuDisplay.Size = new System.Drawing.Size( 220, 582 );
+			this.vfpuDisplay.TabIndex = 4;
 			// 
 			// disassemblyControl1
 			// 
@@ -182,7 +208,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.disassemblyControl1.Location = new System.Drawing.Point( 0, 25 );
 			this.disassemblyControl1.Name = "disassemblyControl1";
 			this.disassemblyControl1.ScrollAlwaysVisible = true;
-			this.disassemblyControl1.Size = new System.Drawing.Size( 583, 602 );
+			this.disassemblyControl1.Size = new System.Drawing.Size( 564, 602 );
 			this.disassemblyControl1.TabIndex = 2;
 			// 
 			// codeToolStrip
@@ -194,7 +220,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
             this.hexToolStripButton} );
 			this.codeToolStrip.Location = new System.Drawing.Point( 0, 0 );
 			this.codeToolStrip.Name = "codeToolStrip";
-			this.codeToolStrip.Size = new System.Drawing.Size( 583, 25 );
+			this.codeToolStrip.Size = new System.Drawing.Size( 564, 25 );
 			this.codeToolStrip.TabIndex = 1;
 			this.codeToolStrip.Text = "Code Tools";
 			// 
@@ -230,26 +256,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.hexToolStripButton.Text = "Hex";
 			this.hexToolStripButton.Click += new System.EventHandler( this.hexToolStripButton_Click );
 			// 
-			// vfpuDisplay
-			// 
-			this.vfpuDisplay.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
-						| System.Windows.Forms.AnchorStyles.Left )
-						| System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.vfpuDisplay.Location = new System.Drawing.Point( 3, 48 );
-			this.vfpuDisplay.Name = "vfpuDisplay";
-			this.vfpuDisplay.Size = new System.Drawing.Size( 201, 582 );
-			this.vfpuDisplay.TabIndex = 4;
-			// 
-			// textBox1
-			// 
-			this.textBox1.Font = new System.Drawing.Font( "Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
-			this.textBox1.Location = new System.Drawing.Point( 118, 28 );
-			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size( 86, 18 );
-			this.textBox1.TabIndex = 5;
-			this.textBox1.Text = "0x00000000";
-			this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-			// 
 			// CodeView
 			// 
 			this.ClientSize = new System.Drawing.Size( 794, 633 );
@@ -284,7 +290,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private System.Windows.Forms.ToolStripLabel toolStripLabel1;
 		private System.Windows.Forms.ToolStripButton hexToolStripButton;
 		private System.Windows.Forms.Label pcLabel;
-		private System.Windows.Forms.ToolStripSplitButton toolStripSplitButton1;
+		private System.Windows.Forms.ToolStripSplitButton registerToggleToolStripSplitButton;
 		private System.Windows.Forms.ToolStripMenuItem generalRegistersToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem fPURegistersToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem vFPURegistersToolStripMenuItem;
@@ -293,6 +299,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private System.Windows.Forms.ColumnHeader registerValuePrettyHeader;
 		private System.Windows.Forms.ColumnHeader registerValueRawHeader;
 		private Noxa.Emulation.Psp.RemoteDebugger.Tools.VfpuDisplay vfpuDisplay;
-		private System.Windows.Forms.TextBox textBox1;
+		private System.Windows.Forms.TextBox pcTextBox;
 	}
 }

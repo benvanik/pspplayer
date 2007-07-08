@@ -26,7 +26,7 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// <summary>
 		/// The current program counter.
 		/// </summary>
-		int ProgramCounter
+		uint ProgramCounter
 		{
 			get;
 			set;

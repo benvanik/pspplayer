@@ -63,7 +63,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.codeViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.memoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.registersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.callstackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
 			this.biosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -83,20 +82,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
 			this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
-			this.controlToolStrip = new System.Windows.Forms.ToolStrip();
-			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
-			this.locationToolStrip = new System.Windows.Forms.ToolStrip();
-			this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
-			this.threadToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
-			this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
-			this.frameToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
 			this.windowsToolStrip = new System.Windows.Forms.ToolStrip();
 			this.codeViewToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.memoryToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.registersToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.callstackToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
 			this.biosToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -106,14 +94,40 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.watchesToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.statisticsToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.logViewToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.controlToolStrip = new System.Windows.Forms.ToolStrip();
+			this.resumeToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.breakToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.stopToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.restartToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.locationToolStrip = new System.Windows.Forms.ToolStrip();
+			this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+			this.threadToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
+			this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+			this.frameToolStripComboBox = new System.Windows.Forms.ToolStripComboBox();
+			this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+			this.showStatementToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.stepIntoToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.stepOutToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.stepOverToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+			this.hexToolStripButton = new System.Windows.Forms.ToolStripButton();
+			this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.breakToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.stopToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
+			this.restartToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.showNextStatementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.stepIntoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.stepOverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.stepOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.menuStrip1.SuspendLayout();
 			this.statusStrip1.SuspendLayout();
 			this.toolStripContainer1.ContentPanel.SuspendLayout();
 			this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
 			this.toolStripContainer1.SuspendLayout();
+			this.windowsToolStrip.SuspendLayout();
 			this.controlToolStrip.SuspendLayout();
 			this.locationToolStrip.SuspendLayout();
-			this.windowsToolStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// menuStrip1
@@ -238,20 +252,20 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			// 
 			this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
 			this.undoToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z ) ) );
-			this.undoToolStripMenuItem.Size = new System.Drawing.Size( 144, 22 );
+			this.undoToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
 			this.undoToolStripMenuItem.Text = "&Undo";
 			// 
 			// redoToolStripMenuItem
 			// 
 			this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
 			this.redoToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y ) ) );
-			this.redoToolStripMenuItem.Size = new System.Drawing.Size( 144, 22 );
+			this.redoToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
 			this.redoToolStripMenuItem.Text = "&Redo";
 			// 
 			// toolStripSeparator3
 			// 
 			this.toolStripSeparator3.Name = "toolStripSeparator3";
-			this.toolStripSeparator3.Size = new System.Drawing.Size( 141, 6 );
+			this.toolStripSeparator3.Size = new System.Drawing.Size( 149, 6 );
 			// 
 			// cutToolStripMenuItem
 			// 
@@ -259,7 +273,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.cutToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
 			this.cutToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X ) ) );
-			this.cutToolStripMenuItem.Size = new System.Drawing.Size( 144, 22 );
+			this.cutToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
 			this.cutToolStripMenuItem.Text = "Cu&t";
 			// 
 			// copyToolStripMenuItem
@@ -268,7 +282,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.copyToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
 			this.copyToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C ) ) );
-			this.copyToolStripMenuItem.Size = new System.Drawing.Size( 144, 22 );
+			this.copyToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
 			this.copyToolStripMenuItem.Text = "&Copy";
 			// 
 			// pasteToolStripMenuItem
@@ -277,22 +291,32 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.pasteToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
 			this.pasteToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V ) ) );
-			this.pasteToolStripMenuItem.Size = new System.Drawing.Size( 144, 22 );
+			this.pasteToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
 			this.pasteToolStripMenuItem.Text = "&Paste";
 			// 
 			// toolStripSeparator4
 			// 
 			this.toolStripSeparator4.Name = "toolStripSeparator4";
-			this.toolStripSeparator4.Size = new System.Drawing.Size( 141, 6 );
+			this.toolStripSeparator4.Size = new System.Drawing.Size( 149, 6 );
 			// 
 			// selectAllToolStripMenuItem
 			// 
 			this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-			this.selectAllToolStripMenuItem.Size = new System.Drawing.Size( 144, 22 );
+			this.selectAllToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
 			this.selectAllToolStripMenuItem.Text = "Select &All";
 			// 
 			// debugToolStripMenuItem
 			// 
+			this.debugToolStripMenuItem.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.resumeToolStripMenuItem,
+            this.breakToolStripMenuItem,
+            this.stopToolStripMenuItem,
+            this.restartToolStripMenuItem,
+            this.toolStripMenuItem3,
+            this.showNextStatementToolStripMenuItem,
+            this.stepIntoToolStripMenuItem,
+            this.stepOverToolStripMenuItem,
+            this.stepOutToolStripMenuItem} );
 			this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
 			this.debugToolStripMenuItem.Size = new System.Drawing.Size( 54, 20 );
 			this.debugToolStripMenuItem.Text = "&Debug";
@@ -309,14 +333,14 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			// customizeToolStripMenuItem
 			// 
 			this.customizeToolStripMenuItem.Name = "customizeToolStripMenuItem";
-			this.customizeToolStripMenuItem.Size = new System.Drawing.Size( 130, 22 );
+			this.customizeToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
 			this.customizeToolStripMenuItem.Text = "&Customize";
 			// 
 			// optionsToolStripMenuItem
 			// 
 			this.optionsToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.OptionsIcon;
 			this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-			this.optionsToolStripMenuItem.Size = new System.Drawing.Size( 130, 22 );
+			this.optionsToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
 			this.optionsToolStripMenuItem.Text = "&Options";
 			// 
 			// windowToolStripMenuItem
@@ -324,7 +348,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.windowToolStripMenuItem.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
             this.codeViewToolStripMenuItem,
             this.memoryToolStripMenuItem,
-            this.registersToolStripMenuItem,
             this.callstackToolStripMenuItem,
             this.toolStripMenuItem2,
             this.biosToolStripMenuItem,
@@ -353,14 +376,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.memoryToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.memoryToolStripMenuItem.Text = "&Memory";
 			this.memoryToolStripMenuItem.Click += new System.EventHandler( this.memoryToolStripButton_Click );
-			// 
-			// registersToolStripMenuItem
-			// 
-			this.registersToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.RegistersIcon;
-			this.registersToolStripMenuItem.Name = "registersToolStripMenuItem";
-			this.registersToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
-			this.registersToolStripMenuItem.Text = "&Registers";
-			this.registersToolStripMenuItem.Click += new System.EventHandler( this.registersToolStripButton_Click );
 			// 
 			// callstackToolStripMenuItem
 			// 
@@ -518,97 +533,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.dockPanel1.Size = new System.Drawing.Size( 873, 568 );
 			this.dockPanel1.TabIndex = 0;
 			// 
-			// controlToolStrip
-			// 
-			this.controlToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-			this.controlToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
-            this.toolStripButton2,
-            this.toolStripButton3,
-            this.toolStripButton4} );
-			this.controlToolStrip.Location = new System.Drawing.Point( 3, 25 );
-			this.controlToolStrip.Name = "controlToolStrip";
-			this.controlToolStrip.Size = new System.Drawing.Size( 104, 25 );
-			this.controlToolStrip.TabIndex = 0;
-			// 
-			// toolStripButton1
-			// 
-			this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton1.Image = ( ( System.Drawing.Image )( resources.GetObject( "toolStripButton1.Image" ) ) );
-			this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton1.Name = "toolStripButton1";
-			this.toolStripButton1.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton1.Text = "toolStripButton1";
-			// 
-			// toolStripButton2
-			// 
-			this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton2.Image = ( ( System.Drawing.Image )( resources.GetObject( "toolStripButton2.Image" ) ) );
-			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton2.Name = "toolStripButton2";
-			this.toolStripButton2.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton2.Text = "toolStripButton2";
-			// 
-			// toolStripButton3
-			// 
-			this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton3.Image = ( ( System.Drawing.Image )( resources.GetObject( "toolStripButton3.Image" ) ) );
-			this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton3.Name = "toolStripButton3";
-			this.toolStripButton3.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton3.Text = "toolStripButton3";
-			// 
-			// toolStripButton4
-			// 
-			this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton4.Image = ( ( System.Drawing.Image )( resources.GetObject( "toolStripButton4.Image" ) ) );
-			this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton4.Name = "toolStripButton4";
-			this.toolStripButton4.Size = new System.Drawing.Size( 23, 22 );
-			this.toolStripButton4.Text = "toolStripButton4";
-			// 
-			// locationToolStrip
-			// 
-			this.locationToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-			this.locationToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripLabel1,
-            this.threadToolStripComboBox,
-            this.toolStripLabel2,
-            this.frameToolStripComboBox} );
-			this.locationToolStrip.Location = new System.Drawing.Point( 107, 25 );
-			this.locationToolStrip.Name = "locationToolStrip";
-			this.locationToolStrip.Size = new System.Drawing.Size( 348, 25 );
-			this.locationToolStrip.TabIndex = 2;
-			// 
-			// toolStripLabel1
-			// 
-			this.toolStripLabel1.Name = "toolStripLabel1";
-			this.toolStripLabel1.Size = new System.Drawing.Size( 47, 22 );
-			this.toolStripLabel1.Text = "Thread:";
-			// 
-			// threadToolStripComboBox
-			// 
-			this.threadToolStripComboBox.Name = "threadToolStripComboBox";
-			this.threadToolStripComboBox.Size = new System.Drawing.Size( 121, 25 );
-			// 
-			// toolStripLabel2
-			// 
-			this.toolStripLabel2.Name = "toolStripLabel2";
-			this.toolStripLabel2.Size = new System.Drawing.Size( 43, 22 );
-			this.toolStripLabel2.Text = "Frame:";
-			// 
-			// frameToolStripComboBox
-			// 
-			this.frameToolStripComboBox.Name = "frameToolStripComboBox";
-			this.frameToolStripComboBox.Size = new System.Drawing.Size( 121, 25 );
-			// 
 			// windowsToolStrip
 			// 
 			this.windowsToolStrip.Dock = System.Windows.Forms.DockStyle.None;
 			this.windowsToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
             this.codeViewToolStripButton,
             this.memoryToolStripButton,
-            this.registersToolStripButton,
             this.callstackToolStripButton,
             this.toolStripSeparator9,
             this.biosToolStripButton,
@@ -620,7 +550,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
             this.logViewToolStripButton} );
 			this.windowsToolStrip.Location = new System.Drawing.Point( 3, 0 );
 			this.windowsToolStrip.Name = "windowsToolStrip";
-			this.windowsToolStrip.Size = new System.Drawing.Size( 254, 25 );
+			this.windowsToolStrip.Size = new System.Drawing.Size( 231, 25 );
 			this.windowsToolStrip.TabIndex = 1;
 			// 
 			// codeViewToolStripButton
@@ -642,16 +572,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.memoryToolStripButton.Size = new System.Drawing.Size( 23, 22 );
 			this.memoryToolStripButton.Text = "Memory";
 			this.memoryToolStripButton.Click += new System.EventHandler( this.memoryToolStripButton_Click );
-			// 
-			// registersToolStripButton
-			// 
-			this.registersToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.registersToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.RegistersIcon;
-			this.registersToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.registersToolStripButton.Name = "registersToolStripButton";
-			this.registersToolStripButton.Size = new System.Drawing.Size( 23, 22 );
-			this.registersToolStripButton.Text = "Registers";
-			this.registersToolStripButton.Click += new System.EventHandler( this.registersToolStripButton_Click );
 			// 
 			// callstackToolStripButton
 			// 
@@ -733,6 +653,243 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.logViewToolStripButton.Text = "Log View";
 			this.logViewToolStripButton.Click += new System.EventHandler( this.logViewToolStripButton_Click );
 			// 
+			// controlToolStrip
+			// 
+			this.controlToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+			this.controlToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.resumeToolStripButton,
+            this.breakToolStripButton,
+            this.stopToolStripButton,
+            this.restartToolStripButton,
+            this.toolStripSeparator6,
+            this.showStatementToolStripButton,
+            this.stepIntoToolStripButton,
+            this.stepOverToolStripButton,
+            this.stepOutToolStripButton,
+            this.toolStripSeparator7,
+            this.hexToolStripButton} );
+			this.controlToolStrip.Location = new System.Drawing.Point( 3, 25 );
+			this.controlToolStrip.Name = "controlToolStrip";
+			this.controlToolStrip.Size = new System.Drawing.Size( 239, 25 );
+			this.controlToolStrip.TabIndex = 0;
+			// 
+			// resumeToolStripButton
+			// 
+			this.resumeToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.resumeToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.PlayIcon;
+			this.resumeToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.resumeToolStripButton.Name = "resumeToolStripButton";
+			this.resumeToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.resumeToolStripButton.Text = "Resume";
+			this.resumeToolStripButton.ToolTipText = "Resume Execution";
+			this.resumeToolStripButton.Click += new System.EventHandler( this.resumeToolStripMenuItem_Click );
+			// 
+			// breakToolStripButton
+			// 
+			this.breakToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.breakToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.PauseIcon;
+			this.breakToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.breakToolStripButton.Name = "breakToolStripButton";
+			this.breakToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.breakToolStripButton.Text = "Break";
+			this.breakToolStripButton.ToolTipText = "Break Execution";
+			this.breakToolStripButton.Click += new System.EventHandler( this.breakToolStripMenuItem_Click );
+			// 
+			// stopToolStripButton
+			// 
+			this.stopToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.stopToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StopIcon;
+			this.stopToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.stopToolStripButton.Name = "stopToolStripButton";
+			this.stopToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.stopToolStripButton.Text = "Stop";
+			this.stopToolStripButton.ToolTipText = "Stop Execution";
+			this.stopToolStripButton.Click += new System.EventHandler( this.stopToolStripMenuItem_Click );
+			// 
+			// restartToolStripButton
+			// 
+			this.restartToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.restartToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.RestartIcon;
+			this.restartToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.restartToolStripButton.Name = "restartToolStripButton";
+			this.restartToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.restartToolStripButton.Text = "Restart";
+			this.restartToolStripButton.Click += new System.EventHandler( this.restartToolStripMenuItem_Click );
+			// 
+			// locationToolStrip
+			// 
+			this.locationToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+			this.locationToolStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripLabel1,
+            this.threadToolStripComboBox,
+            this.toolStripLabel2,
+            this.frameToolStripComboBox} );
+			this.locationToolStrip.Location = new System.Drawing.Point( 242, 25 );
+			this.locationToolStrip.Name = "locationToolStrip";
+			this.locationToolStrip.Size = new System.Drawing.Size( 381, 25 );
+			this.locationToolStrip.TabIndex = 2;
+			this.locationToolStrip.Visible = false;
+			// 
+			// toolStripLabel1
+			// 
+			this.toolStripLabel1.Name = "toolStripLabel1";
+			this.toolStripLabel1.Size = new System.Drawing.Size( 47, 22 );
+			this.toolStripLabel1.Text = "Thread:";
+			// 
+			// threadToolStripComboBox
+			// 
+			this.threadToolStripComboBox.Name = "threadToolStripComboBox";
+			this.threadToolStripComboBox.Size = new System.Drawing.Size( 121, 25 );
+			// 
+			// toolStripLabel2
+			// 
+			this.toolStripLabel2.Name = "toolStripLabel2";
+			this.toolStripLabel2.Size = new System.Drawing.Size( 43, 22 );
+			this.toolStripLabel2.Text = "Frame:";
+			// 
+			// frameToolStripComboBox
+			// 
+			this.frameToolStripComboBox.Name = "frameToolStripComboBox";
+			this.frameToolStripComboBox.Size = new System.Drawing.Size( 121, 25 );
+			// 
+			// toolStripSeparator6
+			// 
+			this.toolStripSeparator6.Name = "toolStripSeparator6";
+			this.toolStripSeparator6.Size = new System.Drawing.Size( 6, 25 );
+			// 
+			// showStatementToolStripButton
+			// 
+			this.showStatementToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.showStatementToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StatementIcon;
+			this.showStatementToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.showStatementToolStripButton.Name = "showStatementToolStripButton";
+			this.showStatementToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.showStatementToolStripButton.Text = "Show Next Statement";
+			this.showStatementToolStripButton.Click += new System.EventHandler( this.showNextStatementToolStripMenuItem_Click );
+			// 
+			// stepIntoToolStripButton
+			// 
+			this.stepIntoToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.stepIntoToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StepIntoIcon;
+			this.stepIntoToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.stepIntoToolStripButton.Name = "stepIntoToolStripButton";
+			this.stepIntoToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.stepIntoToolStripButton.Text = "Step Into";
+			this.stepIntoToolStripButton.Click += new System.EventHandler( this.stepIntoToolStripMenuItem_Click );
+			// 
+			// stepOutToolStripButton
+			// 
+			this.stepOutToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.stepOutToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StepOutIcon;
+			this.stepOutToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.stepOutToolStripButton.Name = "stepOutToolStripButton";
+			this.stepOutToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.stepOutToolStripButton.Text = "Step Out";
+			this.stepOutToolStripButton.Click += new System.EventHandler( this.stepOutToolStripMenuItem_Click );
+			// 
+			// stepOverToolStripButton
+			// 
+			this.stepOverToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.stepOverToolStripButton.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StepOverIcon;
+			this.stepOverToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.stepOverToolStripButton.Name = "stepOverToolStripButton";
+			this.stepOverToolStripButton.Size = new System.Drawing.Size( 23, 22 );
+			this.stepOverToolStripButton.Text = "Step Over";
+			this.stepOverToolStripButton.Click += new System.EventHandler( this.stepOverToolStripMenuItem_Click );
+			// 
+			// toolStripSeparator7
+			// 
+			this.toolStripSeparator7.Name = "toolStripSeparator7";
+			this.toolStripSeparator7.Size = new System.Drawing.Size( 6, 25 );
+			// 
+			// hexToolStripButton
+			// 
+			this.hexToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.hexToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.hexToolStripButton.Name = "hexToolStripButton";
+			this.hexToolStripButton.Size = new System.Drawing.Size( 31, 22 );
+			this.hexToolStripButton.Text = "Hex";
+			this.hexToolStripButton.ToolTipText = "Show Numbers in Hexidecimal";
+			// 
+			// resumeToolStripMenuItem
+			// 
+			this.resumeToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.PlayIcon;
+			this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
+			this.resumeToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+			this.resumeToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.resumeToolStripMenuItem.Text = "&Resume";
+			this.resumeToolStripMenuItem.Click += new System.EventHandler( this.resumeToolStripMenuItem_Click );
+			// 
+			// breakToolStripMenuItem
+			// 
+			this.breakToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.PauseIcon;
+			this.breakToolStripMenuItem.Name = "breakToolStripMenuItem";
+			this.breakToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt )
+						| System.Windows.Forms.Keys.B ) ) );
+			this.breakToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.breakToolStripMenuItem.Text = "&Break";
+			this.breakToolStripMenuItem.Click += new System.EventHandler( this.breakToolStripMenuItem_Click );
+			// 
+			// stopToolStripMenuItem
+			// 
+			this.stopToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StopIcon;
+			this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
+			this.stopToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F5 ) ) );
+			this.stopToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.stopToolStripMenuItem.Text = "&Stop";
+			this.stopToolStripMenuItem.Click += new System.EventHandler( this.stopToolStripMenuItem_Click );
+			// 
+			// toolStripMenuItem3
+			// 
+			this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+			this.toolStripMenuItem3.Size = new System.Drawing.Size( 203, 6 );
+			// 
+			// restartToolStripMenuItem
+			// 
+			this.restartToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.RestartIcon;
+			this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
+			this.restartToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift )
+						| System.Windows.Forms.Keys.F5 ) ) );
+			this.restartToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.restartToolStripMenuItem.Text = "R&estart";
+			this.restartToolStripMenuItem.Click += new System.EventHandler( this.restartToolStripMenuItem_Click );
+			// 
+			// showNextStatementToolStripMenuItem
+			// 
+			this.showNextStatementToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StatementIcon;
+			this.showNextStatementToolStripMenuItem.Name = "showNextStatementToolStripMenuItem";
+			this.showNextStatementToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F9;
+			this.showNextStatementToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.showNextStatementToolStripMenuItem.Text = "Show &Next Statement";
+			this.showNextStatementToolStripMenuItem.Click += new System.EventHandler( this.showNextStatementToolStripMenuItem_Click );
+			// 
+			// stepIntoToolStripMenuItem
+			// 
+			this.stepIntoToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StepIntoIcon;
+			this.stepIntoToolStripMenuItem.Name = "stepIntoToolStripMenuItem";
+			this.stepIntoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F11;
+			this.stepIntoToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.stepIntoToolStripMenuItem.Text = "Step &Into";
+			this.stepIntoToolStripMenuItem.Click += new System.EventHandler( this.stepIntoToolStripMenuItem_Click );
+			// 
+			// stepOverToolStripMenuItem
+			// 
+			this.stepOverToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StepOverIcon;
+			this.stepOverToolStripMenuItem.Name = "stepOverToolStripMenuItem";
+			this.stepOverToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F10;
+			this.stepOverToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.stepOverToolStripMenuItem.Text = "Step &Over";
+			this.stepOverToolStripMenuItem.Click += new System.EventHandler( this.stepOverToolStripMenuItem_Click );
+			// 
+			// stepOutToolStripMenuItem
+			// 
+			this.stepOutToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StepOutIcon;
+			this.stepOutToolStripMenuItem.Name = "stepOutToolStripMenuItem";
+			this.stepOutToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F11 ) ) );
+			this.stepOutToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.stepOutToolStripMenuItem.Text = "Step Ou&t";
+			this.stepOutToolStripMenuItem.Click += new System.EventHandler( this.stepOutToolStripMenuItem_Click );
+			// 
 			// DebugView
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
@@ -754,12 +911,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.toolStripContainer1.TopToolStripPanel.PerformLayout();
 			this.toolStripContainer1.ResumeLayout( false );
 			this.toolStripContainer1.PerformLayout();
+			this.windowsToolStrip.ResumeLayout( false );
+			this.windowsToolStrip.PerformLayout();
 			this.controlToolStrip.ResumeLayout( false );
 			this.controlToolStrip.PerformLayout();
 			this.locationToolStrip.ResumeLayout( false );
 			this.locationToolStrip.PerformLayout();
-			this.windowsToolStrip.ResumeLayout( false );
-			this.windowsToolStrip.PerformLayout();
 			this.ResumeLayout( false );
 			this.PerformLayout();
 
@@ -803,7 +960,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private System.Windows.Forms.ToolStrip windowsToolStrip;
 		private System.Windows.Forms.ToolStripButton codeViewToolStripButton;
 		private System.Windows.Forms.ToolStripButton memoryToolStripButton;
-		private System.Windows.Forms.ToolStripButton registersToolStripButton;
 		private System.Windows.Forms.ToolStripButton biosToolStripButton;
 		private System.Windows.Forms.ToolStripButton threadsToolStripButton;
 		private System.Windows.Forms.ToolStripButton callstackToolStripButton;
@@ -814,7 +970,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem codeViewToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem memoryToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem registersToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem callstackToolStripMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
 		private System.Windows.Forms.ToolStripMenuItem biosToolStripMenuItem;
@@ -829,15 +984,31 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private System.Windows.Forms.ToolStripMenuItem debugToolStripMenuItem;
 		private System.Windows.Forms.ToolStrip controlToolStrip;
 		private System.Windows.Forms.ToolStrip locationToolStrip;
-		private System.Windows.Forms.ToolStripButton toolStripButton1;
+		private System.Windows.Forms.ToolStripButton resumeToolStripButton;
 		private System.Windows.Forms.ToolStripLabel toolStripLabel1;
 		private System.Windows.Forms.ToolStripComboBox threadToolStripComboBox;
 		private System.Windows.Forms.ToolStripLabel toolStripLabel2;
 		private System.Windows.Forms.ToolStripComboBox frameToolStripComboBox;
-		private System.Windows.Forms.ToolStripButton toolStripButton2;
-		private System.Windows.Forms.ToolStripButton toolStripButton3;
-		private System.Windows.Forms.ToolStripButton toolStripButton4;
+		private System.Windows.Forms.ToolStripButton breakToolStripButton;
+		private System.Windows.Forms.ToolStripButton stopToolStripButton;
+		private System.Windows.Forms.ToolStripButton restartToolStripButton;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+		private System.Windows.Forms.ToolStripButton showStatementToolStripButton;
+		private System.Windows.Forms.ToolStripButton stepIntoToolStripButton;
+		private System.Windows.Forms.ToolStripButton stepOverToolStripButton;
+		private System.Windows.Forms.ToolStripButton stepOutToolStripButton;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+		private System.Windows.Forms.ToolStripButton hexToolStripButton;
+		private System.Windows.Forms.ToolStripMenuItem resumeToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem breakToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem stopToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem restartToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
+		private System.Windows.Forms.ToolStripMenuItem showNextStatementToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem stepIntoToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem stepOverToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem stepOutToolStripMenuItem;
 	}
 }
 

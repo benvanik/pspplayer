@@ -56,6 +56,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		private void Debugger_StateChanged( object sender, EventArgs e )
 		{
 			Debug.WriteLine( "debug state changed: " + this.Debugger.State.ToString() );
+
+			this.SetDebugMenu();
 		}
 
 		private void DebugView_Load( object sender, EventArgs e )
@@ -63,7 +65,107 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.Debugger.StartConnection();
 		}
 
-		#region Window controls
+		#region Debug Menu
+
+		private void SetDebugMenu()
+		{
+			switch( this.Debugger.State )
+			{
+				case DebuggerState.Idle:
+					this.resumeToolStripMenuItem.Enabled = true;
+					this.breakToolStripMenuItem.Enabled = false;
+					this.stopToolStripMenuItem.Enabled = false;
+					this.restartToolStripMenuItem.Enabled = false;
+					this.showNextStatementToolStripMenuItem.Enabled = false;
+					this.stepIntoToolStripMenuItem.Enabled = false;
+					this.stepOutToolStripMenuItem.Enabled = false;
+					this.stepOverToolStripMenuItem.Enabled = false;
+					break;
+				case DebuggerState.Running:
+					this.resumeToolStripMenuItem.Enabled = false;
+					this.breakToolStripMenuItem.Enabled = true;
+					this.stopToolStripMenuItem.Enabled = true;
+					this.restartToolStripMenuItem.Enabled = true;
+					this.showNextStatementToolStripMenuItem.Enabled = false;
+					this.stepIntoToolStripMenuItem.Enabled = false;
+					this.stepOutToolStripMenuItem.Enabled = false;
+					this.stepOverToolStripMenuItem.Enabled = false;
+					break;
+				case DebuggerState.Broken:
+					this.resumeToolStripMenuItem.Enabled = true;
+					this.breakToolStripMenuItem.Enabled = false;
+					this.stopToolStripMenuItem.Enabled = true;
+					this.restartToolStripMenuItem.Enabled = true;
+					this.showNextStatementToolStripMenuItem.Enabled = true;
+					this.stepIntoToolStripMenuItem.Enabled = true;
+					this.stepOutToolStripMenuItem.Enabled = true;
+					this.stepOverToolStripMenuItem.Enabled = true;
+					break;
+				case DebuggerState.Detached:
+					this.resumeToolStripMenuItem.Enabled = false;
+					this.breakToolStripMenuItem.Enabled = false;
+					this.stopToolStripMenuItem.Enabled = false;
+					this.restartToolStripMenuItem.Enabled = false;
+					this.showNextStatementToolStripMenuItem.Enabled = false;
+					this.stepIntoToolStripMenuItem.Enabled = false;
+					this.stepOutToolStripMenuItem.Enabled = false;
+					this.stepOverToolStripMenuItem.Enabled = false;
+					break;
+			}
+
+			this.resumeToolStripButton.Enabled = this.resumeToolStripMenuItem.Enabled;
+			this.breakToolStripButton.Enabled = this.breakToolStripMenuItem.Enabled;
+			this.stopToolStripButton.Enabled = this.stopToolStripMenuItem.Enabled;
+			this.restartToolStripButton.Enabled = this.restartToolStripMenuItem.Enabled;
+			this.showStatementToolStripButton.Enabled = this.showNextStatementToolStripMenuItem.Enabled;
+			this.stepIntoToolStripButton.Enabled = this.stepIntoToolStripMenuItem.Enabled;
+			this.stepOutToolStripButton.Enabled = this.stepOutToolStripMenuItem.Enabled;
+			this.stepOverToolStripButton.Enabled = this.stepOverToolStripMenuItem.Enabled;
+		}
+
+		private void resumeToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.Debugger.Host.Controller.Run();
+		}
+
+		private void breakToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.Debugger.Host.Controller.Break();
+		}
+
+		private void stopToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			// TODO: STOP ??
+		}
+
+		private void restartToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			// TODO: RESTART ??
+		}
+
+		private void showNextStatementToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.Debugger.Code.ShowNextStatement();
+		}
+
+		private void stepIntoToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.Debugger.Host.Controller.Step();
+		}
+
+		private void stepOverToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.Debugger.Host.Controller.StepOver();
+		}
+
+		private void stepOutToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.Debugger.Host.Controller.StepOut();
+		}
+
+		#endregion
+
+		#region Window Menu
 
 		private void codeViewToolStripButton_Click( object sender, EventArgs e )
 		{
@@ -71,11 +173,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		}
 
 		private void memoryToolStripButton_Click( object sender, EventArgs e )
-		{
-
-		}
-
-		private void registersToolStripButton_Click( object sender, EventArgs e )
 		{
 
 		}
