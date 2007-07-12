@@ -213,6 +213,30 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 #ifdef DEBUGGING
 			if( pass == 1 )
 			{
+				// We set the flag just during the debug stuff so that the debugger can tell if we are in a delay slot
+				if( ( jumpDelay == true ) || ( inDelay == true ) )
+				{
+					g->mov( MINDELAY( CTXP( _ctx->CtxPointer ) ), 1 );
+
+					// If we know the next PC, set it
+					if( jumpDelay == true )
+					{
+						if( _ctx->JumpTarget != NULL )
+							g->mov( MNEXTPC( CTXP( _ctx->CtxPointer ) ), _ctx->JumpTarget );
+						else if( _ctx->JumpRegister != 0 )
+						{
+							g->mov( EAX, MREG( CTXP( _ctx->CtxPointer ), _ctx->JumpRegister ) );
+							g->mov( MNEXTPC( CTXP( _ctx->CtxPointer ) ), EAX );
+						}
+					}
+					else if( inDelay == true )
+					{
+						LabelMarker^ lm = _ctx->BranchTarget;
+						Debug::Assert( lm != nullptr );
+						g->mov( MNEXTPC( CTXP( _ctx->CtxPointer ) ), lm->Address );
+					}
+				}
+
 				// Add debug thunk space - 12 bytes
 				Debug::Assert( DEBUGTHUNKSIZE == 12 );
 				g->dd( ( uint )0x90909090 );
@@ -223,6 +247,9 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 				int breakpointId;
 				if( _cpu->_hook->BreakpointLookup->TryGetValue( address, breakpointId ) == true )
 					breakpoints->Add( breakpointId );
+
+				if( ( jumpDelay == true ) || ( inDelay == true ) )
+					g->mov( MINDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
 			}
 #endif
 
@@ -702,6 +729,15 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 						GenerateTail( address - 4, false, 0 );
 				}
 			}
+
+#ifdef DEBUGGING
+			// Sizing information
+			int newOffset = _gen->GetLength();
+			int lastSize = ( newOffset - lastOffset );
+			Debug::Assert( lastSize < ushort::MaxValue );
+			block->InstructionSizes[ count ] = lastSize;
+			lastOffset = newOffset;
+#endif
 		}
 	}
 

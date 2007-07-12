@@ -39,6 +39,40 @@ namespace Noxa {
 					virtual void Step();
 					virtual void StepOver();
 					virtual void StepOut();
+
+				internal:
+					enum class InstructionType
+					{
+						Normal,
+						Branch,
+						Jump,
+						JumpAndLink,
+					};
+					enum class AddressBits
+					{
+						Bits16,
+						Bits26,
+						Register,
+					};
+					ref class Instruction
+					{
+					public:
+						String^				Name;
+						uint				Opcode;
+						uint				Mask;
+						AddressBits			Bits;
+						InstructionType		Type;
+						Instruction( String^ name, uint opcode, uint mask, AddressBits addressBits, InstructionType type )
+						{
+							Name = name;
+							Opcode = opcode;
+							Mask = mask;
+							Bits = addressBits;
+							Type = type;
+						}
+					};
+					array<Instruction^>^ _analysisInstructions;
+					InstructionType AnalyzeJump( uint address, uint code, uint* target );
 				};
 
 			}

@@ -119,11 +119,9 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		[NonSerialized]
 		public BiosFunction CachedFunction;
 
-		private static int _ids = 100;
-
-		private Breakpoint( BreakpointType type )
+		private Breakpoint( int id, BreakpointType type )
 		{
-			this.ID = Interlocked.Increment( ref _ids );
+			this.ID = id;
 			this.Type = type;
 			this.Name = null;
 			this.Mode = BreakpointMode.Break;
@@ -133,10 +131,11 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// Initializes a new <see cref="Breakpoint"/> instance with the given parameters.
 		/// </summary>
+		/// <param name="id">A unique ID used to lookup the breakpoint.</param>
 		/// <param name="type">The breakpoint type.</param>
 		/// <param name="address">The address of the breakpoint.</param>
-		public Breakpoint( BreakpointType type, uint address )
-			: this( type )
+		public Breakpoint( int id, BreakpointType type, uint address )
+			: this( id, type )
 		{
 			this.Address = address;
 		}
@@ -144,10 +143,11 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// Initializes a new <see cref="Breakpoint"/> instance with the given parameters.
 		/// </summary>
+		/// <param name="id">A unique ID used to lookup the breakpoint.</param>
 		/// <param name="address">The memory address to break at.</param>
 		/// <param name="accessType">The access type that triggers the breakpoint.</param>
-		public Breakpoint( uint address, MemoryAccessType accessType )
-			: this( BreakpointType.MemoryAccess )
+		public Breakpoint( int id, uint address, MemoryAccessType accessType )
+			: this( id, BreakpointType.MemoryAccess )
 		{
 			this.AccessType = accessType;
 			this.Address = address;
@@ -156,11 +156,27 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// Initializes a new <see cref="Breakpoint"/> instance with the given parameters.
 		/// </summary>
+		/// <param name="id">A unique ID used to lookup the breakpoint.</param>
 		/// <param name="function">The BIOS function to break on.</param>
-		public Breakpoint( BiosFunctionToken function )
-			: this( BreakpointType.BiosFunction )
+		public Breakpoint( int id, BiosFunctionToken function )
+			: this( id, BreakpointType.BiosFunction )
 		{
 			this.Function = function;
+		}
+
+		/// <summary>
+		/// Returns a <see cref="System.String"/> representation of the <see cref="Breakpoint"/>.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> representation of the <see cref="Breakpoint"/>.</returns>
+		public override string ToString()
+		{
+			return string.Format( "{0}{1} ({2} 0x{3:X8}{4})",
+				this.ID,
+				( this.Name != null ) ? " " + this.Name : "",
+				this.Type,
+				this.Address,
+				( this.Type == BreakpointType.MemoryAccess ) ? " " + this.AccessType.ToString() : "" );
+
 		}
 	}
 }
