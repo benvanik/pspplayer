@@ -47,5 +47,11 @@ namespace Noxa.Emulation.Psp.Debugging.Protocol
 		/// Clean up the debugger and get ready for another run.
 		/// </summary>
 		void OnStopped();
+
+		/// <summary>
+		/// Allocate a new unique ID for breakpoints/etc.
+		/// </summary>
+		/// <returns>A unique ID.</returns>
+		int AllocateID();
 	}
 }

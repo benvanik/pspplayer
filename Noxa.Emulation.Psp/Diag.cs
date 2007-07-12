@@ -37,7 +37,12 @@ namespace Noxa.Emulation.Psp
 			}
 		}
 
-		private static bool EnsureAttached( string message )
+		/// <summary>
+		/// Ensure that the debugger is attached; if it's not, a dialog will be presented to the user.
+		/// </summary>
+		/// <param name="message">Information displayed to the user about why the debugger is being requested.</param>
+		/// <returns><c>true</c> if the debugger is attached, otherwise <c>false</c>.</returns>
+		public static bool EnsureAttached( string message )
 		{
 			if( IsAttached == false )
 			{

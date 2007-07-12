@@ -150,6 +150,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			return true;
 		}
 
+		private int _ids = 100;
+		public int AllocateID()
+		{
+			return Interlocked.Increment( ref _ids );
+		}
+
 		#region Remoting services
 
 		public bool SetupRemoting()
@@ -195,8 +201,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.View.Invoke( del );
 
 			// TEST
-			Breakpoint bp = new Breakpoint( BreakpointType.CodeExecute, 0x08900334 );
-			//this.Breakpoints.Add( bp );
+			Breakpoint bp = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, 0x08900334 );
+			this.Breakpoints.Add( bp );
 		}
 
 		public void OnStopped()
@@ -263,7 +269,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public void OnStepComplete( uint address )
 		{
 			this.ShowSourceView( address );
-			Debugger.Break();
 		}
 
 		public void OnBreakpointHit( int id )

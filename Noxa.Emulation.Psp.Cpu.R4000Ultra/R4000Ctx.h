@@ -23,9 +23,11 @@ using namespace Noxa::Emulation::Psp;
 #define CTXSTOPFLAG		1184
 #define CTXCP2PFX		1188
 #define CTXCP2WM		1200
+#define CTXINDELAY		1204
+#define CTXNEXTPC		1208
 //#define CTXCP0REGS	
 //#define CTXCP0CONTROL	
-#define CTXSIZE			1204
+#define CTXSIZE			1212
 
 #define SSE_ALIGN __declspec( align( 16 ) )
 
@@ -84,6 +86,8 @@ namespace Noxa {
 					CtxStopFlags	StopFlag;				// +1184 - used to detect stop conditions
 					int				Cp2Pfx[ 3 ];			// +1188 (12) - s, t, d prefixes
 					int				Cp2Wm;					// +1200 - write mask (bits 0-3)
+					int				InDelay;				// +1204 - DEBUG
+					uint			NextPC;					// +1208 - DEBUG
 					//int			Cp0Registers[ 32 ];		// + (128)
 					//int			Cp0Control[ 32 ];		// + (128)
 				} R4000Ctx;
