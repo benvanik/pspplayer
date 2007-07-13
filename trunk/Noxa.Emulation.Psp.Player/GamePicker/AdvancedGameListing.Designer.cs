@@ -40,6 +40,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.groupLabel = new System.Windows.Forms.Label();
 			this.regionsImageList = new System.Windows.Forms.ImageList( this.components );
+			this.clearFilterButton = new System.Windows.Forms.Button();
 			( ( System.ComponentModel.ISupportInitialize )( this.pictureBox1 ) ).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -56,6 +57,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 						| Noxa.Utilities.Controls.ListViewExtendedStyle.BorderSelect )
 						| Noxa.Utilities.Controls.ListViewExtendedStyle.DoubleBuffer ) ) );
 			this.listView.FullRowSelect = true;
+			this.listView.HideSelection = false;
 			this.listView.Location = new System.Drawing.Point( 3, 30 );
 			this.listView.MultiSelect = false;
 			this.listView.Name = "listView";
@@ -81,6 +83,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			// regionColumnHeader
 			// 
 			this.regionColumnHeader.Text = "";
+			this.regionColumnHeader.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			this.regionColumnHeader.Width = 30;
 			// 
 			// gamesImageList
@@ -92,27 +95,33 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			// filterTextBox
 			// 
 			this.filterTextBox.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.filterTextBox.Location = new System.Drawing.Point( 386, 3 );
+			this.filterTextBox.Location = new System.Drawing.Point( 359, 4 );
 			this.filterTextBox.Name = "filterTextBox";
-			this.filterTextBox.Size = new System.Drawing.Size( 121, 20 );
+			this.filterTextBox.Size = new System.Drawing.Size( 112, 20 );
 			this.filterTextBox.TabIndex = 2;
 			this.filterTextBox.TextChanged += new System.EventHandler( this.filterTextBox_TextChanged );
 			// 
 			// regionComboBox
 			// 
 			this.regionComboBox.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.regionComboBox.Enabled = false;
-			this.regionComboBox.FormattingEnabled = true;
-			this.regionComboBox.Location = new System.Drawing.Point( 513, 3 );
+			this.regionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.regionComboBox.Items.AddRange( new object[] {
+            "All",
+            "US",
+            "UK",
+            "JP",
+            "KR"} );
+			this.regionComboBox.Location = new System.Drawing.Point( 477, 3 );
 			this.regionComboBox.Name = "regionComboBox";
-			this.regionComboBox.Size = new System.Drawing.Size( 59, 21 );
+			this.regionComboBox.Size = new System.Drawing.Size( 44, 21 );
 			this.regionComboBox.TabIndex = 3;
+			this.regionComboBox.SelectedIndexChanged += new System.EventHandler( this.regionComboBox_SelectedIndexChanged );
 			// 
 			// pictureBox1
 			// 
 			this.pictureBox1.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.pictureBox1.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.SearchIcon;
-			this.pictureBox1.Location = new System.Drawing.Point( 364, 3 );
+			this.pictureBox1.Location = new System.Drawing.Point( 337, 4 );
 			this.pictureBox1.Name = "pictureBox1";
 			this.pictureBox1.Size = new System.Drawing.Size( 16, 20 );
 			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -139,10 +148,22 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.regionsImageList.Images.SetKeyName( 4, "UK" );
 			this.regionsImageList.Images.SetKeyName( 5, "KR" );
 			// 
+			// clearFilterButton
+			// 
+			this.clearFilterButton.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.clearFilterButton.Location = new System.Drawing.Point( 527, 2 );
+			this.clearFilterButton.Name = "clearFilterButton";
+			this.clearFilterButton.Size = new System.Drawing.Size( 45, 23 );
+			this.clearFilterButton.TabIndex = 6;
+			this.clearFilterButton.Text = "Clear";
+			this.clearFilterButton.UseVisualStyleBackColor = true;
+			this.clearFilterButton.Click += new System.EventHandler( this.clearFilterButton_Click );
+			// 
 			// AdvancedGameListing
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.Controls.Add( this.clearFilterButton );
 			this.Controls.Add( this.groupLabel );
 			this.Controls.Add( this.pictureBox1 );
 			this.Controls.Add( this.regionComboBox );
@@ -168,6 +189,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		private System.Windows.Forms.Label groupLabel;
 		private System.Windows.Forms.ImageList regionsImageList;
 		private System.Windows.Forms.ImageList gamesImageList;
+		private System.Windows.Forms.Button clearFilterButton;
 
 	}
 }

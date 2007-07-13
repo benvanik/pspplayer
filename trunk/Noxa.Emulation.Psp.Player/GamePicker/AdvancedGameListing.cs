@@ -24,6 +24,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		public AdvancedGameListing()
 		{
 			InitializeComponent();
+			
+			regionComboBox.SelectedIndex = 0;
 		}
 
 		protected override void OnLoad( EventArgs e )
@@ -286,6 +288,10 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 				filters = ft.ToArray();
 			}
 
+			string region = regionComboBox.SelectedItem as string;
+			if( region.ToLowerInvariant() == "all" )
+				region = string.Empty;
+
 			this.listView.BeginUpdate();
 			this.listView.Items.Clear();
 			foreach( GameInformation game in _games )
@@ -299,10 +305,20 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 					if( valid == false )
 						continue;
 				}
+				if( ( game.GameType == GameType.UmdGame ) &&
+					( region != string.Empty ) )
+				{
+					if( item.SubItems[ 2 ].Text.Contains( region.ToUpperInvariant() ) == false )
+						continue;
+				}
+
 				this.listView.Items.Add( item );
 				//this.listView.SetItemDisplay( item.Index, iconColumnHeader.Index, ImagedListView.ItemDisplay.Image, imageIndex );
 			}
 			this.listView.EndUpdate();
+
+			bool hasFilter = ( filter != null ) || ( region != string.Empty );
+			clearFilterButton.Enabled = hasFilter;
 		}
 
 		private void filterTextBox_TextChanged( object sender, EventArgs e )
@@ -339,6 +355,17 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		{
 			if( this.SelectionChanged != null )
 				this.SelectionChanged( this, EventArgs.Empty );
+		}
+
+		private void regionComboBox_SelectedIndexChanged( object sender, EventArgs e )
+		{
+			this.FilterGames();
+		}
+
+		private void clearFilterButton_Click( object sender, EventArgs e )
+		{
+			this.filterTextBox.Text = null;
+			this.regionComboBox.SelectedIndex = 0;
 		}
 	}
 }
