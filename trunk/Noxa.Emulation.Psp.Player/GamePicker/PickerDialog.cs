@@ -37,6 +37,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 			umdGameListing.Text = "UMDs";
 			msGameListing.Text = "EBOOTs";
+			msGameListing.RegionEnabled = false;
 
 			SetEnabledState( true );
 

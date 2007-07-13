@@ -18,6 +18,9 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 	{
 		public event EventHandler SelectionChanged;
 
+		private bool _regionEnabled = true;
+		private int _filterOriginalPad;
+
 		public AdvancedGameListing()
 		{
 			InitializeComponent();
@@ -28,6 +31,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			base.OnLoad( e );
 
 			listView_Resize( null, EventArgs.Empty );
+
+			_filterOriginalPad = regionComboBox.Left - filterTextBox.Right;
 		}
 
 		public override string Text
@@ -42,9 +47,39 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			}
 		}
 
+		public bool RegionEnabled
+		{
+			get
+			{
+				return _regionEnabled;
+			}
+			set
+			{
+				if( _regionEnabled != value )
+				{
+					_regionEnabled = value;
+					if( value == false )
+					{
+						listView.Columns.Remove( regionColumnHeader );
+						regionComboBox.Visible = false;
+						filterTextBox.Width += regionComboBox.Right - filterTextBox.Right;
+					}
+					else
+					{
+						listView.Columns.Add( regionColumnHeader );
+						regionComboBox.Visible = true;
+						filterTextBox.Width = regionComboBox.Left - _filterOriginalPad - filterTextBox.Left;
+					}
+				}
+			}
+		}
+
 		private void listView_Resize( object sender, EventArgs e )
 		{
-			titleColumnHeader.Width = listView.ClientSize.Width - iconColumnHeader.Width - regionColumnHeader.Width - 1;
+			int width = listView.ClientSize.Width - iconColumnHeader.Width - 1;
+			if( _regionEnabled == true )
+				width -= regionColumnHeader.Width;
+			titleColumnHeader.Width = width;
 		}
 
 		private List<GameInformation> _games = new List<GameInformation>();
