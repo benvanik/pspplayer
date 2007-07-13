@@ -59,7 +59,8 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		public BiosFunctionToken( BiosFunction function )
 		{
 			this.NID = function.NID;
-			this.ModuleName = function.Module.Name;
+			if( function.Module != null )
+				this.ModuleName = function.Module.Name;
 			this.MethodName = function.Name;
 		}
 

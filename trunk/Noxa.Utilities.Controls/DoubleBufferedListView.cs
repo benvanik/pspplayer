@@ -67,15 +67,18 @@ namespace Noxa.Utilities.Controls
 
 	public class DoubleBufferedListView : ListView
 	{
-		private enum LVM
+		protected enum LVM
 		{
 			LVM_FIRST = 0x1000,
+			LVM_GETITEM = ( LVM_FIRST + 5 ),
+			LVM_SETITEM = ( LVM_FIRST + 6 ),
+			LVM_GETITEMTEXT = ( LVM_FIRST + 45 ),
 			LVM_SETEXTENDEDLISTVIEWSTYLE = ( LVM_FIRST + 54 ),
 			LVM_GETEXTENDEDLISTVIEWSTYLE = ( LVM_FIRST + 55 ),
 		}
 
 		[DllImport( "user32.dll", CharSet = CharSet.Auto )]
-		private static extern int SendMessage( IntPtr handle, int messg, int wparam, int lparam );
+		protected static extern int SendMessage( IntPtr handle, int msg, int wparam, int lparam );
 
 		public DoubleBufferedListView()
 		{
