@@ -150,9 +150,9 @@ namespace Noxa.Emulation.Psp.Games
 		public Stream DataPsp;
 
 		/// <summary>
-		/// User-defined tag.
+		/// Path of the game on the host, if available.
 		/// </summary>
-		public object Tag;
+		public string HostPath;
 
 		internal GameInformation( GameType gameType, IMediaFolder folder, GameParameters parameters, Stream icon, Stream background, string uniqueId )
 		{
@@ -195,7 +195,7 @@ namespace Noxa.Emulation.Psp.Games
 				this.Background.Dispose();
 
 			this.Folder = null;
-			this.Tag = null;
+			this.HostPath = null;
 		}
 
 		#endregion

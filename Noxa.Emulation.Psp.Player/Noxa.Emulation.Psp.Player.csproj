@@ -61,17 +61,11 @@
     <Compile Include="Configuration\ConfigurationHost.Designer.cs">
       <DependentUpon>ConfigurationHost.cs</DependentUpon>
     </Compile>
-    <Compile Include="GamePicker\GameEntry.cs">
+    <Compile Include="GamePicker\AdvancedGameListing.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="GamePicker\GameEntry.Designer.cs">
-      <DependentUpon>GameEntry.cs</DependentUpon>
-    </Compile>
-    <Compile Include="GamePicker\GameListing.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="GamePicker\GameListing.Designer.cs">
-      <DependentUpon>GameListing.cs</DependentUpon>
+    <Compile Include="GamePicker\AdvancedGameListing.Designer.cs">
+      <DependentUpon>AdvancedGameListing.cs</DependentUpon>
     </Compile>
     <Compile Include="GamePicker\PickerDialog.cs">
       <SubType>Form</SubType>
@@ -117,13 +111,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>Options.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GamePicker\GameEntry.resx">
+    <EmbeddedResource Include="GamePicker\AdvancedGameListing.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>GameEntry.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="GamePicker\GameListing.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>GameListing.cs</DependentUpon>
+      <DependentUpon>AdvancedGameListing.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GamePicker\PickerDialog.resx">
       <SubType>Designer</SubType>
@@ -244,6 +234,7 @@
     <None Include="Resources\InfoIcon.png" />
     <Content Include="Resources\MemoryStickIcon.png" />
     <None Include="Resources\OutputIcon.png" />
+    <Content Include="Resources\SearchIcon.png" />
     <Content Include="Resources\ReportIcon.png" />
     <Content Include="Resources\psp.ico" />
     <None Include="Resources\PspShake.png" />

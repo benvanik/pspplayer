@@ -35,11 +35,14 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 			_emulator = emulator;
 
+			umdGameListing.Text = "UMDs";
+			msGameListing.Text = "EBOOTs";
+
 			SetEnabledState( true );
 
 			this.FindGames();
 
-			recentGamesListing_SelectionChanged( recentGamesListing, EventArgs.Empty );
+			umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
 
 			this.DialogResult = DialogResult.Cancel;
 		}
@@ -53,8 +56,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 		protected override void OnClosed( EventArgs e )
 		{
-			recentGamesListing.ClearGames();
-			memoryStickListing.ClearGames();
+			umdGameListing.ClearGames();
+			msGameListing.ClearGames();
 
 			base.OnClosed( e );
 		}
@@ -62,10 +65,10 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		public void LaunchGame( GameInformation game )
 		{
 			game.IgnoreDispose = true;
-			if( game.Tag != null )
+			if( game.HostPath != null )
 			{
 				// Need to have the UMD instance reload to the game
-				string gamePath = game.Tag as string;
+				string gamePath = game.HostPath;
 				Debug.Assert( gamePath != null );
 
 				_emulator.Umd.Eject();
@@ -96,30 +99,26 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 				if( game.GameType == GameType.Eboot )
 					eboots.Add( game );
 			}
-			memoryStickListing.AddGames( eboots );
+			msGameListing.AddGames( eboots );
 
 			// Load recent UMDs
 			if( Properties.Settings.Default.RecentGames != null )
 			{
 				string lastPlayed = Properties.Settings.Default.LastPlayedGame;
 				List<GameInformation> umds = new List<GameInformation>();
+				GameInformation selectedUmd = null;
 				foreach( string gamePath in Properties.Settings.Default.RecentGames )
 				{
 					GameInformation game = this.LoadGameFromUmd( gamePath );
 					if( game != null )
 					{
 						umds.Add( game );
+						if( game.HostPath == lastPlayed )
+							selectedUmd = game;
 					}
 				}
-				recentGamesListing.AddGames( umds );
-				foreach( GameEntry entry in recentGamesListing.GameEntries )
-				{
-					if( lastPlayed == ( string )entry.Game.Tag )
-					{
-						recentGamesListing.SelectedEntry = entry;
-						break;
-					}
-				}
+				umdGameListing.AddGames( umds );
+				umdGameListing.SelectedGame = selectedUmd;
 			}
 		}
 
@@ -150,7 +149,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 				GameInformation game = GameLoader.FindGame( umdDevice );
 				if( game != null )
 				{
-					game.Tag = gamePath;
+					game.HostPath = gamePath;
 				}
 
 				umdDevice.Cleanup();
@@ -183,7 +182,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			games.Sort( del );
 			Properties.Settings.Default.RecentGames.Clear();
 			foreach( GameInformation game in games )
-				Properties.Settings.Default.RecentGames.Add( game.Tag as string );
+				Properties.Settings.Default.RecentGames.Add( game.HostPath );
 		}
 
 		private void browseButton_Click( object sender, EventArgs e )
@@ -204,9 +203,9 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 						Properties.Settings.Default.Save();
 
 						if( exists == false )
-							recentGamesListing.AddGame( game );
+							umdGameListing.AddGame( game );
 
-						recentGamesListing_SelectionChanged( recentGamesListing, EventArgs.Empty );
+						umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
 					}
 				}
 			}
@@ -214,26 +213,26 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 		private void removeButton_Click( object sender, EventArgs e )
 		{
-			GameListing listing;
+			AdvancedGameListing listing;
 			if( whidbeyTabControl1.SelectedTab == whidbeyTabPage1 )
-				listing = recentGamesListing;
+				listing = umdGameListing;
 			else
-				listing = memoryStickListing;
-			GameEntry entry = listing.SelectedEntry;
-			if( ( entry == null ) ||
-				( entry.Game.Tag == null ) )
+				listing = msGameListing;
+			GameInformation game = listing.SelectedGame;
+			if( ( game == null ) ||
+				( game.HostPath == null ) )
 				return;
 
-			string gamePath = entry.Game.Tag as string;
+			string gamePath = game.HostPath;
 			if( Properties.Settings.Default.RecentGames != null )
 			{
 				Properties.Settings.Default.RecentGames.Remove( gamePath );
 				Properties.Settings.Default.Save();
 			}
 
-			listing.RemoveGame( entry );
+			listing.RemoveGame( game );
 
-			recentGamesListing_SelectionChanged( recentGamesListing, EventArgs.Empty );
+			umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
 		}
 
 		private void clearButton_Click( object sender, EventArgs e )
@@ -241,28 +240,28 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			Properties.Settings.Default.RecentGames = new System.Collections.Specialized.StringCollection();
 			Properties.Settings.Default.Save();
 
-			GameListing listing;
+			AdvancedGameListing listing;
 			if( whidbeyTabControl1.SelectedTab == whidbeyTabPage1 )
-				listing = recentGamesListing;
+				listing = umdGameListing;
 			else
-				listing = memoryStickListing;
+				listing = msGameListing;
 			listing.ClearGames();
 
-			recentGamesListing_SelectionChanged( recentGamesListing, EventArgs.Empty );
+			umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
 		}
 
 		private void playButton_Click( object sender, EventArgs e )
 		{
-			GameListing listing;
+			AdvancedGameListing listing;
 			if( whidbeyTabControl1.SelectedTab == whidbeyTabPage1 )
-				listing = recentGamesListing;
+				listing = umdGameListing;
 			else
-				listing = memoryStickListing;
-			GameEntry entry = listing.SelectedEntry;
-			if( entry == null )
+				listing = msGameListing;
+			GameInformation game = listing.SelectedGame;
+			if( game == null )
 				return;
 
-			this.LaunchGame( entry.Game );
+			this.LaunchGame( game );
 		}
 
 		private void cancelButton_Click( object sender, EventArgs e )
@@ -279,29 +278,27 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		private void whidbeyTabPage1_Showing( object sender, EventArgs e )
 		{
 			SetEnabledState( true );
-			recentGamesListing.Focus();
-			recentGamesListing.SelectedEntry = recentGamesListing.SelectedEntry;
-			recentGamesListing_SelectionChanged( recentGamesListing, EventArgs.Empty );
+			umdGameListing.Focus();
+			umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
 		}
 
 		private void whidbeyTabPage2_Showing( object sender, EventArgs e )
 		{
 			SetEnabledState( false );
-			memoryStickListing.Focus();
-			memoryStickListing.SelectedEntry = memoryStickListing.SelectedEntry;
-			memoryStickListing_SelectionChanged( memoryStickListing, EventArgs.Empty );
+			msGameListing.Focus();
+			msGameListing_SelectionChanged( msGameListing, EventArgs.Empty );
 		}
 
-		private void recentGamesListing_SelectionChanged( object sender, EventArgs e )
+		private void umdGameListing_SelectionChanged( object sender, EventArgs e )
 		{
-			removeButton.Enabled = ( recentGamesListing.SelectedEntry != null );
-			clearButton.Enabled = recentGamesListing.HasGames;
-			playButton.Enabled = ( recentGamesListing.SelectedEntry != null );
+			removeButton.Enabled = ( umdGameListing.SelectedGame != null );
+			clearButton.Enabled = umdGameListing.HasGames;
+			playButton.Enabled = ( umdGameListing.SelectedGame != null );
 		}
 
-		private void memoryStickListing_SelectionChanged( object sender, EventArgs e )
+		private void msGameListing_SelectionChanged( object sender, EventArgs e )
 		{
-			playButton.Enabled = ( memoryStickListing.SelectedEntry != null );
+			playButton.Enabled = ( msGameListing.SelectedGame != null );
 		}
 	}
 }

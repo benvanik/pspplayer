@@ -329,7 +329,8 @@ namespace Noxa.Emulation.Psp.Media.Iso
 									MediaFile file = new MediaFile( this, current, ne.Name, attributes, ne.Timestamp, lbn, ne.Length );
 
 									// Pretty sure this is wrong, but it shouldn't matter
-									_lbnLookup.Add( lbn, file );
+									Debug.Assert( _lbnLookup.ContainsKey( lbn ) == false );
+									_lbnLookup[ lbn ] = file;
 								}
 							}
 							m++;
