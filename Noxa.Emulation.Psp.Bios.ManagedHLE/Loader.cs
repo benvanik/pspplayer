@@ -343,9 +343,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 				// Get header
 				Elf32_Ehdr* header = ( Elf32_Ehdr* )buffer;
-				Debug.Assert( header->e_magic == Elf32_Ehdr.Magic );
+				//Debug.Assert( header->e_magic == Elf32_Ehdr.Magic );
 				if( header->e_magic != Elf32_Ehdr.Magic )
+				{
+					Log.WriteLine( Verbosity.Critical, Feature.Loader, "Module header does not match: {0:X8} != {1:X8}", header->e_magic, Elf32_Ehdr.Magic );
 					return results;
+				}
 				Debug.Assert( header->e_machine == Elf32_Ehdr.MachineMips );
 				if( header->e_machine != Elf32_Ehdr.MachineMips )
 					return results;

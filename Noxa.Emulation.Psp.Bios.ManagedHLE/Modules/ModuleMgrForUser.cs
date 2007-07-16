@@ -63,7 +63,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			loadParams.AppendDatabase = true;
 #endif
 			LoadResults results = _kernel.Bios._loader.LoadModule( ModuleType.Prx, stream, loadParams );
-			Debug.Assert( results.Successful == true );
+			//Debug.Assert( results.Successful == true );
 			if( results.Successful == false )
 			{
 				Log.WriteLine( Verbosity.Critical, Feature.Bios, "LoadModule: loader failed" );
