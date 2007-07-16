@@ -95,6 +95,48 @@ namespace Noxa.Emulation.Psp.Player.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap Flag0 {
+            get {
+                object obj = ResourceManager.GetObject("Flag0", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Flag1 {
+            get {
+                object obj = ResourceManager.GetObject("Flag1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Flag2 {
+            get {
+                object obj = ResourceManager.GetObject("Flag2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Flag3 {
+            get {
+                object obj = ResourceManager.GetObject("Flag3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Flag4 {
+            get {
+                object obj = ResourceManager.GetObject("Flag4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Flag5 {
+            get {
+                object obj = ResourceManager.GetObject("Flag5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap Google {
             get {
                 object obj = ResourceManager.GetObject("Google", resourceCulture);

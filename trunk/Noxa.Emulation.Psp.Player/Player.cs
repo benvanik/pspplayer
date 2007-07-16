@@ -69,7 +69,7 @@ namespace Noxa.Emulation.Psp.Player
 		}
 
 		private delegate void DummyDelegate();
-		void CurrentInstance_StateChanged( object sender, EventArgs e )
+		private void CurrentInstance_StateChanged( object sender, EventArgs e )
 		{
 			DummyDelegate del = delegate()
 			{
@@ -247,6 +247,18 @@ namespace Noxa.Emulation.Psp.Player
 			_host.CurrentInstance.Restart();
 		}
 
+		private void screenshotToolStripButton_Click( object sender, EventArgs e )
+		{
+			using( Bitmap b = _host.CurrentInstance.Video.CaptureScreen() )
+			{
+				string timestamp = DateTime.Now.ToString( "yyyy.MM.dd-HH.mm.ss" );
+				string fileName = string.Format( "Screenshot-{0}-{1}.png",
+					_host.CurrentInstance.Bios.Game.Parameters.DiscID,
+					timestamp );
+				b.Save( fileName );
+			}
+		}
+
 		private void configureToolStripButton_Click( object sender, EventArgs e )
 		{
 			Options options = new Options( _host.ComponentSettings );
@@ -394,18 +406,6 @@ namespace Noxa.Emulation.Psp.Player
 		}
 
 		#endregion
-
-		private void screenshotToolStripButton_Click( object sender, EventArgs e )
-		{
-			using( Bitmap b = _host.CurrentInstance.Video.CaptureScreen() )
-			{
-				string timestamp = DateTime.Now.ToString( "yyyy.MM.dd-HH.mm.ss" );
-				string fileName = string.Format( "Screenshot-{0}-{1}.png",
-					_host.CurrentInstance.Bios.Game.Parameters.DiscID,
-					timestamp );
-				b.Save( fileName );
-			}
-		}
 
 		protected override void OnResize( EventArgs e )
 		{

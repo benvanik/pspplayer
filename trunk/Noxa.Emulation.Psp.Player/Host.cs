@@ -6,13 +6,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Diagnostics;
-using Noxa.Emulation.Psp.Player.Configuration;
-using Noxa.Emulation.Psp.Debugging;
+using System.Text;
 using System.Windows.Forms;
+
+using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Player.Configuration;
 
 namespace Noxa.Emulation.Psp.Player
 {

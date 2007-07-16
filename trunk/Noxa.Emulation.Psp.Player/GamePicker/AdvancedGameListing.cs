@@ -21,11 +21,18 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		private bool _regionEnabled = true;
 		private int _filterOriginalPad;
 
+		private GameCache _cache;
+
 		public AdvancedGameListing()
 		{
 			InitializeComponent();
 			
 			regionComboBox.SelectedIndex = 0;
+		}
+
+		public void SetCache( GameCache cache )
+		{
+			_cache = cache;
 		}
 
 		protected override void OnLoad( EventArgs e )
@@ -125,64 +132,6 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.PostChange();
 		}
 
-		private Image BuildGameImage( GameInformation game )
-		{
-			Image gameImage;
-			if( game.Icon != null )
-				gameImage = Image.FromStream( game.Icon );
-			else
-				gameImage = Image.FromStream( new MemoryStream( Resources.InvalidIcon, false ) );
-
-			//Image mediaImage;
-			//switch( game.GameType )
-			//{
-			//    default:
-			//    case GameType.Eboot:
-			//        mediaImage = Resources.SmallMemoryStickIcon;
-			//        break;
-			//    case GameType.UmdGame:
-			//        mediaImage = Resources.SmallUmdIcon;
-			//        break;
-			//}
-
-			Image regionImage = null;
-			if( game.GameType == GameType.UmdGame )
-			{
-				string regionChar = game.Parameters.DiscID.Substring( 2, 1 );
-				switch( regionChar )
-				{
-					case "U":
-						regionImage = regionsImageList.Images[ "US" ];
-						break;
-					case "E":
-						regionImage = regionsImageList.Images[ "UK" ];
-						break;
-					case "J":
-						regionImage = regionsImageList.Images[ "JP" ];
-						break;
-					case "K":
-						regionImage = regionsImageList.Images[ "KR" ];
-						break;
-					default:
-						regionImage = regionsImageList.Images[ "Unknown" ];
-						break;
-				}
-			}
-
-			Bitmap combined = new Bitmap( gamesImageList.ImageSize.Width, gamesImageList.ImageSize.Height );
-			using( Graphics g = Graphics.FromImage( combined ) )
-			{
-				g.DrawImage( gameImage, 0, 0, combined.Width, combined.Height );
-				//g.DrawImage( mediaImage, combined.Width - mediaImage.Width, combined.Height - mediaImage.Height );
-				if( regionImage != null )
-					g.DrawImageUnscaled( regionImage, combined.Width - regionImage.Width - 2, combined.Height - regionImage.Height - 2 );
-			}
-
-			gameImage.Dispose();
-
-			return combined;
-		}
-
 		private void AddGame( GameInformation game, bool batch )
 		{
 			_games.Add( game );
@@ -190,7 +139,11 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			ListViewItem item = new ListViewItem();
 			item.Tag = game;
 
-			Image gameImage = this.BuildGameImage( game );
+			Image gameImage;
+			if( _cache != null )
+				gameImage = _cache.GetImage( game );
+			else
+				gameImage = GameCache.BuildGameImage( game );
 			gamesImageList.Images.Add( gameImage );
 			item.ImageIndex = gamesImageList.Images.Count - 1;
 			_imageLookup.Add( game, item.ImageIndex );

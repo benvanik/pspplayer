@@ -69,7 +69,7 @@ namespace Noxa.Emulation.Psp.Games
 	/// Game parameters.
 	/// </summary>
 	[Serializable]
-	public class GameParameters
+	public class GameParameters : ICloneable
 	{
 		/// <summary>
 		/// The category the game falls in to.
@@ -105,13 +105,30 @@ namespace Noxa.Emulation.Psp.Games
 		/// The language of the game.
 		/// </summary>
 		public string Language = null;
+
+		/// <summary>
+		/// Create a copy of the <see cref="GameParameters"/> instance.
+		/// </summary>
+		/// <returns>A copy of the <see cref="GameParameters"/> instance.</returns>
+		public object Clone()
+		{
+			GameParameters p = new GameParameters();
+			p.Category = this.Category;
+			p.DiscID = this.DiscID;
+			p.GameVersion = this.GameVersion;
+			p.Language = this.Language;
+			p.Region = this.Region;
+			p.SystemVersion = this.SystemVersion;
+			p.Title = this.Title;
+			return p;
+		}
 	}
 
 	/// <summary>
 	/// Game information.
 	/// </summary>
 	[Serializable]
-	public class GameInformation : IDisposable
+	public class GameInformation : IDisposable, ICloneable
 	{
 		/// <summary>
 		/// The game type.
@@ -154,6 +171,13 @@ namespace Noxa.Emulation.Psp.Games
 		/// </summary>
 		public string HostPath;
 
+		/// <summary>
+		/// For serialization. Do not use.
+		/// </summary>
+		public GameInformation()
+		{
+		}
+
 		internal GameInformation( GameType gameType, IMediaFolder folder, GameParameters parameters, Stream icon, Stream background, string uniqueId )
 		{
 			this.GameType = gameType;
@@ -195,7 +219,6 @@ namespace Noxa.Emulation.Psp.Games
 				this.Background.Dispose();
 
 			this.Folder = null;
-			this.HostPath = null;
 		}
 
 		#endregion
@@ -204,5 +227,16 @@ namespace Noxa.Emulation.Psp.Games
 		/// Ignore Dispose calls; for internal use only.
 		/// </summary>
 		public bool IgnoreDispose = false;
+
+		/// <summary>
+		/// Create a copy of the <see cref="GameInformation"/> instance.
+		/// </summary>
+		/// <returns>A copy of the <see cref="GameInformation"/> instance.</returns>
+		public object Clone()
+		{
+			GameInformation g = new GameInformation( this.GameType, null, ( GameParameters )this.Parameters.Clone(), null, null, this.UniqueID );
+			g.HostPath = this.HostPath;
+			return g;
+		}
 	}
 }

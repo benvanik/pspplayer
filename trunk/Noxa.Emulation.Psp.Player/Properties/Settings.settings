@@ -11,9 +11,6 @@
     <Setting Name="PlayerDisplaySize" Type="System.String" Scope="User">
       <Value Profile="(Default)">Original</Value>
     </Setting>
-    <Setting Name="RecentGames" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="LastPlayedGame" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
