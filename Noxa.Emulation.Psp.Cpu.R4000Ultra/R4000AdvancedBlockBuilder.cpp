@@ -244,9 +244,13 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 				g->dd( ( uint )0x90909090 );
 
 				// See if this instruction has a breakpoint defined
-				int breakpointId;
-				if( _cpu->_hook->BreakpointLookup->TryGetValue( address, breakpointId ) == true )
-					breakpoints->Add( breakpointId );
+				if( ( _cpu->_hook != nullptr ) &&
+					( _cpu->_hook->BreakpointLookup != nullptr ) )
+				{
+					int breakpointId;
+					if( _cpu->_hook->BreakpointLookup->TryGetValue( address, breakpointId ) == true )
+						breakpoints->Add( breakpointId );
+				}
 
 				if( ( jumpDelay == true ) || ( inDelay == true ) )
 					g->mov( MINDELAY( CTXP( _ctx->CtxPointer ) ), 0 );
