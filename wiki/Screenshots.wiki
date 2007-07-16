@@ -4,6 +4,11 @@
 = Screenshots and Movies =
 Although the emulator is pretty advanced, it is also in its early stages. This means that the screenshots you see here aren't that pretty yet. Newer images are at the top because I expect them to be cooler.
 
+=== 2007-07-16 - A-train ===
+Just a menu for now, and it looks horrible, but I'll figure that out :)
+
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2007.07.16.01-Atrain.png]
+
 === 2007-05-14 - Tales of Eternia ===
 The menu is now complete, with fades and everything.
 
