@@ -202,7 +202,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 
 			// TEST
 			Breakpoint bp = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, 0x08900334 );
-			this.Breakpoints.Add( bp );
+			//this.Breakpoints.Add( bp );
 		}
 
 		public void OnStopped()
