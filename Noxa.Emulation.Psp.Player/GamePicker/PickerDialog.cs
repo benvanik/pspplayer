@@ -16,12 +16,14 @@ using System.Windows.Forms;
 
 using Noxa.Emulation.Psp.Games;
 using Noxa.Emulation.Psp.Media;
+using System.Threading;
 
 namespace Noxa.Emulation.Psp.Player.GamePicker
 {
 	partial class PickerDialog : Form
 	{
-		protected Instance _emulator;
+		private Instance _emulator;
+		private GameCache _cache;
 		
 		public PickerDialog()
 		{
@@ -34,6 +36,11 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			Debug.Assert( emulator != null );
 
 			_emulator = emulator;
+
+			string cachePath = GameCache.DefaultPath;
+			_cache = new GameCache();
+			_cache.Load( cachePath );
+			umdGameListing.SetCache( _cache );
 
 			umdGameListing.Text = "UMDs";
 			msGameListing.Text = "EBOOTs";
@@ -92,6 +99,30 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 		public void FindGames()
 		{
+			// Load recent UMDs
+			string lastPlayed = Properties.Settings.Default.LastPlayedGame;
+			List<GameInformation> umds = new List<GameInformation>();
+			GameInformation selectedUmd = null;
+
+			umds.AddRange( _cache.GetGames() );
+			foreach( GameInformation game in umds )
+			{
+				if( game.HostPath == lastPlayed )
+				{
+					selectedUmd = game;
+					break;
+				}
+			}
+
+			umdGameListing.AddGames( umds );
+			umdGameListing.SelectedGame = selectedUmd;
+
+			ThreadPool.QueueUserWorkItem( new WaitCallback( this.FindMemoryStickGames ) );
+		}
+
+		private delegate void AddGamesDelegate( List<GameInformation> games );
+		private void FindMemoryStickGames( object state )
+		{
 			// Load the memory stick listing
 			List<GameInformation> eboots = new List<GameInformation>();
 			GameInformation[] ebootList = GameLoader.FindGames( _emulator.MemoryStick );
@@ -100,27 +131,12 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 				if( game.GameType == GameType.Eboot )
 					eboots.Add( game );
 			}
-			msGameListing.AddGames( eboots );
 
-			// Load recent UMDs
-			if( Properties.Settings.Default.RecentGames != null )
+			AddGamesDelegate del = delegate( List<GameInformation> games )
 			{
-				string lastPlayed = Properties.Settings.Default.LastPlayedGame;
-				List<GameInformation> umds = new List<GameInformation>();
-				GameInformation selectedUmd = null;
-				foreach( string gamePath in Properties.Settings.Default.RecentGames )
-				{
-					GameInformation game = this.LoadGameFromUmd( gamePath );
-					if( game != null )
-					{
-						umds.Add( game );
-						if( game.HostPath == lastPlayed )
-							selectedUmd = game;
-					}
-				}
-				umdGameListing.AddGames( umds );
-				umdGameListing.SelectedGame = selectedUmd;
-			}
+				msGameListing.AddGames( games );
+			};
+			this.Invoke( del, eboots );
 		}
 
 		private GameInformation LoadGameFromUmd( string gamePath )
@@ -164,51 +180,27 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			}
 		}
 
-		private void SortRecentGames()
-		{
-			if( Properties.Settings.Default.RecentGames == null )
-				return;
-
-			List<GameInformation> games = new List<GameInformation>();
-			foreach( string gamePath in Properties.Settings.Default.RecentGames )
-			{
-				GameInformation game = this.LoadGameFromUmd( gamePath );
-				if( game != null )
-					games.Add( game );
-			}
-			Comparison<GameInformation> del = delegate( GameInformation x, GameInformation y )
-			{
-				return string.Compare( x.Parameters.Title, y.Parameters.Title, true );
-			};
-			games.Sort( del );
-			Properties.Settings.Default.RecentGames.Clear();
-			foreach( GameInformation game in games )
-				Properties.Settings.Default.RecentGames.Add( game.HostPath );
-		}
-
 		private void browseButton_Click( object sender, EventArgs e )
 		{
 			if( openFileDialog.ShowDialog( this ) == DialogResult.OK )
 			{
 				foreach( string gamePath in openFileDialog.FileNames )
 				{
+					// Check to see if it exists
+					if( _cache[ gamePath ] != null )
+						continue;
+
 					GameInformation game = this.LoadGameFromUmd( gamePath );
 					if( game != null )
 					{
-						if( Properties.Settings.Default.RecentGames == null )
-							Properties.Settings.Default.RecentGames = new System.Collections.Specialized.StringCollection();
-						bool exists = Properties.Settings.Default.RecentGames.Contains( gamePath );
-						if( exists == false )
-							Properties.Settings.Default.RecentGames.Add( gamePath );
-						this.SortRecentGames();
-						Properties.Settings.Default.Save();
-
-						if( exists == false )
-							umdGameListing.AddGame( game );
+						_cache.Add( game );
+						umdGameListing.AddGame( game );
 
 						umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
 					}
 				}
+
+				_cache.Save();
 			}
 		}
 
@@ -225,11 +217,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 				return;
 
 			string gamePath = game.HostPath;
-			if( Properties.Settings.Default.RecentGames != null )
-			{
-				Properties.Settings.Default.RecentGames.Remove( gamePath );
-				Properties.Settings.Default.Save();
-			}
+			_cache.Remove( gamePath );
+			_cache.Save();
 
 			listing.RemoveGame( game );
 
@@ -238,8 +227,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 		private void clearButton_Click( object sender, EventArgs e )
 		{
-			Properties.Settings.Default.RecentGames = new System.Collections.Specialized.StringCollection();
-			Properties.Settings.Default.Save();
+			_cache.Clear();
 
 			AdvancedGameListing listing;
 			if( whidbeyTabControl1.SelectedTab == whidbeyTabPage1 )
