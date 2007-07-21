@@ -149,6 +149,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 #if !USE
 		[NotImplemented]
 #endif
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x440ca7d8, "__sceSasSetVolume" )]
 		public int __sceSasSetVolume( int sasCore, int num, int l, int el, int r, int er )

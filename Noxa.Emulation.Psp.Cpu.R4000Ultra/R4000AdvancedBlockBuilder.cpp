@@ -42,9 +42,9 @@ using namespace Noxa::Emulation::Psp::Cpu;
 #define MAXCODELENGTH 200
 
 // Debugging addresses
-//#define BREAKADDRESS1		0x081DBEE8
+#define BREAKADDRESS1		0x089000dc
 //#define BREAKADDRESS2		0x08900160
-//#define GENBREAKADDRESS		0x08891034
+//#define GENBREAKADDRESS		0x08900334
 
 extern uint _instructionsExecuted;
 extern uint _codeBlocksExecuted;
@@ -145,6 +145,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 			uint code = *( ( uint* )( mainMemory + ( address - MainMemoryBase ) ) );
 
 #if _DEBUG
+			bool needsFixup = false;
 			// Debug breakpoint on instruction
 #ifdef GENBREAKADDRESS
 			if( address == GENBREAKADDRESS ) Debugger::Break();
@@ -155,6 +156,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 				g->call( ( uint )&__flushTrace );
 #endif
 				g->int3();
+				needsFixup = true;
 			} }
 #endif
 #ifdef BREAKADDRESS2
@@ -163,8 +165,24 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 				g->call( ( uint )&__flushTrace );
 #endif
 				g->int3();
+				needsFixup = true;
 			} }
 #endif
+			if( needsFixup == true )
+			{
+				// Need to fixup offsets
+				int newOffset = _gen->GetLength();
+				if( n == 0 )
+					block->PreambleSize += ( _gen->GetLength() - lastOffset );
+				else
+				{
+					int lastSize = block->InstructionSizes[ n - 1 ];
+					lastSize += ( _gen->GetLength() - lastOffset );
+					Debug::Assert( lastSize < ushort::MaxValue );
+					block->InstructionSizes[ n - 1 ] = lastSize;
+				}
+				lastOffset = newOffset;
+			}
 #endif
 
 			if( ( pass == 1 ) && ( checkNullDelay == true ) )
@@ -173,6 +191,19 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 				g->mov( EAX, MNULLDELAY( CTXP( _ctx->CtxPointer ) ) );
 				g->cmp( EAX, 1 );
 				g->je( nullDelayLabel );
+
+				// Need to fixup offsets
+				int newOffset = _gen->GetLength();
+				if( n == 0 )
+					block->PreambleSize += ( _gen->GetLength() - lastOffset );
+				else
+				{
+					int lastSize = block->InstructionSizes[ n - 1 ];
+					lastSize += ( _gen->GetLength() - lastOffset );
+					Debug::Assert( lastSize < ushort::MaxValue );
+					block->InstructionSizes[ n - 1 ] = lastSize;
+				}
+				lastOffset = newOffset;
 			}
 
 			if( pass == 0 )
@@ -235,6 +266,14 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 						Debug::Assert( lm != nullptr );
 						g->mov( MNEXTPC( CTXP( _ctx->CtxPointer ) ), lm->Address );
 					}
+
+					// Need to fixup offsets
+					int newOffset = _gen->GetLength();
+					int lastSize = block->InstructionSizes[ n - 1 ];
+					lastSize += ( _gen->GetLength() - lastOffset );
+					Debug::Assert( lastSize < ushort::MaxValue );
+					block->InstructionSizes[ n - 1 ] = lastSize;
+					lastOffset = newOffset;
 				}
 
 				// Add debug thunk space - 12 bytes
@@ -250,6 +289,12 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 					int breakpointId;
 					if( _cpu->_hook->BreakpointLookup->TryGetValue( address, breakpointId ) == true )
 						breakpoints->Add( breakpointId );
+
+					for each( Breakpoint^ bp in _cpu->_hook->SteppingBreakpoints )
+					{
+						if( bp->Address == address )
+							breakpoints->Add( bp->ID );
+					}
 				}
 
 				if( ( jumpDelay == true ) || ( inDelay == true ) )

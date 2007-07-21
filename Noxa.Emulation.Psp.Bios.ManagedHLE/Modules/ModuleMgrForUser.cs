@@ -67,7 +67,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( results.Successful == false )
 			{
 				Log.WriteLine( Verbosity.Critical, Feature.Bios, "LoadModule: loader failed" );
-				return -1;
+				return FakeModuleUID;
 			}
 			if( results.Ignored == true )
 			{

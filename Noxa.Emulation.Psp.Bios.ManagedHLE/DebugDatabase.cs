@@ -96,11 +96,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				int middle = ( first + last ) / 2;
 				Symbol symbol = _symbols[ middle ];
-				if( symbol.Address < address )
-					first = middle + 1;
-				else if( ( address >= symbol.Address ) &&
+				if( ( address >= symbol.Address ) &&
 					( address < symbol.Address + symbol.Length ) )
 					return symbol;
+				else if( symbol.Address < address )
+					first = middle + 1;
 				else
 					last = middle - 1;
 			}

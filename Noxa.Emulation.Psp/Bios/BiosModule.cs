@@ -26,7 +26,8 @@ namespace Noxa.Emulation.Psp.Bios
 		/// </summary>
 		public readonly StubExport[] Exports;
 
-		private Dictionary<uint, StubExport> _exportLookup;
+		private Dictionary<uint, StubExport> _exportVariableLookup;
+		private Dictionary<uint, StubExport> _exportFunctionLookup;
 
 		/// <summary>
 		/// Initializes a new <see cref="BiosModule"/> instance with the given parameters.
@@ -49,25 +50,43 @@ namespace Noxa.Emulation.Psp.Bios
 			Debug.Assert( name != null );
 			Name = name;
 			Exports = exports;
-			_exportLookup = new Dictionary<uint, StubExport>( exports.Length );
+			_exportVariableLookup = new Dictionary<uint, StubExport>( exports.Length );
+			_exportFunctionLookup = new Dictionary<uint, StubExport>( exports.Length );
 			foreach( StubExport export in exports )
-				_exportLookup.Add( export.NID, export );
+			{
+				switch( export.Type )
+				{
+					case StubType.Variable:
+						_exportVariableLookup[ export.NID ] = export;
+						break;
+					case StubType.Function:
+						_exportFunctionLookup[ export.NID ] = export;
+						break;
+				}
+			}
 		}
 
 		/// <summary>
 		/// Lookup an export inside the module.
 		/// </summary>
+		/// <param name="type">The type of the export to find.</param>
 		/// <param name="nid">The NID of the export to look up.</param>
 		/// <returns>The <see cref="StubExport"/> or <c>null</c> if it was not found.</returns>
-		public StubExport LookupExport( uint nid )
+		public StubExport LookupExport( StubType type, uint nid )
 		{
-			if( _exportLookup == null )
-				return null;
 			StubExport value;
-			if( _exportLookup.TryGetValue( nid, out value ) == true )
-				return value;
-			else
-				return null;
+			switch( type )
+			{
+				case StubType.Function:
+					if( _exportFunctionLookup.TryGetValue( nid, out value ) == true )
+						return value;
+					break;
+				case StubType.Variable:
+					if( _exportVariableLookup.TryGetValue( nid, out value ) == true )
+						return value;
+					break;
+			}
+			return null;
 		}
 	}
 }
