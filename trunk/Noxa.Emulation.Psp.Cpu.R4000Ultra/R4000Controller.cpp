@@ -235,6 +235,7 @@ int __debugHandlerM( int breakpointId )
 				}
 				Diag::Instance->Client->Handler->OnStepComplete( breakpoint->Address );
 				cpu->_hook->Breakpoints->Remove( breakpoint->ID );
+				cpu->_hook->SteppingBreakpoints->Remove( breakpoint );
 				break;
 			default:
 				Diag::Instance->Client->Handler->OnBreakpointHit( breakpoint->ID );
@@ -257,6 +258,7 @@ int __debugHandlerM( int breakpointId )
 					uint findStepAddress = FindStepAddress( cpu->_controller, breakpoint->Address, _debugResumeParam );
 					Breakpoint^ newBreakpoint = gcnew Breakpoint( Diag::Instance->Client->AllocateID(), BreakpointType::Stepping, findStepAddress );
 					cpu->_hook->Breakpoints->Add( newBreakpoint->ID, newBreakpoint );
+					cpu->_hook->SteppingBreakpoints->Add( newBreakpoint );
 					SetBreakpoint( newBreakpoint );
 				}
 				break;

@@ -561,6 +561,10 @@ GenerationResult FCOMPARE( R4000GenContext^ context, int pass, int address, uint
 			g->cmpeqss( XMM0, MCP1REG( CTX, ft, fmt ) );
 			// XMM0 = FFFFFFFF if ==, else 0
 		}
+		else
+		{
+			Debug::Assert( false );
+		}
 		g->movd( EAX, XMM0 );
 		g->and( EAX, 0x1 );
 		g->mov( MCP1CONDBIT( CTX ), EAX );

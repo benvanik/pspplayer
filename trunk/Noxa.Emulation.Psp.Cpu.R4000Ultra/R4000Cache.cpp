@@ -233,7 +233,7 @@ int R4000Cache::Search( int address, CodeBlock** buffer )
 			}
 
 			CodeBlock* block = &block1[ b2 ];
-			bool valid = ( block->Address + block->Size ) > address;
+			bool valid = ( block->Address + ( block->InstructionCount * 4 ) ) > address;
 			if( valid == false )
 			{
 				if( ( block->Address == 0x0 ) &&

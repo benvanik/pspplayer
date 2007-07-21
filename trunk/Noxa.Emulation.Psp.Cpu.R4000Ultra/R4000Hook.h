@@ -64,6 +64,7 @@ namespace Noxa {
 
 				public:
 					Dictionary<uint, int>^	BreakpointLookup;
+					List<Breakpoint^>^		SteppingBreakpoints;
 					void RefreshBreakpointTable();
 				};
 

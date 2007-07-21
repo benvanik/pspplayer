@@ -29,6 +29,7 @@ R4000Hook::R4000Hook( R4000Cpu^ cpu )
 
 	this->Breakpoints = gcnew Dictionary<int, Breakpoint^>();
 	this->BreakpointLookup = gcnew Dictionary<uint, int>();
+	this->SteppingBreakpoints = gcnew List<Breakpoint^>();
 }
 
 // -- Breakpoints --
