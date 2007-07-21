@@ -42,7 +42,7 @@ using namespace Noxa::Emulation::Psp::Cpu;
 #define MAXCODELENGTH 200
 
 // Debugging addresses
-#define BREAKADDRESS1		0x089000dc
+//#define BREAKADDRESS1		0x089000dc
 //#define BREAKADDRESS2		0x08900160
 //#define GENBREAKADDRESS		0x08900334
 
