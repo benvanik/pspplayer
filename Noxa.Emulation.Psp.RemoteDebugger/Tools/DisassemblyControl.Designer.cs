@@ -107,6 +107,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			// 
 			// copyOperandToolStripMenuItem
 			// 
+			this.copyOperandToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.CopyIcon;
 			this.copyOperandToolStripMenuItem.Name = "copyOperandToolStripMenuItem";
 			this.copyOperandToolStripMenuItem.Size = new System.Drawing.Size( 187, 22 );
 			this.copyOperandToolStripMenuItem.Text = "Copy &Value";
@@ -140,6 +141,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			// 
 			// setNextToolStripMenuItem
 			// 
+			this.setNextToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.StatementIcon;
 			this.setNextToolStripMenuItem.Name = "setNextToolStripMenuItem";
 			this.setNextToolStripMenuItem.Size = new System.Drawing.Size( 187, 22 );
 			this.setNextToolStripMenuItem.Text = "&Set Next Statement";
@@ -152,6 +154,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			// 
 			// copyLineToolStripMenuItem
 			// 
+			this.copyLineToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.CopyIcon;
 			this.copyLineToolStripMenuItem.Name = "copyLineToolStripMenuItem";
 			this.copyLineToolStripMenuItem.Size = new System.Drawing.Size( 187, 22 );
 			this.copyLineToolStripMenuItem.Text = "Copy &Line";
@@ -179,6 +182,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			// lineBreakpointToolStripMenuItem
 			// 
 			this.lineBreakpointToolStripMenuItem.DropDown = this.gutterContextMenuStrip;
+			this.lineBreakpointToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.BreakpointIcon;
 			this.lineBreakpointToolStripMenuItem.Name = "lineBreakpointToolStripMenuItem";
 			this.lineBreakpointToolStripMenuItem.Size = new System.Drawing.Size( 187, 22 );
 			this.lineBreakpointToolStripMenuItem.Text = "&Breakpoint";
@@ -192,13 +196,13 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
             this.addBreakpointToolStripMenuItem,
             this.removeBreakpointToolStripMenuItem} );
 			this.gutterContextMenuStrip.Name = "gutterContextMenuStrip";
-			this.gutterContextMenuStrip.OwnerItem = this.lineBreakpointToolStripMenuItem;
 			this.gutterContextMenuStrip.Size = new System.Drawing.Size( 178, 98 );
 			this.gutterContextMenuStrip.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler( this.GeneralContextClosed );
 			this.gutterContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler( this.gutterContextMenuStrip_Opening );
 			// 
 			// toggleBreakpointToolStripMenuItem
 			// 
+			this.toggleBreakpointToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.ToggleBreakpointIcon;
 			this.toggleBreakpointToolStripMenuItem.Name = "toggleBreakpointToolStripMenuItem";
 			this.toggleBreakpointToolStripMenuItem.Size = new System.Drawing.Size( 177, 22 );
 			this.toggleBreakpointToolStripMenuItem.Text = "&Toggle Breakpoint";
@@ -206,6 +210,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			// 
 			// renameBreakpointToolStripMenuItem
 			// 
+			this.renameBreakpointToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.RenameIcon;
 			this.renameBreakpointToolStripMenuItem.Name = "renameBreakpointToolStripMenuItem";
 			this.renameBreakpointToolStripMenuItem.Size = new System.Drawing.Size( 177, 22 );
 			this.renameBreakpointToolStripMenuItem.Text = "&Rename Breakpoint";
@@ -218,6 +223,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			// 
 			// addBreakpointToolStripMenuItem
 			// 
+			this.addBreakpointToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.NewBreakpointIcon;
 			this.addBreakpointToolStripMenuItem.Name = "addBreakpointToolStripMenuItem";
 			this.addBreakpointToolStripMenuItem.Size = new System.Drawing.Size( 177, 22 );
 			this.addBreakpointToolStripMenuItem.Text = "&Add Breakpoint";
@@ -225,6 +231,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			// 
 			// removeBreakpointToolStripMenuItem
 			// 
+			this.removeBreakpointToolStripMenuItem.Image = global::Noxa.Emulation.Psp.RemoteDebugger.Properties.Resources.DeleteBreakpointIcon;
 			this.removeBreakpointToolStripMenuItem.Name = "removeBreakpointToolStripMenuItem";
 			this.removeBreakpointToolStripMenuItem.Size = new System.Drawing.Size( 177, 22 );
 			this.removeBreakpointToolStripMenuItem.Text = "&Delete Breakpoint";

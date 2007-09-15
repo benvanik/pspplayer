@@ -21,7 +21,7 @@ namespace Noxa.Emulation.Psp.Debugging.Protocol
 		/// <summary>
 		/// Handle a continue after a break.
 		/// </summary>
-		void OnContinue();
+		void OnContinue( bool steppingForward );
 
 		/// <summary>
 		/// Handle a stop after a step operation.

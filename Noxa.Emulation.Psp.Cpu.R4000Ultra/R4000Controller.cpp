@@ -245,7 +245,8 @@ int __debugHandlerM( int breakpointId )
 			_debugResumeMode = DEBUG_RESUME_CONTINUE;
 			WaitForSingleObject( _debugHandle, INFINITE );
 
-			Diag::Instance->Client->Handler->OnContinue();
+			bool steppingForward = ( _debugResumeMode == DEBUG_RESUME_STEP );
+			Diag::Instance->Client->Handler->OnContinue( steppingForward );
 
 			switch( _debugResumeMode )
 			{
