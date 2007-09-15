@@ -122,18 +122,18 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 				this.Removed( this, new BreakpointEventArgs( breakpoint ) );
 		}
 
+		public void ToggleBreakpoint( int id )
+		{
+			Breakpoint breakpoint = this[ id ];
+			Debug.Assert( breakpoint != null );
+			bool old = breakpoint.Enabled;
+			breakpoint.Enabled = !old;
+			this.OnBreakpointToggled( breakpoint );
+		}
+
 		internal void OnBreakpointToggled( Breakpoint breakpoint )
 		{
-			switch( breakpoint.Type )
-			{
-				case BreakpointType.CodeExecute:
-				case BreakpointType.BiosFunction:
-					//this.Debugger.Host.CpuHook.SetCodeBreakpointState( breakpoint.ID, breakpoint.Enabled );
-					break;
-				case BreakpointType.MemoryAccess:
-					//this.Debugger.Host.CpuHook.SetMemoryBreakpointState( breakpoint.ID, breakpoint.Enabled );
-					break;
-			}
+			this.Debugger.Host.CpuHook.UpdateBreakpoint( breakpoint );
 			if( this.Toggled != null )
 				this.Toggled( this, new BreakpointEventArgs( breakpoint ) );
 		}

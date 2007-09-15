@@ -254,11 +254,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 			this.View.Invoke( del, address );
 		}
 
-		public void OnContinue()
+		public void OnContinue( bool steppingForward )
 		{
 			DummyDelegate del = delegate
 			{
-				this.Code.Disable();
+				if( steppingForward == false )
+					this.Code.Disable();
 
 				this.State = DebuggerState.Running;
 				this.OnStateChanged();

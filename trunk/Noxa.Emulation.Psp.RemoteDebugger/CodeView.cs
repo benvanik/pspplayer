@@ -65,8 +65,6 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public void Disable()
 		{
 			this.disassemblyControl1.Enabled = false;
-			this.disassemblyControl1.SetMethod( null );
-			this.registersListView.Items.Clear();
 			this.splitContainer1.Panel1.Enabled = false;
 			this.splitContainer1.Panel2.Enabled = false;
 		}

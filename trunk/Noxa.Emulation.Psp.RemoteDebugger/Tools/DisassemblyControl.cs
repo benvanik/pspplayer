@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using Noxa.Emulation.Psp.Debugging;
 using Noxa.Emulation.Psp.Debugging.Hooks;
 using Noxa.Emulation.Psp.RemoteDebugger.Model;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 {
@@ -266,7 +267,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			{
 				if( instr.BreakpointID != Instruction.InvalidBreakpointID )
 				{
-					Image icon = _breakpointOnIcon;
+					Image icon;
+					Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
+					if( bp.Enabled == true )
+						icon = _breakpointOnIcon;
+					else
+						icon = _breakpointOffIcon;
 					g.DrawImage( icon, x, y - 1, 14, 14 );
 				}
 
@@ -660,7 +666,9 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 				return;
 			Instruction instr = ( Instruction )this.Items[ _contextIndex ];
 
-			instr.BreakpointID = 1;
+			Breakpoint bp = new Breakpoint( this.Debugger.AllocateID(), BreakpointType.CodeExecute, instr.Address );
+			this.Debugger.Breakpoints.Add( bp );
+			instr.BreakpointID = bp.ID;
 
 			this.ContextReturn();
 		}
@@ -671,6 +679,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 				return;
 			Instruction instr = ( Instruction )this.Items[ _contextIndex ];
 
+			Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
+			this.Debugger.Breakpoints.Remove( bp );
 			instr.BreakpointID = Instruction.InvalidBreakpointID;
 
 			this.ContextReturn();
@@ -681,7 +691,10 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			if( _contextIndex < 0 )
 				return;
 			Instruction instr = ( Instruction )this.Items[ _contextIndex ];
-			
+
+			Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
+			// TODO: rename breakpoint
+
 			this.ContextReturn();
 		}
 
@@ -690,6 +703,8 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			if( _contextIndex < 0 )
 				return;
 			Instruction instr = ( Instruction )this.Items[ _contextIndex ];
+
+			this.Debugger.Breakpoints.ToggleBreakpoint( instr.BreakpointID );
 			
 			this.ContextReturn();
 		}
