@@ -26,3 +26,11 @@ s = string
 v = void
 example:
 void foo( int arg1, char* arg2, float arg3 ) -> isf;v
+
+
+Contains bits of code from PSPLINK:
+/*
+ * PSPLINK
+ * -----------------------------------------------------------------------
+ * Licensed under the BSD license, see LICENSE in PSPLINK root for details.
+ */
