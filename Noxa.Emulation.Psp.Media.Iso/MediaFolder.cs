@@ -114,6 +114,8 @@ namespace Noxa.Emulation.Psp.Media.Iso
 		{
 			if( path == "/" )
 				return this;
+			else if( path == string.Empty )
+				return this;
 
 			int slashIndex = path.IndexOfAny( new char[] { '/', '\\' } );
 			if( slashIndex < 0 )

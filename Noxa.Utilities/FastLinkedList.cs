@@ -91,11 +91,28 @@ namespace Noxa
 			return entry;
 		}
 
+		public void MoveToHead( LinkedListEntry<T> entry )
+		{
+			if( entry == _head )
+				return;
+			this.Remove( entry );
+			entry.Next = _head;
+			if( _head != null )
+				_head.Previous = entry;
+			_head = entry;
+			if( _tail == null )
+				_tail = entry;
+			_count++;
+			this.AssertCount();
+		}
+
 		public LinkedListEntry<T> InsertAtHead( T value )
 		{
 			LinkedListEntry<T> entry = new LinkedListEntry<T>();
 			entry.Value = value;
 			entry.Next = _head;
+			if( _head != null )
+				_head.Previous = entry;
 			_head = entry;
 			if( _tail == null )
 				_tail = entry;

@@ -78,7 +78,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceIoOpen( int fileName, int flags, int mode )
 		{
 			string path = _kernel.ReadString( ( uint )fileName );
-			IMediaFile file = ( IMediaFile )_kernel.FindPath( path );
+			IMediaItem item = _kernel.FindPath( path );
+			if( item is IMediaFolder )
+			{
+				// This is a hack for FF7 - it tries to open umd1:, but I really think it wants umd1:/
+				//return this.sceIoDopen( fileName );
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceIoOpen: tried to open directory {0} - redirecting to FF7 file!!!", path );
+				path = "umd1:/PSP_GAME/USRDIR/discimg.pkg";
+				item = _kernel.FindPath( path );
+			}
+			IMediaFile file = ( IMediaFile )item;
 			if( file == null )
 			{
 				// Create if needed

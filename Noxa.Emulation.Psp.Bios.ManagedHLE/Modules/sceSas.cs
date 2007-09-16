@@ -4,7 +4,7 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
-//#define USE
+#define USE
 
 using System;
 using System.Collections.Generic;
@@ -29,11 +29,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 	// Since only one sasCore will ever be active simultaneously (we would hope..)
 	// we don't need to mess around with allocating sceCores.
-
-
-	// QUESTION: How much of this should be moved to an audio plugin?
-	// Is there even a point in having audio plugins, considering that DSound is
-	// the one and only appropriate alternative, and works on 100% of PC:s?
 
 	unsafe class sceSas : Module
 	{
@@ -149,7 +144,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 #if !USE
 		[NotImplemented]
 #endif
-		[DontTrace]
+		//[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x440ca7d8, "__sceSasSetVolume" )]
 		public int __sceSasSetVolume( int sasCore, int num, int l, int el, int r, int er )
@@ -349,12 +344,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
+		//[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x2c8e6ab3, "__sceSasGetPauseFlag" )]
 		public int __sceSasGetPauseFlag()
 		{
-			return Module.NotImplementedReturn;
+			//return Module.NotImplementedReturn;
+			return 0;
 		}
 
 		[NotImplemented]
