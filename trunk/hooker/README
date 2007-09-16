@@ -15,6 +15,7 @@ example:
 1;IoFileMgrForUser;109F50BC;sceIoOpen;six;x
 
 parameter/return format string args:
+h = int16
 i = int32
 l = int64
 x = int32 (hex)

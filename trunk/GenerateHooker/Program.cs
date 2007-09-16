@@ -16,7 +16,7 @@ namespace GenerateHooker
 	{
 		// If true, all functions without an sce prefix will be ignored
 		const bool IgnoreNonScePrefixed = false;
-		
+
 		// Load the ignore list
 		const bool UseIgnores = true;
 		const string IgnoreList = "IgnoreList.txt";
@@ -128,8 +128,11 @@ namespace GenerateHooker
 
 					foreach( PrxLibrary library in prx.Libraries )
 					{
-						//if( ( library.Flags & PrxLibrary.UserFlag ) == 0x0 )
-						//    continue;
+						if( FullDump == false )
+						{
+							if( ( library.Flags & PrxLibrary.UserFlag ) == 0x0 )
+								continue;
+						}
 
 						foreach( PrxFunction function in library.Functions )
 						{
@@ -138,14 +141,28 @@ namespace GenerateHooker
 
 							if( function.Source != null )
 							{
-								bool hasReturn;
-								string transformed = TransformDeclaration( function.Name, function.Source.DeclarationBlock, out hasReturn );
-								writer.WriteLine( "1;{0};0x{1:X8};{2};{3};{4}", prx.Name, function.NID, function.Name, "iiii", "i" );
+								string returnType;
+								string argFormat = string.Empty;
+								try
+								{
+									string[] argTypes;
+									string transformed = TransformDeclaration( function.Name, function.Source.DeclarationBlock, out returnType, out argTypes );
+									foreach( string arg in argTypes )
+										argFormat += EncodeType( arg );
+								}
+								catch
+								{
+									argFormat = "xxxxxx";
+									returnType = "int";
+								}
+								//Debug.WriteLine( string.Format( "{0} -> {1};{2}", function.Source.DeclarationBlock, argFormat, EncodeType( returnType ) ) );
+								writer.WriteLine( "0;{0};0x{1:X8};{2};{3};{4}", prx.Name, function.NID, function.Name, ( argFormat.Length == 0 ) ? "v" : argFormat, EncodeType( returnType ) );
 							}
 							else
 							{
 								// Not found
 								//Debug.WriteLine( string.Format( "{0}::{1} not found", prx.Name, function.NID ) );
+								writer.WriteLine( "0;{0};0x{1:X8};{2};{3};{4}", prx.Name, function.NID, function.Name, "xxxxxx", "x" );
 							}
 						}
 					}
@@ -153,36 +170,77 @@ namespace GenerateHooker
 			}
 		}
 
-		private const string Int64Name = "long";
-		private static List<string> _int64types = new List<string>( new string[] { "SceOff", "SceInt64", "unsigned long long", "long long", } );
-
-		private static string TransformDeclaration( string functionName, string input, out bool hasReturn )
+		/*
+		#define TYPE_INT16	'h'
+		#define TYPE_INT32	'i'
+		#define TYPE_INT64	'l'
+		#define TYPE_HEX32	'x'
+		#define TYPE_HEX64	'X'
+		#define TYPE_OCT32	'o'
+		#define TYPE_SINGLE	'f'
+		#define TYPE_STRING	's'
+		#define TYPE_VOID	'v'*/
+		private static char EncodeType( string type )
 		{
-			string returnType;
+			type = type.Replace( "const ", "" );
+			if( type.Contains( "char*" ) == true )
+				return 's';
+			else if( type.EndsWith( "*" ) == true )
+				return 'x';
+			else
+			{
+				switch( type )
+				{
+					case "void":
+					case "SceVoid":
+						return 'v';
+					case "u16":
+					case "short":
+					case "unsigned short":
+						return 'h';
+					case "int":
+					case "unsigned":
+					case "unsigned int":
+					case "long":
+					case "SceSize":
+					case "u32":
+					case "s32":
+					case "time_t": // I think?
+					case "clock_t": // I think?
+					case "SceUInt":
+					case "SceInt32":
+						return 'i';
+					case "SceOff":
+					case "SceInt64":
+					case "long long":
+					case "unsigned long long":
+					case "u64":
+						return 'l';
+					case "SceUID":
+					case "REGHANDLE":
+					case "ScePVoid":
+						return 'x';
+					case "SceMode":
+						return 'o';
+					case "float":
+						return 'f';
+					default:
+						Debug.WriteLine( string.Format( "unknown type: '{0}'", type ) );
+						return 'x';
+				}
+			}
+		}
+
+		private static string TransformDeclaration( string functionName, string input, out string returnType, out string[] argTypes )
+		{
 			if( input.StartsWith( "void " + functionName ) == true )
 			{
 				returnType = "void";
-				hasReturn = false;
 			}
 			else
 			{
-				string origrt = input.Substring( 0, input.IndexOf( ' ' ) );
-				if( origrt == "unsigned" )
-				{
-					// Hrm just hope it isn't unsigned long long ;)
-					if( input.StartsWith( "unsigned long long" ) == true )
-						origrt = "unsigned long long";
-				}
-				else if( origrt == "long" )
-				{
-					if( input.StartsWith( "long long" ) == true )
-						origrt = "long long";
-				}
-				if( _int64types.Contains( origrt ) == true )
-					returnType = Int64Name;
-				else
-					returnType = "int";
-				hasReturn = true;
+				string origrt = input.Substring( 0, input.IndexOf( functionName ) );
+				returnType = origrt.Replace( " *", "*" ).Trim();
 			}
 
 			string args = "";
@@ -191,9 +249,10 @@ namespace GenerateHooker
 			if( sargs.Length > 0 )
 			{
 				string[] aargs = sargs.Split( ',' );
-				foreach( string arg in aargs )
+				argTypes = new string[ aargs.Length ];
+				for( int n = 0; n < aargs.Length; n++ )
 				{
-					string targ = arg.Trim();
+					string targ = aargs[ n ].Trim();
 
 					// Could replace all this with a regex...
 					string type;
@@ -212,23 +271,19 @@ namespace GenerateHooker
 					type = type.Trim();
 					name = name.Trim();
 
-					if( type.IndexOf( '*' ) >= 0 )
-						type = type.Replace( "*", "" ).Trim();
-					bool is64 = _int64types.Contains( type );
-					// TODO: figure out if 64 or not!
-					string convtype = ( is64 == true ) ? Int64Name : "int";
+					type = type.Replace( " *", "* " );
 
-					args += string.Format( "{0}{1} {2}", ( args.Length != 0 ) ? ", " : "", convtype, name );
+					args += string.Format( "{0}{1} {2}", ( args.Length != 0 ) ? ", " : "", type, name );
+
+					argTypes[ n ] = type.Trim();
 				}
 
 				args = string.Format( " {0} ", args );
 			}
+			else
+				argTypes = new string[ 0 ];
 
-			string output = string.Format( "{0} {1}({2})", returnType, functionName, args );
-			//Debug.WriteLine( " ------------------------------------ " );
-			//Debug.WriteLine( input );
-			//Debug.WriteLine( output );
-			return output;
+			return string.Format( "{0} {1}({2})", returnType, functionName, args );
 		}
 	}
 }

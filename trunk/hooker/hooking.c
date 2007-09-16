@@ -24,6 +24,7 @@ typedef unsigned int uint;
 #define MAKEKERNEL( p ) ( 0x80000000 | ( uint )p )
 #define DELIMITER ";"
 
+#define TYPE_INT16	'h'
 #define TYPE_INT32	'i'
 #define TYPE_INT64	'l'
 #define TYPE_HEX32	'x'
@@ -272,6 +273,8 @@ int Format( char type, char* buffer, uint* value )
 {
 	switch( type )
 	{
+	case TYPE_INT16:
+		return sprintf( buffer, "%d", *( short* )value );
 	default:
 	case TYPE_INT32:
 		return sprintf( buffer, "%d", *( int* )value );
@@ -319,7 +322,8 @@ void* _OnHookHit( int id, uint* args )
 		int m;
 		for( n = 0, m = 0; n < MAXPARAMETERCOUNT; n++ )
 		{
-			if( entry->ParameterFormat[ n ] == 0 )
+			if( ( entry->ParameterFormat[ n ] == 0 ) ||
+				( entry->ParameterFormat[ n ] == 'v' ) )
 				break;
 			if( n != 0 )
 			{
