@@ -1,0 +1,27 @@
+// ----------------------------------------------------------------------------
+// PSP Player Emulation Suite
+// Copyright (C) 2007 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
+Hooks all API functions and logs them all to the terminal connected. The hook list is loaded from
+a transformed psplibdoc.xml file + any in a custom list.
+
+The format of the list is:
+enabled;module name;nid;function name;parameter format;return format
+example:
+// SDK declaration: SceUID sceIoOpen(const char *file, int flags, SceMode mode);
+// NID 0x109F50BC in  IoFileMgrForUser
+1;IoFileMgrForUser;109F50BC;sceIoOpen;six;x
+
+parameter/return format string args:
+i = int32
+l = int64
+x = int32 (hex)
+X = int64 (hex)
+o = int32 (oct)
+f = float
+s = string
+v = void
+example:
+void foo( int arg1, char* arg2, float arg3 ) -> isf;v

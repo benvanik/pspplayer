@@ -156,7 +156,12 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 			{
 				// Assume we got dc/ed
 				this.Debugger.OnConnectionLost();
-
+				this.timer1.Enabled = false;
+			}
+			catch( System.Runtime.Remoting.RemotingException )
+			{
+				// Assume we got dc/ed
+				this.Debugger.OnConnectionLost();
 				this.timer1.Enabled = false;
 			}
 		}

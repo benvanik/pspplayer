@@ -131,7 +131,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				buffer,
 				false,
 				leftvol, rightvol );
-			
+
 			return 0;
 		}
 
@@ -167,7 +167,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x41EFADE7, "sceAudioOneshotOutput" )]
-		public int sceAudioOneshotOutput(){ return Module.NotImplementedReturn; }
+		public int sceAudioOneshotOutput() { return Module.NotImplementedReturn; }
 
 		[Stateless]
 		[BiosFunction( 0x5EC81C55, "sceAudioChReserve" )]
@@ -232,6 +232,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceAudioChangeChannelVolume(int channel, int leftvol, int rightvol);
 		public int sceAudioChangeChannelVolume( int channel, int leftvol, int rightvol )
 		{
+			return 0;
+		}
+
+		//[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0x2D53F36E, "sceAudio_2D53F36E" )]
+		public int sceAudio_2D53F36E()
+		{
+			// Seems to be called at the start of the mixer thread - maybe init?
+			_kernel.ActiveThread.Sleep( true );
+			_kernel.Schedule();
 			return 0;
 		}
 

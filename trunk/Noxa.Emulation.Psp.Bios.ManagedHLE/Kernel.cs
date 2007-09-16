@@ -119,7 +119,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			Devices = new KDevice[]{
 				new KDevice( this, "ms0", new string[]{ "ms0", "fatms0", "ms", "fatms" }, Emulator.MemoryStick ),
-				new KDevice( this, "umd0", new string[]{ "umd0", "disc0", "umd", "isofs", "isofs0" }, Emulator.Umd ),
+				new KDevice( this, "umd0", new string[]{ "umd0", "umd1", "disc0", "umd", "isofs", "isofs0" }, Emulator.Umd ),
 			};
 			DeviceLookup = new Dictionary<string, KDevice>();
 			foreach( KDevice device in Devices )
