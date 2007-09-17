@@ -1,13 +1,13 @@
 TARGET = hooker
 OBJS = main.o hooking.o hookasm.o
 
-BUILD_PRX=1
-PSP_FW_VERSION=150
+#BUILD_PRX=1
+#PSP_FW_VERSION=150
 
 # Use the kernel's small inbuilt libc
-#USE_KERNEL_LIBC = 1
+USE_KERNEL_LIBC = 1
 # Use only kernel libraries
-#USE_KERNEL_LIBS = 1
+USE_KERNEL_LIBS = 1
 
 INCDIR = 
 #CFLAGS = -O2 -G0 -Wall -fno-builtin-printf -DDEBUG
@@ -17,7 +17,7 @@ ASFLAGS = $(CFLAGS)
 
 LIBDIR =
 
-LIBS =
+LIBS = 
 
 PSPSDK=$(shell psp-config --pspsdk-path)
-include $(PSPSDK)/lib/build.mak
+include $(PSPSDK)/lib/build_prx.mak
