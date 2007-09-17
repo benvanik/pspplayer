@@ -13,7 +13,7 @@
 #include <string.h>
 
 PSP_MODULE_INFO( "hooker", PSP_MODULE_KERNEL, 1, 1 );
-PSP_HEAP_SIZE_KB( 12 );
+PSP_HEAP_SIZE_KB( 24 );
 
 int LoadHooks( const char* hooksFile );
 
