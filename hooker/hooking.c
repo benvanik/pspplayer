@@ -144,6 +144,41 @@ void BuildThunk( uint* thunk, void* target, int id )
 	thunk[ 1 ] = 0x34020000 | id;
 }
 
+int _fileBufferOffset = 0;
+int _fileBufferCount = 0;
+char _fileBuffer[ 512 ];
+int ReadLine( SceUID fd, char* buffer )
+{
+	char* p = buffer;
+	while( 1 )
+	{
+		if( ( _fileBufferCount <= 0 ) ||
+			( _fileBufferOffset >= 512 ) )
+		{
+			int bytesRead = sceIoRead( fd, _fileBuffer, 512 );
+			if( bytesRead <= 0 )
+				return -1;
+			_fileBufferOffset = 0;
+			_fileBufferCount = bytesRead;
+		}
+		else
+		{
+			char next = _fileBuffer[ _fileBufferOffset++ ];
+			_fileBufferCount--;
+			if( next == '\n' )
+			{
+				*p = '\0';
+				return 1;
+			}
+			else
+			{
+				*p = next;
+				p++;
+			}
+		}
+	}
+}
+
 int LoadHooks( const char* hooksFile )
 {
 	SceUID fplId = sceKernelCreateFpl( "hooker_entries", 4, 0, sizeof( HookEntry ) * MINIMUMENTRYCAPACITY, 1, NULL );
@@ -159,7 +194,7 @@ int LoadHooks( const char* hooksFile )
 	_entryCapacity = MINIMUMENTRYCAPACITY;
 
 	printf( "LoadHooks: loading from %s\n", hooksFile );
-	FILE* hooksFd = fopen( hooksFile, "r" );
+	SceUID hooksFd = sceIoOpen( hooksFile, PSP_O_RDONLY, 0777 );
 	if( hooksFd <= 0 )
 	{
 		printf( "LoadHooks: unable to open %s, aborting\n", hooksFile );
@@ -172,7 +207,7 @@ int LoadHooks( const char* hooksFile )
 	char lineBuffer[ 512 ];
 	while( 1 )
 	{
-		if( fscanf( hooksFd, "%s", lineBuffer ) == EOF )
+		if( ReadLine( hooksFd, lineBuffer ) <= 0 )
 			break;
 
 		if( _entryCount + 1 >= _entryCapacity )
@@ -188,9 +223,9 @@ int LoadHooks( const char* hooksFile )
 		char* parameterFormat	= strtok( NULL, DELIMITER );
 		char* returnFormat		= strtok( NULL, DELIMITER );
 
-		printf( "LoadHooks: on %s::%s[%s]\n", libraryName, functionName, nidString );
-
 		int shouldEnable = ( enabledString[ 0 ] == '1' );
+		if( shouldEnable == 1 )
+			printf( "LoadHooks: hooking %s::%s[%s]\n", libraryName, functionName, nidString );
 
 		HookEntry* entry = &_entries[ _entryCount++ ];
 		entry->Enabled = 0;
@@ -239,7 +274,7 @@ int LoadHooks( const char* hooksFile )
 		entry->Enabled = shouldEnable;
 	}
 
-	fclose( hooksFd );
+	sceIoClose( hooksFd );
 
 	printf( "LoadHooks: read %d entries from %s; %d failed\n", _entryCount, hooksFile, failed );
 
@@ -271,6 +306,8 @@ int LoadHooks( const char* hooksFile )
 
 int Format( char type, char* buffer, uint* value )
 {
+	if( value == NULL )
+		return sprintf( buffer, "[invalid ptr]" );
 	switch( type )
 	{
 	case TYPE_INT16:
@@ -289,7 +326,10 @@ int Format( char type, char* buffer, uint* value )
 	case TYPE_SINGLE:
 		return sprintf( buffer, "%g", *( float* )value );
 	case TYPE_STRING:
-		return sprintf( buffer, "%s", ( char* )value[ 0 ] );
+		if( value[ 0 ] == NULL )
+			return sprintf( buffer, "[invalid ptr]" );
+		else
+			return sprintf( buffer, "%s", ( char* )value[ 0 ] );
 	case TYPE_VOID:
 		return sprintf( buffer, "void" );
 	}

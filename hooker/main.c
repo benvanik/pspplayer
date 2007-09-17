@@ -13,20 +13,40 @@
 #include <string.h>
 
 PSP_MODULE_INFO( "hooker", PSP_MODULE_KERNEL, 1, 1 );
-PSP_MAIN_THREAD_ATTR( 0 );
 PSP_HEAP_SIZE_KB( 12 );
 
 int LoadHooks( const char* hooksFile );
 
-int main( int argc, char* argv[] )
+int HookerThread( SceSize args, void *argp )
 {
-	pspDebugScreenInit();
-
-	const char hooksFile[] = "hooks.txt";
+	const char hooksFile[] = "host0:/hooks.txt";
 	if( LoadHooks( hooksFile ) <= 0 )
 		return -1;
 
 	sceKernelSleepThread();
 
+	return 0;
+}
+
+int module_start( SceSize args, void* argp )
+{
+	SceUID thid = sceKernelCreateThread( "HookerThread", HookerThread, 10, 0x800, 0, NULL );
+	if( thid < 0 )
+	{
+		printf( "Hooker: unable to create main thread" );
+		return -1;
+	}
+
+	if( sceKernelStartThread( thid, args, argp ) < 0 )
+	{
+		printf( "Hooker: unable to start main thread" );
+		return -1;
+	}
+
+	return 0;
+}
+
+int module_stop( SceSize args, void *argp )
+{
 	return 0;
 }
