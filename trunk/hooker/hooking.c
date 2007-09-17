@@ -326,7 +326,7 @@ int Format( char type, char* buffer, uint* value )
 	case TYPE_SINGLE:
 		return sprintf( buffer, "%g", *( float* )value );
 	case TYPE_STRING:
-		if( value[ 0 ] == NULL )
+		if( ( char* )value[ 0 ] == NULL )
 			return sprintf( buffer, "[invalid ptr]" );
 		else
 			return sprintf( buffer, "%s", ( char* )value[ 0 ] );
