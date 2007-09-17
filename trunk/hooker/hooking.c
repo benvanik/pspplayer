@@ -57,7 +57,6 @@ typedef struct HookEntry_t
 HookEntry*	_entries;
 int			_entryCount;
 int			_entryCapacity;
-char		_hookBuffer[ 1024 ];
 
 uint FindNID( char* moduleName, uint nid )
 {
@@ -316,7 +315,10 @@ int Format( char type, char* buffer, uint* value )
 	case TYPE_INT32:
 		return sprintf( buffer, "%d", *( int* )value );
 	case TYPE_INT64:
-		return sprintf( buffer, "%lld", *( long long* )value );
+		{
+			unsigned long long int64 = ( ( unsigned long long )value[ 1 ] ) << 32 | value[ 0 ];
+			return sprintf( buffer, "%lld", int64 );
+		}
 	case TYPE_HEX32:
 		return sprintf( buffer, "0x%08X", *( uint* )value );
 	case TYPE_HEX64:
@@ -335,29 +337,21 @@ int Format( char type, char* buffer, uint* value )
 	}
 }
 
-int _reentrance = 0;
-int _isReentrant = 0;
-
 void* _OnHookHit( int id, uint* args )
 {
 	HookEntry* entry = NULL;
 	int intc = pspSdkDisableInterrupts();
 	if( ( id >= 0 ) && ( id < _entryCount ) )
 		entry = &_entries[ id ];
-	int reentrant = ( _reentrance > 0 );
-	if( reentrant == 0 )
-		_reentrance++;
-	else
-		_isReentrant = 1;
 	pspSdkEnableInterrupts( intc );
 
 	int k1 = SetK1( 0 );
 
-	if( ( reentrant == 0 ) &&
-		( entry != NULL ) &&
+	if( ( entry != NULL ) &&
 		( entry->Enabled == 1 ) )
 	{
-		int position = sprintf( _hookBuffer, "~0x%08X -> %s[0x%08X](", sceKernelGetThreadId(), entry->FunctionName, entry->NID );
+		char buffer[ 256 ];
+		int position = sprintf( buffer, "~0x%08X -> %s[0x%08X](", sceKernelGetThreadId(), entry->FunctionName, entry->NID );
 		int n;
 		int m;
 		for( n = 0, m = 0; n < MAXPARAMETERCOUNT; n++ )
@@ -367,10 +361,10 @@ void* _OnHookHit( int id, uint* args )
 				break;
 			if( n != 0 )
 			{
-				*( _hookBuffer + position ) = ',';
+				*( buffer + position ) = ',';
 				position++;
 			}
-			position += Format( entry->ParameterFormat[ n ], _hookBuffer + position, args + m );
+			position += Format( entry->ParameterFormat[ n ], buffer + position, args + m );
 
 			switch( entry->ParameterFormat[ n ] )
 			{
@@ -383,8 +377,8 @@ void* _OnHookHit( int id, uint* args )
 				break;
 			}
 		}
-		position += sprintf( _hookBuffer + position, ") from 0x%08X\n", sceKernelGetSyscallRA() );
-		printf( _hookBuffer );
+		position += sprintf( buffer + position, ") from 0x%08X\n", sceKernelGetSyscallRA() );
+		printf( buffer );
 	}
 
 	SetK1( k1 );
@@ -395,7 +389,7 @@ void* _OnHookHit( int id, uint* args )
 		return NULL;
 }
 
-void _OnHookReturn( int id, void* returnValue )
+void _OnHookReturn( int id, uint* returnValue )
 {
 	HookEntry* entry = NULL;
 	int intc = pspSdkDisableInterrupts();
@@ -405,19 +399,14 @@ void _OnHookReturn( int id, void* returnValue )
 
 	int k1 = SetK1( 0 );
 
-	if( ( _isReentrant == 0 ) &&
-		( entry != NULL ) &&
+	if( ( entry != NULL ) &&
 		( entry->Enabled == 1 ) )
 	{
-		int position = sprintf( _hookBuffer, "~0x%08X <- %s[0x%08X] = ", sceKernelGetThreadId(), entry->FunctionName, entry->NID );
-		position += Format( entry->ReturnFormat, _hookBuffer + position, returnValue );
-		position += sprintf( _hookBuffer + position, "\n"  );
-
-		// Write out _hookBuffer with length position + 1 (includes \0)
-		printf( _hookBuffer );
-
-		_reentrance--;
-		_isReentrant = 0;
+		char buffer[ 128 ];
+		int position = sprintf( buffer, "~0x%08X <- %s[0x%08X] = ", sceKernelGetThreadId(), entry->FunctionName, entry->NID );
+		position += Format( entry->ReturnFormat, buffer + position, returnValue );
+		position += sprintf( buffer + position, "\n"  );
+		printf( buffer );
 	}
 
 	SetK1( k1 );
