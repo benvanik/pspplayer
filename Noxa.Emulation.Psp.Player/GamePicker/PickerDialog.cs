@@ -48,9 +48,9 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 
 			SetEnabledState( true );
 
-			this.FindGames();
+			//this.FindGames();
 
-			umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
+			//umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
 
 			this.DialogResult = DialogResult.Cancel;
 		}
@@ -58,7 +58,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		protected override void OnLoad( EventArgs e )
 		{
 			base.OnLoad( e );
-
+            this.FindGames();
+            umdGameListing_SelectionChanged(umdGameListing, EventArgs.Empty);
 			whidbeyTabControl1.SelectedIndex = 0;
 		}
 
