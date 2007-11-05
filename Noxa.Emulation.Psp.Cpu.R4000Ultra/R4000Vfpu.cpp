@@ -72,6 +72,26 @@ enum VfpuRwb{		VFPU_WT,	VFPU_WB,	VFPU_RWB3,	VFPU_RWB4,	};
 enum VfpuPfxCst{	VFPU_CST_0,	VFPU_CST_1,	VFPU_CST_2,	VFPU_CST_1_2,	VFPU_CST_3,	VFPU_CST_1_3,	VFPU_CST_1_4,	VFPU_CST_1_6,	};
 enum VfpuPfxSwz{	VFPU_X,	VFPU_Y,	VFPU_Z,	VFPU_W,	};
 enum VfpuPfxSat{	VFPU_SAT0,	VFPU_SAT_0_1,	VFPU_SAT2,	VFPU_SAT_1_1,	};
+static const float VfpuIdentity[16] = {
+	1,0,0,0,
+	0,1,0,0,
+	0,0,1,0,
+	0,0,0,1
+};
+static const float VfpuZero[16] = {
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0
+};
+static const float VfpuOne[16] = {
+	1,1,1,1,
+	1,1,1,1,
+	1,1,1,1,
+	1,1,1,1
+};
+const float VfpuOnes[4] = { 1, 1, 1, 1 };
+const float VfpuZeros[4] = { 0, 0, 0, 0 };
 
 enum VfpuAttributes
 {
@@ -283,6 +303,7 @@ bool VfpuGenVPFX( R4000GenContext^ context, int address, uint code )
 #define VREG( xr, r ) g->dword_ptr[ xr + CTXCP2REGS + ( ( r ) << 2 ) ]
 #define VIMM( code ) ( int )( ( short )( code & 0x0000FFFF ) )
 #define VWIDTH( code ) ( VfpuWidth )( ( ( code >> 7 ) & 0x1 ) + ( ( ( code >> 15 ) & 0x1 ) << 1 ) )
+#define VMATRIXWIDTH( code ) ( VfpuWidth )( ( ( code >> 7 ) & 0x1 ) + ( ( ( code >> 15 ) & 0x1 ) << 1 ) + 3 )
 
 // EAX = address in guest space, result in EAX
 void EmitAddressLookup( R4000GenContext^ context, int address );
@@ -734,6 +755,44 @@ int VfpuImplArith( R4000Ctx* ctx, uint address, uint code )
 	}
 	VfpuApplyPrefix( ctx, VPFXD, width, s );
 	VfpuSetVector( ctx, width, VRD( code ), s );
+	return 0;
+}
+
+int VfpuImplVectorInit( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float* source;
+	switch( ( code >> 16 ) & 0xF )
+	{
+	/* vzero */ case 6: source = ( float* )VfpuZeros;		break;
+	/* vone  */ case 7: source = ( float* )VfpuOnes;		break;
+	default:
+		assert( false );
+		break;
+	}
+	// Need to copy because apply prefix overwrites
+	float s[ 4 ];
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		s[ n ] = source[ n ];
+	VfpuApplyPrefix( ctx, VPFXD, width, s );
+	VfpuSetVector( ctx, width, VRD( code ), s );
+	return 0;
+}
+
+int VfpuImplMatrixInit( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VMATRIXWIDTH( code );
+	float* source;
+	switch( ( code >> 16 ) & 0xF )
+	{
+	/* vmidt  */ case 3: source = ( float* )VfpuIdentity;	break;
+	/* vmzero */ case 6: source = ( float* )VfpuZero;		break;
+	/* vmone  */ case 7: source = ( float* )VfpuOne;		break;
+	default:
+		assert( false );
+		break;
+	}
+	VfpuSetVector( ctx, width, VRD( code ), source, 4 );
 	return 0;
 }
 
