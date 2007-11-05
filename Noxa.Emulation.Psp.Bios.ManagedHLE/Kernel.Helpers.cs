@@ -35,11 +35,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public KDevice FindDevice( IMediaDevice device )
 		{
-			for( int n = 0; n < Devices.Length; n++ )
-			{
-				if( Devices[ n ].Device == device )
-					return Devices[ n ];
-			}
+            foreach (KDevice Device in Devices)
+                if (Device == device)
+                       return Device;
 			return null;
 		}
 
