@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-
+using System.Threading;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
@@ -19,7 +19,6 @@ using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Debugging.Hooks;
 using Noxa.Emulation.Psp.Debugging.Protocol;
 using Noxa.Emulation.Psp.Debugging.Statistics;
-using System.Threading;
 
 namespace Noxa.Emulation.Psp.Debugging
 {
@@ -33,11 +32,11 @@ namespace Noxa.Emulation.Psp.Debugging
 		/// <summary>
 		/// The port the <see cref="DebugHost"/> listens on.
 		/// </summary>
-		public const int ServerPort = 10001;
+		public const int ServerPort = 30001;
 		/// <summary>
 		/// The port the <see cref="IDebugger"/> listens on.
 		/// </summary>
-		public const int ClientPort = 10002;
+		public const int ClientPort = 30002;
 
 		#endregion
 

@@ -825,6 +825,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					if( type == ModuleType.Boot )
 					{
 						KModule module = new KModule( kernel, new BiosModule( results.Name, results.Exports.ToArray() ) );
+						module.LoadResults = results;
 						kernel.UserModules.Add( module );
 						Debug.Assert( kernel.MainModule == null );
 						kernel.MainModule = module;

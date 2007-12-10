@@ -81,6 +81,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_kernel.Bios._metaModuleLookup.Add( module.Name, module );
 
 			KModule kmod = new KModule( _kernel, module );
+			kmod.LoadResults = results;
 			_kernel.AddHandle( kmod );
 
 			return ( int )kmod.UID;
@@ -286,7 +287,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xF9275D98, "sceKernelLoadModuleBufferUsbWlan" )]
 		// SDK location: /user/pspmodulemgr.h:106
 		// SDK declaration: SceUID sceKernelLoadModuleBufferUsbWlan(SceSize bufsize, void *buf, int flags, SceKernelLMOption *option);
-		public int sceKernelLoadModuleBufferUsbWlan( int bufsize, int buf, int flags, int option ){ return Module.NotImplementedReturn; }
+		public int sceKernelLoadModuleBufferUsbWlan( int bufsize, int buf, int flags, int option ) { return Module.NotImplementedReturn; }
 
 		[Stateless]
 		[BiosFunction( 0x50F0C1EC, "sceKernelStartModule" )]
@@ -476,13 +477,26 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( int )_kernel.ActiveThread.Module.UID;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xD8B73127, "sceKernelGetModuleIdByAddress" )]
 		// manual add
 		public int sceKernelGetModuleIdByAddress( int address )
 		{
-			return Module.NotImplementedReturn;
+			// This is nasty - need to have a list
+			foreach( KHandle handle in _kernel.Handles.Values )
+			{
+				if( handle is KModule )
+				{
+					KModule module = ( KModule )handle;
+					if( module.LoadResults != null )
+					{
+						if( ( address >= module.LoadResults.LowerBounds ) &&
+							( address < module.LoadResults.UpperBounds ) )
+							return ( int )module.UID;
+					}
+				}
+			}
+			return -1;
 		}
 
 		[NotImplemented]
@@ -490,7 +504,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x748CBED9, "sceKernelQueryModuleInfo" )]
 		// SDK location: /user/pspmodulemgr.h:198
 		// SDK declaration: int sceKernelQueryModuleInfo(SceUID modid, SceKernelModuleInfo *info);
-		public int sceKernelQueryModuleInfo( int modid, int info ){ return Module.NotImplementedReturn; }
+		public int sceKernelQueryModuleInfo( int modid, int info ) { return Module.NotImplementedReturn; }
 
 	}
 }
