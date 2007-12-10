@@ -229,6 +229,12 @@ bool VfpuGenDummy( R4000GenContext^ context, int address, uint code )
 	return true;
 }
 
+bool VfpuGenNop( R4000GenContext^ context, int address, uint code )
+{
+	// ^_^
+	return true;
+}
+
 // Taken from ector's code
 #define VFPU_FLOAT16_EXP_MAX	0x1f
 #define VFPU_SH_FLOAT16_SIGN	15
@@ -725,6 +731,7 @@ int VfpuImplVSCL( R4000Ctx* ctx, uint address, uint code )
 
 // A lot of these could be generated inline or at least use SSE for big speedups
 #define F_PI_2 ( ( float )1.57079632679489661923132169164 )
+#define F_LOG_2 ( ( float )0.30102999566398119521373889472449 )
 #pragma intrinsic( fabs )
 int VfpuImplArith( R4000Ctx* ctx, uint address, uint code )
 {
@@ -746,7 +753,7 @@ int VfpuImplArith( R4000Ctx* ctx, uint address, uint code )
 		/* vsin  */ case 18:	s[ n ] = sin( F_PI_2 * s[ n ] );			break;
 		/* vcos  */ case 19:	s[ n ] = cos( F_PI_2 * s[ n ] );			break;
 		/* vexp2 */ case 20:	s[ n ] = powf( 2.0f, s[ n ] );				break;
-		/* vlog2 */ case 21:	s[ n ] = log( s[ n ] ) / log( 2.0f );		break;
+		/* vlog2 */ case 21:	s[ n ] = log( s[ n ] ) / F_LOG_2;			break;
 		/* vsqrt */ case 22:	s[ n ] = sqrt( s[ n ] );					break;
 		default:
 			assert( false );
@@ -793,6 +800,74 @@ int VfpuImplMatrixInit( R4000Ctx* ctx, uint address, uint code )
 		break;
 	}
 	VfpuSetVector( ctx, width, VRD( code ), source, 4 );
+	return 0;
+}
+
+int VfpuImplVIDT( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	uint vd = VRD( code );
+	float s[ 4 ];
+	switch( width )
+	{
+	case VPair:
+		s[ 0 ] = ( ( vd & 1 ) == 0 ) ? 1.0f : 0.0f;
+		s[ 1 ] = ( ( vd & 1 ) == 1 ) ? 1.0f : 0.0f;
+		break;
+	case VQuad:
+		s[ 0 ] = ( ( vd & 3 ) == 0 ) ? 1.0f : 0.0f;
+		s[ 1 ] = ( ( vd & 3 ) == 1 ) ? 1.0f : 0.0f;
+		s[ 2 ] = ( ( vd & 3 ) == 2 ) ? 1.0f : 0.0f;
+		s[ 3 ] = ( ( vd & 3 ) == 3 ) ? 1.0f : 0.0f;
+		break;
+	default:
+		assert( false );
+		break;
+	}
+	VfpuSetVector( ctx, width, VRD( code ), s );
+	return 0;
+}
+
+int VfpuImplVMMUL( R4000Ctx* ctx, uint address, uint code )
+{
+	float s[ 16 ];
+	float t[ 16 ];
+	float d[ 16 ];
+
+	VfpuWidth width = VWIDTH( code );
+	int n = 2;
+	switch( width )
+	{
+	//case V2x2: n = 2; break;
+	case V3x3: n = 3; break;
+	case V4x4: n = 4; break;
+	}
+
+	VfpuGetVector( ctx, width, VRS( code ), s, 4 );
+	VfpuGetVector( ctx, width, VRT( code ), t, 4 );
+
+	// Matrix multiplication = MMX target
+	for( int a = 0; a < n; a++ )
+	{
+		for( int b = 0; b < n; b++ )
+		{
+			float sum = 0;
+			for( int c = 0; c < n; c++ )
+				sum += s[ b * 4 + c ] * t[ a * 4 + c ];
+			d[ a * 4 + b ] = sum;
+		}
+	}
+
+	VfpuSetVector( ctx, width, VRD( code ), d, 4 );
+	return 0;
+}
+
+int VfpuImplVMMOV( R4000Ctx* ctx, uint address, uint code )
+{
+	float s[ 16 ];
+	VfpuWidth width = VWIDTH( code );
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuSetVector( ctx, width, VRD( code ), s );
 	return 0;
 }
 

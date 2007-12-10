@@ -127,7 +127,7 @@ void __traceLine( int address, int code )
 	else if( traceToggle == false )
 		return;
 #endif
-#if 1
+#if 0
 	if( address == 0x08a635b0 )
 		traceToggle = true;
 	if( traceToggle == true )
