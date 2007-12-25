@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{102BC2E8-2DED-489C-851C-333302D03BFF}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp", "Noxa.Emulation.Psp\Noxa.Emulation.Psp.csproj", "{C211B8D0-BA1C-4B50-A19F-CEE9C396CA56}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Noxa.Emulation.Psp.Player", "Noxa.Emulation.Psp.Player\Noxa.Emulation.Psp.Player.csproj", "{1497FF04-09C9-4D55-A617-E4EB10747319}"
@@ -26,8 +28,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Cpu.R400
 	ProjectSection(ProjectDependencies) = postProject
 		{3BA8A34E-E779-4282-9566-2E0FE1D507FC} = {3BA8A34E-E779-4282-9566-2E0FE1D507FC}
 	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{102BC2E8-2DED-489C-851C-333302D03BFF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Noxa.Emulation.Psp.Video.OpenGL", "Noxa.Emulation.Psp.Video.OpenGL\Noxa.Emulation.Psp.Video.OpenGL.vcproj", "{78980526-7FCC-4DB8-BDDA-BEDBBE8C8705}"
 EndProject

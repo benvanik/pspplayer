@@ -29,7 +29,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 		protected Dictionary<ComponentType, ComboBox> _comboLookup = new Dictionary<ComponentType, ComboBox>();
 		protected Dictionary<ComponentType, LinkLabel> _linkLookup = new Dictionary<ComponentType, LinkLabel>();
 		protected Dictionary<ComponentType, Button> _configLookup = new Dictionary<ComponentType, Button>();
-		
+
 		public Options()
 		{
 			InitializeComponent();
@@ -198,7 +198,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 
 			LinkLabel link = _linkLookup[ type ];
 			Button configButton = _configLookup[ type ];
-			
+
 			IComponent component = comboBox.SelectedItem as IComponent;
 			if( component.Version != null )
 			{
@@ -270,9 +270,9 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 						// Speeds things up, but note that will we will need to reload
 						// later to get the proper types!
 						//assembly = Assembly.ReflectionOnlyLoadFrom( assemblyPath );
-						assembly = Assembly.LoadFile(assemblyPath);
+						assembly = Assembly.LoadFile( assemblyPath );
 					}
-					catch (Exception e)
+					catch( Exception e )
 					{
 						// Failed, ignore
 						Log.WriteLine( Verbosity.Critical, Feature.General, "FindComponents: Failed to load assembly " + assemblyPath + ", probably not .NET : " + e.ToString() + " " + e.Message );
@@ -340,7 +340,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 			foreach( ComponentType type in _comboLookup.Keys )
 			{
 				component = _comboLookup[ type ].SelectedItem as IComponent;
-				
+
 				settings = new Settings();
 				settings.SetValue<string>( "componentName", component.GetType().FullName );
 				settings.SetValue<string>( "componentPath", component.GetType().Assembly.Location );
