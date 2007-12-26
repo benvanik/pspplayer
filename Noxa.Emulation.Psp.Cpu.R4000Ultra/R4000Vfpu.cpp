@@ -1224,4 +1224,48 @@ int VfpuImplVDET( R4000Ctx* ctx, uint address, uint code )
 	return 0;
 }
 
+int VfpuImplVF2I( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	int d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	// TODO: and the mask to kill everything but swizzle
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	int imm = ( code >> 16 ) & 0x1F;
+	float mult = ( float )( 1 << imm );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+	{
+		switch( ( code >> 21 ) & 0x1F )
+		{
+		/* n */ case 16:	d[ n ] = ( int )floor( s[ n ] * mult + 0.5f );	break;
+		/* z */ case 17:	d[ n ] = s[ n ] >= 0 ? ( int )floor( s[ n ] * mult ) : ( int )ceil( s[ n ] * mult ); break;
+		/* u */ case 18:	d[ n ] = ( int )ceil( s[ n ] * mult );			break;
+		/* d */ case 19:	d[ n ] = ( int )floor( s[ n ] * mult );			break;
+		}
+	}
+	// TODO: and the mask to kill everything but mask
+	VfpuApplyPrefix( ctx, VPFXD, width, ( float* )d );
+	VfpuSetVector( ctx, width, VRD( code ), ( float* )d );
+	return 0;
+}
+
+int VfpuImplVI2F( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	int s[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), ( float* )s );
+	// TODO: and the mask to kill everything but swizzle
+	VfpuApplyPrefix( ctx, VPFXS, width, ( float* )s );
+	int imm = ( code >> 16 ) & 0x1F;
+	float mult = 1.0f / ( float )( 1 << imm );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		d[ n ] = ( float )s[ n ] * mult;
+	// TODO: and the mask to kill everything but mask
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
 #pragma managed
