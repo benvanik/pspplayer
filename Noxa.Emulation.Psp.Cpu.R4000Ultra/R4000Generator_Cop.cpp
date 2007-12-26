@@ -21,8 +21,6 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 #define g context->Generator
 
-#define ASSERTCOND01() { Label* ll = g->DefineLabel(); g->cmp( EAX, 1 ); g->jle( ll ); g->int3(); g->MarkLabel( ll ); }
-
 GenerationResult BCzF( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
 	int target = address + ( SE( imm ) << 2 );
@@ -43,10 +41,13 @@ GenerationResult BCzF( R4000GenContext^ context, int pass, int address, uint cod
 			g->mov( EAX, MCP1CONDBIT( CTX ) );
 		else if( opcode == 2 )
 			g->mov( EAX, MCP2CONDBIT( CTX ) );
-		ASSERTCOND01();
-		// EAX = 1 if cond true, 0 if cond false
-		g->xor( EAX, 0x1 ); // <- flip, as we are F
-		g->mov( MPCVALID( CTX ), EAX );
+		// EAX = >=1 if cond true, 0 if cond false
+		g->xor( EBX, EBX );
+		g->cmp( EAX, 1 );
+		g->setge( BL );
+		// EBX = 1 if >=1, 0 if 0
+		g->xor( EBX, 0x1 ); // <- flip, as we are F
+		g->mov( MPCVALID( CTX ), EBX );
 	}
 	return GenerationResult::Branch;
 }
@@ -71,12 +72,15 @@ GenerationResult BCzFL( R4000GenContext^ context, int pass, int address, uint co
 			g->mov( EAX, MCP1CONDBIT( CTX ) );
 		else if( opcode == 2 )
 			g->mov( EAX, MCP2CONDBIT( CTX ) );
-		ASSERTCOND01();
-		// EAX = 1 if cond true, 0 if cond false
-		g->xor( EAX, 0x1 ); // <- flip, as we are F
-		g->mov( MPCVALID( CTX ), EAX );
-		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
-		g->mov( MNULLDELAY( CTX ), EAX );
+		// EAX = >=1 if cond true, 0 if cond false
+		g->xor( EBX, EBX );
+		g->cmp( EAX, 1 );
+		g->setge( BL );
+		// EBX = 1 if >=1, 0 if 0
+		g->xor( EBX, 0x1 ); // <- flip, as we are F
+		g->mov( MPCVALID( CTX ), EBX );
+		g->xor( EBX, 0x1 ); // nulldelay = !pcvalid
+		g->mov( MNULLDELAY( CTX ), EBX );
 	}
 	return GenerationResult::BranchAndNullifyDelay;
 }
@@ -101,9 +105,12 @@ GenerationResult BCzT( R4000GenContext^ context, int pass, int address, uint cod
 			g->mov( EAX, MCP1CONDBIT( CTX ) );
 		else if( opcode == 2 )
 			g->mov( EAX, MCP2CONDBIT( CTX ) );
-		ASSERTCOND01();
-		// EAX = 1 if cond true, 0 if cond false
-		g->mov( MPCVALID( CTX ), EAX );
+		// EAX = >=1 if cond true, 0 if cond false
+		g->xor( EBX, EBX );
+		g->cmp( EAX, 1 );
+		g->setge( BL );
+		// EBX = 1 if >=1, 0 if 0
+		g->mov( MPCVALID( CTX ), EBX );
 	}
 	return GenerationResult::Branch;
 }
@@ -128,11 +135,14 @@ GenerationResult BCzTL( R4000GenContext^ context, int pass, int address, uint co
 			g->mov( EAX, MCP1CONDBIT( CTX ) );
 		else if( opcode == 2 )
 			g->mov( EAX, MCP2CONDBIT( CTX ) );
-		ASSERTCOND01();
-		// EAX = 1 if cond true, 0 if cond false
-		g->mov( MPCVALID( CTX ), EAX );
-		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
-		g->mov( MNULLDELAY( CTX ), EAX );
+		// EAX = >=1 if cond true, 0 if cond false
+		g->xor( EBX, EBX );
+		g->cmp( EAX, 1 );
+		g->setge( BL );
+		// EBX = 1 if >=1, 0 if 0
+		g->mov( MPCVALID( CTX ), EBX );
+		g->xor( EBX, 0x1 ); // nulldelay = !pcvalid
+		g->mov( MNULLDELAY( CTX ), EBX );
 	}
 	return GenerationResult::BranchAndNullifyDelay;
 }
