@@ -21,11 +21,13 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 #define g context->Generator
 
+#define ASSERTCOND01() { Label* ll = g->DefineLabel(); g->cmp( EAX, 1 ); g->jle( ll ); g->int3(); g->MarkLabel( ll ); }
+
 GenerationResult BCzF( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
 	int target = address + ( SE( imm ) << 2 );
 
-	Debug::Assert( opcode == 1, "Only support COP1" );
+	Debug::Assert( ( opcode == 1 ) || ( opcode == 2 ), "Only support COP1/2" );
 
 	if( pass == 0 )
 	{
@@ -37,7 +39,11 @@ GenerationResult BCzF( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		g->mov( EAX, MCP1CONDBIT( CTX ) );
+		if( opcode == 1 )
+			g->mov( EAX, MCP1CONDBIT( CTX ) );
+		else if( opcode == 2 )
+			g->mov( EAX, MCP2CONDBIT( CTX ) );
+		ASSERTCOND01();
 		// EAX = 1 if cond true, 0 if cond false
 		g->xor( EAX, 0x1 ); // <- flip, as we are F
 		g->mov( MPCVALID( CTX ), EAX );
@@ -49,7 +55,7 @@ GenerationResult BCzFL( R4000GenContext^ context, int pass, int address, uint co
 {
 	int target = address + ( SE( imm ) << 2 );
 
-	Debug::Assert( opcode == 1, "Only support COP1" );
+	Debug::Assert( ( opcode == 1 ) || ( opcode == 2 ), "Only support COP1/2" );
 
 	if( pass == 0 )
 	{
@@ -61,7 +67,11 @@ GenerationResult BCzFL( R4000GenContext^ context, int pass, int address, uint co
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		g->mov( EAX, MCP1CONDBIT( CTX ) );
+		if( opcode == 1 )
+			g->mov( EAX, MCP1CONDBIT( CTX ) );
+		else if( opcode == 2 )
+			g->mov( EAX, MCP2CONDBIT( CTX ) );
+		ASSERTCOND01();
 		// EAX = 1 if cond true, 0 if cond false
 		g->xor( EAX, 0x1 ); // <- flip, as we are F
 		g->mov( MPCVALID( CTX ), EAX );
@@ -75,7 +85,7 @@ GenerationResult BCzT( R4000GenContext^ context, int pass, int address, uint cod
 {
 	int target = address + ( SE( imm ) << 2 );
 
-	Debug::Assert( opcode == 1, "Only support COP1" );
+	Debug::Assert( ( opcode == 1 ) || ( opcode == 2 ), "Only support COP1/2" );
 
 	if( pass == 0 )
 	{
@@ -87,7 +97,11 @@ GenerationResult BCzT( R4000GenContext^ context, int pass, int address, uint cod
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		g->mov( EAX, MCP1CONDBIT( CTX ) );
+		if( opcode == 1 )
+			g->mov( EAX, MCP1CONDBIT( CTX ) );
+		else if( opcode == 2 )
+			g->mov( EAX, MCP2CONDBIT( CTX ) );
+		ASSERTCOND01();
 		// EAX = 1 if cond true, 0 if cond false
 		g->mov( MPCVALID( CTX ), EAX );
 	}
@@ -98,7 +112,7 @@ GenerationResult BCzTL( R4000GenContext^ context, int pass, int address, uint co
 {
 	int target = address + ( SE( imm ) << 2 );
 
-	Debug::Assert( opcode == 1, "Only support COP1" );
+	Debug::Assert( ( opcode == 1 ) || ( opcode == 2 ), "Only support COP1/2" );
 
 	if( pass == 0 )
 	{
@@ -110,7 +124,11 @@ GenerationResult BCzTL( R4000GenContext^ context, int pass, int address, uint co
 		Debug::Assert( targetLabel != nullptr );
 		context->BranchTarget = targetLabel;
 
-		g->mov( EAX, MCP1CONDBIT( CTX ) );
+		if( opcode == 1 )
+			g->mov( EAX, MCP1CONDBIT( CTX ) );
+		else if( opcode == 2 )
+			g->mov( EAX, MCP2CONDBIT( CTX ) );
+		ASSERTCOND01();
 		// EAX = 1 if cond true, 0 if cond false
 		g->mov( MPCVALID( CTX ), EAX );
 		g->xor( EAX, 0x1 ); // nulldelay = !pcvalid
@@ -121,9 +139,9 @@ GenerationResult BCzTL( R4000GenContext^ context, int pass, int address, uint co
 
 GenerationResult MFCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
-	//Debug::Assert( opcode == 1, "Only support COP1" );
-	if( opcode != 1 )
-		Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "MFC{0} ${1} - only supports COP1!", opcode, rs );
+	Debug::Assert( opcode == 1, "Only support COP1" );
+	//if( opcode != 1 )
+	//	Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "MFC{0} ${1} - only supports COP1!", opcode, rs );
 
 	if( pass == 0 )
 	{
@@ -143,9 +161,9 @@ GenerationResult MFCz( R4000GenContext^ context, int pass, int address, uint cod
 
 GenerationResult MTCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
-	//Debug::Assert( opcode == 1, "Only support COP1" );
-	if( opcode != 1 )
-		Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "MTC{0} ${1} - only supports COP1!", opcode, rs );
+	Debug::Assert( opcode == 1, "Only support COP1" );
+	//if( opcode != 1 )
+	//	Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "MTC{0} ${1} - only supports COP1!", opcode, rs );
 
 	if( pass == 0 )
 	{
@@ -202,5 +220,5 @@ GenerationResult CTCz( R4000GenContext^ context, int pass, int address, uint cod
 		//g->mov( MREG( CTX, rt ), EAX );
 	}
 
-	return GenerationResult::Success;
+	return GenerationResult::Invalid;
 }

@@ -46,6 +46,7 @@ using namespace Noxa::Emulation::Psp::CodeGen;
 #define MINTMASK( xr )			g->dword_ptr[ xr + CTXINTMASK ]
 #define MCP1REG( xr, r, fmt )	g->dword_ptr[ xr + CTXCP1REGS + ( r << 4 ) ]
 #define MCP1CONDBIT( xr )		g->dword_ptr[ xr + CTXCP1CONDBIT ]
+#define MCP2CONDBIT( xr )		g->dword_ptr[ xr + CTXCP2CONDBIT ]
 #define MSTOPFLAG( xr )			g->dword_ptr[ xr + CTXSTOPFLAG ]
 #define MINDELAY( xr )			g->dword_ptr[ xr + CTXINDELAY ]
 #define MNEXTPC( xr )			g->dword_ptr[ xr + CTXNEXTPC ]
