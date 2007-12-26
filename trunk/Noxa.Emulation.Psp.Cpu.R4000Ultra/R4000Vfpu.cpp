@@ -37,6 +37,21 @@ using namespace Noxa::Emulation::Psp::Cpu;
 
 #define MCP2REG( xr, r )		g->dword_ptr[ xr + CTXCP2REGS + ( r << 2 ) ]
 
+#define F_PI			( ( float )3.14159265358979323846 )				/* pi */
+#define F_PI_2			( ( float )1.57079632679489661923132169164 )	/* pi/2 */
+#define F_PI_4			( ( float )0.78539816339744830961566084582 )	/* pi/4 */
+#define F_1_PI			( ( float )0.31830988618379067154 )				/* 1/pi */
+#define F_2_PI			( ( float )0.63661977236758134308 )				/* 2/pi */
+#define F_2_SQRTPI		( ( float )1.12837916709551257390 )				/* 2/sqrt(pi) */
+#define F_LOG_2			( ( float )0.30102999566398119521373889472449 )
+#define F_LOG2E			( ( float )1.4426950408889634074 )				/* log_2 e */
+#define F_LOG10E		( ( float )0.43429448190325182765 )				/* log_10 e */
+#define F_LN2			( ( float )0.69314718055994530942 )				/* log_e 2 */
+#define F_LN10			( ( float )2.30258509299404568402 )				/* log_e 10 */
+#define F_E				( ( float )2.718281828459045235360287471352 )	/* e */
+#define F_SQRT2			( ( float )1.41421356237309504880 )				/* sqrt(2) */
+#define F_SQRT1_2		( ( float )0.70710678118654752440 )				/* 1/sqrt(2) */
+
 enum VfpuWidth
 {
 	VSingle,
@@ -68,6 +83,12 @@ enum VfpuConstants
 	VFPU_SQRT3_2,
 	VFPU_NUM_CONSTANTS,
 };
+//static const float _vfpuConstantValues[ 32 ] = {
+//	0, std::numeric_limits<float>::max(), sqrt(2.0f), sqrt(0.5f), 2.0f/sqrtf(F_PI), 2.0f/F_PI,
+//	1.0f/F_PI, F_PI/4, F_PI/2, F_PI, F_E, F_LOG2E, F_LOG10E,
+//	F_LN2, F_LN10, 2*F_PI, F_PI/6, log10(2.0f), log(10.0f)/log(2.0f),
+//	sqrt(3.0f)/2.0f,
+//};
 enum VfpuRwb{		VFPU_WT,	VFPU_WB,	VFPU_RWB3,	VFPU_RWB4,	};
 enum VfpuPfxCst{	VFPU_CST_0,	VFPU_CST_1,	VFPU_CST_2,	VFPU_CST_1_2,	VFPU_CST_3,	VFPU_CST_1_3,	VFPU_CST_1_4,	VFPU_CST_1_6,	};
 enum VfpuPfxSwz{	VFPU_X,	VFPU_Y,	VFPU_Z,	VFPU_W,	};
@@ -142,6 +163,10 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 	if( pass == 0 )
 	{
 		Debug::WriteLine( String::Format( "[0x{0:X8}] {1:X8}\t{2} {3}", address - 4, code, gcnew String( instr->Name ), gcnew String( instr->Arguments ) ) );
+		bool hasGen = ( instr->Generate != VfpuGenDummy );
+		bool hasImpl = ( instr->Execute != VfpuImplDummy );
+		if( ( hasGen == false ) && ( hasImpl == false ) )
+			Debug::WriteLine( String::Format( "  hasGen={0}, hasImpl={1}", hasGen, hasImpl ) );
 	}
 #endif
 
@@ -554,6 +579,40 @@ bool VfpuGenVFIM( R4000GenContext^ context, int address, uint code )
 	return true;
 }
 
+bool VfpuGenVCST( R4000GenContext^ context, int address, uint code )
+{
+	static const float vfpuConstant4x[ 32 ][ 4 ] = {
+		{ 0, 0, 0, 0 },
+		{ FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX },
+		{ sqrt(2.0f), sqrt(2.0f), sqrt(2.0f), sqrt(2.0f) },
+		{ sqrt(0.5f), sqrt(0.5f), sqrt(0.5f), sqrt(0.5f) },
+		{ 2.0f/sqrtf(F_PI), 2.0f/sqrtf(F_PI), 2.0f/sqrtf(F_PI), 2.0f/sqrtf(F_PI) },
+		{ 2.0f/F_PI, 2.0f/F_PI, 2.0f/F_PI, 2.0f/F_PI },
+		{ 1.0f/F_PI, 1.0f/F_PI, 1.0f/F_PI, 1.0f/F_PI },
+		{ F_PI/4, F_PI/4, F_PI/4, F_PI/4 },
+		{ F_PI/2, F_PI/2, F_PI/2, F_PI/2 },
+		{ F_PI, F_PI, F_PI, F_PI },
+		{ F_E, F_E, F_E, F_E },
+		{ F_LOG2E, F_LOG2E, F_LOG2E, F_LOG2E },
+		{ F_LOG10E, F_LOG10E, F_LOG10E, F_LOG10E },
+		{ F_LN2, F_LN2, F_LN2, F_LN2 },
+		{ F_LN10, F_LN10, F_LN10, F_LN10 },
+		{ 2*F_PI, 2*F_PI, 2*F_PI, 2*F_PI },
+		{ F_PI/6, F_PI/6, F_PI/6, F_PI/6 },
+		{ log10(2.0f), log10(2.0f), log10(2.0f), log10(2.0f) },
+		{ log(10.0f)/log(2.0f), log(10.0f)/log(2.0f), log(10.0f)/log(2.0f), log(10.0f)/log(2.0f) },
+		{ sqrt(3.0f)/2.0f, sqrt(3.0f)/2.0f, sqrt(3.0f)/2.0f, sqrt(3.0f)/2.0f }
+	};
+
+	VfpuWidth width = VWIDTH( code );
+	int elements = _vfpuSizes[ width ];
+	int constant = ( code >> 16 ) & 0x1F;
+	float* p = ( float* )vfpuConstant4x[ constant ];
+	g->mov( EAX, p );
+	EmitVfpuWrite( context, width, VRD( code ), 4 );
+	return true;
+}
+
 // ----------------------------------- BEGIN IMPL -----------------------------------------------------------
 // Everything below here is unmanaged!
 #pragma unmanaged
@@ -730,8 +789,6 @@ int VfpuImplVSCL( R4000Ctx* ctx, uint address, uint code )
 }
 
 // A lot of these could be generated inline or at least use SSE for big speedups
-#define F_PI_2 ( ( float )1.57079632679489661923132169164 )
-#define F_LOG_2 ( ( float )0.30102999566398119521373889472449 )
 #pragma intrinsic( fabs )
 int VfpuImplArith( R4000Ctx* ctx, uint address, uint code )
 {
@@ -755,6 +812,12 @@ int VfpuImplArith( R4000Ctx* ctx, uint address, uint code )
 		/* vexp2 */ case 20:	s[ n ] = powf( 2.0f, s[ n ] );				break;
 		/* vlog2 */ case 21:	s[ n ] = log( s[ n ] ) / F_LOG_2;			break;
 		/* vsqrt */ case 22:	s[ n ] = sqrt( s[ n ] );					break;
+		/* vasin */ case 23:	s[ n ] = asin( s[ n ] ) * F_2_PI;			break;
+		/* vnrcp */ case 24:	s[ n ] = -1.0f / s[ n ];					break;
+		// 25?
+		/* vnsin */ case 26:	s[ n ] = -sin( F_PI_2 * s[ n ] );			break;
+		// 27?
+		/* vrexp2 */ case 28:	s[ n ] = 1.0f / powf( 2.0f, s[ n ] );		break;
 		default:
 			assert( false );
 			break;
@@ -762,6 +825,57 @@ int VfpuImplArith( R4000Ctx* ctx, uint address, uint code )
 	}
 	VfpuApplyPrefix( ctx, VPFXD, width, s );
 	VfpuSetVector( ctx, width, VRD( code ), s );
+	return 0;
+}
+
+int VfpuImplArith3( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float t[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRT( code ), t );
+	VfpuApplyPrefix( ctx, VPFXT, width, t );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+	{
+		switch( code >> 26 )
+		{
+		case 24: // VFPU0
+			switch( ( code >> 23 ) & 7 )
+			{
+			/* vadd  */ case 0:		d[ n ] = s[ n ] + t[ n ];		break;
+			/* vsub  */ case 1:		d[ n ] = s[ n ] - t[ n ];		break;
+			/* vdiv  */ case 7:		d[ n ] = s[ n ] / t[ n ];		break;
+			default:
+				assert( false );
+				break;
+			}
+			break;
+		case 25: // VFPU1
+			switch( ( code >> 23 ) & 7 )
+			{
+			/* vmul  */ case 0:		d[ n ] = s[ n ] * t[ n ];		break;
+			default:
+				assert( false );
+				break;
+			}
+			break;
+			/*
+		case 27: // VFPU3
+			switch ((code>>23)&7)
+			{
+			case 0: d[i] = s[i] * t[i]; break; //vmul
+			}
+			break;*/
+		default:
+			assert( false );
+			break;
+		}
+	}
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
 	return 0;
 }
 
@@ -868,6 +982,137 @@ int VfpuImplVMMOV( R4000Ctx* ctx, uint address, uint code )
 	VfpuWidth width = VWIDTH( code );
 	VfpuGetVector( ctx, width, VRS( code ), s );
 	VfpuSetVector( ctx, width, VRD( code ), s );
+	return 0;
+}
+
+int VfpuImplVCMP( R4000Ctx* ctx, uint address, uint code )
+{
+	float s[ 4 ];
+	float t[ 4 ];
+	VfpuWidth width = VWIDTH( code );
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRT( code ), t );
+	VfpuApplyPrefix( ctx, VPFXT, width, t );
+	int elements = _vfpuSizes[ width ];
+
+	int condition = code & 15;
+	int cc = 0;
+	int or = 0;
+	int and = 1;
+	for( int i = 0; i < elements; i++ )
+	{
+		int c;
+		switch( condition )
+		{
+		case VFPU_EZ: c = s[ i ] == 0.0f || s[ i ] == -0.0f; break;
+		case VFPU_LT: c = s[ i ] < t[ i ]; break;
+		case VFPU_LE: c = s[ i ] <= t[ i ]; break;
+		case VFPU_TR: c = 1; break;
+		case VFPU_FL: c = 0; break;
+		case VFPU_NE: c = s[ i ] != t[ i ]; break;
+		case VFPU_GT: c = s[ i ] > t[ i ]; break;
+		case VFPU_GE: c = s[ i ] >= t[ i ]; break;
+		case VFPU_NZ: c = s[ i ] != 0; break;
+		default:
+			assert( false );
+			break;
+		}
+		cc |= ( c << i );
+		or |= c;
+		and &= c;
+	}
+	ctx->Cp2ConditionBit = ( cc | ( or << 4 ) | ( and << 5 ) ); // > 0
+	return 0;
+}
+
+int VfpuImplVDOT( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float t[ 4 ];
+	float d = 0.0f;
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRT( code ), s );
+	VfpuApplyPrefix( ctx, VPFXT, width, t );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		d += s[ n ] + t[ n ];
+	VfpuApplyPrefix( ctx, VPFXD, VSingle, &d );
+	VfpuSetVector( ctx, VSingle, VRD( code ), &d );
+	return 0;
+}
+
+int VfpuImplVOCP( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		d[ n ] = 1.0f - s[ n ];
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVSOCP( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+	{
+		d[ n * 2 ] = 1.0f - s[ n ];
+		d[ n * 2 + 1 ] = s[ n ];
+	}
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+
+int VfpuImplVCMOV( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float t[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRD( code ), t );
+	VfpuApplyPrefix( ctx, VPFXT, width, t );
+	int tf = ( code >> 19 ) & 3;
+	int imm3 = ( code >> 16 ) & 7;
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		d[ n ] = t[ n ];
+	int cc = ctx->Cp2ConditionBit;
+	if( imm3 < 6 )
+	{
+		if( ( ( cc >> imm3 ) & 1 ) == !tf )
+		{
+			for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+				d[ n ] = s[ n ];
+		}
+	}
+	else if( imm3 == 6 )
+	{
+		for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		{
+			if( ( ( cc >> n ) & 1 ) == !tf )
+				d[ n ] = s[ n ];
+		}
+	}
+	else 
+	{
+		// bad imm3 in cmov
+		assert( false );
+	}
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
 	return 0;
 }
 
