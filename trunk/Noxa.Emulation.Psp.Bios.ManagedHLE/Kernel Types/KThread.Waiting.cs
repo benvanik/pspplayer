@@ -84,7 +84,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			State = KThreadState.Waiting;
 			this.RemoveFromSchedule();
 
-			Debug.Assert( waitTimeUs > 0 );
+			// A time of zero could be valid - that may mean just delay until the next time cycle
+			//Debug.Assert( waitTimeUs > 0 );
 
 			CanHandleCallbacks = canHandleCallbacks;
 

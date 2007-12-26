@@ -195,7 +195,7 @@ GenerationResult CFCz( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		g->mov( EAX, 0 );
+		g->mov( EAX, MCP1REG( CTX, rd, 0 ) );
 		g->mov( MREG( CTX, rt ), EAX );
 	}
 	
@@ -216,9 +216,9 @@ GenerationResult CTCz( R4000GenContext^ context, int pass, int address, uint cod
 	}
 	else if( pass == 1 )
 	{
-		//g->mov( EAX, 0 );
-		//g->mov( MREG( CTX, rt ), EAX );
+		g->mov( EAX, MCP1REG( CTX, rd, 0 ) );
+		g->mov( MREG( CTX, rt ), EAX );
 	}
 
-	return GenerationResult::Invalid;
+	return GenerationResult::Success;
 }
