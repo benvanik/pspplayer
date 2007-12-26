@@ -162,11 +162,12 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 #ifdef _DEBUG
 	if( pass == 0 )
 	{
-		Debug::WriteLine( String::Format( "[0x{0:X8}] {1:X8}\t{2} {3}", address - 4, code, gcnew String( instr->Name ), gcnew String( instr->Arguments ) ) );
 		bool hasGen = ( instr->Generate != VfpuGenDummy );
 		bool hasImpl = ( instr->Execute != VfpuImplDummy );
 		if( ( hasGen == false ) && ( hasImpl == false ) )
-			Debug::WriteLine( String::Format( "  hasGen={0}, hasImpl={1}", hasGen, hasImpl ) );
+		{
+			Debug::WriteLine( String::Format( "[0x{0:X8}] {1:X8}\t{2} {3}", address - 4, code, gcnew String( instr->Name ), gcnew String( instr->Arguments ) ) );
+		}
 	}
 #endif
 
@@ -608,7 +609,7 @@ bool VfpuGenVCST( R4000GenContext^ context, int address, uint code )
 	int elements = _vfpuSizes[ width ];
 	int constant = ( code >> 16 ) & 0x1F;
 	float* p = ( float* )vfpuConstant4x[ constant ];
-	g->mov( EAX, p );
+	g->mov( EAX, ( uint )p );
 	EmitVfpuWrite( context, width, VRD( code ), 4 );
 	return true;
 }
@@ -1113,6 +1114,23 @@ int VfpuImplVCMOV( R4000Ctx* ctx, uint address, uint code )
 	}
 	VfpuApplyPrefix( ctx, VPFXD, width, d );
 	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVH2F( R4000Ctx* ctx, uint address, uint code )
+{
+	// nvidia Half format [S:1][E:5][M:10]
+	VfpuWidth width = VWIDTH( code );
+	uint s[ 4 ];
+	uint d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), ( float* )s );
+	VfpuApplyPrefix( ctx, VPFXS, width, ( float* )s );
+	d[ 0 ] = ( ( s[ 0 ] & 0x00008000 ) << 16 ) | ( ( ( ( s[ 0 ] >> 10 ) & 0x00001F ) + 0x000070 ) << 23 ) | ( ( s[ 0 ] & 0x000003FF ) << 13 );
+	d[ 1 ] =   ( s[ 0 ] & 0x80000000 )         | ( ( ( ( s[ 0 ] >> 10 ) & 0x1F0000 ) + 0x700000 ) << 7  ) | ( ( s[ 0 ] & 0x03FF0000 ) >> 3 );
+	d[ 2 ] = ( ( s[ 1 ] & 0x00008000 ) << 16 ) | ( ( ( ( s[ 1 ] >> 10 ) & 0x00001F ) + 0x000070 ) << 23 ) | ( ( s[ 1 ] & 0x000003FF ) << 13 );
+	d[ 3 ] =   ( s[ 1 ] & 0x80000000 )         | ( ( ( ( s[ 1 ] >> 10 ) & 0x1F0000 ) + 0x700000 ) << 7  ) | ( ( s[ 1 ] & 0x03FF0000 ) >> 3 );
+	VfpuApplyPrefix( ctx, VPFXD, width, ( float* )d );
+	VfpuSetVector( ctx, width, VRD( code ), ( float* )d );
 	return 0;
 }
 
