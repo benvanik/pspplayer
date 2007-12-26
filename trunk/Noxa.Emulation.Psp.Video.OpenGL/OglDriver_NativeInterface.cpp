@@ -236,11 +236,19 @@ int niEnqueueList( void* startAddress, void* stallAddress, int callbackId, bool 
 		WaitForSingleObject( _hListSyncEvent, 1 );
 	}
 
+	assert( listId < LISTCOUNT );
 	return listId;
 }
 
 void niUpdateList( int listId, void* stallAddress )
 {
+	// If we get -1, chances are they want the last list ID
+	if( listId == -1 )
+	{
+		OutputDebugString( L"niUpdateList: called with listId -1, using last list - this may be a bug" );
+		listId = _lastListId;
+	}
+
 	assert( ( listId >= 0 ) && ( listId < LISTCOUNT ) );
 
 	LOCK;

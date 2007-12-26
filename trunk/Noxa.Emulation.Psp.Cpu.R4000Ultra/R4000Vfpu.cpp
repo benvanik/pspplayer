@@ -614,6 +614,38 @@ bool VfpuGenVCST( R4000GenContext^ context, int address, uint code )
 	return true;
 }
 
+bool VfpuGenVBTF( R4000GenContext^ context, int address, uint code )
+{
+	int target = address + ( SE( code & 0xFFFF ) << 2 );
+	int imm3 = ( code >> 18 ) & 7;
+	g->mov( EAX, MCP2CONDBIT( CTX ) );
+	g->shr( EAX, imm3 );
+	g->and( EAX, 1 );
+	// EAX = 1 if cond true, 0 if cond false
+	switch( ( code >> 16 ) & 3 )
+	{
+	/* bvf  */ case 0: g->xor( EAX, 1 ); break;
+	/* bvt  */ case 1: break;
+	}
+	return true;
+}
+
+bool VfpuGenVBTFL( R4000GenContext^ context, int address, uint code )
+{
+	int target = address + ( SE( code & 0xFFFF ) << 2 );
+	int imm3 = ( code >> 18 ) & 7;
+	g->mov( EAX, MCP2CONDBIT( CTX ) );
+	g->shr( EAX, imm3 );
+	g->and( EAX, 1 );
+	// EAX = 1 if cond true, 0 if cond false
+	switch( ( code >> 16 ) & 3 )
+	{
+	/* bvfl */ case 2: g->xor( EAX, 1 ); break;
+	/* bvtl */ case 3: break;
+	}
+	return true;
+}
+
 // ----------------------------------- BEGIN IMPL -----------------------------------------------------------
 // Everything below here is unmanaged!
 #pragma unmanaged
@@ -953,12 +985,12 @@ int VfpuImplVMMUL( R4000Ctx* ctx, uint address, uint code )
 	int n = 2;
 	switch( width )
 	{
-	//case V2x2: n = 2; break;
+	case V2x2: n = 2; break;
 	case V3x3: n = 3; break;
 	case V4x4: n = 4; break;
 	}
 
-	VfpuGetVector( ctx, width, VRS( code ), s, 4 );
+	VfpuGetVector( ctx, width, VRS( code ), s, 4 ); // 4 = n??
 	VfpuGetVector( ctx, width, VRT( code ), t, 4 );
 
 	// Matrix multiplication = MMX target
@@ -1035,7 +1067,7 @@ int VfpuImplVDOT( R4000Ctx* ctx, uint address, uint code )
 	float d = 0.0f;
 	VfpuGetVector( ctx, width, VRS( code ), s );
 	VfpuApplyPrefix( ctx, VPFXS, width, s );
-	VfpuGetVector( ctx, width, VRT( code ), s );
+	VfpuGetVector( ctx, width, VRT( code ), t );
 	VfpuApplyPrefix( ctx, VPFXT, width, t );
 	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
 		d += s[ n ] + t[ n ];
@@ -1131,6 +1163,64 @@ int VfpuImplVH2F( R4000Ctx* ctx, uint address, uint code )
 	d[ 3 ] =   ( s[ 1 ] & 0x80000000 )         | ( ( ( ( s[ 1 ] >> 10 ) & 0x1F0000 ) + 0x700000 ) << 7  ) | ( ( s[ 1 ] & 0x03FF0000 ) >> 3 );
 	VfpuApplyPrefix( ctx, VPFXD, width, ( float* )d );
 	VfpuSetVector( ctx, width, VRD( code ), ( float* )d );
+	return 0;
+}
+
+int VfpuImplVTFM( R4000Ctx* ctx, uint address, uint code )
+{
+	// Matrix-vector transform
+	// May need prefixes
+	VfpuWidth width = VWIDTH( code );
+	float md[ 16 ];
+	float t[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, VMATRIXWIDTH( width ), VRS( code ), md, 4 );
+	VfpuGetVector( ctx, width, VRT( code ), t );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+	{
+		d[ n ] = 0.0f;
+		for( int m = 0; m < _vfpuSizes[ width ]; m++ )
+			d[ n ] += md[ n * 4 + m ] * t[ m ];
+	}
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVHTFM( R4000Ctx* ctx, uint address, uint code )
+{
+	// Homogenous transform
+	// May be wrong (last /)
+	// May need prefixes
+	VfpuWidth width = VWIDTH( code );
+	float md[ 16 ];
+	float t[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, VMATRIXWIDTH( width ), VRS( code ), md, 4 );
+	VfpuGetVector( ctx, width, VRT( code ), t );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+	{
+		d[ n ] = 0.0f;
+		for( int m = 0; m < _vfpuSizes[ width ]; m++ )
+			d[ n ] += md[ n * 4 + m ] * t[ m ];
+	}
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		d[ n ] /= d[ _vfpuSizes[ width ] ];
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVDET( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float t[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRT( code ), s );
+	VfpuApplyPrefix( ctx, VPFXT, width, t );
+	float d = s[ 0 ] * t[ 1 ] - s[ 1 ] * t[ 0 ];
+	VfpuApplyPrefix( ctx, VPFXD, VSingle, &d );
+	VfpuSetVector( ctx, VSingle, VRD( code ), &d );
 	return 0;
 }
 
