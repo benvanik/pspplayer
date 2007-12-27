@@ -377,6 +377,8 @@ void R4000Memory::WriteBytes( int address, array<byte>^ bytes )
 {
 	if( bytes->Length == 0 )
 		return;
+	int rawAddress = address;
+	address &= 0x3FFFFFFF;
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
 		pin_ptr<byte> ptr = &bytes[ 0 ];
@@ -410,6 +412,8 @@ void R4000Memory::WriteStream( int address, Stream^ source, int count )
 {
 	if( count == 0 )
 		return;
+	int rawAddress = address;
+	address &= 0x3FFFFFFF;
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
 		//long pos = source.Position;
@@ -438,6 +442,8 @@ void R4000Memory::WriteStream( int address, Stream^ source, int count )
 
 uint R4000Memory::GetMemoryHash( int address, int count, uint prime )
 {
+	int rawAddress = address;
+	address &= 0x3FFFFFFF;
 	if( ( address >= MainMemoryBase ) && ( address < MainMemoryBound ) )
 	{
 		uint hash = ( uint )count;
