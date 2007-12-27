@@ -1268,4 +1268,63 @@ int VfpuImplVI2F( R4000Ctx* ctx, uint address, uint code )
 	return 0;
 }
 
+int VfpuImplVMIN( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float t[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRT( code ), t );
+	VfpuApplyPrefix( ctx, VPFXT, width, t );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		d[ n ] = min( s[ n ], t[ n ] );
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVMAX( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float t[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRT( code ), t );
+	VfpuApplyPrefix( ctx, VPFXT, width, t );
+	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+		d[ n ] = max( s[ n ], t[ n ] );
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVROT( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	int imm = ( code >> 16 ) & 0x1F;
+	float angle = ctx->Cp2Registers[ VRS( code ) ];
+	float sine = sinf( angle * F_PI_2 );
+	if( imm & 0x10 )
+		sine = -sine;
+	float cosine = cosf( angle * F_PI_2 );
+	float s[ 4 ];
+	float d[ 4 ] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	if( ( ( imm >> 2 ) & 3 ) == ( imm & 3 ) )
+	{
+		for( int n = 0; n < _vfpuSizes[ width ]; n++ )
+			d[ n ] = sine;
+	}
+	d[ ( imm >> 2 ) & 3 ] = sine;
+	d[ imm & 3 ] = cosine;
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
 #pragma managed

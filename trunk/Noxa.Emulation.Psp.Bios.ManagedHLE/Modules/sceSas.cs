@@ -101,9 +101,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int __sceSasInit()
 		{
 			for( int i = 0; i < 32; i++ )
-			{
 				voices[ i ].finished = true;
-			}
 			return coreID;
 		}
 
