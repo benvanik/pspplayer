@@ -267,7 +267,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( item == null )
 			{
 				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoGetstat: could not find path {0}", path );
-				return -1;
+				return unchecked( ( int )( uint )0x80010002 );
+				//_memory.WriteWord( stat, 4, 0777 | 0x2000 );
+				//_memory.WriteWord( stat + 4, 4, 0x0020 );
+				//_memory.WriteWord( stat + 8, 4, 0 );
+				//_memory.WriteWord( stat + 12, 4, 0 );
+				//return 0;
 			}
 
 			int mode = 0;
