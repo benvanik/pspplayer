@@ -293,7 +293,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger
 		public bool OnError( Error error )
 		{
 			this.ShowSourceView( error.PC );
-			Debugger.Break();
+			//Debugger.Break();
 
 			return true;
 		}
