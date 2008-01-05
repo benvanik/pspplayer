@@ -1327,4 +1327,38 @@ int VfpuImplVROT( R4000Ctx* ctx, uint address, uint code )
 	return 0;
 }
 
+int VfpuImplVCRSP( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float t[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRT( code ), t );
+	VfpuApplyPrefix( ctx, VPFXT, width, t );
+	switch( width )
+	{
+	case VTriple:
+		// Cross product - vcrsp.t vd, vs, vt
+		d[ 0 ] = s[ 1 ] * t[ 2 ] - s[ 2 ] * t[ 1 ];
+		d[ 1 ] = s[ 2 ] * t[ 0 ] - s[ 0 ] * t[ 2 ];
+		d[ 2 ] = s[ 0 ] * t[ 1 ] - s[ 1 ] * t[ 0 ];
+		break;
+	case VQuad:
+		// Quaternion multiply - vqmul.q vd, vs, vt
+		d[ 0 ] = s[ 3 ] * t[ 0 ] + s[ 0 ] * t[ 3 ] + s[ 1 ] * t[ 2 ] - s[ 2 ] * t[ 1 ];
+		d[ 1 ] = s[ 3 ] * t[ 1 ] + s[ 1 ] * t[ 3 ] + s[ 2 ] * t[ 0 ] - s[ 0 ] * t[ 2 ];
+		d[ 2 ] = s[ 3 ] * t[ 2 ] + s[ 2 ] * t[ 3 ] + s[ 0 ] * t[ 1 ] - s[ 1 ] * t[ 0 ];
+		d[ 3 ] = s[ 3 ] * t[ 3 ] + s[ 0 ] * t[ 0 ] + s[ 1 ] * t[ 1 ] - s[ 2 ] * t[ 2 ];
+		break;
+	default:
+		assert( false );
+		break;
+	}
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
 #pragma managed
