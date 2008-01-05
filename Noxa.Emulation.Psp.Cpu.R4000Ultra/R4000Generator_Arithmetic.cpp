@@ -1018,8 +1018,6 @@ GenerationResult BITREV( R4000GenContext^ context, int pass, int address, uint c
 	{
 		// Taken from http://graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith32Bits
 
-		g->int3();
-
 		g->mov( EAX, MREG( CTX, rt ) );
 		g->mov( ECX, EAX );
 
@@ -1059,8 +1057,6 @@ GenerationResult BITREV( R4000GenContext^ context, int pass, int address, uint c
 		g->sar( EAX, 0x10 );
 		g->shl( EDX, 0x10 );
 		g->or( EAX, EDX );
-
-		g->int3();
 
 		g->mov( MREG( CTX, rd ), EAX );
 	}

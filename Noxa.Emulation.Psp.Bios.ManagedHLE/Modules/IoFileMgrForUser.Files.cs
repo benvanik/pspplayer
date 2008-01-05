@@ -84,7 +84,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				// This is a hack for FF7 - it tries to open umd1:, but I really think it wants umd1:/
 				//return this.sceIoDopen( fileName );
 				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceIoOpen: tried to open directory {0} - redirecting to FF7 file!!!", path );
-				path = "umd1:/PSP_GAME/USRDIR/discimg.pkg";
+				//path = "umd1:/PSP_GAME/USRDIR/discimg.pkg";
 				item = _kernel.FindPath( path );
 			}
 			IMediaFile file = ( IMediaFile )item;
@@ -93,9 +93,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				// Create if needed
 				if( ( flags & 0x0200 ) != 0 )
 				{
-					string parentPath = path.Substring( 0, path.LastIndexOf( '/' ) );
-					string newName = path.Substring( path.LastIndexOf( '/' ) + 1 );
-					IMediaFolder parent = ( IMediaFolder )_kernel.FindPath( parentPath );
+					string newName;
+					IMediaFolder parent;
+					if( path.IndexOf( '/' ) >= 0 )
+					{
+						string parentPath = path.Substring( 0, path.LastIndexOf( '/' ) );
+						newName = path.Substring( path.LastIndexOf( '/' ) + 1 );
+						parent = ( IMediaFolder )_kernel.FindPath( parentPath );
+					}
+					else
+					{
+						newName = path;
+						parent = _kernel.CurrentPath;
+					}
 					if( parent == null )
 					{
 						Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find parent to create file '{0}' in on open", path );
@@ -166,7 +176,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			handle.Result = handle.UID;
 
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened file {0} with ID {1}", path, handle.UID );
-			
+
 			return ( int )handle.UID;
 		}
 
