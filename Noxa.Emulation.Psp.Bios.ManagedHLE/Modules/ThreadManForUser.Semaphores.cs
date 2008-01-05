@@ -51,6 +51,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[BiosFunction( 0x3F53E640, "sceKernelSignalSema" )]
 		// SDK location: /user/pspthreadman.h:539
 		// SDK declaration: int sceKernelSignalSema(SceUID semaid, int signal);
@@ -68,6 +69,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[BiosFunction( 0x4E3A1105, "sceKernelWaitSema" )]
 		// SDK location: /user/pspthreadman.h:555
 		// SDK declaration: int sceKernelWaitSema(SceUID semaid, int signal, SceUInt *timeout);
@@ -92,6 +94,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[BiosFunction( 0x6D212BAC, "sceKernelWaitSemaCB" )]
 		// SDK location: /user/pspthreadman.h:571
 		// SDK declaration: int sceKernelWaitSemaCB(SceUID semaid, int signal, SceUInt *timeout);
