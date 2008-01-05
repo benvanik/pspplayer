@@ -982,9 +982,8 @@ int VfpuImplVMMUL( R4000Ctx* ctx, uint address, uint code )
 	float d[ 16 ];
 
 	VfpuWidth width = VWIDTH( code );
-	int matrixWidth = VMATRIXWIDTH( code );
 	int n = 2;
-	switch( matrixWidth )
+	switch( VMATRIXWIDTH( code ) )
 	{
 	case V2x2: n = 2; break;
 	case V3x3: n = 3; break;
@@ -1394,7 +1393,7 @@ int VfpuImplVMSCL( R4000Ctx* ctx, uint address, uint code )
 	case V4x4: matrixWidth = 4; break;
 	}
 	float ms[ 16 ];
-	float st = ctx->Cp2Registers[ VRT( code ) ];;
+	float st = ctx->Cp2Registers[ VRT( code ) ];
 	float md[ 16 ];
 	VfpuGetVector( ctx, VMATRIXWIDTH( code ), VRS( code ), ms, matrixWidth );
 	for( int i = 0; i < _vfpuSizes[ width ]; i++ )
