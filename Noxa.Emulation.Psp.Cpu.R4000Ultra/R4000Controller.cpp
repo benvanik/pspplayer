@@ -280,6 +280,18 @@ int __debugHandlerM( int breakpointId )
 	return DEBUG_HANDLE_CONTINUE;
 }
 
+int ErrorDebugBreak( uint pc )
+{
+	Breakpoint^ bp = gcnew Breakpoint( Diag::Instance->Client->AllocateID(), BreakpointType::Stepping, pc );
+	bp->Enabled = true;
+	Diag::Instance->CpuHook->AddBreakpoint( bp );
+	int handleResult = __debugHandlerM( bp->ID );
+	Diag::Instance->CpuHook->RemoveBreakpoint( bp->ID );
+	// handleResult should be 0 for continue, non-zero for death?
+	assert( handleResult == 0 );
+	return handleResult;
+}
+
 #pragma unmanaged
 extern "C" void * _AddressOfReturnAddress ( void );
 extern "C" void * _ReturnAddress ( void );

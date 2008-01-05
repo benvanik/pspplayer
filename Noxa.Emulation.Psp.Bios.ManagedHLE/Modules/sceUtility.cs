@@ -335,7 +335,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					_saveStatus = UtilityStatus.Finished;
 					break;
 				case UtilityStatus.Finished:
-					//_saveStatus = MessageStatus.Closed;
+					_saveStatus = UtilityStatus.Closed;
 					break;
 				case UtilityStatus.Closed:
 					_saveStatus = UtilityStatus.None;

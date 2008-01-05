@@ -30,12 +30,18 @@ void EmitAddressTranslation( R4000Generator *gen )
 	gen->and( gen->eax, 0x3FFFFFFF );
 }
 
+// R4000Controller.cpp
+int ErrorDebugBreak( uint pc );
+
 int __readMemoryThunk( int pc, int targetAddress )
 {
 #ifdef DEBUGGING
 	R4000Ctx* ctx = _cpuCtx;
 	MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidRead, pc, targetAddress, 4 );
-	Diag::ThrowError( error );
+	if( Diag::ThrowError( error ) == true )
+	{
+		int breakResult = ErrorDebugBreak( pc );
+	}
 #endif
 	//return R4000Cpu::GlobalCpu->Memory->ReadWord( targetAddress );
 	return 0;
@@ -44,8 +50,12 @@ int __readMemoryThunk( int pc, int targetAddress )
 void __writeMemoryThunk( uint pc, uint targetAddress, int width, uint value )
 {
 #ifdef DEBUGGING
+	R4000Ctx* ctx = _cpuCtx;
 	MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidWrite, pc, targetAddress, ( byte )width, value );
-	Diag::ThrowError( error );
+	if( Diag::ThrowError( error ) == true )
+	{
+		int breakResult = ErrorDebugBreak( pc );
+	}
 #endif
 	//R4000Cpu::GlobalCpu->Memory->WriteWord( targetAddress, width, value );
 }
@@ -175,9 +185,8 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 
 	// TEST
 #if 0
-	char skipTest[20];
-	sprintf_s( skipTest, 20, "l%Xt", address - 4 );
-	g->cmp( EAX, 0x8bff28 );
+	Label blah
+	g->cmp( EAX, 0x08A43438 );
 	g->jne( skipTest );
 	g->int3();
 	g->label( skipTest );
@@ -213,7 +222,7 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 #if 0
 	Label* skipTest = g->DefineLabel();
 	Label* hitTest = g->DefineLabel();
-	g->cmp( EAX, 0x089269C4 );
+	g->cmp( EAX, 0x08A43438 );
 	g->je( hitTest );
 	/*g->cmp( EAX, 0x97BF6BD );
 	g->je( hitTest );
@@ -228,6 +237,10 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 	g->jmp( skipTest );
 	g->MarkLabel( hitTest );
 	g->int3();
+	// Just so I know what the PC is
+	g->push( EAX );
+	g->mov( EAX, ( uint )address );
+	g->pop( EAX );
 	g->MarkLabel( skipTest );
 #endif
 
