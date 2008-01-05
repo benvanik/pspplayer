@@ -115,8 +115,6 @@ void R4000Generator::Setup()
 	TableR[ 27 ] = DIVU;
 	TableR[ 28 ] = MADD;
 	TableR[ 29 ] = MADDU;
-	TableR[ 30 ] = MSUB;
-	TableR[ 31 ] = MSUBU;
 	TableR[ 32 ] = ADD;
 	TableR[ 33 ] = ADDU;
 	TableR[ 34 ] = SUB;
@@ -129,6 +127,8 @@ void R4000Generator::Setup()
 	TableR[ 43 ] = SLTU;
 	TableR[ 44 ] = MAX;
 	TableR[ 45 ] = MIN;
+	TableR[ 46 ] = MSUB;
+	TableR[ 47 ] = MSUBU;
 
 	TableR_n[ 0 ] = "SLL";
 	TableR_n[ 2 ] = "SRL";
@@ -155,8 +155,6 @@ void R4000Generator::Setup()
 	TableR_n[ 27 ] = "DIVU";
 	TableR_n[ 28 ] = "MADD";
 	TableR_n[ 29 ] = "MADDU";
-	TableR_n[ 30 ] = "MSUB";
-	TableR_n[ 31 ] = "MSUBU";
 	TableR_n[ 32 ] = "ADD";
 	TableR_n[ 33 ] = "ADDU";
 	TableR_n[ 34 ] = "SUB";
@@ -169,6 +167,8 @@ void R4000Generator::Setup()
 	TableR_n[ 43 ] = "SLTU";
 	TableR_n[ 44 ] = "MAX";
 	TableR_n[ 45 ] = "MIN";
+	TableR_n[ 46 ] = "MSUB";
+	TableR_n[ 47 ] = "MSUBU";
 
 	TableI[ 2 ] = J;
 	TableI[ 3 ] = JAL;

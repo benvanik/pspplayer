@@ -97,7 +97,7 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 					break;
 			}
 
-			Stream stream = _info.Open( fsMode, fsAccess, FileShare.Read );
+			Stream stream = _info.Open( fsMode, fsAccess, FileShare.ReadWrite );
 
 			// Hack to overcome the Win32 limitation of not being able to
 			// open a file for read/write append
@@ -263,7 +263,11 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 				return;
 
 			_parent.RemoveItemInternal( this );
-			_info.Delete();
+			try
+			{
+				_info.Delete();
+			}
+			catch { }
 		}
 
 		internal void Refresh()

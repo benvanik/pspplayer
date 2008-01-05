@@ -94,8 +94,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			WaitTimeout = waitTimeUs * 10;	// us -> ticks
 
 			uint waitTimeMs = waitTimeUs / 1000;
-			if( waitTimeMs > 1000 )
-				Debugger.Break();
+			//if( waitTimeMs > 1000 )
+			//    Debugger.Break();
 			if( waitTimeMs <= 0 )
 				waitTimeMs = 1;
 
