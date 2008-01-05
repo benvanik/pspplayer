@@ -982,16 +982,17 @@ int VfpuImplVMMUL( R4000Ctx* ctx, uint address, uint code )
 	float d[ 16 ];
 
 	VfpuWidth width = VWIDTH( code );
+	int matrixWidth = VMATRIXWIDTH( code );
 	int n = 2;
-	switch( width )
+	switch( matrixWidth )
 	{
 	case V2x2: n = 2; break;
 	case V3x3: n = 3; break;
 	case V4x4: n = 4; break;
 	}
 
-	VfpuGetVector( ctx, width, VRS( code ), s, 4 ); // 4 = n??
-	VfpuGetVector( ctx, width, VRT( code ), t, 4 );
+	VfpuGetVector( ctx, VMATRIXWIDTH( code ), VRS( code ), s, n ); // 4 = n??
+	VfpuGetVector( ctx, VMATRIXWIDTH( code ), VRT( code ), t, n );
 
 	// Matrix multiplication = MMX target
 	for( int a = 0; a < n; a++ )
@@ -1000,21 +1001,28 @@ int VfpuImplVMMUL( R4000Ctx* ctx, uint address, uint code )
 		{
 			float sum = 0;
 			for( int c = 0; c < n; c++ )
-				sum += s[ b * 4 + c ] * t[ a * 4 + c ];
-			d[ a * 4 + b ] = sum;
+				sum += s[ b * n + c ] * t[ a * n + c ];
+			d[ a * n + b ] = sum;
 		}
 	}
 
-	VfpuSetVector( ctx, width, VRD( code ), d, 4 );
+	VfpuSetVector( ctx, VMATRIXWIDTH( code ), VRD( code ), d, n );
 	return 0;
 }
 
 int VfpuImplVMMOV( R4000Ctx* ctx, uint address, uint code )
 {
 	float s[ 16 ];
-	VfpuWidth width = VWIDTH( code );
-	VfpuGetVector( ctx, width, VRS( code ), s );
-	VfpuSetVector( ctx, width, VRD( code ), s );
+	VfpuWidth matrixWidth = VMATRIXWIDTH( code );
+	int n = 2;
+	switch( matrixWidth )
+	{
+	case V2x2: n = 2; break;
+	case V3x3: n = 3; break;
+	case V4x4: n = 4; break;
+	}
+	VfpuGetVector( ctx, matrixWidth, VRS( code ), s, n );
+	VfpuSetVector( ctx, matrixWidth, VRD( code ), s, n );
 	return 0;
 }
 
@@ -1171,16 +1179,23 @@ int VfpuImplVTFM( R4000Ctx* ctx, uint address, uint code )
 	// Matrix-vector transform
 	// May need prefixes
 	VfpuWidth width = VWIDTH( code );
+	int matrixWidth = 2;
+	switch( VMATRIXWIDTH( code ) )
+	{
+	case V2x2: matrixWidth = 2; break;
+	case V3x3: matrixWidth = 3; break;
+	case V4x4: matrixWidth = 4; break;
+	}
 	float md[ 16 ];
 	float t[ 4 ];
 	float d[ 4 ];
-	VfpuGetVector( ctx, VMATRIXWIDTH( width ), VRS( code ), md, 4 );
+	VfpuGetVector( ctx, VMATRIXWIDTH( code ), VRS( code ), md, matrixWidth );
 	VfpuGetVector( ctx, width, VRT( code ), t );
 	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
 	{
 		d[ n ] = 0.0f;
 		for( int m = 0; m < _vfpuSizes[ width ]; m++ )
-			d[ n ] += md[ n * 4 + m ] * t[ m ];
+			d[ n ] += md[ n * matrixWidth + m ] * t[ m ];
 	}
 	VfpuSetVector( ctx, width, VRD( code ), d );
 	return 0;
@@ -1192,16 +1207,23 @@ int VfpuImplVHTFM( R4000Ctx* ctx, uint address, uint code )
 	// May be wrong (last /)
 	// May need prefixes
 	VfpuWidth width = VWIDTH( code );
+	int matrixWidth = 2;
+	switch( VMATRIXWIDTH( code ) )
+	{
+	case V2x2: matrixWidth = 2; break;
+	case V3x3: matrixWidth = 3; break;
+	case V4x4: matrixWidth = 4; break;
+	}
 	float md[ 16 ];
 	float t[ 4 ];
 	float d[ 4 ];
-	VfpuGetVector( ctx, VMATRIXWIDTH( width ), VRS( code ), md, 4 );
+	VfpuGetVector( ctx, VMATRIXWIDTH( code ), VRS( code ), md, matrixWidth );
 	VfpuGetVector( ctx, width, VRT( code ), t );
 	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
 	{
 		d[ n ] = 0.0f;
 		for( int m = 0; m < _vfpuSizes[ width ]; m++ )
-			d[ n ] += md[ n * 4 + m ] * t[ m ];
+			d[ n ] += md[ n * matrixWidth + m ] * t[ m ];
 	}
 	for( int n = 0; n < _vfpuSizes[ width ]; n++ )
 		d[ n ] /= d[ _vfpuSizes[ width ] ];
@@ -1358,6 +1380,29 @@ int VfpuImplVCRSP( R4000Ctx* ctx, uint address, uint code )
 	}
 	VfpuApplyPrefix( ctx, VPFXD, width, d );
 	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVMSCL( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	int matrixWidth = 2;
+	switch( VMATRIXWIDTH( code ) )
+	{
+	case V2x2: matrixWidth = 2; break;
+	case V3x3: matrixWidth = 3; break;
+	case V4x4: matrixWidth = 4; break;
+	}
+	float ms[ 16 ];
+	float st = ctx->Cp2Registers[ VRT( code ) ];;
+	float md[ 16 ];
+	VfpuGetVector( ctx, VMATRIXWIDTH( code ), VRS( code ), ms, matrixWidth );
+	for( int i = 0; i < _vfpuSizes[ width ]; i++ )
+	{
+		for( int j = 0; j <_vfpuSizes[ width ]; j++ )
+			md[ i * matrixWidth + j ] = ms[ i * matrixWidth + j ] * st; 
+	}
+	VfpuSetVector( ctx, VMATRIXWIDTH( code ), VRD( code ), md, matrixWidth );
 	return 0;
 }
 
