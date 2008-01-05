@@ -149,9 +149,9 @@ GenerationResult BCzTL( R4000GenContext^ context, int pass, int address, uint co
 
 GenerationResult MFCz( R4000GenContext^ context, int pass, int address, uint code, byte opcode, byte rs, byte rt, ushort imm )
 {
-	Debug::Assert( opcode == 1, "Only support COP1" );
-	//if( opcode != 1 )
-	//	Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "MFC{0} ${1} - only supports COP1!", opcode, rs );
+	//Debug::Assert( opcode == 1, "Only support COP1" );
+	if( opcode != 1 )
+		Log::WriteLine( Verbosity::Verbose, Feature::Cpu, "MFC{0} ${1} - only supports COP1!", opcode, rs );
 
 	if( pass == 0 )
 	{
@@ -164,7 +164,7 @@ GenerationResult MFCz( R4000GenContext^ context, int pass, int address, uint cod
 			g->mov( MREG( CTX, rt ), EAX );
 		}
 		else
-			g->mov( MREG( CTX, rt ), 0 );
+			g->mov( MREG( CTX, rt ), 0xDEADBEEF );
 	}
 	return GenerationResult::Success;
 }

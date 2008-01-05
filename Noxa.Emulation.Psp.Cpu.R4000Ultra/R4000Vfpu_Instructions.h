@@ -42,6 +42,7 @@ DEFIMPL( VfpuImplVI2F );
 DEFIMPL( VfpuImplVMIN );
 DEFIMPL( VfpuImplVMAX );
 DEFIMPL( VfpuImplVROT );
+DEFIMPL( VfpuImplVCRSP );
 
 const VfpuInstruction _vfpuInstructions[] = {
 {"bvf",			"?c,p",				0x49000000, 0xffe30000, VFPU_BRANCH,		VfpuGenVBTF,		VfpuImplDummy		},
@@ -125,7 +126,7 @@ const VfpuInstruction _vfpuInstructions[] = {
 {"vtfm4.q",		"?v3z,?s7y,?t3x",	0xf1808080, 0xff808080, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplVTFM		},
 {"vhtfm4.q",	"?v3z,?s7y,?t3x",	0xf1808000, 0xff808080, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplVHTFM		},
 {"vmscl.q",		"?x7z,?s7y,?t0x",	0xf2008080, 0xff808080, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplDummy		},
-{"vqmul.q",		"?v3z,?s3y,?t3x",	0xf2808080, 0xff808080, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplDummy		},
+{"vqmul.q",		"?v3z,?s3y,?t3x",	0xf2808080, 0xff808080, VFPU_PFX,		VfpuGenDummy,		VfpuImplVCRSP		},
 {"vmmov.q",		"?x7z,?s7y",		0xf3808080, 0xffff8080, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplVMMOV		},
 {"vmidt.q",		"?d7z",				0xf3838080, 0xffffff80, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplMatrixInit	},
 {"vmzero.q",	"?d7z",				0xf3868080, 0xffffff80, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplMatrixInit	},
@@ -192,7 +193,7 @@ const VfpuInstruction _vfpuInstructions[] = {
 {"vmzero.t",	"?d6z",				0xf3868000, 0xffffff80, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplMatrixInit	},
 {"vmone.t",		"?d6z",				0xf3878000, 0xffffff80, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplMatrixInit	},
 {"vrot.t",		"?x2z,?s0y,?w",		0xf3a08000, 0xffe08080, VFPU_PFX,		VfpuGenDummy,		VfpuImplVROT		},
-{"vcrsp.t",		"?d2z,?s2y,?t2x",	0xf2808000, 0xff808080, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplDummy		},
+{"vcrsp.t",		"?d2z,?s2y,?t2x",	0xf2808000, 0xff808080, VFPU_PFX,		VfpuGenDummy,		VfpuImplVCRSP		},
 {"vadd.p",		"?d1d,?s1s,?t1t",	0x60000080, 0xff808080, VFPU_PFX,		VfpuGenDummy,		VfpuImplArith3		},
 {"vsub.p",		"?d1d,?s1s,?t1t",	0x60800080, 0xff808080, VFPU_PFX,		VfpuGenDummy,		VfpuImplArith3		},
 {"vdiv.p",		"?x1z,?s1y,?t1x",	0x63800080, 0xff808080, VFPU_PFX,		VfpuGenDummy,		VfpuImplArith3		},
