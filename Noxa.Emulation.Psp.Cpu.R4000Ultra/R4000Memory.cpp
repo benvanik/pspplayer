@@ -206,9 +206,9 @@ int R4000Memory::ReadStream( int address, Stream^ destination, int count )
 	{
 		//long pos = destination.Position;
 		array<byte>^ buffer = gcnew array<byte>( count );
-		destination->Write( buffer, 0, count );
 		pin_ptr<byte> ptr = &buffer[ 0 ];
 		memcpy( ptr, MainMemory + ( address - MainMemoryBase ), count );
+		destination->Write( buffer, 0, count );
 		//destination.Position = pos;
 		return count;
 	}
