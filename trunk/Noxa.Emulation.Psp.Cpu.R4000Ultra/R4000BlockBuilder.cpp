@@ -92,33 +92,10 @@ void __runtimeRegsPrint()
 #endif
 
 #ifdef TRACE
-void __traceRegs()
-{
-	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
-	char buffer[ 1024 ];
-	char* p = buffer;
-	for( int n = 1; n < 32; n++ )
-		p += sprintf_s( p, 512, "%d=%08X ", n, ctx->Registers[ n ] );
-	sprintf_s( p, 512, "\r\n" );
-	Tracer::WriteLine( buffer );
-}
-
-void __traceFpuRegs()
-{
-	R4000Ctx* ctx = ( R4000Ctx* )R4000Cpu::GlobalCpu->_ctx;
-	StringBuilder^ sb = gcnew StringBuilder();
-	for( int n = 0; n < 32; n++ )
-		sb->AppendFormat( "{0}={1} ", n, ctx->Cp1Registers[ n * 4 ] );
-	sb->AppendLine();
-	String^ str = sb->ToString();
-	const char* str2 = ( char* )( void* )Marshal::StringToHGlobalAnsi( str );
-	Tracer::WriteLine( str2 );
-	Marshal::FreeHGlobal( ( IntPtr )( void* )str2 );
-}
-
 #pragma unmanaged
 static bool traceToggle = false;
 static bool traceToggle1 = false;
+byte traceBuffer[ 1024 ];
 void __traceLine( int address, int code )
 {
 #ifdef TRACEAFTER
@@ -138,17 +115,28 @@ void __traceLine( int address, int code )
 	if( traceToggle1 == false )
 		return;
 #endif
-	char buffer[ 50 ];
-	sprintf_s( buffer, 50, "[0x%08X]: %08X\r\n", address, code );
-	Tracer::WriteLine( buffer );
-	if( address == 0x08a6a8e4 )
-		__traceRegs();
+	R4000Ctx* ctx = _cpuCtx;
+	uint* p = ( uint* )traceBuffer;
+	*(p + 0) = address;
+	*(p + 1) = code;
+	*(p + 2) = ctx->NextPC;
+	*(p + 3) = ctx->InDelay;
+	*(p + 4) = ctx->NullifyDelay;
+	p += 5;
 #ifdef TRACEREGISTERS
-	__traceRegs();
+	*(p + 0) = ctx->HI;
+	*(p + 1) = ctx->LO;
+	for( int n = 0; n < 32; n++ )
+		*(p + 2 + n) = ctx->Registers[ n ];
+	p += 34;
 #endif
 #ifdef TRACEFPUREGS
-	__traceFpuRegs();
+	*(p + 0) = ctx->Cp1ConditionBit;
+	for( int n = 0; n < 32; n++ )
+		*(( float* )(p + 1 + n)) = ctx->Cp1Registers[ n * 4 ];
+	p += 33;
 #endif
+	Tracer::WriteBytes( traceBuffer, ( byte* )p - traceBuffer );
 }
 
 void __flushTrace()

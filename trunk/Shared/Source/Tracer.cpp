@@ -38,6 +38,14 @@ void Tracer::WriteLine( const char* line )
 	::WriteFile( _file, line, length, ( LPDWORD )&dummy, NULL );
 }
 
+void Tracer::WriteBytes( const byte* buffer, int length )
+{
+	if( _file == NULL )
+		return;
+	int dummy;
+	::WriteFile( _file, buffer, length, ( LPDWORD )&dummy, NULL );
+}
+
 void Tracer::Flush()
 {
 	::FlushFileBuffers( _file );
