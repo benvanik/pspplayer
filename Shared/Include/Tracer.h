@@ -23,6 +23,7 @@ namespace Noxa {
 				static void CloseFile();
 
 				static void WriteLine( const char* line );
+				static void WriteBytes( const byte* buffer, int length );
 				static void Flush();
 			};
 
