@@ -1382,6 +1382,24 @@ int VfpuImplVCRSP( R4000Ctx* ctx, uint address, uint code )
 	return 0;
 }
 
+int VfpuImplVCRS( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float t[ 4 ];
+	float d[ 4 ];
+	// No swizzles
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuGetVector( ctx, width, VRT( code ), t );
+	// Half cross product - vcrs.t vd, vs, vt
+	d[ 0 ] = s[ 1 ] * t[ 2 ];
+	d[ 1 ] = s[ 2 ] * t[ 0 ];
+	d[ 2 ] = s[ 0 ] * t[ 1 ];
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
 int VfpuImplVMSCL( R4000Ctx* ctx, uint address, uint code )
 {
 	VfpuWidth width = VWIDTH( code );
@@ -1402,6 +1420,39 @@ int VfpuImplVMSCL( R4000Ctx* ctx, uint address, uint code )
 			md[ i * matrixWidth + j ] = ms[ i * matrixWidth + j ] * st; 
 	}
 	VfpuSetVector( ctx, VMATRIXWIDTH( code ), VRD( code ), md, matrixWidth );
+	return 0;
+}
+
+int VfpuImplVBFY1( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	for( int n = 0; n < _vfpuSizes[ width ]; n += 2 )
+	{
+		d[ n + 0 ] = s[ n + 0 ] + s[ n + 1 ];
+		d[ n + 1 ] = s[ n + 0 ] - s[ n + 1 ];
+	}
+	VfpuApplyPrefix( ctx, VPFXD, width, d );
+	VfpuSetVector( ctx, width, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVBFY2( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	float s[ 4 ];
+	float d[ 4 ];
+	VfpuGetVector( ctx, VQuad, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, VQuad, s );
+	d[ 0 ] = s[ 0 ] + s[ 2 ];
+	d[ 1 ] = s[ 1 ] + s[ 3 ];
+	d[ 2 ] = s[ 0 ] - s[ 2 ];
+	d[ 3 ] = s[ 1 ] - s[ 3 ];
+	VfpuApplyPrefix( ctx, VPFXD, VQuad, d );
+	VfpuSetVector( ctx, VQuad, VRD( code ), d );
 	return 0;
 }
 
