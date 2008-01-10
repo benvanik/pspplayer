@@ -317,8 +317,8 @@ const VfpuInstruction _vfpuInstructions[] = {
 {"vfim.s",		"?t0d,?u",			0xdf800000, 0xff800000, VFPU_PFX,		VfpuGenVFIM,		VfpuImplDummy		},
 {"vnop",		"",					0xffff0000, 0xffffffff, VFPU_NORMAL,	VfpuGenNop,			VfpuImplDummy		},
 {"vflush",		"",					0xffff040d, 0xffffffff, VFPU_NORMAL,	VfpuGenNop,			VfpuImplDummy		},
-{"vsync",		"",					0xffff0320, 0xffffffff, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplDummy		},
-{"vsync",		"i",				0xffff0000, 0xffff0000, VFPU_NORMAL,	VfpuGenDummy,		VfpuImplDummy		},
+{"vsync",		"",					0xffff0320, 0xffffffff, VFPU_NORMAL,	VfpuGenNop,			VfpuImplDummy		},
+{"vsync",		"i",				0xffff0000, 0xffff0000, VFPU_NORMAL,	VfpuGenNop,			VfpuImplDummy		},
 };
 
 const int _vfpuNumInstructions = sizeof( _vfpuInstructions ) / sizeof( VfpuInstruction );
