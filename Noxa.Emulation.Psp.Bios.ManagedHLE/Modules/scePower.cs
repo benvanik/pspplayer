@@ -108,12 +108,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int scePowerGetBatteryChargingStatus();
 		public int scePowerGetBatteryChargingStatus(){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xD3075926, "scePowerIsLowBattery" )]
 		// SDK location: /power/psppower.h:86
 		// SDK declaration: int scePowerIsLowBattery();
-		public int scePowerIsLowBattery(){ return Module.NotImplementedReturn; }
+		public int scePowerIsLowBattery()
+		{
+			return 0;
+		}
 
 		[Stateless]
 		[BiosFunction( 0x2085D15D, "scePowerGetBatteryLifePercent" )]
