@@ -1442,7 +1442,6 @@ int VfpuImplVBFY1( R4000Ctx* ctx, uint address, uint code )
 
 int VfpuImplVBFY2( R4000Ctx* ctx, uint address, uint code )
 {
-	VfpuWidth width = VWIDTH( code );
 	float s[ 4 ];
 	float d[ 4 ];
 	VfpuGetVector( ctx, VQuad, VRS( code ), s );
@@ -1453,6 +1452,42 @@ int VfpuImplVBFY2( R4000Ctx* ctx, uint address, uint code )
 	d[ 3 ] = s[ 1 ] - s[ 3 ];
 	VfpuApplyPrefix( ctx, VPFXD, VQuad, d );
 	VfpuSetVector( ctx, VQuad, VRD( code ), d );
+	return 0;
+}
+
+int VfpuImplVI2X( R4000Ctx* ctx, uint address, uint code )
+{
+	VfpuWidth width = VWIDTH( code );
+	VfpuWidth outWidth = width;
+	float s[ 4 ];
+	uint d[ 4 ];
+	// TODO: and the mask to kill everything but swizzle
+	VfpuGetVector( ctx, width, VRS( code ), s );
+	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	switch( ( code >> 16 ) & 3 )
+	{
+	case 0: // vi2uc.q
+		for( int n = 0; n < 4; n++ )
+		{
+			int v = s[ n ];
+			if( v < 0 ) v = 0;
+			v >>= 23;
+			d[ 0 ] |= ( ( uint )v & 0xFF ) << ( n * 8 );
+		}
+		outWidth = VSingle;
+		break;
+	case 1: // vi2c
+		//break;
+	case 2:  // vi2us
+		//break;
+	case 3:  // vi2s
+		//break;
+	default:
+		assert( false );
+		break;
+	}
+	VfpuApplyPrefix( ctx, VPFXD, outWidth, ( float* )d );
+	VfpuSetVector( ctx, outWidth, VRD( code ), ( float* )d );
 	return 0;
 }
 
