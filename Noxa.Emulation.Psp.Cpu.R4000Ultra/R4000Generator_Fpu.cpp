@@ -545,19 +545,19 @@ GenerationResult FCOMPARE( R4000GenContext^ context, int pass, int address, uint
 		}
 		else if( ( lessBit == true ) && ( equalBit == true ) )
 		{
-			Debug::Assert( unorderedBit == false );
+			//Debug::Assert( unorderedBit == false );
 			g->cmpless( XMM0, MCP1REG( CTX, ft, fmt ) );
 			// XMM0 = FFFFFFFF if <=, else 0
 		}
 		else if( lessBit == true )
 		{
-			Debug::Assert( unorderedBit == false );
+			//Debug::Assert( unorderedBit == false );
 			g->cmpltss( XMM0, MCP1REG( CTX, ft, fmt ) );
 			// XMM0 = FFFFFFFF if <, else 0
 		}
 		else if( equalBit == true )
 		{
-			Debug::Assert( unorderedBit == false );
+			//Debug::Assert( unorderedBit == false );
 			g->cmpeqss( XMM0, MCP1REG( CTX, ft, fmt ) );
 			// XMM0 = FFFFFFFF if ==, else 0
 		}
