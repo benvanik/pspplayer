@@ -142,6 +142,23 @@ int VfpuImplDummy( R4000Ctx* ctx, uint address, uint code );
 // Contains _vfpuInstructions table, with _vfpuNumInstructions entries
 #include "R4000Vfpu_Instructions.h"
 
+#pragma unmanaged
+#define ASSERTVFPUSTATE
+#define STOPONVFPUADDR 0x08019f8c
+void AssertVfpuState( R4000Ctx* ctx, uint address, uint preOrPost )
+{
+	for( int n = 0; n < 128; n++ )
+	{
+		float v = ctx->Cp2Registers[ n ];
+		if( ( v > 0.0f ) && ( v < 0.000000001f ) )
+		{
+			// Bad
+			int x = 99;
+		}
+	}
+}
+#pragma managed
+
 GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ context, int pass, int address, uint code )
 {
 	// Look up instruction - slowly
@@ -168,6 +185,12 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 		{
 			Debug::WriteLine( String::Format( "[0x{0:X8}] {1:X8}\t{2} {3}", address - 4, code, gcnew String( instr->Name ), gcnew String( instr->Arguments ) ) );
 		}
+#ifdef STOPONVFPUADDR
+		if( address == STOPONVFPUADDR )
+		{
+			Debug::WriteLine( String::Format( "[0x{0:X8}] {1:X8}\t{2} {3} - STOPPED", address - 4, code, gcnew String( instr->Name ), gcnew String( instr->Arguments ) ) );
+		}
+#endif
 	}
 #endif
 
@@ -197,7 +220,12 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 			context->BranchTarget = targetLabel;
 		}
 
-		//g->int3();
+#ifdef ASSERTVFPUSTATE
+		g->push( ( uint )0 );
+		g->push( ( uint )address );
+		g->push( ( uint )CTX );
+		g->call( ( uint )AssertVfpuState );
+#endif
 
 		if( instr->Generate != VfpuGenDummy )
 		{
@@ -213,6 +241,13 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 			g->call( ( uint )instr->Execute );
 			g->add( ESP, 12 );
 		}
+
+#ifdef ASSERTVFPUSTATE
+		g->push( ( uint )1 );
+		g->push( ( uint )address );
+		g->push( ( uint )CTX );
+		g->call( ( uint )AssertVfpuState );
+#endif
 
 		// Clear state
 		if( ( instr->Attributes & VFPU_PFX ) == VFPU_PFX )
