@@ -96,6 +96,7 @@ void __runtimeRegsPrint()
 static bool traceToggle = false;
 static bool traceToggle1 = false;
 byte traceBuffer[ 1024 ];
+extern int _currentTcsId;
 void __traceLine( int address, int code )
 {
 #ifdef TRACEAFTER
@@ -117,12 +118,13 @@ void __traceLine( int address, int code )
 #endif
 	R4000Ctx* ctx = _cpuCtx;
 	uint* p = ( uint* )traceBuffer;
-	*(p + 0) = address;
-	*(p + 1) = code;
-	*(p + 2) = ctx->NextPC;
-	*(p + 3) = ctx->InDelay;
-	*(p + 4) = ctx->NullifyDelay;
-	p += 5;
+	*(p + 0) = _currentTcsId;
+	*(p + 1) = address;
+	*(p + 2) = code;
+	*(p + 3) = ctx->NextPC;
+	*(p + 4) = ctx->InDelay;
+	*(p + 5) = ctx->NullifyDelay;
+	p += 6;
 #ifdef TRACEREGISTERS
 	*(p + 0) = ctx->HI;
 	*(p + 1) = ctx->LO;
@@ -135,6 +137,16 @@ void __traceLine( int address, int code )
 	for( int n = 0; n < 32; n++ )
 		*(( float* )(p + 1 + n)) = ctx->Cp1Registers[ n * 4 ];
 	p += 33;
+#endif
+#ifdef TRACEVFPUREGS
+	*(p + 0) = ctx->Cp2ConditionBit;
+	*(p + 1) = ctx->Cp2Wm;
+	*(p + 2) = ctx->Cp2Pfx[ 0 ];
+	*(p + 3) = ctx->Cp2Pfx[ 1 ];
+	*(p + 4) = ctx->Cp2Pfx[ 2 ];
+	for( int n = 0; n < 128; n++ )
+		*(( float* )(p + 5 + n)) = ctx->Cp2Registers[ n ];
+	p += 128 + 5;
 #endif
 	Tracer::WriteBytes( traceBuffer, ( byte* )p - traceBuffer );
 }
