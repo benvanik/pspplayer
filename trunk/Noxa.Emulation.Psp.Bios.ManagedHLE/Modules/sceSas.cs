@@ -61,7 +61,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		private const int coreID = 0x12345678;
+		private const int CoreID = 0x00000000;
 
 		private struct Voice
 		{
@@ -102,7 +102,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			for( int i = 0; i < 32; i++ )
 				voices[ i ].finished = true;
-			return coreID;
+			return CoreID;
 		}
 
 		//This one does the mixing - it outputs 256 stereo samples (1024 bytes)
