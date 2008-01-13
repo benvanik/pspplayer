@@ -225,6 +225,7 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 		g->push( ( uint )address );
 		g->push( ( uint )CTX );
 		g->call( ( uint )AssertVfpuState );
+		g->add( ESP, 12 );
 #endif
 
 		if( instr->Generate != VfpuGenDummy )
@@ -247,6 +248,7 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 		g->push( ( uint )address );
 		g->push( ( uint )CTX );
 		g->call( ( uint )AssertVfpuState );
+		g->add( ESP, 12 );
 #endif
 
 		// Clear state

@@ -198,7 +198,7 @@ namespace Noxa.Emulation.Psp.Player
 							break;
 						case ComponentType.Other:
 						default:
-							Log.WriteLine( Verbosity.Critical, Feature.General, "CreateInstance: unknown component type for {0} in {1}", componentName, componentPath );
+							//Log.WriteLine( Verbosity.Critical, Feature.General, "CreateInstance: unknown component type for {0} in {1}", componentName, componentPath );
 							continue;
 					}
 

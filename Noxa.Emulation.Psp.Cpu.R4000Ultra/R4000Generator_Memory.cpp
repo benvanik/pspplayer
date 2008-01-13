@@ -123,7 +123,7 @@ void EmitAddressLookup( R4000GenContext^ context, int address )
 #endif
 	g->mov( EBX, (int)&__readMemoryThunk );
 	g->call( EBX );
-	g->add( ESP, 4 );
+	g->add( ESP, 8 );
 	g->mov( EAX, 0 );
 
 	// done
@@ -199,7 +199,7 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 #endif
 	g->mov( EBX, (int)&__readMemoryThunk );
 	g->call( EBX );
-	g->add( ESP, 4 );
+	g->add( ESP, 8 );
 
 	// done
 	g->MarkLabel( l4 );
@@ -325,7 +325,7 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 		break;
 	}
 	g->push( EBX );
-	g->push( (uint)width );
+	g->push( ( uint )width );
 	g->push( EAX );
 	g->push( ( uint )( address - 4 ) );
 #ifdef BREAKONINVALIDACCESS
@@ -333,7 +333,7 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 #endif
 	g->mov( EBX, (int)&__writeMemoryThunk );
 	g->call( EBX );
-	g->add( ESP, 12 );
+	g->add( ESP, 16 );
 
 	// done
 	g->MarkLabel( l4 );
