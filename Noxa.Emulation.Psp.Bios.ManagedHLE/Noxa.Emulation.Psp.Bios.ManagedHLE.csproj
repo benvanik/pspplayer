@@ -88,6 +88,7 @@
     <Compile Include="Modules\sceGe_user.cs" />
     <Compile Include="Modules\sceHprm.cs" />
     <Compile Include="Modules\sceImpose.cs" />
+    <Compile Include="Modules\sceMpeg.cs" />
     <Compile Include="Modules\sceNet.cs" />
     <Compile Include="Modules\sceNetApctl.cs" />
     <Compile Include="Modules\sceNetInet.cs" />
