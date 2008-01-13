@@ -144,7 +144,7 @@ int VfpuImplDummy( R4000Ctx* ctx, uint address, uint code );
 
 #pragma unmanaged
 #define ASSERTVFPUSTATE
-#define STOPONVFPUADDR 0x08019f8c
+#define STOPONVFPUADDR 0x0809da44
 void AssertVfpuState( R4000Ctx* ctx, uint address, uint preOrPost )
 {
 	for( int n = 0; n < 128; n++ )
@@ -190,6 +190,13 @@ GenerationResult Noxa::Emulation::Psp::Cpu::TryEmitVfpu( R4000GenContext^ contex
 		{
 			Debug::WriteLine( String::Format( "[0x{0:X8}] {1:X8}\t{2} {3} - STOPPED", address - 4, code, gcnew String( instr->Name ), gcnew String( instr->Arguments ) ) );
 		}
+#endif
+	}
+	else if( pass == 1 )
+	{
+#ifdef STOPONVFPUADDR
+		if( address == STOPONVFPUADDR )
+			g->int3();
 #endif
 	}
 #endif
@@ -472,7 +479,7 @@ void EmitVfpuWrite( R4000GenContext^ context, VfpuWidth dataWidth, int reg, int 
 bool VfpuGenLVS( R4000GenContext^ context, int address, uint code )
 {
 	g->mov( EAX, MREG( CTX, RS( code ) ) );
-	int imm = ( int )( ( short )( code & 0x0000FFFF ) );
+	int imm = ( int )( ( short )( code & 0x0000FFFC ) );
 	if( imm != 0 )
 		g->add( EAX, imm );
 	EmitAddressLookup( context, address );
@@ -488,7 +495,7 @@ bool VfpuGenLVS( R4000GenContext^ context, int address, uint code )
 bool VfpuGenLVQ( R4000GenContext^ context, int address, uint code )
 {
 	g->mov( EAX, MREG( CTX, RS( code ) ) );
-	int imm = ( int )( ( short )( code & 0x0000FFFF ) );
+	int imm = ( int )( ( short )( code & 0x0000FFFC ) );
 	if( imm != 0 )
 		g->add( EAX, imm );
 	EmitAddressLookup( context, address );
@@ -504,7 +511,7 @@ bool VfpuGenLVQ( R4000GenContext^ context, int address, uint code )
 bool VfpuGenSVS( R4000GenContext^ context, int address, uint code )
 {
 	g->mov( EAX, MREG( CTX, RS( code ) ) );
-	int imm = ( int )( ( short )( code & 0x0000FFFF ) );
+	int imm = ( int )( ( short )( code & 0x0000FFFC ) );
 	if( imm != 0 )
 		g->add( EAX, imm );
 	EmitAddressLookup( context, address );
@@ -520,7 +527,7 @@ bool VfpuGenSVS( R4000GenContext^ context, int address, uint code )
 bool VfpuGenSVQ( R4000GenContext^ context, int address, uint code )
 {
 	g->mov( EAX, MREG( CTX, RS( code ) ) );
-	int imm = ( int )( ( short )( code & 0x0000FFFF ) );
+	int imm = ( int )( ( short )( code & 0x0000FFFC ) );
 	if( imm != 0 )
 		g->add( EAX, imm );
 	EmitAddressLookup( context, address );
