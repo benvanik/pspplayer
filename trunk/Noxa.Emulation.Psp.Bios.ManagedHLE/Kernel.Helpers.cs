@@ -36,9 +36,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public KDevice FindDevice( IMediaDevice device )
 		{
-            foreach (KDevice Device in Devices)
-                if (Device.Device == device)
-                       return Device;
+			foreach( KDevice Device in Devices )
+				if( Device.Device == device )
+					return Device;
 			return null;
 		}
 
@@ -66,31 +66,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					{
 						Debug.Assert( device is IUmdDevice );
 						IUmdDevice umd = ( IUmdDevice )device;
-						
+
 						// Lookup LBN/etc
 						//0x0_size0xbb141
-						path = path.Substring(7);
+						path = path.Substring( 7 );
 						int sep = path.LastIndexOf( '_' );
 						string slbn = path.Substring( 0, sep );
 						string ssize = path.Substring( sep + 5 );
 						long lbn;
 						long size;
-						if (slbn.StartsWith("0x"))
-						{
-							lbn = long.Parse( slbn, NumberStyles.AllowHexSpecifier );
-						}
+						if( slbn.StartsWith( "0x" ) )
+							lbn = long.Parse( slbn.Substring( 2 ), NumberStyles.HexNumber );
 						else
-						{
 							lbn = long.Parse( slbn );
-						}
-						if (ssize.StartsWith("0x"))
-						{
-                            size = long.Parse(ssize, NumberStyles.AllowHexSpecifier);
-						}
+						if( ssize.StartsWith( "0x" ) )
+							size = long.Parse( ssize.Substring( 2 ), NumberStyles.HexNumber );
 						else
-						{
 							size = long.Parse( ssize );
-						}
 						return umd.Lookup( lbn, size );
 					}
 					else
