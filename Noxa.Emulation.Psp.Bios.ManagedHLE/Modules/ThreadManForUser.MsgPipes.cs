@@ -26,21 +26,21 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: SceUID sceKernelCreateMsgPipe(const char *name, int part, int attr, void *unk1, void *opt);
 		public int sceKernelCreateMsgPipe( int _name, int part, int attr, int unk1, int opt )
 		{
-            string name = _kernel.ReadString((uint)_name);
+			string name = _kernel.ReadString( ( uint )_name );
 
-            KPartition partition = _kernel.Partitions[part];
-            Debug.Assert(partition != null);
-            if (partition == null)
-            {
-                return -1;
-            }
-            
-            KPipe handle = new KPipe(_kernel, partition, name);
-            _kernel.AddHandle(handle);
+			KPartition partition = _kernel.Partitions[ part ];
+			Debug.Assert( partition != null );
+			if( partition == null )
+			{
+				return -1;
+			}
 
-            Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceKernelCreateMsgPipe: opened pipe {0} with ID {1}, for partition {2}", name, handle.UID, part);
+			KPipe handle = new KPipe( _kernel, partition, name );
+			_kernel.AddHandle( handle );
 
-            return (int)handle.UID;
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelCreateMsgPipe: opened pipe {0} with ID {1}, for partition {2}", name, handle.UID, part );
+
+			return ( int )handle.UID;
 		}
 
 		[NotImplemented]
@@ -79,22 +79,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelTrySendMsgPipe(SceUID uid, void *message, unsigned int size, int unk1, void *unk2);
 		public int sceKernelTrySendMsgPipe( int uid, int message, int size, int unk1, int unk2 )
 		{
-            KPipe handle = _kernel.GetHandle<KPipe>(uid);
-            if (handle == null)
-            {
-                Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: kernel pipe handle not found: {0}", uid);
-                return -1;
-            }
-            
-            if (_memory.ReadStream(message, handle.Stream, size) != size)
-            {
-                Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: could not read enough for {0}", uid);
-                return -1;
-            }
+			KPipe handle = _kernel.GetHandle<KPipe>( uid );
+			if( handle == null )
+			{
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: kernel pipe handle not found: {0}", uid );
+				return -1;
+			}
 
-            Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: {0} {1:X8} {2} {3:X8} {4:X8}", uid, message, size, unk1, unk2);
-            //handle.Stream.Seek(0, SeekOrigin.Begin);
-            return 0;
+			if( _memory.ReadStream( message, handle.Stream, size ) != size )
+			{
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: could not read enough for {0}", uid );
+				return -1;
+			}
+
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: {0} {1:X8} {2} {3:X8} {4:X8}", uid, message, size, unk1, unk2 );
+			//handle.Stream.Seek(0, SeekOrigin.Begin);
+			return 0;
 		}
 
 		[Stateless]
@@ -103,24 +103,24 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelReceiveMsgPipe(SceUID uid, void *message, unsigned int size, int unk1, void *unk2, unsigned int *timeout);
 		public int sceKernelReceiveMsgPipe( int uid, int message, int size, int unk1, int unk2, int timeout )
 		{
-            KPipe handle = _kernel.GetHandle<KPipe>(uid);
-            if (handle == null)
-            {
-                Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceKernelReceiveMsgPipe: kernel pipe handle not found: {0}", uid);
-                return -1;
-            }
+			KPipe handle = _kernel.GetHandle<KPipe>( uid );
+			if( handle == null )
+			{
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelReceiveMsgPipe: kernel pipe handle not found: {0}", uid );
+				return -1;
+			}
 
-            Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceKernelReceiveMsgPipe: {0} {1:X8} {2} {3:X8} {4:X8} {5}", uid, message, size, unk1, unk2, timeout);
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelReceiveMsgPipe: {0} {1:X8} {2} {3:X8} {4:X8} {5}", uid, message, size, unk1, unk2, timeout );
 
-            if (handle.Stream.Length < size)
-            {
-                return -1;
-            }
-            
-            handle.Stream.Seek(0, SeekOrigin.Begin);
-            _memory.WriteStream(message, handle.Stream, size);
-            handle.Stream.SetLength(0);
-            return 0;
+			if( handle.Stream.Length < size )
+			{
+				return -1;
+			}
+
+			handle.Stream.Seek( 0, SeekOrigin.Begin );
+			_memory.WriteStream( message, handle.Stream, size );
+			handle.Stream.SetLength( 0 );
+			return 0;
 		}
 
 		[NotImplemented]
