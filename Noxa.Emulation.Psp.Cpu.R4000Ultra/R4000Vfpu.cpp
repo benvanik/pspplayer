@@ -144,7 +144,7 @@ int VfpuImplDummy( R4000Ctx* ctx, uint address, uint code );
 
 #pragma unmanaged
 #define ASSERTVFPUSTATE
-#define STOPONVFPUADDR 0x0809da44
+//#define STOPONVFPUADDR 0x0809da44
 void AssertVfpuState( R4000Ctx* ctx, uint address, uint preOrPost )
 {
 	for( int n = 0; n < 128; n++ )

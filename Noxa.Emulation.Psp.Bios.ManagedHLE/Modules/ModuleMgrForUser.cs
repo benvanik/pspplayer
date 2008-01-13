@@ -50,7 +50,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		#endregion
 
 		public const int FakeModuleUID = 3;
-		public const int ModuleAlreadyLoaded = unchecked( ( int )0x8002013B );
+		public const int ModuleAlreadyLoaded = unchecked( ( int )0x80020139 );
 
 		#region Module Loading
 
