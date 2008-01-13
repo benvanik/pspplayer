@@ -75,7 +75,9 @@ int main( int argc, char *argv[] )
 	//fprintf( stdout, "%d %d %d %d %d\n", buf[ 0 ], buf[ 1 ], buf[ 2 ], buf[ 3 ], buf[ 4 ] );
 	// 124958 42083 41968 512 64
 
-
+	SceIoStat s;
+	unsigned int ret = sceIoGetstat( "ms0:/foo.txt", &s );
+	pspDebugScreenPrintf( "ret: %X", ret );
 
 	//sceKernelSleepThreadCB();
 	for( ;; );

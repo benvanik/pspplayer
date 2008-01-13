@@ -145,7 +145,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					//return unchecked( ( int )0x80020325 );
 					break;
 				default:
-					return -1;
+					return 0;
 			}
 
 			return 0;

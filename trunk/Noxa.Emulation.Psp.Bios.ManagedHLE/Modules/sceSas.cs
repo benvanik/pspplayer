@@ -122,8 +122,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 #if !USE
 		[NotImplemented]
-		[DontTrace]
 #endif
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x68a46b95, "__sceSasGetEndFlag" )]
 		public int __sceSasGetEndFlag( int sasCore )
@@ -175,6 +175,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x99944089, "__sceSasSetVoice" )]
 		public int __sceSasSetVoice( int sasCore, int num, int vagPtr, int size, int loopmode )
 		{
+			// I get a lot of errors here - lots of overruns in unpackedData
+			return 0;
+
 			//Real VAG header is 0x30 bytes behind the vagAddr
 			//The existance of this header can probably not be relied on 
 			//since FMOD docs http://www.fmod.org/docs/tutorials/psp.htm 
