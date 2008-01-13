@@ -324,10 +324,11 @@ namespace Noxa.Emulation.Psp.Media.Iso
 									if( ( ne.Flags & NativeEntryFlags.Hidden ) == NativeEntryFlags.Hidden )
 										attributes |= MediaItemAttributes.Hidden;
 
-									long lbn = ne.FirstSector * 2048;
+									long lbn = ne.FirstSector/* * 2048*/;
 
-									MediaFile file = new MediaFile( this, current, ne.Name, attributes, ne.Timestamp, lbn, ne.Length );
+									MediaFile file = new MediaFile( this, current, ne.Name, attributes, ne.Timestamp, lbn * 2048, ne.Length );
 
+                                    //Log.WriteLine(Verbosity.Normal, Feature.Bios, "{0} = {1}", ne.Name, lbn);
 									// Pretty sure this is wrong, but it shouldn't matter
 									Debug.Assert( _lbnLookup.ContainsKey( lbn ) == false );
 									_lbnLookup[ lbn ] = file;
