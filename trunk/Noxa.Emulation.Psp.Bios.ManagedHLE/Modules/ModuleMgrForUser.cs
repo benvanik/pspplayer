@@ -49,16 +49,42 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		public const int FakeModuleUID = unchecked( ( int )0x80020139 );
+		public const int FakeModuleUID = 3;
+		public const int ModuleAlreadyLoaded = unchecked( ( int )0x8002013B );
 
 		#region Module Loading
+
+		/// <summary>
+		/// List of module prxs to blacklist.
+		/// </summary>
+		private static readonly string[] _moduleBlacklist = new string[]
+		{
+			"libatrac3plus.prx",
+			"sc_sascore.prx",
+			"audiocodec.prx",
+			"videocodec.prx",
+			"mpegbase.prx",
+			"mpeg.prx",
+		};
 
 		private int LoadModule( IMediaFile file, Stream stream, int flags, int option )
 		{
 			// Load!
 			LoadParameters loadParams = new LoadParameters();
 			if( file != null )
+			{
 				loadParams.Path = file.Parent;
+				string fileName = file.Name.ToLowerInvariant();
+				foreach( string blacklisted in _moduleBlacklist )
+				{
+					if( fileName == blacklisted )
+					{
+						// Module is blacklisted - ignore
+						Log.WriteLine( Verbosity.Normal, Feature.Bios, "LoadModule: module is blacklisted, ignoring" );
+						return FakeModuleUID;
+					}
+				}
+			}
 #if DEBUG
 			loadParams.AppendDatabase = true;
 #endif
