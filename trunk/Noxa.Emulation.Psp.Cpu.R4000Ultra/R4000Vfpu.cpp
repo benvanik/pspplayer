@@ -143,7 +143,7 @@ int VfpuImplDummy( R4000Ctx* ctx, uint address, uint code );
 #include "R4000Vfpu_Instructions.h"
 
 #pragma unmanaged
-#define ASSERTVFPUSTATE
+//#define ASSERTVFPUSTATE
 //#define STOPONVFPUADDR 0x0809da44
 void AssertVfpuState( R4000Ctx* ctx, uint address, uint preOrPost )
 {
