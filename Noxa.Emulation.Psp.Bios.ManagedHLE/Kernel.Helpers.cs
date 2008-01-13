@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 
 using Noxa.Emulation.Psp;
@@ -60,19 +61,36 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				IMediaDevice device = kdevice.Device;
 				if( device.State == MediaState.Present )
 				{
-					path = path.Substring( colonPos + 1 );
+					path = path.Substring( colonPos + 2 );
 					if( path.StartsWith( "sce_lbn" ) == true )
 					{
 						Debug.Assert( device is IUmdDevice );
 						IUmdDevice umd = ( IUmdDevice )device;
-
+						
 						// Lookup LBN/etc
 						//0x0_size0xbb141
+						path = path.Substring(7);
 						int sep = path.LastIndexOf( '_' );
-						string slbn = path.Substring( 7, path.Length - sep - 7 );
-						string ssize = path.Substring( sep + 4 );
-						long lbn = long.Parse( slbn );
-						long size = long.Parse( ssize );
+						string slbn = path.Substring( 0, sep );
+						string ssize = path.Substring( sep + 5 );
+						long lbn;
+						long size;
+						if (slbn.StartsWith("0x"))
+						{
+							lbn = long.Parse( slbn, NumberStyles.AllowHexSpecifier );
+						}
+						else
+						{
+							lbn = long.Parse( slbn );
+						}
+						if (ssize.StartsWith("0x"))
+						{
+                            size = long.Parse(ssize, NumberStyles.AllowHexSpecifier);
+						}
+						else
+						{
+							size = long.Parse( ssize );
+						}
 						return umd.Lookup( lbn, size );
 					}
 					else
