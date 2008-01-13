@@ -1496,11 +1496,11 @@ int VfpuImplVI2X( R4000Ctx* ctx, uint address, uint code )
 {
 	VfpuWidth width = VWIDTH( code );
 	VfpuWidth outWidth = width;
-	float s[ 4 ];
+	int s[ 4 ];
 	uint d[ 4 ];
 	// TODO: and the mask to kill everything but swizzle
-	VfpuGetVector( ctx, width, VRS( code ), s );
-	VfpuApplyPrefix( ctx, VPFXS, width, s );
+	VfpuGetVector( ctx, width, VRS( code ), ( float* )s );
+	VfpuApplyPrefix( ctx, VPFXS, width, ( float* )s );
 	switch( ( code >> 16 ) & 3 )
 	{
 	case 0: // vi2uc.q

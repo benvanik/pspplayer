@@ -298,7 +298,11 @@ void niSyncList( int listId, VideoSyncType syncType )
 {
 	assert( ( listId >= 0 ) && ( listId < LISTCOUNT ) );
 	DisplayList* list = &_lists[ listId ];
-	assert( list->ID >= 0 );
+	if( ( list->ID < 0 ) || ( list->ID > LISTCOUNT ) )
+	{
+		// Probably finished already
+		return;
+	}
 
 	//return;
 

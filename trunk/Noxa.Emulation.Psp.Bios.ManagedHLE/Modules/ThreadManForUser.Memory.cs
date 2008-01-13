@@ -220,9 +220,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				( uint )attr, ( uint )size, blocks );
 			if( pool.AllocateFplBlocks() == false )
 			{
-				Debug.Assert( false );
 				pool.Dispose();
-				//0x800200E0
+				//return unchecked( ( int )0x800200E0 );
+				//return unchecked( ( int )0x800200D9 );
 				return -1;
 			}
 			_kernel.AddHandle( pool );
