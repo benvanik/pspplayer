@@ -159,14 +159,32 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_kernel.IssueCallback( cb, ( uint )1 );
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x08BD7374, "sceIoGetDevType" )]
 		// SDK location: /user/pspiofilemgr.h:448
 		// SDK declaration: int sceIoGetDevType(SceUID fd);
 		public int sceIoGetDevType( int fd )
 		{
-			return Module.NotImplementedReturn;
+			KFile handle = _kernel.GetHandle<KFile>( fd );
+			if( handle == null )
+			{
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoGetDevType: kernel handle {0} not found", fd );
+				return -1;
+			}
+
+			if( handle.Device != null )
+			{
+				switch( handle.Device.Device.MediaType )
+				{
+					default:
+					case MediaType.Umd:
+						return 4;
+					case MediaType.MemoryStick:
+						return 16;
+				}
+			}
+			else
+				return 4;
 		}
 
 		[NotImplemented]

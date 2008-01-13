@@ -6,6 +6,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Noxa.Emulation.Psp.Media
@@ -56,6 +57,12 @@ namespace Noxa.Emulation.Psp.Media
 		/// <param name="minimalCache"><c>true</c> to only cache PSP_GAME and SYSDIR.</param>
 		/// <returns><c>true</c> if the load was successful; otherwise <c>false</c>.</returns>
 		bool Load( string path, bool minimalCache );
+
+		/// <summary>
+		/// Open a stream to access the UMD image in block mode.
+		/// </summary>
+		/// <returns>The UMD image stream.</returns>
+		Stream OpenImageStream();
 
 		/// <summary>
 		/// Lookup a file by LBN.

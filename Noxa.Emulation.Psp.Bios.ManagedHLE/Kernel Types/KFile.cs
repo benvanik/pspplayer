@@ -28,6 +28,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public KDevice Device;
 		public IMediaItem Item;
 
+		public bool IsBlockAccess;
 		public int FolderOffset;
 		public Stream Stream;
 
