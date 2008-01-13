@@ -354,6 +354,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			//this.sceUtilitySavedataUpdate( 2 );
 
+			if( _saveStatus == UtilityStatus.Closed )
+			{
+				_saveStatus = UtilityStatus.None;
+				return ( int )UtilityStatus.Closed;
+			}
+
 			return ( int )_saveStatus;
 		}
 
