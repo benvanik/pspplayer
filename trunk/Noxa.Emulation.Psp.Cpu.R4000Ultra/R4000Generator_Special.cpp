@@ -336,8 +336,8 @@ GenerationResult SYSCALL( R4000GenContext^ context, int pass, int address, uint 
 		g->mov( EAX, MSTOPFLAG( CTX ) );
 		g->test( EAX, EAX );
 		g->je( skipStopLabel );
-		g->int3();
-		g->xor( EAX, EAX );
+		//g->int3();
+		g->mov( EAX, 1 );
 		g->ret();
 		g->MarkLabel( skipStopLabel );
 	}

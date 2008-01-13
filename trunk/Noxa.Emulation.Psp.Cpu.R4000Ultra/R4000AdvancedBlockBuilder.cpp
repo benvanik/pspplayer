@@ -914,8 +914,7 @@ void R4000AdvancedBlockBuilder::GenerateTail( int address, bool tailJump, int ta
 
 			g->push( EAX );
 			g->call( ( uint )&QuickPointerLookup );
-			g->pop( EBX ); // used below, maybe
-			//g->add( ESP, 4 );
+			g->pop( EBX ); // get the argument (address) used, as it may be used below in EmitJumpBlockEbx
 
 			// EAX = NULL or address to jump to
 			g->test( EAX, 0xFFFFFFFF );
