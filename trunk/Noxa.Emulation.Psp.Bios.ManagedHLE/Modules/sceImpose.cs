@@ -50,37 +50,39 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction( 0x24FD7BCF, "sceRegOpenRegistry" )]
+		[BiosFunction( 0x24FD7BCF, "sceImposeGetLanguageMode" )]
 		// manual add - ptrs to storage for values
 		public int sceImposeGetLanguageMode( int language, int swapButtons ){ return Module.NotImplementedReturn; }
 
-		[NotImplemented]
 		[Stateless]
-		[BiosFunction( 0x36AA6E91, "sceRegOpenRegistry" )]
+		[BiosFunction( 0x36AA6E91, "sceImposeSetLanguageMode" )]
 		// manual add
-		public int sceImposeSetLanguageMode( int language, int swapButtons ){ return Module.NotImplementedReturn; }
+		public int sceImposeSetLanguageMode( int language, int swapButtons )
+		{
+			return 0;
+		}
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction( 0x381BD9E7, "sceRegOpenRegistry" )]
+		[BiosFunction( 0x381BD9E7, "sceImposeHomeButton" )]
 		// manual add
 		public int sceImposeHomeButton(){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction( 0x72189C48, "sceRegOpenRegistry" )]
+		[BiosFunction( 0x72189C48, "sceImposeSetUMDPopup" )]
 		// manual add
 		public int sceImposeSetUMDPopup( int enable ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction( 0x8C943191, "sceRegOpenRegistry" )]
+		[BiosFunction( 0x8C943191, "sceImposeGetBatteryIconStatus" )]
 		// manual add
 		public int sceImposeGetBatteryIconStatus( int status0, int status1 ){ return Module.NotImplementedReturn; }
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction( 0xE0887BC8, "sceRegOpenRegistry" )]
+		[BiosFunction( 0xE0887BC8, "sceImposeGetUMDPopup" )]
 		// manual add
 		public int sceImposeGetUMDPopup(){ return Module.NotImplementedReturn; }
 	}
