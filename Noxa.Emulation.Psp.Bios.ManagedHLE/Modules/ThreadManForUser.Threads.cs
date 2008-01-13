@@ -109,9 +109,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Don't support this
 			if( _kernel.ActiveThread == thread )
 			{
+				thread.Exit( 0 );
 				_kernel.Schedule();
+				Debug.Assert( _kernel.ActiveThread != thread );
 			}
-			Debug.Assert( _kernel.ActiveThread != thread );
 			Debug.Assert( thread.State == KThreadState.Dead );
 
 			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelDeleteThread: deleting thread {0} {1}", thread.UID, thread.Name );

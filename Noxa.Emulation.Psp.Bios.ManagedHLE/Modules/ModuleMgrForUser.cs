@@ -49,7 +49,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		public const int FakeModuleUID = 3;
+		public const int FakeModuleUID = unchecked( ( int )0x80020139 );
 
 		#region Module Loading
 
@@ -72,6 +72,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( results.Ignored == true )
 			{
 				// Faked
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "LoadModule: ignoring module" );
 				return FakeModuleUID;
 			}
 

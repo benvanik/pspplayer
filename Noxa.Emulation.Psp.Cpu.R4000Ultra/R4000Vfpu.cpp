@@ -1535,4 +1535,18 @@ int VfpuImplVI2X( R4000Ctx* ctx, uint address, uint code )
 	return 0;
 }
 
+int VfpuImplVUC2IFS( R4000Ctx* ctx, uint address, uint code )
+{
+	int s;
+	uint d[ 4 ];
+	VfpuGetVector( ctx, VSingle, VRS( code ), ( float* )s );
+	d[ 0 ] = ( ( s & 0x0000007E ) >> 1 ) | ( ( s & 0x0000007F ) << 7 ) | ( ( s & 0x0000007F ) << 15 ) | ( ( s & 0x0000007F ) << 23 );
+	d[ 1 ] = ( ( s & 0x00007E00 ) >> 1 ) | ( ( s & 0x00007F00 ) << 7 ) | ( ( s & 0x00007F00 ) << 15 ) | ( ( s & 0x00007F00 ) << 23 );
+	d[ 2 ] = ( ( s & 0x007E0000 ) >> 1 ) | ( ( s & 0x007F0000 ) << 7 ) | ( ( s & 0x007F0000 ) << 15 ) | ( ( s & 0x007F0000 ) << 23 );
+	d[ 3 ] = ( ( s & 0x7E000000 ) >> 1 ) | ( ( s & 0x7F000000 ) << 7 ) | ( ( s & 0x7F000000 ) << 15 ) | ( ( s & 0x7F000000 ) << 23 );
+	VfpuApplyPrefix( ctx, VPFXD, VQuad, ( float* )d );
+	VfpuSetVector( ctx, VQuad, VRD( code ), ( float* )d );
+	return 0;
+}
+
 #pragma managed
