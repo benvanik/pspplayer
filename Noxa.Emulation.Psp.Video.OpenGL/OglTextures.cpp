@@ -168,9 +168,7 @@ byte* Widen5650( const byte* in, byte* out, const uint width, const uint height 
 		if( b > 0 )
 			b = ( ( b + 1 ) * 255 ) / 32;
 
-		uint dpixel = 0x000000FF;
-		dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
-		*output = dpixel;
+		*output = ( 0xFF << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
 
 		input++;
 		output++;
@@ -181,28 +179,26 @@ byte* Widen5650( const byte* in, byte* out, const uint width, const uint height 
 byte* Widen5551( const byte* in, byte* out, const uint width, const uint height )
 {
 	// Copy 1555 to 8888
-	short* input = ( short* )in;
+	unsigned short* input = ( unsigned short* )in;
 	uint* output = ( uint* )out;
 	for( uint n = 0; n < width * height; n++ )
 	{
-		short spixel = *input;
+		unsigned short spixel = *input;
 		/*
 		  ABBBBBGGGGGRRRRR	<- PSP
 		 */
-		unsigned short r = ( ( spixel & 0xF800 ) >> 11 );
-		unsigned short g = ( ( spixel & 0x07C0 ) >> 6 );
-		unsigned short b = ( ( spixel & 0x003E ) >> 1 );
-		unsigned short a = ( spixel & 0x0001 );
+		unsigned char a = ( ( spixel & 0x8000 ) >> 15 );
+		unsigned char r = ( ( spixel & 0x7C00 ) >> 10 );
+		unsigned char g = ( ( spixel & 0x03E0 ) >> 5 );
+		unsigned char b = ( ( spixel & 0x001F ) >> 0 );
 		if( r > 0 )
 			r = ( ( r + 1 ) * 255 ) / 32;
 		if( g > 0 )
 			g = ( ( g + 1 ) * 255 ) / 32;
 		if( b > 0 )
 			b = ( ( b + 1 ) * 255 ) / 32;
-
-		uint dpixel = a ? 0x000000FF : 0x0;
-		dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
-		*output = dpixel;
+		
+		*output = ( (a ? 0xFF : 0x00) << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
 
 		input++;
 		output++;
@@ -231,10 +227,10 @@ byte* Widen4444( const byte* in, byte* out, const uint width, const uint height 
 			g = ( ( g + 1 ) * 255 ) / 16;
 		if( b > 0 )
 			b = ( ( b + 1 ) * 255 ) / 16;
-
-		uint dpixel = a ? 0x000000FF : 0x0;
-		dpixel |= ( r << 24 ) | ( g << 16 ) | ( b << 8 );
-		*output = dpixel;
+		if( a > 0 )
+			a = ( ( a + 1 ) * 255 ) / 16;
+		
+		*output = ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | b;
 
 		input++;
 		output++;
