@@ -81,104 +81,123 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			IMediaItem item = _kernel.FindPath( path );
 			if( item is IMediaFolder )
 			{
-				// This is a hack for FF7 - it tries to open umd1:, but I really think it wants umd1:/
-				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceIoOpen: tried to open directory {0} - redirecting to FF7 file!!!", path );
-				//return this.sceIoDopen( fileName );
-				//path = "umd1:/PSP_GAME/USRDIR/discimg.pkg";
-				//item = _kernel.FindPath( path );
-				return -1;
-			}
-			IMediaFile file = ( IMediaFile )item;
-			if( file == null )
-			{
-				// Create if needed
-				if( ( flags & 0x0200 ) != 0 )
+				// Block access?
+				Debug.Assert( item.Device is IUmdDevice );
+				IUmdDevice umd = ( IUmdDevice )item.Device;
+				Stream stream = umd.OpenImageStream();
+				if( stream == null )
 				{
-					string newName;
-					IMediaFolder parent;
-					if( path.IndexOf( '/' ) >= 0 )
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not open image stream '{0}'", path );
+					return -1;
+				}
+
+				KDevice dev = _kernel.FindDevice( umd );
+				Debug.Assert( dev != null );
+
+				KFile handle = new KFile( _kernel, dev, item, stream );
+				handle.IsBlockAccess = true;
+				_kernel.AddHandle( handle );
+
+				handle.Result = handle.UID;
+
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened block access on {0} with ID {1}", path, handle.UID );
+
+				return ( int )handle.UID;
+			}
+			else
+			{
+				IMediaFile file = ( IMediaFile )item;
+				if( file == null )
+				{
+					// Create if needed
+					if( ( flags & 0x0200 ) != 0 )
 					{
-						string parentPath = path.Substring( 0, path.LastIndexOf( '/' ) );
-						newName = path.Substring( path.LastIndexOf( '/' ) + 1 );
-						parent = ( IMediaFolder )_kernel.FindPath( parentPath );
+						string newName;
+						IMediaFolder parent;
+						if( path.IndexOf( '/' ) >= 0 )
+						{
+							string parentPath = path.Substring( 0, path.LastIndexOf( '/' ) );
+							newName = path.Substring( path.LastIndexOf( '/' ) + 1 );
+							parent = ( IMediaFolder )_kernel.FindPath( parentPath );
+						}
+						else
+						{
+							newName = path;
+							parent = _kernel.CurrentPath;
+						}
+						if( parent == null )
+						{
+							Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find parent to create file '{0}' in on open", path );
+							return -1;
+						}
+						file = parent.CreateFile( newName );
 					}
 					else
 					{
-						newName = path;
-						parent = _kernel.CurrentPath;
-					}
-					if( parent == null )
-					{
-						Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find parent to create file '{0}' in on open", path );
+						Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find path '{0}'", path );
 						return -1;
 					}
-					file = parent.CreateFile( newName );
 				}
-				else
+				/*
+				 *	#define PSP_O_RDONLY	0x0001
+					#define PSP_O_WRONLY	0x0002
+					#define PSP_O_RDWR		(PSP_O_RDONLY | PSP_O_WRONLY)
+					#define PSP_O_NBLOCK	0x0004
+					#define PSP_O_DIROPEN	0x0008	// Internal use for dopen
+					#define PSP_O_APPEND	0x0100
+					#define PSP_O_CREAT		0x0200
+					#define PSP_O_TRUNC		0x0400
+					#define	PSP_O_EXCL		0x0800
+					#define PSP_O_NOWAIT	0x8000*/
+				MediaFileMode fileMode = MediaFileMode.Normal;
+				if( ( flags & 0x0100 ) == 0x0100 )
+					fileMode = MediaFileMode.Append;
+				if( ( flags & 0x0400 ) == 0x0400 )
+					fileMode = MediaFileMode.Truncate;
+				MediaFileAccess fileAccess = MediaFileAccess.ReadWrite;
+				if( ( flags & 0x0001 ) == 0x0001 )
+					fileAccess = MediaFileAccess.Read;
+				if( ( flags & 0x0002 ) == 0x0002 )
+					fileAccess = MediaFileAccess.Write;
+				if( ( flags & 0x0003 ) == 0x0003 )
+					fileAccess = MediaFileAccess.ReadWrite;
+
+				if( ( flags & 0x0800 ) != 0 )
 				{
-					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find path '{0}'", path );
+					// Exclusive O_EXCL
+					//int x = 1;
+				}
+				if( ( flags & 0x8000 ) != 0 )
+				{
+					// Non-blocking O_NOWAIT
+					//int x = 1;
+				}
+				if( ( flags & 0x0004 ) != 0 )
+				{
+					// ? O_NBLOCK
+					//int x = 1;
+				}
+
+				Stream stream = file.Open( fileMode, fileAccess );
+				if( stream == null )
+				{
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not open stream on file '{0}' for mode {1} access {2}", path, fileMode, fileAccess );
 					return -1;
 				}
+
+				IMediaDevice device = file.Device;
+				KDevice dev = _kernel.FindDevice( file.Device );
+				Debug.Assert( dev != null );
+
+				KFile handle = new KFile( _kernel, dev, file, stream );
+				_kernel.AddHandle( handle );
+
+				handle.Result = handle.UID;
+
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened file {0} with ID {1}", path, handle.UID );
+
+				return ( int )handle.UID;
 			}
-			/*
-			 *	#define PSP_O_RDONLY	0x0001
-				#define PSP_O_WRONLY	0x0002
-				#define PSP_O_RDWR		(PSP_O_RDONLY | PSP_O_WRONLY)
-				#define PSP_O_NBLOCK	0x0004
-				#define PSP_O_DIROPEN	0x0008	// Internal use for dopen
-				#define PSP_O_APPEND	0x0100
-				#define PSP_O_CREAT		0x0200
-				#define PSP_O_TRUNC		0x0400
-				#define	PSP_O_EXCL		0x0800
-				#define PSP_O_NOWAIT	0x8000*/
-			MediaFileMode fileMode = MediaFileMode.Normal;
-			if( ( flags & 0x0100 ) == 0x0100 )
-				fileMode = MediaFileMode.Append;
-			if( ( flags & 0x0400 ) == 0x0400 )
-				fileMode = MediaFileMode.Truncate;
-			MediaFileAccess fileAccess = MediaFileAccess.ReadWrite;
-			if( ( flags & 0x0001 ) == 0x0001 )
-				fileAccess = MediaFileAccess.Read;
-			if( ( flags & 0x0002 ) == 0x0002 )
-				fileAccess = MediaFileAccess.Write;
-			if( ( flags & 0x0003 ) == 0x0003 )
-				fileAccess = MediaFileAccess.ReadWrite;
-
-			if( ( flags & 0x0800 ) != 0 )
-			{
-				// Exclusive O_EXCL
-				//int x = 1;
-			}
-			if( ( flags & 0x8000 ) != 0 )
-			{
-				// Non-blocking O_NOWAIT
-				//int x = 1;
-			}
-			if( ( flags & 0x0004 ) != 0 )
-			{
-				// ? O_NBLOCK
-				//int x = 1;
-			}
-
-			Stream stream = file.Open( fileMode, fileAccess );
-			if( stream == null )
-			{
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not open stream on file '{0}' for mode {1} access {2}", path, fileMode, fileAccess );
-				return -1;
-			}
-
-			IMediaDevice device = file.Device;
-			KDevice dev = _kernel.FindDevice( file.Device );
-			Debug.Assert( dev != null );
-
-			KFile handle = new KFile( _kernel, dev, file, stream );
-			_kernel.AddHandle( handle );
-
-			handle.Result = handle.UID;
-
-			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened file {0} with ID {1}", path, handle.UID );
-
-			return ( int )handle.UID;
 		}
 
 		[Stateless]

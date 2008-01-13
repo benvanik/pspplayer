@@ -6,9 +6,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 
 namespace Noxa.Emulation.Psp.Media.FileSystem
 {
@@ -187,6 +187,11 @@ namespace Noxa.Emulation.Psp.Media.FileSystem
 		public void Cleanup()
 		{
 			_root = null;
+		}
+
+		public Stream OpenImageStream()
+		{
+			throw new NotImplementedException();
 		}
 
 		public IMediaFile Lookup( long lbn, long size )

@@ -68,13 +68,14 @@ int main( int argc, char *argv[] )
 
 	sceKernelSleepThreadCB();*/
 
-	unsigned int buf[5];
-	unsigned int *pbuf = buf;
-	sceIoDevctl("ms0:", 0x02425818, &pbuf, sizeof(pbuf), 0, 0);
+	//unsigned int buf[5];
+	//unsigned int *pbuf = buf;
+	//sceIoDevctl("ms0:", 0x02425818, &pbuf, sizeof(pbuf), 0, 0);
 	//pspDebugScreenPrintf( "%d %d %d %d %d", buf[ 0 ], buf[ 1 ], buf[ 2 ], buf[ 3 ], buf[ 4 ] );
-	fprintf( stdout, "%d %d %d %d %d\n", buf[ 0 ], buf[ 1 ], buf[ 2 ], buf[ 3 ], buf[ 4 ] );
-
+	//fprintf( stdout, "%d %d %d %d %d\n", buf[ 0 ], buf[ 1 ], buf[ 2 ], buf[ 3 ], buf[ 4 ] );
 	// 124958 42083 41968 512 64
+
+
 
 	//sceKernelSleepThreadCB();
 	for( ;; );

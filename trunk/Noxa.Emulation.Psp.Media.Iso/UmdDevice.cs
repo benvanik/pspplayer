@@ -198,6 +198,12 @@ namespace Noxa.Emulation.Psp.Media.Iso
 			return new IsoStream( fileStream, position, length );
 		}
 
+		public Stream OpenImageStream()
+		{
+			Stream isoStream = File.Open( _hostPath, FileMode.Open, FileAccess.Read, FileShare.Read );
+			return new IsoStream( isoStream, 0, isoStream.Length );
+		}
+
 		public IMediaFile Lookup( long lbn, long size )
 		{
 			MediaFile file;
