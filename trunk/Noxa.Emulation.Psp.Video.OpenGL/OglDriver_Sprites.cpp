@@ -122,19 +122,19 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 			switch( colorType )
 			{
 			case VTColorBGR5650:
-				assert( false );
+				*( ( uint* )vclr[ m ] ) = Convert5650(*(unsigned short *)src);
 				src += 2;
 				break;
 			case VTColorABGR4444:
-				assert( false );
+				*( ( uint* )vclr[ m ] ) = Convert4444(*(unsigned short *)src);
 				src += 2;
 				break;
 			case VTColorABGR5551:
-				assert( false );
+				*( ( uint* )vclr[ m ] ) = Convert5551(*(unsigned short *)src);
 				src += 2;
 				break;
 			case VTColorABGR8888:
-				*( ( int* )vclr[ m ] ) = *( ( int* )src );
+				*( ( uint* )vclr[ m ] ) = *( ( uint* )src );
 				src += 4;
 				break;
 			}

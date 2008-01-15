@@ -247,6 +247,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				return null;
 		}
 
+		public T GetHandleOrNull<T>(int uid) where T : KHandle
+		{
+			KHandle handle;
+			if (Handles.TryGetValue((uint)uid, out handle) == true)
+				if (handle is T)
+					return (T)handle;
+				else
+					return null;
+			else
+				return null;
+		}
+
 		public void RemoveHandle( uint uid )
 		{
 			Handles.Remove( uid );

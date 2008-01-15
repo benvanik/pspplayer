@@ -20,6 +20,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		Mbx,			// mailbox something
 		Vpl,			// Wait until VPL has space
 		Fpl,			// Wait until FPL has space
+		/// <summary>
+		///  Message Pipe
+		/// </summary>
 		Mpp,			// message pipe stuff
 		Join,			// Wait until the target thread ends
 		EventHandler,	// message pump something

@@ -70,12 +70,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x611E9E11, "sceMpegQueryStreamSize" )]
 		public int sceMpegQueryStreamSize() { return DummyReturn; }
 
-#if !PRETENDVALID
-		[NotImplemented]
-#endif
 		[Stateless]
 		[BiosFunction( 0x682A619B, "sceMpegInit" )]
-		public int sceMpegInit() { return DummyReturn; }
+		public int sceMpegInit()
+		{
+			// Always return success
+			return 0;
+		}
 
 #if !PRETENDVALID
 		[NotImplemented]
@@ -84,19 +85,21 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x874624D6, "sceMpegFinish" )]
 		public void sceMpegFinish() { }
 
-#if !PRETENDVALID
-		[NotImplemented]
-#endif
 		[Stateless]
 		[BiosFunction( 0xC132E22F, "sceMpegQueryMemSize" )]
-		public int sceMpegQueryMemSize() { return DummyReturn; }
+		public int sceMpegQueryMemSize(int unk)
+		{
+			Debug.Assert(unk == 0);
+			return 0x16BD7;
+		}
 
-#if !PRETENDVALID
-		[NotImplemented]
-#endif
 		[Stateless]
 		[BiosFunction( 0xD8C5F121, "sceMpegCreate" )]
-		public int sceMpegCreate() { return DummyReturn; }
+		public int sceMpegCreate(int mpeg, int data, int size, int ringbuffer, int framewidth, int unk1, int unk2)
+		{
+			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegCreate({0:X8}, {1:X8}, {2}, {3:X8}, {4}, {5}, {6})", mpeg, data, size, ringbuffer, framewidth, unk1, unk2);
+			return 0;
+		}
 
 #if !PRETENDVALID
 		[NotImplemented]
@@ -105,12 +108,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x606A4649, "sceMpegDelete" )]
 		public int sceMpegDelete() { return DummyReturn; }
 
-#if !PRETENDVALID
-		[NotImplemented]
-#endif
 		[Stateless]
 		[BiosFunction( 0x42560F23, "sceMpegRegistStream" )]
-		public int sceMpegRegistStream() { return DummyReturn; }
+		public int sceMpegRegistStream(int mpeg, int streamid, int unk)
+		{
+			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegRegistStream({0:X8}, {1}, {2})", mpeg, streamid, unk);
+			return 0x12345678;
+		}
 
 #if !PRETENDVALID
 		[NotImplemented]
@@ -217,12 +221,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x0F6C18D7, "sceMpegAvcDecodeDetail" )]
 		public int sceMpegAvcDecodeDetail() { return DummyReturn; }
 
-#if !PRETENDVALID
-		[NotImplemented]
-#endif
 		[Stateless]
 		[BiosFunction( 0xA11C7026, "sceMpegAvcDecodeMode" )]
-		public int sceMpegAvcDecodeMode() { return DummyReturn; }
+		public int sceMpegAvcDecodeMode(int mpeg, int mode)
+		{
+			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegAvcDecodeMode({0:X8}, {1:X8})", mpeg, mode);
+			return 0;
+		}
 
 #if !PRETENDVALID
 		[NotImplemented]
@@ -238,19 +243,35 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x800C44DF, "sceMpegAtracDecode" )]
 		public int sceMpegAtracDecode() { return DummyReturn; }
 
-#if !PRETENDVALID
-		[NotImplemented]
-#endif
 		[Stateless]
 		[BiosFunction( 0xD7A29F46, "sceMpegRingbufferQueryMemSize" )]
-		public int sceMpegRingbufferQueryMemSize() { return DummyReturn; }
+		public int sceMpegRingbufferQueryMemSize(int packets)
+		{
+			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegRingbufferQueryMemSize({0})", packets);
+			return packets * 235;
+		}
 
-#if !PRETENDVALID
-		[NotImplemented]
-#endif
 		[Stateless]
 		[BiosFunction( 0x37295ED8, "sceMpegRingbufferConstruct" )]
-		public int sceMpegRingbufferConstruct() { return DummyReturn; }
+		public int sceMpegRingbufferConstruct(uint ringbuffer, int packets, int allocated, int size, int callback, int cbparam)
+		{
+			unsafe
+			{
+				byte* p = _memorySystem.Translate(ringbuffer);
+				*((int*)(p + 0)) = packets;
+				*((int*)(p + 4)) = 0x11111111;
+				*((int*)(p + 8)) = 0x22222222;
+				*((int*)(p + 12)) = 0x33333333;
+				*((int*)(p + 16)) = allocated;
+				*((int*)(p + 20)) = callback;
+				*((int*)(p + 24)) = cbparam;
+				*((int*)(p + 28)) = 0x44444444;
+				*((int*)(p + 32)) = 0x55555555;
+				*((int*)(p + 36)) = 0x66666666;
+			}
+			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegRingbufferConstruct({0:X8}, {1}, {2}, {3}, {4:X8}, {5:X8})", ringbuffer, packets, allocated, size, callback, cbparam);
+			return -1;
+		}
 
 #if !PRETENDVALID
 		[NotImplemented]

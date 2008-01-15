@@ -35,7 +35,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 			}
 
-			KPipe handle = new KPipe( _kernel, partition, name );
+			KMessagePipe handle = new KMessagePipe( _kernel, partition, name );
 			_kernel.AddHandle( handle );
 
 			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelCreateMsgPipe: opened pipe {0} with ID {1}, for partition {2}", name, handle.UID, part );
@@ -79,7 +79,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelTrySendMsgPipe(SceUID uid, void *message, unsigned int size, int unk1, void *unk2);
 		public int sceKernelTrySendMsgPipe( int uid, int message, int size, int unk1, int unk2 )
 		{
-			KPipe handle = _kernel.GetHandle<KPipe>( uid );
+			KMessagePipe handle = _kernel.GetHandle<KMessagePipe>( uid );
 			if( handle == null )
 			{
 				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: kernel pipe handle not found: {0}", uid );
@@ -92,6 +92,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 			}
 
+			handle.Signal();
+
 			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: {0} {1:X8} {2} {3:X8} {4:X8}", uid, message, size, unk1, unk2 );
 			//handle.Stream.Seek(0, SeekOrigin.Begin);
 			return 0;
@@ -103,34 +105,30 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelReceiveMsgPipe(SceUID uid, void *message, unsigned int size, int unk1, void *unk2, unsigned int *timeout);
 		public int sceKernelReceiveMsgPipe( int uid, int message, int size, int unk1, int unk2, int timeout )
 		{
-			KPipe handle = _kernel.GetHandle<KPipe>( uid );
+			KMessagePipe handle = _kernel.GetHandle<KMessagePipe>( uid );
 			if( handle == null )
 			{
 				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelReceiveMsgPipe: kernel pipe handle not found: {0}", uid );
 				return -1;
 			}
 
-			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelReceiveMsgPipe: {0} {1:X8} {2} {3:X8} {4:X8} {5}", uid, message, size, unk1, unk2, timeout );
+			return handle.MaybeWait( message, size, unk1, unk2, timeout, false );
+		}
 
-			if( handle.Stream.Length < size )
+		[Stateless]
+		[BiosFunction(0xFBFA697D, "sceKernelReceiveMsgPipeCB")]
+		// SDK location: /user/pspthreadman.h:1192
+		// SDK declaration: int sceKernelReceiveMsgPipeCB(SceUID uid, void *message, unsigned int size, int unk1, void *unk2, unsigned int *timeout);
+		public int sceKernelReceiveMsgPipeCB(int uid, int message, int size, int unk1, int unk2, int timeout)
+		{
+			KMessagePipe handle = _kernel.GetHandle<KMessagePipe>(uid);
+			if (handle == null)
 			{
+				Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceKernelReceiveMsgPipe: kernel pipe handle not found: {0}", uid);
 				return -1;
 			}
 
-			handle.Stream.Seek( 0, SeekOrigin.Begin );
-			_memory.WriteStream( message, handle.Stream, size );
-			handle.Stream.SetLength( 0 );
-			return 0;
-		}
-
-		[NotImplemented]
-		[Stateless]
-		[BiosFunction( 0xFBFA697D, "sceKernelReceiveMsgPipeCB" )]
-		// SDK location: /user/pspthreadman.h:1192
-		// SDK declaration: int sceKernelReceiveMsgPipeCB(SceUID uid, void *message, unsigned int size, int unk1, void *unk2, unsigned int *timeout);
-		public int sceKernelReceiveMsgPipeCB( int uid, int message, int size, int unk1, int unk2, int timeout )
-		{
-			return Module.NotImplementedReturn;
+			return handle.MaybeWait(message, size, unk1, unk2, timeout, true);
 		}
 
 		[NotImplemented]

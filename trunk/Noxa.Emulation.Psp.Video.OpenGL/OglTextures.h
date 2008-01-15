@@ -55,6 +55,10 @@ namespace Noxa {
 				bool IsTextureValid( OglTexture* texture );
 				bool GenerateTexture( OglContext_t* context, OglTexture* texture, uint checksum );
 				uint CalculateTextureChecksum( byte* address, int width, int height, int pixelStorage );
+
+				uint Convert5650(ushort source);
+				uint Convert5551(ushort source);
+				uint Convert4444(ushort source);
 			}
 		}
 	}
