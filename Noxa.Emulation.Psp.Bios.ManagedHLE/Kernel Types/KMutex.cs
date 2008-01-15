@@ -40,6 +40,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				KThread thread = Kernel.ActiveThread;
 				thread.Wait( this, timeoutUs );
+				Kernel.Schedule();
 			}
 		}
 
