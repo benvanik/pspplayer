@@ -38,47 +38,61 @@ namespace Noxa.Emulation.Psp.Games
 			if( game == null )
 				return null;
 
-			IMediaFolder folder = game.Folder;
-			if( folder[ "PSP_GAME" ] != null )
-				folder = folder[ "PSP_GAME" ] as IMediaFolder;
-			if( folder[ "SYSDIR" ] != null )
-				folder = folder[ "SYSDIR" ] as IMediaFolder;
-			IMediaFile bootBin = null;
-			bootBin = folder[ "BOOT.BIN" ] as IMediaFile;
-			if( bootBin == null )
-				bootBin = folder[ "EBOOT.BIN" ] as IMediaFile;
-			if( bootBin == null )
-				bootBin = folder[ "BOOT.ELF" ] as IMediaFile;
-			if( bootBin == null )
-				bootBin = folder[ "EBOOT.ELF" ] as IMediaFile;
-
 			Stream bootStream = null;
-			if( bootBin == null )
+			
+			string kernelLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+			string prxLocation = Path.Combine(kernelLocation, "BOOT");
+			// DiscID might be more appropriate than Title
+			string lookasideBoot = Path.Combine(Path.Combine(prxLocation, game.Parameters.Title), "BOOT.BIN");
+			if (File.Exists(lookasideBoot) == true)
 			{
-				// Probably in PBP - unless exploited!
-				if( folder.Name.Contains( "__SCE__" ) == true )
-				{
-					// If this is exploited, the eboot.pbp IS the elf!
-					bootStream = ( folder[ "EBOOT.PBP" ] as IMediaFile ).OpenRead();
-				}
-				else
-				{
-					IMediaFile pbp = folder[ "EBOOT.PBP" ] as IMediaFile;
-					using( Stream stream = pbp.OpenRead() )
-					{
-						PbpReader reader = new PbpReader( stream );
-						if( reader.ContainsEntry( PbpReader.PbpEntryType.DataPsp ) == true )
-						{
-							bootStream = reader.Read( stream, PbpReader.PbpEntryType.DataPsp );
-						}
-					}
-				}
+				// Load ours instead
+				Log.WriteLine(Verbosity.Normal, Feature.Bios, "Lookaside boot found at {0}", lookasideBoot);
+				bootStream = File.OpenRead(lookasideBoot);
 			}
 			else
 			{
-				bootStream = bootBin.OpenRead();
+				IMediaFolder folder = game.Folder;
+				if (folder["PSP_GAME"] != null)
+					folder = folder["PSP_GAME"] as IMediaFolder;
+				if (folder["SYSDIR"] != null)
+					folder = folder["SYSDIR"] as IMediaFolder;
+				IMediaFile bootBin = null;
+				bootBin = folder["BOOT.BIN"] as IMediaFile;
+				if (bootBin == null)
+					bootBin = folder["EBOOT.BIN"] as IMediaFile;
+				if (bootBin == null)
+					bootBin = folder["BOOT.ELF"] as IMediaFile;
+				if (bootBin == null)
+					bootBin = folder["EBOOT.ELF"] as IMediaFile;
+				
+				if (bootBin == null)
+				{
+					// Probably in PBP - unless exploited!
+					if (folder.Name.Contains("__SCE__") == true)
+					{
+						// If this is exploited, the eboot.pbp IS the elf!
+						bootStream = (folder["EBOOT.PBP"] as IMediaFile).OpenRead();
+					}
+					else
+					{
+						IMediaFile pbp = folder["EBOOT.PBP"] as IMediaFile;
+						using (Stream stream = pbp.OpenRead())
+						{
+							PbpReader reader = new PbpReader(stream);
+							if (reader.ContainsEntry(PbpReader.PbpEntryType.DataPsp) == true)
+							{
+								bootStream = reader.Read(stream, PbpReader.PbpEntryType.DataPsp);
+							}
+						}
+					}
+				}
+				else
+				{
+					bootStream = bootBin.OpenRead();
+				}
 			}
-
+			
 			return bootStream;
 		}
 

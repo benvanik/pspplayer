@@ -138,7 +138,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[BiosFunction( 0x4A9E5E29, "sceUmdWaitDriveStatCB" )]
 		// manual add
-		public int sceUmdWaitDriveStatCB( int stat, int timeout )
+		public int sceUmdWaitDriveStatCB( int stat )
 		{
 			// Just hope we never get here
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdWaitDriveStatCB: waiting on status {0}", stat );

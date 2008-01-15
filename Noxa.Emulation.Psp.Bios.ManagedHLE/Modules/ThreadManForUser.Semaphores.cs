@@ -57,7 +57,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelSignalSema(SceUID semaid, int signal);
 		public int sceKernelSignalSema( int semaid, int signal )
 		{
-			KSemaphore sema = _kernel.GetHandle<KSemaphore>( semaid );
+			KSemaphore sema = _kernel.GetHandleOrNull<KSemaphore>( semaid );
 			if( sema == null )
 			{
 				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelSignalSema: could not find semaphore with ID {0}", semaid );
@@ -75,7 +75,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelWaitSema(SceUID semaid, int signal, SceUInt *timeout);
 		public int sceKernelWaitSema( int semaid, int signal, int timeout )
 		{
-			KSemaphore sema = _kernel.GetHandle<KSemaphore>( semaid );
+			KSemaphore sema = _kernel.GetHandleOrNull<KSemaphore>( semaid );
 			if( sema == null )
 			{
 				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelWaitSema: could not find semaphore with ID {0}", semaid );

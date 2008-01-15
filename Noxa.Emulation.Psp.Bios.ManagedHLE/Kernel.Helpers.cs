@@ -61,15 +61,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				IMediaDevice device = kdevice.Device;
 				if( device.State == MediaState.Present )
 				{
-					path = path.Substring( colonPos + 2 );
-					if( path.StartsWith( "sce_lbn" ) == true )
+					path = path.Substring( colonPos + 1 );
+					if( path.StartsWith( "/sce_lbn" ) == true )
 					{
 						Debug.Assert( device is IUmdDevice );
 						IUmdDevice umd = ( IUmdDevice )device;
 
 						// Lookup LBN/etc
 						//0x0_size0xbb141
-						path = path.Substring( 7 );
+						path = path.Substring( 8 );
 						int sep = path.LastIndexOf( '_' );
 						string slbn = path.Substring( 0, sep );
 						string ssize = path.Substring( sep + 5 );

@@ -237,5 +237,21 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.WaitTimeoutSetup( timeoutUs );
 			WaitHandle = mutex;
 		}
+
+		public void Wait(KMessagePipe pipe, int message, int size, int timeout, bool canHandleCallbacks)
+		{
+			this.State = KThreadState.Waiting;
+			this.RemoveFromSchedule();
+
+			this.CanHandleCallbacks = canHandleCallbacks;
+			
+			pipe.WaitingThreads.Enqueue(this);
+
+			this.WaitingOn = KThreadWait.Mpp;
+			this.WaitTimeoutSetup((uint)timeout);
+			this.WaitHandle = pipe;
+			this.WaitArgument = (uint)size;
+			this.WaitAddress = (uint)message;
+		}
 	}
 }

@@ -380,11 +380,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// NOTE: this is wrong! It's not supported!
 			long runClocks = thread.RunClocks;
 
+			uint size;
+
 			// Ensure 104 bytes
 			uint *p = ( uint* )_memorySystem.Translate( ( uint )info );
-			if( *p != 104 )
+			size = *p;
+			if( size != 104 && size != 108 )
 			{
-				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelReferThreadStatus: app passed struct with size {0}, expected 104", *p );
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelReferThreadStatus: app passed struct with size {0}, expected 104", size );
 				return -1;
 			}
 			p++;
@@ -410,6 +413,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			*( p++ ) = thread.InterruptPreemptionCount;
 			*( p++ ) = thread.ThreadPreemptionCount;
 			*( p++ ) = thread.ReleaseCount;
+			
+			if (size == 108)
+				*( p++ ) = 0;
 
 			return 0;
 		}

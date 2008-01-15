@@ -147,28 +147,73 @@ byte* Unswizzle( const TextureFormat* format, const byte* in, byte* out, const u
 	return out;
 }
 
+uint Noxa::Emulation::Psp::Video::Convert5650(ushort source)
+{
+	/*
+		BBBBBGGGGGGRRRRR	<- PSP
+	 */
+	byte r = ( ( source & 0xF800 ) >> 11 );
+	byte g = ( ( source & 0x07E0 ) >> 5 );
+	byte b = ( source & 0x001F );
+	if( r > 0 )
+		r = ( ( r + 1 ) * 255 ) / 32;
+	if( g > 0 )
+		g = ( ( g + 1 ) * 255 ) / 64;
+	if( b > 0 )
+		b = ( ( b + 1 ) * 255 ) / 32;
+
+	return ( 0xFF << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
+}
+
+uint Noxa::Emulation::Psp::Video::Convert5551(ushort source)
+{
+	/*
+		ABBBBBGGGGGRRRRR	<- PSP
+	 */
+	byte a = ( ( source & 0x8000 ) >> 15 );
+	byte r = ( ( source & 0x7C00 ) >> 10 );
+	byte g = ( ( source & 0x03E0 ) >> 5 );
+	byte b = ( ( source & 0x001F ) >> 0 );
+	if( r > 0 )
+		r = ( ( r + 1 ) * 255 ) / 32;
+	if( g > 0 )
+		g = ( ( g + 1 ) * 255 ) / 32;
+	if( b > 0 )
+		b = ( ( b + 1 ) * 255 ) / 32;
+	
+	return ( (a ? 0xFF : 0x00) << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
+}
+
+uint Noxa::Emulation::Psp::Video::Convert4444(ushort source)
+{
+	/*
+		AAAABBBBGGGGRRRR	<- PSP
+	 */
+	byte r = ( ( source & 0xF000 ) >> 12 );
+	byte g = ( ( source & 0x0F00 ) >> 8 );
+	byte b = ( ( source & 0x00F0 ) >> 4 );
+	byte a = ( source & 0x000F );
+	
+	if( r > 0 )
+		r = ( ( r + 1 ) * 255 ) / 16;
+	if( g > 0 )
+		g = ( ( g + 1 ) * 255 ) / 16;
+	if( b > 0 )
+		b = ( ( b + 1 ) * 255 ) / 16;
+	if( a > 0 )
+		a = ( ( a + 1 ) * 255 ) / 16;
+		
+	return ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | b;
+}
+
 byte* Widen5650( const byte* in, byte* out, const uint width, const uint height )
 {
 	// Copy 0565 to 8888
-	short* input = ( short* )in;
+	ushort* input = ( ushort* )in;
 	uint* output = ( uint* )out;
 	for( uint n = 0; n < width * height; n++ )
 	{
-		short spixel = *input;
-		/*
-		  BBBBBGGGGGGRRRRR	<- PSP
-		 */
-		unsigned short r = ( ( spixel & 0xF800 ) >> 11 );
-		unsigned short g = ( ( spixel & 0x07E0 ) >> 5 );
-		unsigned short b = ( spixel & 0x001F );
-		if( r > 0 )
-			r = ( ( r + 1 ) * 255 ) / 32;
-		if( g > 0 )
-			g = ( ( g + 1 ) * 255 ) / 64;
-		if( b > 0 )
-			b = ( ( b + 1 ) * 255 ) / 32;
-
-		*output = ( 0xFF << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
+		*output = Convert5650(*input);
 
 		input++;
 		output++;
@@ -179,26 +224,11 @@ byte* Widen5650( const byte* in, byte* out, const uint width, const uint height 
 byte* Widen5551( const byte* in, byte* out, const uint width, const uint height )
 {
 	// Copy 1555 to 8888
-	unsigned short* input = ( unsigned short* )in;
+	ushort* input = ( ushort* )in;
 	uint* output = ( uint* )out;
 	for( uint n = 0; n < width * height; n++ )
 	{
-		unsigned short spixel = *input;
-		/*
-		  ABBBBBGGGGGRRRRR	<- PSP
-		 */
-		unsigned char a = ( ( spixel & 0x8000 ) >> 15 );
-		unsigned char r = ( ( spixel & 0x7C00 ) >> 10 );
-		unsigned char g = ( ( spixel & 0x03E0 ) >> 5 );
-		unsigned char b = ( ( spixel & 0x001F ) >> 0 );
-		if( r > 0 )
-			r = ( ( r + 1 ) * 255 ) / 32;
-		if( g > 0 )
-			g = ( ( g + 1 ) * 255 ) / 32;
-		if( b > 0 )
-			b = ( ( b + 1 ) * 255 ) / 32;
-		
-		*output = ( (a ? 0xFF : 0x00) << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
+		*output = Convert5551(*input);
 
 		input++;
 		output++;
@@ -209,29 +239,11 @@ byte* Widen5551( const byte* in, byte* out, const uint width, const uint height 
 byte* Widen4444( const byte* in, byte* out, const uint width, const uint height )
 {
 	// Copy 4444 to 8888
-	short* input = ( short* )in;
+	ushort* input = ( ushort* )in;
 	uint* output = ( uint* )out;
 	for( uint n = 0; n < width * height; n++ )
 	{
-		short spixel = *input;
-		/*
-		  AAAABBBBGGGGRRRR	<- PSP
-		 */
-		unsigned short r = ( ( spixel & 0xF000 ) >> 12 );
-		unsigned short g = ( ( spixel & 0x0F00 ) >> 8 );
-		unsigned short b = ( ( spixel & 0x00F0 ) >> 4 );
-		unsigned short a = ( spixel & 0x000F );
-		if( r > 0 )
-			r = ( ( r + 1 ) * 255 ) / 16;
-		if( g > 0 )
-			g = ( ( g + 1 ) * 255 ) / 16;
-		if( b > 0 )
-			b = ( ( b + 1 ) * 255 ) / 16;
-		if( a > 0 )
-			a = ( ( a + 1 ) * 255 ) / 16;
-		
-		*output = ( a << 24 ) | ( r << 16 ) | ( g << 8 ) | b;
-
+		*output = Convert4444(*input);
 		input++;
 		output++;
 	}
@@ -258,32 +270,43 @@ __inline uint ClutLookup( const OglContext* context, uint index )
 		{
 		case 0x0:
 			// 16-bit BGR 5650
-			return
-				( ( entry & 0x1F ) * 8 ) |
-				( ( ( ( entry >> 5 ) & 0x3F ) * 4 ) << 8 ) |
-				( ( ( ( entry >> 11 ) & 0x1F ) * 8 ) << 16 ) |
-				( 0xFF << 24 );
+			return Convert5650(entry);
 			break;
 		case 0x1:
 			// 16-bit ABGR 5551
-			return
-				( ( entry & 0x1F ) * 8 ) |
-				( ( ( ( entry >> 5 ) & 0x1F ) * 8 ) << 8 ) |
-				( ( ( ( entry >> 10 ) & 0x1F ) * 8 ) << 16 ) |
-				( ( ( entry >> 15 ) * 255 ) << 24 );
+			return Convert5551(entry);
 			break;
 		case 0x2:
 			// 16-bit ABGR 4444
-			return
-				( ( entry & 0xF ) * 16 ) |
-				( ( ( ( entry >> 4 ) & 0xF ) * 16 ) << 8 ) |
-				( ( ( ( entry >> 8 ) & 0xF ) * 16 ) << 16 ) |
-				( ( ( ( entry >> 12 ) & 0xF ) * 16 ) << 24 );
+			return Convert4444(entry);
+			break;
+		default:
+			assert(false);
+			break;
 		}
 	}
-
+	
 	return 0;
 }
+
+
+#pragma pack(1)
+struct TGAHEADER
+{
+	unsigned char IDLength;
+	unsigned char ColorMapType;
+	unsigned char ImageType;
+	unsigned short CMapStart;
+	unsigned short CMapLength;
+	unsigned char CMapDepth;
+	unsigned short xOffset;
+	unsigned short yOffset;
+	unsigned short width;
+	unsigned short height;
+	unsigned char unk1;
+	unsigned char unk2;
+};
+#pragma pack()
 
 byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint width, const uint height, const uint lineWidth )
 {
@@ -292,6 +315,7 @@ byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint 
 	uint* output = ( uint* )out;
 	int diff = ( width - lineWidth ) / 2;
 	assert( diff >= 0 );
+	
 	for( uint y = 0; y < height; y++ )
 	{
 		for( uint x = 0; x < width; x++ )
@@ -310,6 +334,7 @@ byte* Decode4( const OglContext* context, const byte* in, byte* out, const uint 
 		input += lineWidth / 2;
 		output += width;
 	}
+
 	return out;
 }
 
@@ -317,6 +342,7 @@ byte* Decode8( const OglContext* context, const byte* in, byte* out, const uint 
 {
 	byte* input = ( byte* )in;
 	uint* output = ( uint* )out;
+	memset(output, 0, width * height * 4);
 	for( uint y = 0; y < height; y++ )
 	{
 		for( uint x = 0; x < width; x++ )
@@ -327,6 +353,7 @@ byte* Decode8( const OglContext* context, const byte* in, byte* out, const uint 
 		input += lineWidth;
 		output += width;
 	}
+	
 	return out;
 }
 
@@ -344,6 +371,7 @@ byte* Decode16( const OglContext* context, const byte* in, byte* out, const uint
 		input += lineWidth;
 		output += width;
 	}
+
 	return out;
 }
 
@@ -361,6 +389,7 @@ byte* Decode32( const OglContext* context, const byte* in, byte* out, const uint
 		input += lineWidth;
 		output += width;
 	}
+
 	return out;
 }
 
@@ -392,6 +421,9 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	if( _decodeBuffer == NULL )
 		_decodeBuffer = ( byte* )malloc( 1024 * 1024 * 4 );
 
+	memset(_unswizzleBuffer, 0xCC, 1024 * 1024 * 4);
+	memset(_decodeBuffer, 0xCC, 1024 * 1024 * 4);
+
 	byte* address = context->Memory->Translate( texture->Address );
 	TextureFormat* format = ( TextureFormat* )&__formats[ texture->PixelStorage ];
 	int size = texture->LineWidth * texture->Height * format->Size;
@@ -403,11 +435,7 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	byte* buffer = address;
 	if( context->TexturesSwizzled == true )
 	{
-		// Not sure if this is right, but it works for Puzzle Bobble
-		if( format->Size == 0 )
-			buffer = Unswizzle( format, buffer, _unswizzleBuffer, texture->LineWidth, texture->Height );
-		else
-			buffer = Unswizzle( format, buffer, _unswizzleBuffer, lineWidth, texture->Height );
+		buffer = Unswizzle( format, buffer, _unswizzleBuffer, texture->LineWidth, texture->Height );
 	}
 
 	// buffer now contains an unswizzled texture - may need to un-CLUT it, or convert colors
