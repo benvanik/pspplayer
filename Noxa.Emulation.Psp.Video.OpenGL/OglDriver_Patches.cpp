@@ -87,7 +87,7 @@ void DrawBezier( OglContext* context, int vertexType, int vertexSize, byte* iptr
 	int weightType = ( vertexType & VTWeightMask );
 
 	assert( normalType == 0 );
-	assert( textureType == 0 );
+	//assert( textureType == 0 );
 	assert( colorType == 0 );
 	assert( weightType == 0 );
 
