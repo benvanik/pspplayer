@@ -70,7 +70,7 @@ namespace Noxa.Emulation.Psp.HookerPC
 						{
 							while( _client.Available > 0 )
 							{
-								int mode = reader.PeekChar();
+								int mode = reader.ReadByte();
 								switch( mode )
 								{
 									case 0:
