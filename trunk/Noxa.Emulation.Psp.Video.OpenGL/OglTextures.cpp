@@ -337,7 +337,7 @@ byte* Decode8( const OglContext* context, const byte* in, byte* out, const uint 
 {
 	byte* input = ( byte* )in;
 	uint* output = ( uint* )out;
-	memset(output, 0, width * height * 4);
+	//memset(output, 0, width * height * 4);
 	for( uint y = 0; y < height; y++ )
 	{
 		for( uint x = 0; x < width; x++ )
@@ -348,7 +348,6 @@ byte* Decode8( const OglContext* context, const byte* in, byte* out, const uint 
 		input += lineWidth;
 		output += width;
 	}
-	
 	return out;
 }
 
@@ -366,7 +365,6 @@ byte* Decode16( const OglContext* context, const byte* in, byte* out, const uint
 		input += lineWidth;
 		output += width;
 	}
-
 	return out;
 }
 
@@ -384,7 +382,6 @@ byte* Decode32( const OglContext* context, const byte* in, byte* out, const uint
 		input += lineWidth;
 		output += width;
 	}
-
 	return out;
 }
 
