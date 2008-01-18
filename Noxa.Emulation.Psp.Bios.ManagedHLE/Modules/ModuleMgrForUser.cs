@@ -8,13 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
-
-using Noxa.Utilities;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Media;
+using Noxa.Utilities;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
@@ -88,6 +88,46 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 #if DEBUG
 			loadParams.AppendDatabase = true;
 #endif
+
+			// Check to see if it's one we have a decoded version of
+			string kernelLocation = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
+			string prxLocation = Path.Combine( kernelLocation, "PRX" );
+			string lookasidePrx = Path.Combine( prxLocation, file.Name );
+			if( File.Exists( lookasidePrx ) == true )
+			{
+				// Load ours instead
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "LoadModule: lookaside prx found at {0}", lookasidePrx );
+				stream = File.OpenRead( lookasidePrx );
+			}
+
+			Debug.Assert( stream != null );
+			if( stream == null )
+			{
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "LoadModule: unable to load module {0}", file.Name );
+				return -1;
+			}
+
+			// Quick check to make sure it isn't encrypted before sending off to loader
+			byte[] magicBytes = new byte[ 4 ];
+			stream.Read( magicBytes, 0, 4 );
+			stream.Seek( -4, SeekOrigin.Current );
+			// 0x7E, 0x50, 0x53, 0x50 = ~PSP
+			bool encrypted = (
+				( magicBytes[ 0 ] == 0x7E ) &&
+				( magicBytes[ 1 ] == 0x50 ) &&
+				( magicBytes[ 2 ] == 0x53 ) &&
+				( magicBytes[ 3 ] == 0x50 ) );
+			//Debug::Assert( encrypted == false );
+			if( encrypted == true )
+			{
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "LoadModule: module {0} is encrypted - unable to load", file.Name );
+
+				// We spoof the caller in to thinking we worked right... by just returning 0 ^_^
+				KModule fakemod = new KModule( _kernel, null );
+				_kernel.AddHandle( fakemod );
+				return ( int )fakemod.UID;
+			}
+
 			LoadResults results = _kernel.Bios._loader.LoadModule( ModuleType.Prx, stream, loadParams );
 			//Debug.Assert( results.Successful == true );
 			if( results.Successful == false )
@@ -251,52 +291,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelLoadModule: loading module {0}", modulePath );
 
-			Stream stream = null;
-
-			// Check to see if it's one we have a decoded version of
-			string kernelLocation = Path.GetDirectoryName( System.Reflection.Assembly.GetExecutingAssembly().Location );
-			string prxLocation = Path.Combine( kernelLocation, "PRX" );
-			string lookasidePrx = Path.Combine( prxLocation, file.Name );
-			if( File.Exists( lookasidePrx ) == true )
-			{
-				// Load ours instead
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelLoadModule: lookaside prx found at {0}", lookasidePrx );
-				stream = File.OpenRead( lookasidePrx );
-			}
-			else
-			{
-				// Load the given file
-				stream = file.OpenRead();
-			}
-
-			Debug.Assert( stream != null );
-			if( stream == null )
-			{
-				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelLoadModule: unable to load module {0}", modulePath );
-				return -1;
-			}
-
-			// Quick check to make sure it isn't encrypted before sending off to loader
-			byte[] magicBytes = new byte[ 4 ];
-			stream.Read( magicBytes, 0, 4 );
-			stream.Seek( -4, SeekOrigin.Current );
-			// 0x7E, 0x50, 0x53, 0x50 = ~PSP
-			bool encrypted = (
-				( magicBytes[ 0 ] == 0x7E ) &&
-				( magicBytes[ 1 ] == 0x50 ) &&
-				( magicBytes[ 2 ] == 0x53 ) &&
-				( magicBytes[ 3 ] == 0x50 ) );
-			//Debug::Assert( encrypted == false );
-			if( encrypted == true )
-			{
-				Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelLoadModule: module {0} is encrypted - unable to load", modulePath );
-
-				// We spoof the caller in to thinking we worked right... by just returning 0 ^_^
-				KModule kmod = new KModule( _kernel, null );
-				_kernel.AddHandle( kmod );
-				return ( int )kmod.UID;
-			}
-
+			Stream stream = file.OpenRead();
 			return this.LoadModule( file, stream, flags, option );
 		}
 
@@ -361,12 +356,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		}
 
 		[Stateless]
-		[NotImplemented]
 		[BiosFunction( 0xC629AF26, "sceUtilityLoadAvModule" )]
 		// manual add - loads avcodec.prx (or audiocodec.prx)
 		public int sceUtilityLoadAvModule( int module )
 		{
-			return Module.NotImplementedReturn;
+			return 0;
 		}
 
 		[Stateless]

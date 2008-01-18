@@ -87,7 +87,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Maybe we could hack this differently using a timer and just wait
 			// the thread for a second or two?
 			KThread thread = _kernel.ActiveThread;
-			thread.Suspend();
+			thread.Delay( 3000000, true );
 			_kernel.Schedule();
 
 			if( _driver == null )
@@ -113,11 +113,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceAudioOutputPanned(int channel, int leftvol, int rightvol, void *buffer);
 		public int sceAudioOutputPanned( int channel, int leftvol, int rightvol, int buf )
 		{
-			// This really shouldn't block
-			KThread thread = _kernel.ActiveThread;
-			thread.Suspend();
-			_kernel.Schedule();
-
 			if( _driver == null )
 				return 0;
 
@@ -144,7 +139,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Maybe we could hack this differently using a timer and just wait
 			// the thread for a second or two?
 			KThread thread = _kernel.ActiveThread;
-			thread.Suspend();
+			thread.Delay( 3000000, true );
 			_kernel.Schedule();
 
 			if( _driver == null )

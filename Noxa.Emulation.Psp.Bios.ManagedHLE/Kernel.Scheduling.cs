@@ -36,14 +36,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					}
 				}
 
-				if( earliest != null )
+				if( ( earliest != null ) && ( earliest.State == KThreadState.Waiting ) )
 				{
 					// Wait on it
-					while( earliest.State == KThreadState.Waiting )
-					{
-						// This happens A LOT - it'd be best if we just spun, but by sleeping we save some time
-						System.Threading.Thread.Sleep( 0 );
-					}
+					System.Threading.Thread.Sleep( 1 );
 				}
 				else
 				{
