@@ -147,7 +147,7 @@ byte* Unswizzle( const TextureFormat* format, const byte* in, byte* out, const u
 	return out;
 }
 
-uint Noxa::Emulation::Psp::Video::Convert5650(ushort source)
+uint Noxa::Emulation::Psp::Video::Convert5650( ushort source )
 {
 	/*
 		BBBBBGGGGGGRRRRR	<- PSP
@@ -165,7 +165,7 @@ uint Noxa::Emulation::Psp::Video::Convert5650(ushort source)
 	return ( 0xFF << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
 }
 
-uint Noxa::Emulation::Psp::Video::Convert5551(ushort source)
+uint Noxa::Emulation::Psp::Video::Convert5551( ushort source )
 {
 	/*
 		ABBBBBGGGGGRRRRR	<- PSP
@@ -181,10 +181,10 @@ uint Noxa::Emulation::Psp::Video::Convert5551(ushort source)
 	if( b > 0 )
 		b = ( ( b + 1 ) * 255 ) / 32;
 	
-	return ( (a ? 0xFF : 0x00) << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
+	return ( ( a ? 0xFF : 0x00 ) << 24 ) | ( r << 16 ) | ( g << 8 ) | ( b << 0 );
 }
 
-uint Noxa::Emulation::Psp::Video::Convert4444(ushort source)
+uint Noxa::Emulation::Psp::Video::Convert4444( ushort source )
 {
 	/*
 		AAAABBBBGGGGRRRR	<- PSP
@@ -213,8 +213,7 @@ byte* Widen5650( const byte* in, byte* out, const uint width, const uint height 
 	uint* output = ( uint* )out;
 	for( uint n = 0; n < width * height; n++ )
 	{
-		*output = Convert5650(*input);
-
+		*output = Convert5650( *input );
 		input++;
 		output++;
 	}
@@ -228,8 +227,7 @@ byte* Widen5551( const byte* in, byte* out, const uint width, const uint height 
 	uint* output = ( uint* )out;
 	for( uint n = 0; n < width * height; n++ )
 	{
-		*output = Convert5551(*input);
-
+		*output = Convert5551( *input );
 		input++;
 		output++;
 	}
@@ -243,7 +241,7 @@ byte* Widen4444( const byte* in, byte* out, const uint width, const uint height 
 	uint* output = ( uint* )out;
 	for( uint n = 0; n < width * height; n++ )
 	{
-		*output = Convert4444(*input);
+		*output = Convert4444( *input );
 		input++;
 		output++;
 	}
@@ -270,18 +268,15 @@ __inline uint ClutLookup( const OglContext* context, uint index )
 		{
 		case 0x0:
 			// 16-bit BGR 5650
-			return Convert5650(entry);
-			break;
+			return Convert5650( entry );
 		case 0x1:
 			// 16-bit ABGR 5551
-			return Convert5551(entry);
-			break;
+			return Convert5551( entry );
 		case 0x2:
 			// 16-bit ABGR 4444
-			return Convert4444(entry);
-			break;
+			return Convert4444( entry );
 		default:
-			assert(false);
+			assert( false );
 			break;
 		}
 	}
@@ -421,8 +416,8 @@ bool Noxa::Emulation::Psp::Video::GenerateTexture( OglContext* context, OglTextu
 	if( _decodeBuffer == NULL )
 		_decodeBuffer = ( byte* )malloc( 1024 * 1024 * 4 );
 
-	memset(_unswizzleBuffer, 0xCC, 1024 * 1024 * 4);
-	memset(_decodeBuffer, 0xCC, 1024 * 1024 * 4);
+	//memset( _unswizzleBuffer, 0xCC, 1024 * 1024 * 4 );
+	//memset( _decodeBuffer, 0xCC, 1024 * 1024 * 4 );
 
 	byte* address = context->Memory->Translate( texture->Address );
 	TextureFormat* format = ( TextureFormat* )&__formats[ texture->PixelStorage ];
