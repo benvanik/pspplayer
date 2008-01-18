@@ -257,7 +257,7 @@ void niUpdateList( int listId, void* stallAddress )
 	assert( list->ID >= 0 );
 
 	// HACK: wait until stalled or done
-	if( list->StallAddress == false )
+	if( ( list->StallAddress != 0x0 ) && ( list->Stalled == true ) )
 	{
 		UNLOCK;
 		while( list->Stalled == false )
@@ -294,39 +294,43 @@ void niCancelList( int listId )
 	//list->Cancelled = true;
 }
 
-void niSyncList( int listId, VideoSyncType syncType )
+int niSyncList( int listId, int syncType )
 {
 	assert( ( listId >= 0 ) && ( listId < LISTCOUNT ) );
 	DisplayList* list = &_lists[ listId ];
 	if( ( list->ID < 0 ) || ( list->ID > LISTCOUNT ) )
 	{
 		// Probably finished already
-		return;
+		return SyncListDone;
 	}
 
-	//return;
-
-	switch( syncType )
+	if( syncType == 0 )
 	{
-	case SyncListDone:
-		while( list->Done == false )
+		// Wait
+		while( ( list->Done == false ) && ( list->Cancelled == false ) )
 			WaitForSingleObject( _hListSyncEvent, 10 );
-		break;
-	case SyncListQueued:
-		// ?
-		break;
-	case SyncListDrawn:
-		//while( list->Drawn == false )
-		//	WaitForSingleObject( _hListSyncEvent, 10 );
-		break;
-	case SyncListStalled:
-		while( list->Stalled == false )
-			WaitForSingleObject( _hListSyncEvent, 10 );
-		break;
-	case SyncListCancelled:
-		//while( list->Cancelled == false )
-		//	WaitForSingleObject( _hListSyncEvent, 10 );
-		break;
+		if( list->Cancelled == true )
+			return SyncListCancelled;
+		else
+			return SyncListDone;
+	}
+	else
+	{
+		if( list->Done == true )
+			return SyncListDone;
+		else
+		{
+			if( list->Stalled == true )
+				return SyncListStalled;
+			else if( list->Queued == true )
+				return SyncListQueued;
+			else if( list->Drawn == true )
+				return SyncListDrawn;
+			else if( list->Cancelled == true )
+				return SyncListCancelled;
+			else
+				return SyncListQueued;
+		}
 	}
 }
 
@@ -336,18 +340,30 @@ void UnstallAll()
 		_lists[ n ].Stalled = false;
 }
 
-void niSync( VideoSyncType syncType )
+int niSync( int syncType )
 {
 	//UnstallAll();
 
-	switch( syncType )
+	if( syncType == 0 )
 	{
-	case SyncListDone:
-	case SyncListQueued:
-	case SyncListDrawn:
-	case SyncListStalled:
-	case SyncListCancelled:
-		break;
+		// Wait
+		for( int n = 0; n < LISTCOUNT; n++ )
+		{
+			while( _lists[ n ].Done == false )
+				WaitForSingleObject( _hListSyncEvent, 10 );
+		}
+		return SyncListDone;
+	}
+	else
+	{
+		for( int n = 0; n < LISTCOUNT; n++ )
+		{
+			if( _lists[ n ].Stalled == true )
+				return SyncListStalled;
+			if( _lists[ n ].Done == false )
+				return SyncListQueued;
+		}
+		return SyncListDone;
 	}
 
 	_vsyncWaiting = true;

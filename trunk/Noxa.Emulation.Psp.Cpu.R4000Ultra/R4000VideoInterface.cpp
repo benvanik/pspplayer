@@ -122,14 +122,12 @@ int sceGeListUpdateStallAddr( int qid, uint stall )
 
 int sceGeListSync( int qid, int syncType )
 {
-	_videoApi->SyncList( qid, ( VideoSyncType )syncType );
-	return 0;
+	return _videoApi->SyncList( qid, syncType );
 }
 
 int sceGeDrawSync( int syncType )
 {
-	_videoApi->Sync( ( VideoSyncType )syncType );
-	return 0;
+	return _videoApi->Sync( syncType );
 }
 
 #pragma managed
