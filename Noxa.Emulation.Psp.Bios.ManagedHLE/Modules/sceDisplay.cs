@@ -88,6 +88,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xA544C486, "sceDisplaySetResumeMode" )]
 		public int sceDisplaySetResumeMode(){ return Module.NotImplementedReturn; }
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x0E20F177, "sceDisplaySetMode" )]
 		// SDK location: /display/pspdisplay.h:53

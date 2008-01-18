@@ -182,7 +182,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 				default:
 					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDevctl: unknown command 0x" + cmd.ToString( "X8" ) );
-
 					return 0;
 			}
 

@@ -28,8 +28,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( thread == null )
 				return -1;
 
-			thread.Sleep( false );
-			_kernel.Schedule();
+			if( thread.Sleep( false ) == true )
+				_kernel.Schedule();
 
 			return 0;
 		}
@@ -43,8 +43,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( thread == null )
 				return -1;
 
-			thread.Sleep( true );
-			_kernel.Schedule();
+			if( thread.Sleep( true ) == true )
+				_kernel.Schedule();
 
 			return 0;
 		}
@@ -60,7 +60,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			// Perhaps we shouldn't schedule here?
 			thread.Wake( 0 );
-			_kernel.Schedule();
+			if( thread.State == KThreadState.Ready )
+				_kernel.Schedule();
 
 			return 0;
 		}
@@ -75,10 +76,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( thread == null )
 				return -1;
 
-			// cancel wakeup not supported - perhaps we shouldn't cs in sceKernelWakeupThread?
-			Debug.Assert( false );
-
-			return Module.NotImplementedReturn;
+			// Cancel wakeup not supported - perhaps we shouldn't cs in sceKernelWakeupThread?
+			if( thread.WakeupCount > 0 )
+			{
+				thread.WakeupCount = 0;
+				return ( int )thread.WakeupCount;
+			}
+			else
+				return 0;
 		}
 
 		[Stateless]
@@ -239,7 +244,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x2C34E053, "sceKernelReleaseWaitThread" )]
 		// SDK location: /user/pspthreadman.h:399
@@ -249,7 +253,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KThread thread = _kernel.GetHandle<KThread>( thid );
 			if( thread == null )
 				return -1;
-			return Module.NotImplementedReturn;
+			if( ( thread.State == KThreadState.Waiting ) ||
+				( thread.State == KThreadState.WaitSuspended ) )
+			{
+				thread.ReleaseWait();
+				_kernel.Schedule();
+				return 0;
+			}
+			else
+				return unchecked( ( int )0x800201A6 );
 		}
 
 		[NotImplemented]
