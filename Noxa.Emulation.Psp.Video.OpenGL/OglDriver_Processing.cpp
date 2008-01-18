@@ -823,7 +823,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 				if( context->ClutPointer != 0x0 )
 				{
 					byte* tablePointer = context->Memory->Translate( context->ClutPointer );
-					int entries = argi * 16;
+					int entries = argi * ( ( context->ClutFormat < 3 ) ? 16 : 8 );
 					int entryWidth = ( ( context->ClutFormat < 3 ) ? 2 : 4 );
 					memcpy( context->ClutTable, tablePointer, entries * entryWidth );
 
