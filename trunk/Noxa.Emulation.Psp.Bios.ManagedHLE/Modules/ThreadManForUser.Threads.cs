@@ -150,6 +150,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 
 			thread.Exit( status );
+			_kernel.Schedule();
 
 			return 0;
 		}

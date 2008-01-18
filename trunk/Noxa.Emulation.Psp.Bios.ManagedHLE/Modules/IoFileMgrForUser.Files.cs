@@ -78,6 +78,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceIoOpen( int fileName, int flags, int mode )
 		{
 			string path = _kernel.ReadString( ( uint )fileName );
+			if( string.IsNullOrEmpty( path ) == true )
+				return -1;
 			IMediaItem item = _kernel.FindPath( path );
 			if( item is IMediaFolder )
 			{

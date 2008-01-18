@@ -117,6 +117,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0xa3589d81, "__sceSasCore" )]
 		public int __sceSasCore( int sasCore, int outBufPtr )
 		{
+			// TODO: proper blocking - this just waits the thread forever
+			// Maybe we could hack this differently using a timer and just wait
+			// the thread for a second or two?
+			KThread thread = _kernel.ActiveThread;
+			thread.Delay( 3000000, true );
+			_kernel.Schedule();
 			return 0;
 		}
 
@@ -258,6 +264,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 #if !USE
 		[NotImplemented]
 #endif
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x74ae582a, "__sceSasGetEnvelopeHeight" )]
 		public int __sceSasGetEnvelopeHeight( int sasCore, int num )
