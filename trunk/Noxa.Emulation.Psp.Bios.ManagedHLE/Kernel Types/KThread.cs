@@ -37,6 +37,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		Ready = 2,
 		Waiting = 4,
 		Suspended = 8,
+		WaitSuspended = 12,
 		Stopped = 16,
 		Dead = 32,
 	}
@@ -66,7 +67,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public KModule Module;
 
 		public KThreadState State;
-		public bool Suspended;
 		public int ExitCode;
 
 		public KPartition Partition;

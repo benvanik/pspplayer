@@ -289,12 +289,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		}
 
 		//Stop a voice
-		[NotImplemented]
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0xa0cf2fa4, "__sceSasSetKeyOff" )]
 		public int __sceSasSetKeyOff( int sasCore, int num )
 		{
-			return Module.NotImplementedReturn;
+			return 0;
 		}
 
 		[NotImplemented]

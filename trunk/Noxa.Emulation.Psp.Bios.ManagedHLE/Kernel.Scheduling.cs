@@ -27,7 +27,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				for( int n = 0; n < this.Threads.Count; n++ )
 				{
 					KThread thread = this.Threads[ n ];
-					if( ( thread.State == KThreadState.Waiting ) &&
+					if( ( ( thread.State == KThreadState.Waiting ) || ( thread.State == KThreadState.WaitSuspended ) ) &&
 						( thread.WaitingOn == KThreadWait.Delay ) )
 					{
 						if( ( earliest == null ) ||
