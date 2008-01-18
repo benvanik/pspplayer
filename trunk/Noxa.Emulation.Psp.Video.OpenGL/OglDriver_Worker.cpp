@@ -229,18 +229,18 @@ listAbort:
 			_vcount++;
 			SwapBuffers( hDC );
 			PulseEvent( _hSyncEvent );
+
+			if( _screenshotPending == true )
+			{
+				_screenshotPending = false;
+				TakeScreenshot();
+			}
 		}
 		else
 		{
 			//Sleep( 0 );
 		}
 		//_vsyncWaiting = false;
-
-		if( _screenshotPending == true )
-		{
-			_screenshotPending = false;
-			TakeScreenshot();
-		}
 
 #if _DEBUG
 		bool oldPeriodDown = periodDown;
