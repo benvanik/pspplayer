@@ -236,6 +236,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return 0;
 			}
 
+			int scalar = ( handle.IsBlockAccess == true ) ? 2048 : 1;
+			size *= scalar;
+
 			int end = ( int )handle.Stream.Length - ( int )handle.Stream.Position;
 			int length = ( size < end ) ? size : end;
 
@@ -277,6 +280,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoWrite: kernel file handle not found: {0}", fd );
 				return -1;
 			}
+
+			int scalar = ( handle.IsBlockAccess == true ) ? 2048 : 1;
+			size *= scalar;
 
 			if( handle is KStdFile )
 			{
@@ -326,6 +332,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 			}
 
+			int scalar = ( handle.IsBlockAccess == true ) ? 2048 : 1;
+
 			SeekOrigin seekOrigin;
 			switch( whence )
 			{
@@ -345,7 +353,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					break;
 			}
 
-			long ret = handle.Stream.Seek( offset, seekOrigin );
+			long ret = handle.Stream.Seek( offset * scalar, seekOrigin );
 			handle.Result = ret;
 			return ret;
 		}
@@ -379,6 +387,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 			}
 
+			int scalar = ( handle.IsBlockAccess == true ) ? 2048 : 1;
+
 			SeekOrigin seekOrigin;
 			switch( whence )
 			{
@@ -398,7 +408,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					break;
 			}
 
-			int ret = ( int )handle.Stream.Seek( offset, seekOrigin );
+			int ret = ( int )handle.Stream.Seek( offset * scalar, seekOrigin );
 			handle.Result = ret;
 			return ret;
 		}

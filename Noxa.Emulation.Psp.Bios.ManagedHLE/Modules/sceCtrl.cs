@@ -95,7 +95,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_device.Poll();
 
 			Sample sample = new Sample();
-			sample.Timestamp = ( uint )Environment.TickCount;
+			sample.Timestamp = ( uint )Environment.TickCount * 10;
 			sample.Buttons = ( int )_device.Buttons;
 			sample.AnalogX = _device.AnalogX;
 			sample.AnalogY = _device.AnalogY;
@@ -283,7 +283,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			{
 				uint timestamp = ( uint )Environment.TickCount;
 				byte* p = _memorySystem.Translate( ( uint )pad_data );
-				for( int n = 0; n < count; n++ )
+				for( int n = 0; n < 1; n++ )
 				{
 					Sample sample;
 #if THREADED
@@ -316,7 +316,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( pad_data != 0 )
 			{
 				byte* p = _memorySystem.Translate( ( uint )pad_data );
-				for( int n = 0; n < count; n++ )
+				for( int n = 0; n < 1; n++ )
 				{
 					Sample sample;
 #if THREADED

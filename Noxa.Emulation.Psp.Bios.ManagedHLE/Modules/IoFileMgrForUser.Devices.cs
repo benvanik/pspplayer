@@ -20,24 +20,55 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
 	partial class IoFileMgrForUser
 	{
-		[NotImplemented]
+		private const int IoctlGetSectorSize = 0x01020003;
+		private const int IoctlGetFilePointer = 0x01020004;
+		private const int DevctlActivateUmd = 0x01F00003;
+
 		[Stateless]
 		[BiosFunction( 0x63632449, "sceIoIoctl" )]
 		// SDK location: /user/pspiofilemgr.h:368
 		// SDK declaration: int sceIoIoctl(SceUID fd, unsigned int cmd, void *indata, int inlen, void *outdata, int outlen);
-		public int sceIoIoctl( int fd, int cmd, int indata, int inlen, int outdata, int outlen )
+		public unsafe int sceIoIoctl( int fd, int cmd, int indata, int inlen, int outdata, int outlen )
 		{
-			return Module.NotImplementedReturn;
+			KFile handle = _kernel.GetHandle<KFile>( fd );
+			if( handle == null )
+			{
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoIoctl: kernel file handle not found: {0}", fd );
+				return -1;
+			}
+
+			byte* inp = ( byte* )0;
+			byte* outp = ( byte* )0;
+			if( indata != 0 )
+				inp = _memorySystem.Translate( ( uint )indata );
+			if( outdata != 0 )
+				outp = _memorySystem.Translate( ( uint )outdata );
+
+			switch( cmd )
+			{
+				case IoctlGetSectorSize:
+					Debug.Assert( outlen == 4 );
+					*( uint* )outp = 2048;
+					return 0;
+				case IoctlGetFilePointer:
+					// Not sure if this is 64 or 32
+					Debug.Assert( outlen == 8 );
+					Debug.Assert( handle.Stream != null );
+					*( ulong* )outp = ( ulong )handle.Stream.Position;
+					return 0;
+				default:
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoIoctl: unknown command 0x" + cmd.ToString( "X8" ) );
+					return 0;
+			}
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE95A012B, "sceIoIoctlAsync" )]
 		// SDK location: /user/pspiofilemgr.h:381
 		// SDK declaration: int sceIoIoctlAsync(SceUID fd, unsigned int cmd, void *indata, int inlen, void *outdata, int outlen);
 		public int sceIoIoctlAsync( int fd, int cmd, int indata, int inlen, int outdata, int outlen )
 		{
-			return Module.NotImplementedReturn;
+			return sceIoIoctl( fd, cmd, indata, inlen, outdata, outlen );
 		}
 
 		private KCallback _msInsertEjectCallback;
@@ -144,7 +175,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					//break;
 					//return unchecked( ( int )0x80020325 );
 					break;
+
+				case DevctlActivateUmd:	// Activate the UMD drive for real?
+					// Nothing?
+					break;
+
 				default:
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDevctl: unknown command 0x" + cmd.ToString( "X8" ) );
+
 					return 0;
 			}
 
@@ -187,24 +225,26 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return 4;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xB2A628C1, "sceIoAssign" )]
 		// SDK location: /user/pspiofilemgr.h:325
 		// SDK declaration: int sceIoAssign(const char *dev1, const char *dev2, const char *dev3, int mode, void* unk1, long unk2);
 		public int sceIoAssign( int dev1, int dev2, int dev3, int mode, int unk1, int unk2 )
 		{
-			return Module.NotImplementedReturn;
+			string dev1s = ( dev1 == 0 ) ? string.Empty : _kernel.ReadString( ( uint )dev1 );
+			string dev2s = ( dev2 == 0 ) ? string.Empty : _kernel.ReadString( ( uint )dev2 );
+			string dev3s = ( dev3 == 0 ) ? string.Empty : _kernel.ReadString( ( uint )dev3 );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoAssign: {0} {1} {2} - not implemented", dev1s, dev2s, dev3s );
+			return 0;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x6D08A871, "sceIoUnassign" )]
 		// SDK location: /user/pspiofilemgr.h:334
 		// SDK declaration: int sceIoUnassign(const char *dev);
 		public int sceIoUnassign( int dev )
 		{
-			return Module.NotImplementedReturn;
+			return 0;
 		}
 	}
 }
