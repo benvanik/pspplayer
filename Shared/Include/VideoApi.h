@@ -54,8 +54,8 @@ namespace Noxa {
 						void (*UpdateList)( int listId, void* stallAddress );
 						void (*CancelList)( int listId );
 
-						void (*SyncList)( int listId, VideoSyncType syncType );
-						void (*Sync)( VideoSyncType syncType );
+						int (*SyncList)( int listId, int syncType );
+						int (*Sync)( int syncType );
 
 						void (*WaitForVsync)();
 

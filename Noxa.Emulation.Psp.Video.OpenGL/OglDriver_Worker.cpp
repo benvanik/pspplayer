@@ -148,8 +148,8 @@ void TakeScreenshot()
 #pragma unmanaged
 void NativeWorker( HDC hDC, OglContext* context )
 {
-	long long startTime;
-	long long endTime;
+	//long long startTime;
+	//long long endTime;
 	long long freq;
 
 	bool commaDown = false;
@@ -217,8 +217,10 @@ listAbort:
 			}
 		}
 
-		if( listsDone > 0 )
+		if( ( listsDone > 0 ) &&
+			( _vsyncWaiting == true ) )
 		{
+			_vsyncWaiting = false;
 			_processedFrames++;
 
 			glBindTexture( GL_TEXTURE_2D, 0 );
@@ -230,9 +232,9 @@ listAbort:
 		}
 		else
 		{
-			Sleep( 0 );
+			//Sleep( 0 );
 		}
-		_vsyncWaiting = false;
+		//_vsyncWaiting = false;
 
 		if( _screenshotPending == true )
 		{
