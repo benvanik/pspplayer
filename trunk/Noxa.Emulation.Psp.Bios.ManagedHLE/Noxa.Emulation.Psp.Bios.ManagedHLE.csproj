@@ -47,8 +47,8 @@
     <Compile Include="DebugDatabase.cs" />
     <Compile Include="Kernel Types\KCallback.cs" />
     <Compile Include="Kernel Types\KDevice.cs" />
+    <Compile Include="Kernel Types\KMessagePipe.cs" />
     <Compile Include="Kernel Types\KMutex.cs" />
-    <Compile Include="Kernel Types\KPipe.cs" />
     <Compile Include="Kernel Types\KThread.Waiting.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="Kernel Types\KEvent.cs" />
