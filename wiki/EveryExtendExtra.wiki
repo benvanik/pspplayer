@@ -7,8 +7,8 @@ Currently goes in game and is somewhat playable - most issues are with graphics.
 = Graphics Issues =
 
 == Logos ==
- * Pre 'loading' bit - doesn't show (either doesn't render or emu loads too fast)
- * Fade in/out
+ * Missing: pre 'loading' bit - doesn't show (either doesn't render or emu loads too fast)
+ * Incorrect: fade in/out
 
 == Intro screen ==
  * Missing: EEE text - semitransparent
