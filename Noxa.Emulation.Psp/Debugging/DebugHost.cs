@@ -262,10 +262,17 @@ namespace Noxa.Emulation.Psp.Debugging
 			serverProps[ "port" ] = ServerPort;
 			serverProps[ "timeout" ] = Timeout.Infinite;
 
-			TcpChannel channel = new TcpChannel( serverProps, clientProvider, serverProvider );
-			ChannelServices.RegisterChannel( channel, false );
+			try
+			{
+				TcpChannel channel = new TcpChannel( serverProps, clientProvider, serverProvider );
+				ChannelServices.RegisterChannel( channel, false );
 
-			RemotingServices.Marshal( this, "DebugHost" );
+				RemotingServices.Marshal( this, "DebugHost" );
+			}
+			catch
+			{
+				return false;
+			}
 
 			return true;
 		}
