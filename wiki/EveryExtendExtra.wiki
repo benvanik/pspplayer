@@ -15,18 +15,8 @@ Currently goes in game and is somewhat playable - most issues are with graphics.
 
 == Tutorial ==
  * Missing: purple legs
- * Incorrect: flying cubes (pyramid things do display
- * Incorrect: ship shows as some kind of crazy inverse
- * WTF: blue triangle fan coming from ship out to screen
- * Missing: fog
-
-== Menu ==
- * Missing: red chevron on selected item (was there before)
+ * Incorrect: fog is a little dark
 
 == Game ==
- * Missing: stage 1/audio text
- * Missing: right-hand icons
- * Incorrect: ship invert render error
- * Missing: starburts (white/green/purple)
+ * Missing: name/audio text (stage 1 shows)
  * Missing: background/foreground sphere
- * Missing: explosions
