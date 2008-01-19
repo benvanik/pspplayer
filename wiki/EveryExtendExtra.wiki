@@ -1,0 +1,41 @@
+#summary Developer notes for Every Extend Extra
+
+= Status =
+
+Currently goes in game and is somewhat playable - most issues are with graphics.
+
+= Graphics Issues =
+
+== Logos ==
+ * Pre 'loading' bit - doesn't show (either doesn't render or emu loads too fast)
+ * Fade in/out
+
+== Intro screen ==
+ * Missing: EEE text - semitransparent
+ * Missing: bottom button text (copyright shows)
+ * Missing: item text (glows when selected)
+ * Missing: blue background
+ * Missing: blue dots (red and orange show)
+ * Missing: dot group at the bottom
+ * Midding: fades out
+
+== Tutorial ==
+ * Missing: purple legs
+ * Incorrect: flying cubes (pyramid things do display
+ * Incorrect: ship shows as some kind of crazy inverse
+ * WTF: blue triangle fan coming from ship out to screen
+ * Missing: fog
+
+== Menu ==
+ * Missing: background purple
+ * Missing: yellow line through menu items
+ * Missing: lower left inner white bezier patch
+ * Missing: top right white bezier patch
+
+== Game ==
+ * Missing: stage 1/audio text
+ * Missing: right-hand icons
+ * Incorrect: ship invert render error
+ * Missing: starburts (white/green/purple)
+ * Missing: background/foreground sphere
+ * Missing: explosions
