@@ -251,13 +251,15 @@ listAbort:
 		if( commaDown == true )
 		{
 			// Draw wireframe
-			glClear( GL_COLOR_BUFFER_BIT );
+			//glClear( GL_COLOR_BUFFER_BIT );
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			context->WireframeEnabled = true;
 		}
 		else
 		{
 			// Draw solid (normal)
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+			context->WireframeEnabled = false;
 		}
 		if( oldPeriodDown != periodDown )
 		{

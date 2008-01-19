@@ -288,6 +288,14 @@ void DrawBezier( OglContext* context, int vertexType, int vertexSize, byte* iptr
 
 		glBegin( GL_TRIANGLE_STRIP );
 
+		if( ( context->WireframeEnabled == true ) &&
+			( textureType != 0 ) )
+			glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+
+		if( ( context->WireframeEnabled == false ) &&
+			( transformed == true ) )
+			glColor4fv( context->AmbientMaterial );
+
 		for( int v = 0; v <= vdivs; v++ )
 		{
 			float px = ( ( float )v ) / ( ( float )vdivs );			// Percent along the X axis
@@ -297,8 +305,6 @@ void DrawBezier( OglContext* context, int vertexType, int vertexSize, byte* iptr
 				glTexCoord2f( _lastCoord[ v ].u, _lastCoord[ v ].v );
 			else
 				glTexCoord2f( pyold, tpx );
-			if( transformed == true )
-				glColor4fv( context->AmbientMaterial );
 			glVertex3d( _last[ v ].x, _last[ v ].y, _last[ v ].z );	// Old Point
 
 			_last[ v ] = Bernstein( px, temp );						// Generate new point
@@ -307,8 +313,6 @@ void DrawBezier( OglContext* context, int vertexType, int vertexSize, byte* iptr
 				glTexCoord2f( _lastCoord[ v ].u, _lastCoord[ v ].v );
 			else
 				glTexCoord2f( py, tpx );
-			if( transformed == true )
-				glColor4fv( context->AmbientMaterial );
 			glVertex3d( _last[ v ].x, _last[ v ].y, _last[ v ].z );	// New Point
 		}
 

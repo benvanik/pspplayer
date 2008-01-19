@@ -235,7 +235,10 @@ void ProcessList( OglContext* context, DisplayList* list )
 			if( argi == 0 )
 				glDisable( GL_ALPHA_TEST );
 			else
-				glEnable( GL_ALPHA_TEST );
+			{
+				if( context->WireframeEnabled == false )
+					glEnable( GL_ALPHA_TEST );
+			}
 			break;
 		case ATST:
 			switch( argi & 0xFF )
@@ -457,26 +460,40 @@ void ProcessList( OglContext* context, DisplayList* list )
 			// fog enable
 			if( argi == 1 )
 			{
-				//glEnable( GL_FOG );
-				//glFogi( GL_FOG_MODE, GL_EXP2 );
+				glEnable( GL_FOG );
+				glFogi( GL_FOG_MODE, GL_LINEAR );
 				//glFogf( GL_FOG_DENSITY, 0.35f );
-				//glHint( GL_FOG_HINT, GL_DONT_CARE );
+				glHint( GL_FOG_HINT, GL_DONT_CARE );
 			}
 			else
 				glDisable( GL_FOG );
 			break;
 		case FCOL:
 			// fog color
-			//CONVERTCOLOR( argi, color3 );
-			glFogfv( GL_FOG_COLOR, color3 );
-			break;
-		case FDIST:
-			// fog start (float)
-			glFogf( GL_FOG_START, argf );
+			color4[ 0 ] = ( argi & 0xFF ) / 255.0f;
+			color4[ 1 ] = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
+			color4[ 2 ] = ( ( argi >> 16 ) & 0xFF ) / 255.0f;
+			color4[ 3 ] = 1.0f;
+			glFogfv( GL_FOG_COLOR, color4 );
 			break;
 		case FFAR:
-			// fog end (float)
-			glFogf( GL_FOG_END, argf );
+			// fog far (float)
+			context->FogEnd = argf;
+			break;
+		case FDIST:
+			// fog distance (float)
+			context->FogDepth = argf;
+			// We get f precalculated, so need to derive start
+			{
+				if( ( context->FogEnd != 0.0 ) &&
+					( context->FogDepth != 0.0 ) )
+				{
+					float end = context->FogEnd;
+					float start = end - ( 1 / argf );
+					glFogf( GL_FOG_START, start );
+					glFogf( GL_FOG_END, end );
+				}
+			}
 			break;
 
 		case LTE:
@@ -627,8 +644,11 @@ void ProcessList( OglContext* context, DisplayList* list )
 			}
 			else
 			{
-				context->TexturesEnabled = true;
-				glEnable( GL_TEXTURE_2D );
+				if( context->WireframeEnabled == false )
+				{
+					context->TexturesEnabled = true;
+					glEnable( GL_TEXTURE_2D );
+				}
 			}
 			break;
 		case TSYNC:
