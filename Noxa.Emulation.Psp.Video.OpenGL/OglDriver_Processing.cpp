@@ -237,7 +237,10 @@ void ProcessList( OglContext* context, DisplayList* list )
 			else
 			{
 				if( context->WireframeEnabled == false )
+				{
 					glEnable( GL_ALPHA_TEST );
+					glAlphaFunc( GL_GREATER,0.03f );
+				}
 			}
 			break;
 		case ATST:
@@ -270,7 +273,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 				break;
 			}
 			argf = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
-			if( argf > 0.0f )
+			if( argf >= 0.0f )
 			{
 				glEnable( GL_ALPHA_TEST );
 				glAlphaFunc( temp, argf );
@@ -331,10 +334,12 @@ void ProcessList( OglContext* context, DisplayList* list )
 			glDepthFunc( temp );
 			break;
 		case NEARZ:
-			//argf = argf;
+			context->NearZ = argf;
+			glDepthRange( context->NearZ, context->FarZ );
 			break;
 		case FARZ:
-			//argf = argf;
+			context->FarZ = argf;
+			glDepthRange( context->NearZ, context->FarZ );
 			break;
 
 		case ABE:
@@ -424,7 +429,8 @@ void ProcessList( OglContext* context, DisplayList* list )
 						1.0f );*/
 					break;
 				}
-				glBlendFunc( src, dest );
+				glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+				//glBlendFunc( src, dest );
 			}
 			break;
 		case SFIX:	// source fix color

@@ -28,6 +28,8 @@ namespace Noxa {
 					uint			FrameBufferWidth;
 
 					// Misc state
+					float			NearZ;
+					float			FarZ;
 					int				Scissor[ 4 ];
 					float			FogEnd;
 					float			FogDepth;
