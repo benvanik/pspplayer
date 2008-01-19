@@ -11,13 +11,7 @@ Currently goes in game and is somewhat playable - most issues are with graphics.
  * Incorrect: fade in/out
 
 == Intro screen ==
- * Missing: EEE text - semitransparent
- * Missing: bottom button text (copyright shows)
- * Missing: item text (glows when selected)
- * Missing: blue background
- * Missing: blue dots (red and orange show)
- * Missing: dot group at the bottom
- * Midding: fades out
+ * Incorrect: fades out wrong - flickers fullbright then to current fade value
 
 == Tutorial ==
  * Missing: purple legs
@@ -27,10 +21,7 @@ Currently goes in game and is somewhat playable - most issues are with graphics.
  * Missing: fog
 
 == Menu ==
- * Missing: background purple
- * Missing: yellow line through menu items
- * Missing: lower left inner white bezier patch
- * Missing: top right white bezier patch
+ * Missing: red chevron on selected item (was there before)
 
 == Game ==
  * Missing: stage 1/audio text
