@@ -29,6 +29,8 @@ namespace Noxa {
 
 					// Misc state
 					int				Scissor[ 4 ];
+					float			FogEnd;
+					float			FogDepth;
 
 					// Matrices
 					//float			ProjectionMatrix[ 16 ];
@@ -37,6 +39,7 @@ namespace Noxa {
 					float			TextureMatrix[ 16 ];
 
 					// Textures / colors
+					bool			WireframeEnabled;
 					bool			TexturesEnabled;
 					bool			TexturesSwizzled;
 					int				MipMapLevel;

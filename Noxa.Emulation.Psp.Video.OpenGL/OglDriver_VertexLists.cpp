@@ -40,6 +40,7 @@ void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int ve
 
 	if( transformed == true )
 	{
+		glPushAttrib( GL_ENABLE_BIT );
 		glDisable( GL_CULL_FACE );
 
 		glMatrixMode( GL_PROJECTION );
@@ -71,7 +72,7 @@ void DrawBuffers( OglContext* context, int primitiveType, int vertexType, int ve
 		glMatrixMode( GL_PROJECTION );
 		glPopMatrix();
 
-		glEnable( GL_CULL_FACE );
+		glPopAttrib();
 	}
 }
 
@@ -245,12 +246,14 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 				uint* dp = _colorBuffer;
 				for( int n = 0; n < vertexCount; n++ )
 				{
-					uint entry = ( uint )( ( ushort* )sp );
+					uint entry = ( uint )*( ( ushort* )sp );
 					*dp =	( ( entry & 0xF ) * 16 ) |
 							( ( ( ( entry >> 4 ) & 0xF ) * 16 ) << 8 ) |
 							( ( ( ( entry >> 8 ) & 0xF ) * 16 ) << 16 ) |
 							( ( ( ( entry >> 12 ) & 0xF ) * 16 ) << 24 );
+					*dp = _byteswap_ulong( *dp );
 					sp += vertexSize;
+					dp += 1;
 				}
 				glColorPointer( 4, GL_UNSIGNED_BYTE, 0, _colorBuffer );
 			}
@@ -262,27 +265,42 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 				uint* dp = _colorBuffer;
 				for( int n = 0; n < vertexCount; n++ )
 				{
-					uint entry = ( uint )( ( ushort* )sp );
+					uint entry = ( uint )*( ( ushort* )sp );
 					*dp =	( ( entry & 0x1 ) * 256 ) |
 							( ( ( ( entry >> 1 ) & 0x1F ) * 8 ) << 8 ) |
 							( ( ( ( entry >> 6 ) & 0x1F ) * 8 ) << 16 ) |
 							( ( ( ( entry >> 11 ) & 0x1F ) * 8 ) << 24 );
+					*dp = _byteswap_ulong( *dp );
 					sp += vertexSize;
+					dp += 1;
 				}
 				glColorPointer( 4, GL_UNSIGNED_BYTE, 0, _colorBuffer );
 			}
 			src += 2;
 			break;
 		case VTColorABGR8888:
-			glColorPointer( 4, GL_UNSIGNED_BYTE, vertexSize, src );
+			{
+				byte* sp = src;
+				uint* dp = _colorBuffer;
+				for( int n = 0; n < vertexCount; n++ )
+				{
+					*dp = _byteswap_ulong( *( uint* )sp );
+					sp += vertexSize;
+					dp += 1;
+				}
+				glColorPointer( 4, GL_UNSIGNED_BYTE, 0, _colorBuffer );
+			}
+			//glColorPointer( 4, GL_UNSIGNED_BYTE, vertexSize, src );
 			src += 4;
 			break;
 		default:
 			glColor4fv( context->AmbientMaterial );
 			break;
 		}
-		//float f = ( float )rand() / RAND_MAX;
-		//glColor3f( f, f, f );
+
+		if( ( context->WireframeEnabled == true ) &&
+			( colorType == 0 ) )
+			glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 
 		switch( normalType )
 		{
