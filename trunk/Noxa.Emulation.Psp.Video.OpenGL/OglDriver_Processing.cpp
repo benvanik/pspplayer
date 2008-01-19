@@ -457,7 +457,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			// fog enable
 			if( argi == 1 )
 			{
-				glEnable( GL_FOG );
+				//glEnable( GL_FOG );
 				//glFogi( GL_FOG_MODE, GL_EXP2 );
 				//glFogf( GL_FOG_DENSITY, 0.35f );
 				//glHint( GL_FOG_HINT, GL_DONT_CARE );
