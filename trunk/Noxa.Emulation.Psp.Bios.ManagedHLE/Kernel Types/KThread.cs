@@ -84,6 +84,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public uint ThreadPreemptionCount;
 
 		public bool CanHandleCallbacks;
+		public FastLinkedList<KCallback> NotifiedCallbacks;
 
 		// Wait junk
 		public KThreadWait WaitingOn;
@@ -110,6 +111,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			State = KThreadState.Stopped;
 
 			ExitWaiters = new FastLinkedList<KThread>();
+			NotifiedCallbacks = new FastLinkedList<KCallback>();
 
 			//if( stackSize < 65535 )
 			//{

@@ -49,11 +49,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( cb == null )
 				return -1;
 
-			// Unset?? walk callback listings and remove?
-			foreach( FastLinkedList<KCallback> list in _kernel.Callbacks )
-				list.Remove( cb );
-
-			_kernel.RemoveHandle( cb.UID );
+			_kernel.DeleteCallback( cb );
 
 			return 0;
 		}
