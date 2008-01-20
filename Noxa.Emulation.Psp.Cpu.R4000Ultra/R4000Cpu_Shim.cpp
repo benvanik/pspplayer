@@ -79,7 +79,6 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem^ memory, void
 		ilgen->Emit( OpCodes::Ldc_I4, ( int )registers + ( 2 << 2 ) );	// load registers[ v0 = $2 ]
 		ilgen->Emit( OpCodes::Conv_I );
 
-#if 0
 		if( wideReturn == true )
 		{
 			// 64 bit return - lower in v0 ($2), upper in v1 ($3)
@@ -98,7 +97,6 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem^ memory, void
 			
 			// stack now contains address of $v0
 		}
-#endif
 	}
 
 	// Push module instance (needed for Call below)
@@ -201,16 +199,11 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem^ memory, void
 	// Handle return
 	if( hasReturn == true )
 	{
-		if( wideReturn == false )
-			ilgen->Emit( OpCodes::Stind_I4 );				// store to $v0
-		else
-			ilgen->Emit( OpCodes::Stind_I8 );				// store to $v0 + $v1
-#if 0
 		if( wideReturn == true )
 		{
-			MethodInfo^ breakInfo = ( Debugger::typeid )->GetMethod( "Break" );
+			/*MethodInfo^ breakInfo = ( Debugger::typeid )->GetMethod( "Break" );
 			Debug::Assert( breakInfo != nullptr );
-			ilgen->Emit( OpCodes::Call, breakInfo );
+			ilgen->Emit( OpCodes::Call, breakInfo );*/
 
 			// 64 bit return - lower in v0 ($2), upper in v1 ($3)
 			// stack contains v0 addr, v1 addr, long value
@@ -236,8 +229,7 @@ BiosShim^ R4000Cpu::EmitShim( BiosFunction^ function, MemorySystem^ memory, void
 		}
 
 		// Shared code for $v0
-		ilgen->Emit( OpCodes::Stind_I4 );					// store in $v0
-#endif
+		ilgen->Emit( OpCodes::Stind_I4 );					// store lower in $v0
 	}
 	else
 	{

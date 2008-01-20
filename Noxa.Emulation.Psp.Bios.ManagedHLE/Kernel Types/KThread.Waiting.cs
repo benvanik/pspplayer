@@ -26,12 +26,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			if( State == KThreadState.Dead )
 				return;
-	
+
 			if( State == KThreadState.WaitSuspended )
 				State = KThreadState.Suspended;
 			else
 				State = KThreadState.Ready;
-			Kernel.Cpu.SetContextRegister( ContextID, 4, ( uint )returnValue );
+			Kernel.Cpu.SetContextRegister( ContextID, 2, ( uint )returnValue );
 
 			WakeupCount++;
 
@@ -55,7 +55,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				State = KThreadState.Ready;
 
 			ReleaseCount++;
-			Kernel.Cpu.SetContextRegister( ContextID, 4, 0x800201AA );
+			Kernel.Cpu.SetContextRegister( ContextID, 2, 0x800201AA );
 
 			if( State == KThreadState.Ready )
 				this.AddToSchedule();
@@ -113,12 +113,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			if( State == KThreadState.WaitSuspended )
 				State = KThreadState.Suspended;
-			else
-				State = KThreadState.Ready;
-			Kernel.Cpu.SetContextRegister( ContextID, 4, 0 );
-
-			if( State == KThreadState.Ready )
+			else if( ( State == KThreadState.Waiting ) &&
+				( WaitingOn == KThreadWait.Delay ) )
 			{
+				State = KThreadState.Ready;
+				//Kernel.Cpu.SetContextRegister( ContextID, 2, 0 );
 				this.AddToSchedule();
 
 				// We cannot schedule here - in a weird thread
@@ -158,7 +157,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private void JoinCallback( Timer timer )
 		{
 			State = KThreadState.Ready;
-			Kernel.Cpu.SetContextRegister( ContextID, 4, unchecked( ( uint )-1 ) );
+			Kernel.Cpu.SetContextRegister( ContextID, 2, unchecked( ( uint )-1 ) );
 
 			this.AddToSchedule();
 
