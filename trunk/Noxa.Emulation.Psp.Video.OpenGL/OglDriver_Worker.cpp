@@ -227,6 +227,7 @@ listAbort:
 
 			// THIS IS WRONG
 			_vcount++;
+			glFlush();
 			SwapBuffers( hDC );
 			PulseEvent( _hSyncEvent );
 

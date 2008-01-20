@@ -117,12 +117,12 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 		format = GL_V3F;
 
 	// We can only support interleaved arrays if we are not transformed
-	if( ( format != 0 ) && ( transformed == false ) && ( crazyTextures == false ) )
-	{
-		// Something we support - issue an interleaved array
-		glInterleavedArrays( format, vertexSize, ptr );
-	}
-	else
+	//if( ( format != 0 ) && ( transformed == false ) && ( crazyTextures == false ) )
+	//{
+	//	// Something we support - issue an interleaved array
+	//	glInterleavedArrays( format, vertexSize, ptr );
+	//}
+	//else
 	{
 		// Interleaved unsupported - use separate arrays
 
@@ -251,11 +251,11 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 							( ( ( ( entry >> 4 ) & 0xF ) * 16 ) << 8 ) |
 							( ( ( ( entry >> 8 ) & 0xF ) * 16 ) << 16 ) |
 							( ( ( ( entry >> 12 ) & 0xF ) * 16 ) << 24 );
-					*dp = _byteswap_ulong( *dp );
 					sp += vertexSize;
 					dp += 1;
 				}
 				glColorPointer( 4, GL_UNSIGNED_BYTE, 0, _colorBuffer );
+				//glColor4f( 0.0f, 0.0f, 1.0f, 1.0f );
 			}
 			src += 2;
 			break;
@@ -270,31 +270,25 @@ void SetupVertexBuffers( OglContext* context, int vertexType, int vertexCount, i
 							( ( ( ( entry >> 1 ) & 0x1F ) * 8 ) << 8 ) |
 							( ( ( ( entry >> 6 ) & 0x1F ) * 8 ) << 16 ) |
 							( ( ( ( entry >> 11 ) & 0x1F ) * 8 ) << 24 );
-					*dp = _byteswap_ulong( *dp );
 					sp += vertexSize;
 					dp += 1;
 				}
 				glColorPointer( 4, GL_UNSIGNED_BYTE, 0, _colorBuffer );
+				//glColor4f( 0.0f, 1.0f, 0.0f, 1.0f );
 			}
 			src += 2;
 			break;
 		case VTColorABGR8888:
-			{
-				byte* sp = src;
-				uint* dp = _colorBuffer;
-				for( int n = 0; n < vertexCount; n++ )
-				{
-					*dp = _byteswap_ulong( *( uint* )sp );
-					sp += vertexSize;
-					dp += 1;
-				}
-				glColorPointer( 4, GL_UNSIGNED_BYTE, 0, _colorBuffer );
-			}
-			//glColorPointer( 4, GL_UNSIGNED_BYTE, vertexSize, src );
+			glColorPointer( 4, GL_UNSIGNED_BYTE, vertexSize, src );
 			src += 4;
 			break;
-		default:
+		case 0:
 			glColor4fv( context->AmbientMaterial );
+			//if( context->AmbientMaterial[ 0 ] == context->AmbientMaterial[ 1 ] == context->AmbientMaterial[ 2 ] == 0.0f )
+			//	glColor4f( 1.0f, 1.0f, 1.0f, context->AmbientMaterial[ 3 ] );
+			//else
+			//	glColor4fv( context->AmbientMaterial );
+			//glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
 			break;
 		}
 
