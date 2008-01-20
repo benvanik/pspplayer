@@ -355,11 +355,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		private enum LoadAvModule
+		{
+			AvCodec = 0,
+			SasCore = 1,
+			Atrac3Plus = 2,
+			MpegBase = 3,
+		}
+
 		[Stateless]
 		[BiosFunction( 0xC629AF26, "sceUtilityLoadAvModule" )]
 		// manual add - loads avcodec.prx (or audiocodec.prx)
 		public int sceUtilityLoadAvModule( int module )
 		{
+			LoadAvModule moduleType = ( LoadAvModule )module;
+			// TODO: return the ID of the module
+			Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceUtilityLoadAvModule: attempted to load {0} ({1}) - return code should be module ID", moduleType, module );
 			return 0;
 		}
 
@@ -372,20 +383,26 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		//#define PSP_NET_MODULE_COMMON 1
-		//#define PSP_NET_MODULE_ADHOC 2
-		//#define PSP_NET_MODULE_INET 3
-		//#define PSP_NET_MODULE_PARSEURI 4
-		//#define PSP_NET_MODULE_PARSEHTTP 5
-		//#define PSP_NET_MODULE_HTTP 6
-		//#define PSP_NET_MODULE_SSL 7
+		private enum LoadNetModule
+		{
+			Common = 1,
+			Adhoc = 2,
+			Inet = 3,
+			ParseUri = 4,
+			ParseHttp = 5,
+			Http = 6,
+			Ssl = 7,
+		}
+
 		[Stateless]
-		[NotImplemented]
 		[BiosFunction( 0x1579A159, "sceUtilityLoadNetModule" )]
 		// manual add - loads one of the PSP_NET_MODULE_ prxs
 		public int sceUtilityLoadNetModule( int module )
 		{
-			return Module.NotImplementedReturn;
+			LoadNetModule moduleType = ( LoadNetModule )module;
+			// TODO: return the ID of the module
+			Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceUtilityLoadNetModule: attempted to load {0} ({1}) - return code should be module ID", moduleType, module );
+			return 0;
 		}
 
 		[Stateless]

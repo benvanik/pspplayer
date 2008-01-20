@@ -24,19 +24,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public void Wake( int returnValue )
 		{
-			if( State == KThreadState.Dead )
+			if( this.State == KThreadState.Dead )
 				return;
 
-			if( State == KThreadState.WaitSuspended )
-				State = KThreadState.Suspended;
-			else
-				State = KThreadState.Ready;
-			Kernel.Cpu.SetContextRegister( ContextID, 2, ( uint )returnValue );
-
-			WakeupCount++;
-
-			if( State == KThreadState.Ready )
+			if( this.State == KThreadState.WaitSuspended )
+				this.State = KThreadState.Suspended;
+			else if( ( this.State == KThreadState.Waiting ) &&
+				( this.WaitingOn == KThreadWait.Semaphore ) )
+			{
+				this.State = KThreadState.Ready;
+				this.Kernel.Cpu.SetContextRegister( ContextID, 2, ( uint )returnValue );
+				this.WakeupCount++;
 				this.AddToSchedule();
+			}
 		}
 
 		public void ReleaseWait()
@@ -109,19 +109,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			return true;
 		}
 
-		private void DelayCallback( Timer timer )
+		private void DelayCallback( Timer timer, object state )
 		{
-			if( State == KThreadState.WaitSuspended )
-				State = KThreadState.Suspended;
-			else if( ( State == KThreadState.Waiting ) &&
-				( WaitingOn == KThreadWait.Delay ) )
+			if( this.State == KThreadState.WaitSuspended )
+				this.State = KThreadState.Suspended;
+			else if( ( this.State == KThreadState.Waiting ) &&
+				( this.WaitingOn == KThreadWait.Delay ) )
 			{
-				State = KThreadState.Ready;
+				this.State = KThreadState.Ready;
 				//Kernel.Cpu.SetContextRegister( ContextID, 2, 0 );
 				this.AddToSchedule();
-
-				// We cannot schedule here - in a weird thread
-				Kernel.Cpu.BreakExecution();
+				this.Kernel.Schedule();
 			}
 		}
 
@@ -146,7 +144,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				waitTimeMs = 1;
 
 			// Install timer
-			Kernel.AddOneShotTimer( new TimerCallback( this.DelayCallback ), this, waitTimeMs );
+			Kernel.AddOneShotTimer( this.DelayCallback, this, waitTimeMs );
 
 			if( canHandleCallbacks == true )
 				this.Kernel.CheckCallbacks();
@@ -154,15 +152,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.Kernel.Schedule();
 		}
 
-		private void JoinCallback( Timer timer )
+		private void JoinCallback( Timer timer, object state )
 		{
-			State = KThreadState.Ready;
-			Kernel.Cpu.SetContextRegister( ContextID, 2, unchecked( ( uint )-1 ) );
+			this.State = KThreadState.Ready;
+			this.Kernel.Cpu.SetContextRegister( ContextID, 2, unchecked( ( uint )-1 ) );
 
 			this.AddToSchedule();
-
-			// We cannot schedule here - in a weird thread
-			Kernel.Cpu.BreakExecution();
+			this.Kernel.Schedule();
 		}
 
 		public void Join( KThread targetThread, uint timeoutUs, bool canHandleCallbacks )
@@ -179,7 +175,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				WaitTimeout = timeoutUs * 10;	// us -> ticks
 
 				// Install timer
-				Kernel.AddOneShotTimer( new TimerCallback( this.JoinCallback ), this, timeoutUs / 1000 );
+				Kernel.AddOneShotTimer( this.JoinCallback, this, timeoutUs / 1000 );
 			}
 			else
 				WaitTimeout = 0;
@@ -195,31 +191,29 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public const uint SCE_KERNEL_ERROR_WAIT_TIMEOUT = 0x800201A8;
 
-		private void WaitCallback( Timer timer )
+		private void WaitCallback( Timer timer, object state )
 		{
 			// If we have not been made ready already, we wake
-			if( ( State == KThreadState.Waiting ) ||
-				( State == KThreadState.WaitSuspended ) )
+			if( ( this.State == KThreadState.Waiting ) ||
+				( this.State == KThreadState.WaitSuspended ) )
 			{
-				if( WaitHandle is KSemaphore )
-					( ( KSemaphore )WaitHandle ).WaitingThreads.Remove( this );
-				else if( WaitHandle is KEvent )
-					( ( KEvent )WaitHandle ).WaitingThreads.Remove( this );
-				else if( WaitHandle is KPool )
-					( ( KPool )WaitHandle ).WaitingThreads.Remove( this );
+				if( this.WaitHandle is KSemaphore )
+					( ( KSemaphore )this.WaitHandle ).WaitingThreads.Remove( this );
+				else if( this.WaitHandle is KEvent )
+					( ( KEvent )this.WaitHandle ).WaitingThreads.Remove( this );
+				else if( this.WaitHandle is KPool )
+					( ( KPool )this.WaitHandle ).WaitingThreads.Remove( this );
 
-				if( State == KThreadState.Waiting )
+				if( this.State == KThreadState.Waiting )
 				{
-					State = KThreadState.Ready;
-					Kernel.Cpu.SetContextRegister( ContextID, 2, SCE_KERNEL_ERROR_WAIT_TIMEOUT );
+					this.State = KThreadState.Ready;
+					this.Kernel.Cpu.SetContextRegister( ContextID, 2, SCE_KERNEL_ERROR_WAIT_TIMEOUT );
 
 					this.AddToSchedule();
-
-					// We cannot schedule here - in a weird thread
-					Kernel.Cpu.BreakExecution();
+					this.Kernel.Schedule();
 				}
 				else
-					State = KThreadState.Suspended;
+					this.State = KThreadState.Suspended;
 			}
 		}
 
@@ -232,7 +226,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				WaitTimeout = Math.Max( 1, WaitTimeout );
 
 				// Install timer
-				Kernel.AddOneShotTimer( new TimerCallback( this.WaitCallback ), this, timeoutUs / 1000 );
+				Kernel.AddOneShotTimer( this.WaitCallback, this, timeoutUs / 1000 );
 			}
 			else
 				WaitTimeout = 0;

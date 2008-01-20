@@ -20,6 +20,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 	{
 		public bool Schedule()
 		{
+			this.HandleCompletedTimers();
+
 			while( this.SchedulableThreads.Count == 0 )
 			{
 				// No threads to run? Check for delayed
@@ -43,7 +45,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				}
 				else
 				{
-					//Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Schedule: ran out of threads to run" );
+					Log.WriteLine( Verbosity.Critical, Feature.Bios, "Kernel::Schedule: ran out of threads to run - we're dead!" );
 					return false;
 				}
 			}
@@ -68,6 +70,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			Debug.Assert( ActiveThread != null );
 
+			this.HandleCompletedTimers();
+
 			// Execute active thread
 			bool breakFlag;
 			uint instructionsExecuted;
@@ -82,6 +86,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private KThread _oldThread;
 		private KCallback _runningCallback;
 		private bool _runningUserCall;
+		private KThreadState _oldThreadState;
 
 		public bool NotifyCallback( KCallback callback, uint argument )
 		{
@@ -119,9 +124,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			if( this.ActiveThread != thread )
 			{
+				Debug.Assert( ( thread.State == KThreadState.Waiting ) || ( thread.State == KThreadState.WaitSuspended ) );
 				_oldThread = this.ActiveThread;
 				this.ActiveThread = thread;
 			}
+
+			_oldThreadState = thread.State;
 
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Kernel::CheckCallbacks: issuing callback {0} on thread {1} (thread was {2})", _runningCallback.UID.ToString( "X" ), this.ActiveThread.UID.ToString( "X" ), _oldThread.UID.ToString( "X" ) );
 
@@ -154,12 +162,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			_runningCallback = null;
 
+			Debug.Assert( this.ActiveThread.State == _oldThreadState );
+
 			// See if there are more
 			if( this.CheckCallbacks( this.ActiveThread ) == true )
 				return true;
 
-			this.ActiveThread = _oldThread;
-			_oldThread = null;
+			if( _oldThread != null )
+			{
+				this.ActiveThread = _oldThread;
+				_oldThread = null;
+			}
 
 			return true;
 		}

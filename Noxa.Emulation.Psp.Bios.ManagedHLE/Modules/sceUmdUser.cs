@@ -99,6 +99,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x6B4A146C, "sceUmdGetDriveStat" )]
 		// manual add
