@@ -238,7 +238,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KThread thread = _kernel.ActiveThread;
 			Debug.Assert( thread != null );
 			thread.Delay( fixedElapsed, allowCallbacks );
-			_kernel.Schedule();
 		}
 
 		[DontTrace]
@@ -251,7 +250,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// RETURN FB ADDRESS
 			this.WaitVblank( false );
-			return 0;
+			return 0x0000DEAD;
 		}
 
 		[DontTrace]
@@ -263,7 +262,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// RETURN FB ADDRESS
 			this.WaitVblank( true );
-			return 0;
+			return 0x0000DEAD;
 		}
 
 		[DontTrace]
@@ -276,7 +275,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// RETURN FB ADDRESS
 			this.WaitVblank( false );
-			return 0;
+			return 0x0000DEAD;
 		}
 
 		[DontTrace]
@@ -288,7 +287,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// RETURN FB ADDRESS
 			this.WaitVblank( true );
-			return 0;
+			return 0x0000DEAD;
 		}
 	}
 }

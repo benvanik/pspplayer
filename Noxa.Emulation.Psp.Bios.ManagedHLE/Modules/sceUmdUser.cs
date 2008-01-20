@@ -142,6 +142,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// Just hope we never get here
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdWaitDriveStatCB: waiting on status {0}", stat );
+			_kernel.CheckCallbacks();
 			return 0;
 		}
 

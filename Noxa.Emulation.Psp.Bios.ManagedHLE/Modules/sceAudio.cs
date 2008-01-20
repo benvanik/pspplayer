@@ -88,7 +88,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// the thread for a second or two?
 			KThread thread = _kernel.ActiveThread;
 			thread.Delay( 3000000, true );
-			_kernel.Schedule();
 
 			if( _driver == null )
 				return 0;
@@ -140,7 +139,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// the thread for a second or two?
 			KThread thread = _kernel.ActiveThread;
 			thread.Delay( 3000000, true );
-			_kernel.Schedule();
 
 			if( _driver == null )
 				return 0;
@@ -237,7 +235,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// Seems to be called at the start of the mixer thread - maybe init?
 			_kernel.ActiveThread.Sleep( true );
-			_kernel.Schedule();
 			return 0;
 		}
 

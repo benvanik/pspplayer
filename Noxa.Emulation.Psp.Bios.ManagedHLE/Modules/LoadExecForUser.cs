@@ -76,7 +76,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				LinkedListEntry<KCallback> cbs = cbll.HeadEntry;
 				while( cbs != null )
 				{
-					_kernel.IssueCallback( cbs.Value, ( uint )status );
+					_kernel.NotifyCallback( cbs.Value, ( uint )status );
 					cbs = cbs.Next;
 				}
 			}

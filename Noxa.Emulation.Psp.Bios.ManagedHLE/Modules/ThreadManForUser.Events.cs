@@ -134,7 +134,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				KThread thread = _kernel.ActiveThread;
 				Debug.Assert( thread != null );
 				thread.Wait( ev, ( KWaitType )wait, ( uint )bits, ( uint )outBits, ( uint )timeout, false );
-				_kernel.Schedule();
 
 				return 0;
 			}
@@ -179,8 +178,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				KThread thread = _kernel.ActiveThread;
 				Debug.Assert( thread != null );
 				thread.Wait( ev, ( KWaitType )wait, ( uint )bits, ( uint )outBits, ( uint )timeout, true );
-				_kernel.Schedule();
-
+				
 				return 0;
 			}
 		}
