@@ -728,6 +728,20 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		}
 
 		#endregion
+
+		[Stateless]
+		[BiosFunction(0x2A2B3DE0, "sceUtility_2A2B3DE0")]
+		public int sceUtility_2A2B3DE0()
+		{
+			return 0x00112233;
+		}
+
+		[Stateless]
+		[BiosFunction(0xE49BFE92, "sceUtility_E49BFE92")]
+		public int sceUtility_E49BFE92()
+		{
+			return 0x00223344;
+		}
 	}
 }
 
