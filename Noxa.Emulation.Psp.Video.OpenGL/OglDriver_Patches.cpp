@@ -220,7 +220,10 @@ void DrawBezier( OglContext* context, int vertexType, int vertexSize, byte* iptr
 				for( int v = 0; v < vcount; v++ )
 				{
 					float *s = ( float* )src;
-					anchors[ u ][ v ] = Point( s[ 0 ], s[ 1 ], s[ 2 ] );
+					// Sometimes z is really big (65535) - this is either an error in the vfpu, fpu, or really means something on the psp
+					// HACK: ignore big Z in bezier
+					// For now, just pretend we didn't see it ^_^
+					anchors[ u ][ v ] = Point( s[ 0 ], s[ 1 ], ( s[ 2 ] > 60000 ) ? 1.0f : s[ 2 ] );
 					src += vertexSize;
 				}
 			}
@@ -305,6 +308,7 @@ void DrawBezier( OglContext* context, int vertexType, int vertexSize, byte* iptr
 				glTexCoord2f( _lastCoord[ v ].u, _lastCoord[ v ].v );
 			else
 				glTexCoord2f( pyold, tpx );
+			assert( _last[ v ].z < 50000.0f );
 			glVertex3d( _last[ v ].x, _last[ v ].y, _last[ v ].z );	// Old Point
 
 			_last[ v ] = Bernstein( px, temp );						// Generate new point
@@ -313,6 +317,7 @@ void DrawBezier( OglContext* context, int vertexType, int vertexSize, byte* iptr
 				glTexCoord2f( _lastCoord[ v ].u, _lastCoord[ v ].v );
 			else
 				glTexCoord2f( py, tpx );
+			assert( _last[ v ].z < 50000.0f );
 			glVertex3d( _last[ v ].x, _last[ v ].y, _last[ v ].z );	// New Point
 		}
 

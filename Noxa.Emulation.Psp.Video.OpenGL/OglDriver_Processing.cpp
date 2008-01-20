@@ -87,6 +87,8 @@ void ProcessList( OglContext* context, DisplayList* list )
 	int argx;
 	float argf;
 
+	context->AmbientMaterial[ 0 ] = context->AmbientMaterial[ 1 ] = context->AmbientMaterial[ 2 ] = context->AmbientMaterial[ 3 ] = 1.0f;
+
 	glDisable( GL_LIGHTING );
 	//glDisable( GL_CULL_FACE );
 
@@ -239,7 +241,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 				if( context->WireframeEnabled == false )
 				{
 					glEnable( GL_ALPHA_TEST );
-					glAlphaFunc( GL_GREATER,0.03f );
+					glAlphaFunc( GL_GREATER, 0.03f );
 				}
 			}
 			break;
@@ -273,7 +275,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 				break;
 			}
 			argf = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
-			if( argf >= 0.0f )
+			if( argf > 0.0f )
 			{
 				glEnable( GL_ALPHA_TEST );
 				glAlphaFunc( temp, argf );
@@ -334,11 +336,18 @@ void ProcessList( OglContext* context, DisplayList* list )
 			glDepthFunc( temp );
 			break;
 		case NEARZ:
-			context->NearZ = argf;
-			glDepthRange( context->NearZ, context->FarZ );
+			context->NearZ = argi;
+			//glDepthRange( context->NearZ, context->FarZ );
 			break;
 		case FARZ:
-			context->FarZ = argf;
+			argi = ( int )( ( short )( ushort )argi );
+			if( context->NearZ > argi )
+			{
+				context->FarZ = context->NearZ;
+				context->NearZ = argi;
+			}
+			else
+				context->FarZ = argi;
 			glDepthRange( context->NearZ, context->FarZ );
 			break;
 
@@ -392,9 +401,27 @@ void ProcessList( OglContext* context, DisplayList* list )
 				case 3:		// GU_ONE_MINUS_SRC_ALPHA
 					src = GL_ONE_MINUS_SRC_ALPHA;
 					break;
+				case 4:		// GU_DST_ALPHA
+					src = GL_DST_ALPHA;
+					break;
+				case 5:		// GU_ONE_MINUS_DST_ALPHA
+					src = GL_ONE_MINUS_DST_ALPHA;
+					break;
+				case 6:
+					src = GL_SRC_ALPHA; // x2
+					break;
+				case 7:
+					src = GL_ONE_MINUS_SRC_ALPHA; // x2
+					break;
+				case 8:
+					src = GL_DST_ALPHA; // x2
+					break;
+				case 9:
+					src = GL_ONE_MINUS_DST_ALPHA; // x2
+					break;
 				case 10:	// GU_FIX
 					//assert( false );
-					src = GL_ONE;
+					src = GL_SRC_ALPHA;
 					break;
 				}
 				int dest;
@@ -419,6 +446,18 @@ void ProcessList( OglContext* context, DisplayList* list )
 				case 5:		// GU_ONE_MINUS_DST_ALPHA
 					dest = GL_ONE_MINUS_DST_ALPHA;
 					break;
+				case 6:
+					dest = GL_SRC_ALPHA; // x2
+					break;
+				case 7:
+					dest = GL_ONE_MINUS_SRC_ALPHA; // x2
+					break;
+				case 8:
+					dest = GL_DST_ALPHA; // x2
+					break;
+				case 9:
+					dest = GL_ONE_MINUS_DST_ALPHA; // x2
+					break;
 				case 10:	// GU_FIX
 					//assert( false );
 					/*dest = GL_CONSTANT_COLOR;
@@ -427,10 +466,11 @@ void ProcessList( OglContext* context, DisplayList* list )
 						( ( context->DestFix >> 8 ) & 0xFF ) / 255.0f,
 						( context->DestFix & 0xFF ) / 255.0f,
 						1.0f );*/
+					dest = GL_ONE_MINUS_SRC_ALPHA;
 					break;
 				}
-				glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-				//glBlendFunc( src, dest );
+				//glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+				glBlendFunc( src, dest );
 			}
 			break;
 		case SFIX:	// source fix color
@@ -468,7 +508,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			{
 				glEnable( GL_FOG );
 				glFogi( GL_FOG_MODE, GL_LINEAR );
-				//glFogf( GL_FOG_DENSITY, 0.35f );
+				glFogf( GL_FOG_DENSITY, 0.1f );
 				glHint( GL_FOG_HINT, GL_DONT_CARE );
 			}
 			else
@@ -1068,7 +1108,6 @@ void DummyTri( bool ortho )
 {
 	if( ortho == true )
 	{
-		glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
 		glPushAttrib( GL_ENABLE_BIT );
 		glDisable( GL_DEPTH_TEST );
 		glDepthMask( GL_FALSE );
@@ -1106,7 +1145,6 @@ void DummyTri( bool ortho )
 		glPopMatrix();
 		glDepthMask( GL_TRUE );
 		glPopAttrib();
-		glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
 	}
 }
 

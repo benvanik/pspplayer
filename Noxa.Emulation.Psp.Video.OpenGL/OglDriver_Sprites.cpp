@@ -54,7 +54,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	bool transformed = ( vertexType & VTTransformedMask ) != 0;
 	
 	// Disable clipping
-	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
+	//glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST );
 
 	// Disable depth testing (we place in the order we get it)
 	glPushAttrib( GL_ENABLE_BIT );
@@ -245,7 +245,7 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 	glPopAttrib();
 
 	// Re-enable clipping
-	glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
+	//glHint( GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_DONT_CARE );
 }
 
 #pragma managed
