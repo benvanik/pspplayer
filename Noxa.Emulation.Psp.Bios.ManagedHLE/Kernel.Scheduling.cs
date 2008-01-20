@@ -83,28 +83,56 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private KCallback _runningCallback;
 		private bool _runningUserCall;
 
-		public bool CheckCallbacks()
-		{
-			return false;
-		}
-
 		public bool NotifyCallback( KCallback callback, uint argument )
 		{
 			Debug.Assert( callback != null );
+			callback.NotifyCount++;
+			callback.NotifyArguments = argument;
+
+			KThread thread = callback.Thread;
+			if( thread.NotifiedCallbacks.Find( callback ) == null )
+				thread.NotifiedCallbacks.Enqueue( callback );
+			//if( ( thread.State == KThreadState.Waiting ) &&
+			//    ( thread.CanHandleCallbacks == true ) )
+			//{
+			//    this.CheckCallbacks( thread );
+			//}
+
+			return true;
+		}
+
+		public bool CheckCallbacks()
+		{
+			KThread thread = this.ActiveThread;
+			return this.CheckCallbacks( thread );
+		}
+
+		public bool CheckCallbacks( KThread thread )
+		{
+			Debug.Assert( thread != null );
+
+			if( thread.NotifiedCallbacks.Count == 0 )
+				return false;
+
 			Debug.Assert( _runningUserCall == false );
 			Debug.Assert( _runningCallback == null );
 
-			callback.NotifyCount++;
+			if( this.ActiveThread != thread )
+			{
+				_oldThread = this.ActiveThread;
+				this.ActiveThread = thread;
+			}
 
-			_oldThread = ActiveThread;
-			ActiveThread = callback.Thread;
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Kernel::CheckCallbacks: issuing callback {0} on thread {1} (thread was {2})", _runningCallback.UID.ToString( "X" ), this.ActiveThread.UID.ToString( "X" ), _oldThread.UID.ToString( "X" ) );
+
+			KCallback callback = thread.NotifiedCallbacks.Dequeue();
 
 			_runningCallback = callback;
 
 			// Format is arg1, arg2, commonAddress
-			// arg1 = ?
+			// arg1 = passed during notify
 			// arg2 is passed during notify and given to use in argument
-			Cpu.MarshalCall( ActiveThread.ContextID, callback.Address, new uint[] { callback.NotifyCount, argument, callback.CommonAddress }, new MarshalCompleteDelegate( this.CallbackComplete ), 0 );
+			Cpu.MarshalCall( this.ActiveThread.ContextID, callback.Address, new uint[] { callback.NotifyCount, callback.NotifyArguments, callback.CommonAddress }, new MarshalCompleteDelegate( this.CallbackComplete ), 0 );
 
 			return true;
 		}
@@ -115,12 +143,38 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Debug.Assert( _runningCallback != null );
 
 			// Something ? return value something?
+			if( result == 1 )
+			{
+				// Delete callback
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "Kernel::CallbackComplete: callback {0} deleted by request", _runningCallback.UID.ToString( "X" ) );
+				this.DeleteCallback( _runningCallback );
+			}
 
-			ActiveThread = _oldThread;
-			_oldThread = null;
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Kernel::CallbackComplete: finished callback {0} on thread {1}; result was {2}", _runningCallback.UID.ToString( "X" ), this.ActiveThread.UID.ToString( "X" ), result.ToString( "X" ) );
+
 			_runningCallback = null;
 
+			// See if there are more
+			if( this.CheckCallbacks( this.ActiveThread ) == true )
+				return true;
+
+			this.ActiveThread = _oldThread;
+			_oldThread = null;
+
 			return true;
+		}
+
+		public void DeleteCallback( KCallback callback )
+		{
+			// Unset?? walk callback listings and remove?
+			foreach( FastLinkedList<KCallback> list in this.Callbacks )
+				list.Remove( callback );
+
+			// Trickier - remove from pending notification threads
+			foreach( KThread thread in this.Threads )
+				thread.NotifiedCallbacks.Remove( callback );
+
+			this.RemoveHandle( callback.UID );
 		}
 
 		public bool IssueUserCall( uint address, uint[] arguments )

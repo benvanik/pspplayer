@@ -392,10 +392,8 @@ uint NativeExecute( bool* breakFlag )
 		//int v1 = _cpuCtx->Registers[ 3 ];
 		PopState();
 
-		bool test = _currentTcs->MarshalSwitchback;
-
 		// Switch state back
-		if( test )
+		if( _currentTcs->MarshalSwitchback == true )
 			PerformSwitchBack( SwitchNormal );
 		
 		// Make callback

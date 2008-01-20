@@ -170,9 +170,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					}
 					break;
 				case 0x02425823:
-					// Unknown - guessing wait on MS insert/eject?
-					//_kernel.Schedule();
-					//break;
+					// Unknown - guessing wait on MS insert/eject? Forever?
+					if( outp != null )
+						*( uint* )outp = 1;
 					//return unchecked( ( int )0x80020325 );
 					break;
 
