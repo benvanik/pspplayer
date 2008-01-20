@@ -124,7 +124,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// Just hope we never get here
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdWaitDriveStat: waiting on status {0}", stat );
-			return 0;
+			return stat;
 		}
 
 		[BiosFunction( 0x56202973, "sceUmdWaitDriveStatWithTimer" )]
@@ -133,7 +133,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			// Just hope we never get here
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdWaitDriveStatWithTimer: waiting on status {0}", stat );
-			return 0;
+			return stat;
 		}
 
 		[BiosFunction( 0x4A9E5E29, "sceUmdWaitDriveStatCB" )]
@@ -143,7 +143,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Just hope we never get here
 			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceUmdWaitDriveStatCB: waiting on status {0}", stat );
 			_kernel.CheckCallbacks();
-			return 0;
+			return stat;
 		}
 
 		[Stateless]
