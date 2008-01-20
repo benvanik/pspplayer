@@ -44,6 +44,12 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			_filterOriginalPad = regionComboBox.Left - filterTextBox.Right;
 		}
 
+		public void FocusList()
+		{
+			this.listView.Focus();
+			this.ActiveControl = this.listView;
+		}
+
 		public override string Text
 		{
 			get
@@ -308,6 +314,19 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		{
 			if( this.SelectionChanged != null )
 				this.SelectionChanged( this, EventArgs.Empty );
+		}
+
+		private void listView_KeyPress( object sender, KeyPressEventArgs e )
+		{
+			if( ( e.KeyChar >= 'a' && e.KeyChar <= 'z' ) ||
+				( e.KeyChar >= 'A' && e.KeyChar <= 'Z' ) ||
+				( e.KeyChar >= '1' && e.KeyChar <= '0' ) )
+			{
+				e.Handled = true;
+				this.filterTextBox.Text = e.KeyChar.ToString();
+				this.filterTextBox.Focus();
+				this.filterTextBox.SelectionStart = 1;
+			}
 		}
 
 		private void regionComboBox_SelectedIndexChanged( object sender, EventArgs e )

@@ -69,6 +69,7 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 			this.listView.View = System.Windows.Forms.View.Details;
 			this.listView.Resize += new System.EventHandler( this.listView_Resize );
 			this.listView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler( this.listView_ItemSelectionChanged );
+			this.listView.KeyPress += new System.Windows.Forms.KeyPressEventHandler( this.listView_KeyPress );
 			// 
 			// iconColumnHeader
 			// 
