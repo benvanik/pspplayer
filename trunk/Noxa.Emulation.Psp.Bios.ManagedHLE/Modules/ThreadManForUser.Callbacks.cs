@@ -50,6 +50,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 
 			// Unset?? walk callback listings and remove?
+			foreach( FastLinkedList<KCallback> list in _kernel.Callbacks )
+				list.Remove( cb );
 
 			_kernel.RemoveHandle( cb.UID );
 
@@ -65,10 +67,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( cb == null )
 				return -1;
 
-			cb.NotifyCount++;
-			//cb.NotifyArguments = arg2;
-
-			_kernel.IssueCallback( cb, ( uint )arg2 );
+			_kernel.NotifyCallback( cb, ( uint )arg2 );
 
 			// Real return set by marshaller
 			return 0;
@@ -103,7 +102,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceKernelCheckCallback()
 		{
 			// No clue what this does - related to checkthreadstack?
-			return 1;
+			if( _kernel.CheckCallbacks() == true )
+				return 1;
+			else
+				return 0;
 		}
 
 		[Stateless]

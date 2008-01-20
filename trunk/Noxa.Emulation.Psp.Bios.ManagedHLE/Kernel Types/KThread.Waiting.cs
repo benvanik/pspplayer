@@ -101,6 +101,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			WaitingOn = KThreadWait.Sleep;
 
+			if( canHandleCallbacks == true )
+				this.Kernel.CheckCallbacks();
+
+			this.Kernel.Schedule();
+
 			return true;
 		}
 
@@ -143,6 +148,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			// Install timer
 			Kernel.AddOneShotTimer( new TimerCallback( this.DelayCallback ), this, waitTimeMs );
+
+			if( canHandleCallbacks == true )
+				this.Kernel.CheckCallbacks();
+
+			this.Kernel.Schedule();
 		}
 
 		private void JoinCallback( Timer timer )
@@ -177,6 +187,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			WaitHandle = targetThread;
 
 			targetThread.ExitWaiters.Enqueue( this );
+
+			if( canHandleCallbacks == true )
+				this.Kernel.CheckCallbacks();
+
+			this.Kernel.Schedule();
 		}
 
 		public const uint SCE_KERNEL_ERROR_WAIT_TIMEOUT = 0x800201A8;
@@ -239,6 +254,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			WaitEventMode = waitEventMode;
 			WaitArgument = userValue;
 			WaitAddress = outAddress;
+
+			if( canHandleCallbacks == true )
+				this.Kernel.CheckCallbacks();
+
+			this.Kernel.Schedule();
 		}
 
 		public void Wait( KPool pool, uint pdata, uint timeoutUs, bool canHandleCallbacks )
@@ -257,6 +277,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.WaitTimeoutSetup( timeoutUs );
 			WaitHandle = pool;
 			WaitAddress = pdata;
+
+			if( canHandleCallbacks == true )
+				this.Kernel.CheckCallbacks();
+
+			this.Kernel.Schedule();
 		}
 
 		public void Wait( KSemaphore sema, int count, uint timeoutUs, bool canHandleCallbacks )
@@ -271,6 +296,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.WaitTimeoutSetup( timeoutUs );
 			WaitHandle = sema;
 			WaitArgument = ( uint )count;
+
+			if( canHandleCallbacks == true )
+				this.Kernel.CheckCallbacks();
+
+			this.Kernel.Schedule();
 		}
 
 		public void Wait( KMutex mutex, uint timeoutUs )
@@ -284,6 +314,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			WaitingOn = KThreadWait.Mutex;
 			this.WaitTimeoutSetup( timeoutUs );
 			WaitHandle = mutex;
+
+			this.Kernel.Schedule();
 		}
 
 		public void Wait( KMessagePipe pipe, int message, int size, int timeout, bool canHandleCallbacks )
@@ -300,6 +332,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.WaitHandle = pipe;
 			this.WaitArgument = ( uint )size;
 			this.WaitAddress = ( uint )message;
+
+			if( canHandleCallbacks == true )
+				this.Kernel.CheckCallbacks();
+
+			this.Kernel.Schedule();
 		}
 	}
 }

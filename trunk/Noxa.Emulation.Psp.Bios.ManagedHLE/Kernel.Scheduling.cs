@@ -83,11 +83,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private KCallback _runningCallback;
 		private bool _runningUserCall;
 
-		public bool IssueCallback( KCallback callback, uint argument )
+		public bool CheckCallbacks()
+		{
+			return false;
+		}
+
+		public bool NotifyCallback( KCallback callback, uint argument )
 		{
 			Debug.Assert( callback != null );
 			Debug.Assert( _runningUserCall == false );
 			Debug.Assert( _runningCallback == null );
+
+			callback.NotifyCount++;
 
 			_oldThread = ActiveThread;
 			ActiveThread = callback.Thread;

@@ -95,7 +95,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceIoWaitAsyncCB(SceUID fd, SceInt64 *res);
 		public int sceIoWaitAsyncCB( int fd, int res )
 		{
-			return sceIoPollAsync( fd, res );
+			int ret = sceIoPollAsync( fd, res );
+			_kernel.CheckCallbacks();
+			return ret;
 		}
 
 		[Stateless]

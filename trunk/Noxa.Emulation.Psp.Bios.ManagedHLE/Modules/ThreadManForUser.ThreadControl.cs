@@ -28,8 +28,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( thread == null )
 				return -1;
 
-			if( thread.Sleep( false ) == true )
-				_kernel.Schedule();
+			thread.Sleep( false );
 
 			return 0;
 		}
@@ -43,8 +42,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( thread == null )
 				return -1;
 
-			if( thread.Sleep( true ) == true )
-				_kernel.Schedule();
+			thread.Sleep( true );
 
 			return 0;
 		}
@@ -147,7 +145,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			}
 
 			thread.Join( targetThread, timeoutUs, false );
-			_kernel.Schedule();
 
 			return 0;
 		}
@@ -181,7 +178,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			}
 
 			thread.Join( targetThread, timeoutUs, true );
-			_kernel.Schedule();
 
 			return 0;
 		}
@@ -197,8 +193,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 
 			thread.Delay( ( uint )delay, false );
-			_kernel.Schedule();
-
+			
 			return 0;
 		}
 
@@ -213,7 +208,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 
 			thread.Delay( ( uint )delay, true );
-			_kernel.Schedule();
 
 			return 0;
 		}

@@ -122,7 +122,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// the thread for a second or two?
 			KThread thread = _kernel.ActiveThread;
 			thread.Delay( 3000000, true );
-			_kernel.Schedule();
 			return 0;
 		}
 
