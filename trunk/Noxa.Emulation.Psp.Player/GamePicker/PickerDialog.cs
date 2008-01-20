@@ -268,14 +268,14 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 		private void whidbeyTabPage1_Showing( object sender, EventArgs e )
 		{
 			SetEnabledState( true );
-			umdGameListing.Focus();
+			umdGameListing.FocusList();
 			umdGameListing_SelectionChanged( umdGameListing, EventArgs.Empty );
 		}
 
 		private void whidbeyTabPage2_Showing( object sender, EventArgs e )
 		{
 			SetEnabledState( false );
-			msGameListing.Focus();
+			msGameListing.FocusList();
 			msGameListing_SelectionChanged( msGameListing, EventArgs.Empty );
 		}
 
