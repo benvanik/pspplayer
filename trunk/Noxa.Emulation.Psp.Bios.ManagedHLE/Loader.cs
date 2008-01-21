@@ -224,7 +224,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		private struct PspModuleInfo
 		{
 			public uint flags;
-			
+
 			public sbyte name;	// name is 28 bytes - this takes up the first 1
 			public uint name1;	// following is the rest of the 27 bytes
 			public uint name2;
@@ -245,7 +245,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		#endregion
 
 		#region Helpers
-		
+
 		private Elf32_Shdr* FindSection( byte* buffer, string name )
 		{
 			Elf32_Ehdr* header = ( Elf32_Ehdr* )buffer;
@@ -299,7 +299,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		private struct HiReloc
 		{
-			public uint	Value;
+			public uint Value;
 			public uint* CodePointer;
 		}
 
@@ -316,6 +316,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			results.Successful = false;
 			results.Imports = new List<StubImport>();
 			results.Exports = new List<StubExport>();
+			results.MissingImports = new FastLinkedList<DelayedImport>();
 
 			Debug.Assert( moduleStream != null );
 			Debug.Assert( moduleStream.CanRead == true );
@@ -463,17 +464,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					Elf32_Shdr* shdr = allocSections[ n ];
 					uint address = baseAddress + shdr->sh_addr;
 					byte* pdest = memory.Translate( address );
-					
+
 					switch( shdr->sh_type )
 					{
-					case ShType.SHT_NOBITS:
-						// Write zeros?
-						MemorySystem.ZeroMemory( pdest, shdr->sh_size );
-						break;
-					default:
-					case ShType.SHT_PROGBITS:
-						MemorySystem.CopyMemory( buffer + shdr->sh_offset, pdest, shdr->sh_size );
-						break;
+						case ShType.SHT_NOBITS:
+							// Write zeros?
+							MemorySystem.ZeroMemory( pdest, shdr->sh_size );
+							break;
+						default:
+						case ShType.SHT_PROGBITS:
+							MemorySystem.CopyMemory( buffer + shdr->sh_offset, pdest, shdr->sh_size );
+							break;
 					}
 				}
 
@@ -541,7 +542,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 								Debug.Assert( valueHeaderN < header->e_phnum );
 								Elf32_Phdr* offsetHeader = ( Elf32_Phdr* )( buffer + header->e_phoff + ( header->e_phentsize * offsetHeaderN ) );
 								Elf32_Phdr* valueHeader = ( Elf32_Phdr* )( buffer + header->e_phoff + ( header->e_phentsize * valueHeaderN ) );
-								
+
 								basea += valueHeader->p_vaddr;
 								offset += offsetHeader->p_vaddr;
 							}
@@ -551,48 +552,48 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 							switch( rtype )
 							{
-							case RelType.MipsHi16:
-								{
-									HiReloc hiReloc = new HiReloc();
-									hiReloc.Value = basea;
-									hiReloc.CodePointer = ( uint* )pcode;
-									hiRelocs.Add( hiReloc );
-								}
-								break;
-							case RelType.MipsLo16:
-								{
-									uint code = *pcode;
-									uint vallo = ( ( code & 0x0000FFFF ) ^ 0x00008000 ) - 0x00008000;
-									while( hiRelocs.Count > 0 )
+								case RelType.MipsHi16:
 									{
-										HiReloc hiReloc = hiRelocs[ hiRelocs.Count - 1 ];
-										hiRelocs.RemoveAt( hiRelocs.Count - 1 );
-
-										Debug.Assert( hiReloc.Value == basea );
-
-										uint value2 = *hiReloc.CodePointer;
-										uint temp = ( ( value2 & 0x0000FFFF ) << 16 ) + vallo;
-										temp += basea;
-										temp = ( ( temp >> 16 ) + ( ( ( temp & 0x00008000 ) != 0 ) ? ( uint )1 : ( uint )0 ) ) & 0x0000FFFF;
-										value2 = ( uint )( ( value2 & ~0x0000FFFF ) | temp );
-
-										//Debug.WriteLine( string.Format( "   Updating memory at 0x{0:X8} to {1:X8} (from previous HI16)", hiReloc.Address, value2 ) );
-										*hiReloc.CodePointer = value2;
+										HiReloc hiReloc = new HiReloc();
+										hiReloc.Value = basea;
+										hiReloc.CodePointer = ( uint* )pcode;
+										hiRelocs.Add( hiReloc );
 									}
-									*pcode = ( uint )( ( code & ~0x0000FFFF ) | ( ( basea + vallo ) & 0x0000FFFF ) );
-								}
-								break;
-							case RelType.Mips26:
-								{
-									uint code = *pcode;
-									uint addr = ( code & 0x03FFFFFF ) << 2;
-									addr += basea;
-									*pcode = ( code & unchecked( ( uint )~0x03FFFFFF ) ) | ( addr >> 2 );
-								}
-								break;
-							case RelType.Mips32:
-								*pcode += basea;
-								break;
+									break;
+								case RelType.MipsLo16:
+									{
+										uint code = *pcode;
+										uint vallo = ( ( code & 0x0000FFFF ) ^ 0x00008000 ) - 0x00008000;
+										while( hiRelocs.Count > 0 )
+										{
+											HiReloc hiReloc = hiRelocs[ hiRelocs.Count - 1 ];
+											hiRelocs.RemoveAt( hiRelocs.Count - 1 );
+
+											Debug.Assert( hiReloc.Value == basea );
+
+											uint value2 = *hiReloc.CodePointer;
+											uint temp = ( ( value2 & 0x0000FFFF ) << 16 ) + vallo;
+											temp += basea;
+											temp = ( ( temp >> 16 ) + ( ( ( temp & 0x00008000 ) != 0 ) ? ( uint )1 : ( uint )0 ) ) & 0x0000FFFF;
+											value2 = ( uint )( ( value2 & ~0x0000FFFF ) | temp );
+
+											//Debug.WriteLine( string.Format( "   Updating memory at 0x{0:X8} to {1:X8} (from previous HI16)", hiReloc.Address, value2 ) );
+											*hiReloc.CodePointer = value2;
+										}
+										*pcode = ( uint )( ( code & ~0x0000FFFF ) | ( ( basea + vallo ) & 0x0000FFFF ) );
+									}
+									break;
+								case RelType.Mips26:
+									{
+										uint code = *pcode;
+										uint addr = ( code & 0x03FFFFFF ) << 2;
+										addr += basea;
+										*pcode = ( code & unchecked( ( uint )~0x03FFFFFF ) ) | ( addr >> 2 );
+									}
+									break;
+								case RelType.Mips32:
+									*pcode += basea;
+									break;
 							}
 						}
 
@@ -607,6 +608,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					Diag.Instance.Database.BeginUpdate();
 				}
 
+				int variableExportCount = 0;
+				int functionExportCount = 0;
+
 				// Get exports
 				uint PspModuleExportSize = ( uint )sizeof( PspModuleExport );
 				uint pexports = moduleInfo->exports + ( ( needsRelocation == true ) ? baseAddress : 0 );
@@ -618,6 +622,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					if( ex->name != 0x0 )
 						name = kernel.ReadString( ex->name );
 
+					// Ignore null names?
+					//if( ex->name == 0x0 )
+					//	continue;
+
 					uint* pnid = ( uint* )memory.Translate( ex->exports );
 					uint* pvalue = ( uint* )memory.Translate( ex->exports + ( ( uint )( ex->func_count + ex->var_count ) * 4 ) );
 
@@ -628,9 +636,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 						StubExport stubExport = new StubExport();
 						if( m < ex->func_count )
+						{
 							stubExport.Type = StubType.Function;
+							Log.WriteLine( Verbosity.Verbose, Feature.Loader, "export func {0} 0x{1:X8}: {2:X8}", name, nid, value );
+							functionExportCount++;
+						}
 						else
+						{
 							stubExport.Type = StubType.Variable;
+							Log.WriteLine( Verbosity.Verbose, Feature.Loader, "export var {0} 0x{1:X8}: {2:X8}", name, nid, value );
+							variableExportCount++;
+						}
 						stubExport.ModuleName = name;
 						stubExport.NID = nid;
 						stubExport.Address = value;
@@ -643,7 +659,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				int nidNotImplementedCount = 0;
 				int moduleNotFoundCount = 0;
 				List<string> missingModules = new List<string>();
-				
+
 				// Get imports
 				uint PspModuleImportSize = ( uint )sizeof( PspModuleImport );
 				uint pimports = moduleInfo->imports + ( ( needsRelocation == true ) ? baseAddress : 0 );
@@ -659,11 +675,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					BiosModule module = _bios.FindModule( name );
 					if( module == null )
 						missingModules.Add( name );
-					
+
 					uint* pnid = ( uint* )memory.Translate( im->nids );
 					uint* pfuncs = ( uint* )memory.Translate( im->funcs );
-					
-					// Functions
+
+					// Functions & variables at the same time
 					for( int m = 0; m < ( im->func_count + im->var_count ); m++ )
 					{
 						uint nid = *( pnid + m );
@@ -682,6 +698,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							Log.WriteLine( Verbosity.Normal, Feature.Loader, "{0} 0x{1:X8} not found (NID not present)", name, nid );
 							stubImport.Result = StubReferenceResult.NidNotFound;
 							nidNotFoundCount++;
+							results.MissingImports.Enqueue( new DelayedImport( stubImport ) );
 						}
 						else if( function.IsImplemented == false )
 						{
@@ -814,12 +831,21 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					foreach( string moduleName in missingModules )
 						Log.WriteLine( Verbosity.Normal, Feature.Loader, "\t\t{0}", moduleName );
 				}
+				if( ( functionExportCount > 0 ) || ( variableExportCount > 0 ) )
+					Log.WriteLine( Verbosity.Critical, Feature.Loader, "Exported {0} functions and {1} variables", functionExportCount, variableExportCount );
 #endif
 
 				results.Successful = true;
 
 				if( results.Successful == true )
 				{
+					// If we export things, go back and find previously loaded modules that may need fixing up
+					if( ( functionExportCount > 0 ) || ( variableExportCount > 0 ) )
+					{
+						bool fixupResult = this.FixupDelayedImports( kernel, results );
+						Debug.Assert( fixupResult == true );
+					}
+
 					// If we are the boot load - we do some special stuff like run start, etc
 					// If we are a PRX, all that is taken care of for us by the user code making calls
 					if( type == ModuleType.Boot )
@@ -878,6 +904,66 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 
 			return results;
+		}
+
+		private bool FixupDelayedImports( Kernel kernel, LoadResults results )
+		{
+			int fixupCount = 0;
+			foreach( KModule previous in kernel.UserModules )
+			{
+				if( previous.LoadResults.MissingImports.Count == 0 )
+					continue;
+
+				LinkedListEntry<DelayedImport> e = previous.LoadResults.MissingImports.HeadEntry;
+				while( e != null )
+				{
+					LinkedListEntry<DelayedImport> next = e.Next;
+					DelayedImport import = e.Value;
+					if( import.StubImport.ModuleName == results.Name )
+					{
+						// Find export
+						StubExport myExport = null;
+						foreach( StubExport export in results.Exports )
+						{
+							if( export.NID == import.StubImport.NID )
+							{
+								myExport = export;
+								break;
+							}
+						}
+						if( myExport != null )
+						{
+							previous.LoadResults.MissingImports.Remove( e );
+							fixupCount++;
+
+							// Fixup
+							Log.WriteLine( Verbosity.Verbose, Feature.Loader, "Fixing up module {0} delayed import 0x{1:X8}; value={2:X8}", previous.Name, import.StubImport.NID, myExport.Address );
+
+							Debug.Assert( myExport.Type == import.StubImport.Type );
+							if( myExport.Type == StubType.Function )
+							{
+								BiosFunction function = import.StubImport.Function;
+								// TODO: Change function module, etc?
+
+								// Perform fixup
+								uint* pcode = ( uint* )function.StubAddress;
+								{
+									// j {target}
+									// nop
+									*( pcode + 0 ) = ( uint )( ( 2 << 26 ) | ( ( myExport.Address >> 2 ) & 0x03FFFFFF ) );
+									*( pcode + 1 ) = ( uint )0;
+								}
+							}
+							else
+							{
+								throw new NotImplementedException( "Cannot handle fixups of variable imports" );
+							}
+						}
+					}
+					e = next;
+				}
+			}
+			return true;
 		}
 
 		private void KmoduleThreadEnd( int tcsId, int state )

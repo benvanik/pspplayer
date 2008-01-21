@@ -48,7 +48,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		private bool _inited;
+		private bool _isInited;
 
 		//State of the connection as the PSP sees it, should probably be an enum (Is one defined in the PSPSDK?)
 		// -1: not trying to connect, not sure if this is the correct value to use but it will work.
@@ -63,7 +63,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: public int sceNetApctlInit(int stackSize, int initPriority);
 		public int sceNetApctlInit( int stackSize, int initPriority )
 		{
-			_inited = true;
+			_isInited = true;
 			//How used in PSPSDK:
 			//sceNetApctlInit(0x1400, 0x42)
 			//Looks like we are meant to fire up a thread, for now we won't

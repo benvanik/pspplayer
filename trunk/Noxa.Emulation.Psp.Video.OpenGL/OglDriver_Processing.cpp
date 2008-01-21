@@ -336,7 +336,8 @@ void ProcessList( OglContext* context, DisplayList* list )
 			glDepthFunc( temp );
 			break;
 		case NEARZ:
-			context->NearZ = argi;
+			argi = ( int )( ( short )( ushort )argi );
+			context->NearZ = ( float )argi;
 			//glDepthRange( context->NearZ, context->FarZ );
 			break;
 		case FARZ:
@@ -344,10 +345,10 @@ void ProcessList( OglContext* context, DisplayList* list )
 			if( context->NearZ > argi )
 			{
 				context->FarZ = context->NearZ;
-				context->NearZ = argi;
+				context->NearZ = ( float )argi;
 			}
 			else
-				context->FarZ = argi;
+				context->FarZ = ( float )argi;
 			glDepthRange( context->NearZ, context->FarZ );
 			break;
 

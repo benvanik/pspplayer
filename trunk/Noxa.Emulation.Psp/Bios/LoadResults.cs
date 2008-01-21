@@ -61,6 +61,11 @@ namespace Noxa.Emulation.Psp.Bios
 		public List<StubExport> Exports;
 
 		/// <summary>
+		/// List of missing imports.
+		/// </summary>
+		public FastLinkedList<DelayedImport> MissingImports;
+
+		/// <summary>
 		/// Used internally to preserve important information. Only present if requested in <see cref="LoadParameters"/>.
 		/// </summary>
 		public IntPtr PreservedData;
@@ -111,6 +116,26 @@ namespace Noxa.Emulation.Psp.Bios
 		/// The stub was found, but not implemented.
 		/// </summary>
 		NidNotImplemented,
+	}
+
+	/// <summary>
+	/// Delayed NID import reference.
+	/// </summary>
+	public class DelayedImport
+	{
+		/// <summary>
+		/// The <c>StubImport</c> that is missing.
+		/// </summary>
+		public StubImport StubImport;
+
+		/// <summary>
+		/// Initializes a new <c>DelayedImport</c> instance with the given parameters.
+		/// </summary>
+		/// <param name="stubImport">The stub import that was missing.</param>
+		public DelayedImport( StubImport stubImport )
+		{
+			this.StubImport = stubImport;
+		}
 	}
 
 	/// <summary>
