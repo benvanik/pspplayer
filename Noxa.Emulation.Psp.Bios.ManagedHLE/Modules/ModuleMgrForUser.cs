@@ -149,6 +149,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			KModule kmod = new KModule( _kernel, module );
 			kmod.LoadResults = results;
+			_kernel.UserModules.Add( kmod );
 			_kernel.AddHandle( kmod );
 
 			return ( int )kmod.UID;

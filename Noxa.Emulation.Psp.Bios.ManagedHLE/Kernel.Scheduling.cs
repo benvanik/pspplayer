@@ -42,6 +42,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				{
 					// Wait on it
 					System.Threading.Thread.Sleep( 1 );
+					this.HandleCompletedTimers();
 				}
 				else
 				{
