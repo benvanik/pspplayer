@@ -316,6 +316,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			results.Successful = false;
 			results.Imports = new List<StubImport>();
 			results.Exports = new List<StubExport>();
+			results.ExportNames = new List<string>();
 			results.MissingImports = new FastLinkedList<DelayedImport>();
 
 			Debug.Assert( moduleStream != null );
@@ -623,8 +624,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						name = kernel.ReadString( ex->name );
 
 					// Ignore null names?
-					//if( ex->name == 0x0 )
-					//	continue;
+					if( ex->name == 0x0 )
+						continue;
+					results.ExportNames.Add( name );
 
 					uint* pnid = ( uint* )memory.Translate( ex->exports );
 					uint* pvalue = ( uint* )memory.Translate( ex->exports + ( ( uint )( ex->func_count + ex->var_count ) * 4 ) );
@@ -692,6 +694,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						{
 							stubImport.Result = StubReferenceResult.ModuleNotFound;
 							moduleNotFoundCount++;
+							results.MissingImports.Enqueue( new DelayedImport( stubImport ) );
 						}
 						else if( function == null )
 						{
@@ -919,7 +922,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				{
 					LinkedListEntry<DelayedImport> next = e.Next;
 					DelayedImport import = e.Value;
-					if( import.StubImport.ModuleName == results.Name )
+					if( results.ExportNames.Contains( import.StubImport.ModuleName ) == true )
 					{
 						// Find export
 						StubExport myExport = null;

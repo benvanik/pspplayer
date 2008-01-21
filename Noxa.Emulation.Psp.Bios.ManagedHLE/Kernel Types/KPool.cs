@@ -179,7 +179,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				KMemoryBlock block = Partition.Allocate( KAllocType.Low, 0, BlockSize );
 				if( block == null )
-					throw new Exception();
+					return false;
 				block.Name = string.Format( "VPL {0} block", this.Name );
 				Blocks.Enqueue( block );
 				FreeBlocks.Enqueue( block );
