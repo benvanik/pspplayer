@@ -8,12 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
-
-using Noxa.Utilities;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Utilities;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
@@ -48,12 +48,28 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		[NotImplemented]
-		[Stateless]
+		[StructLayout( LayoutKind.Sequential )]
+		private struct SceKernelLoadExecParam
+		{
+			public uint Size;
+			public uint ArgCount;
+			public uint ArgPointer;
+			public uint Key;
+		}
+
 		[BiosFunction( 0xBD2F1094, "sceKernelLoadExec" )]
 		// SDK location: /user/psploadexec.h:80
 		// SDK declaration: int sceKernelLoadExec(const char *file, struct SceKernelLoadExecParam *param);
-		public int sceKernelLoadExec( int file, int param ){ return Module.NotImplementedReturn; }
+		public unsafe int sceKernelLoadExec( int file, int param )
+		{
+			// Restart the emu loading the prx in file?
+			string prxName = _kernel.ReadString( ( uint )file );
+			SceKernelLoadExecParam* loadParam = ( SceKernelLoadExecParam* )_kernel.MemorySystem.Translate( ( uint )param );
+
+			Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceKernelLoadExec: attempt to reset psp to prx {0}; THIS IS NOT IMPLEMENTED", prxName );
+
+			return Module.NotImplementedReturn;
+		}
 
 		[BiosFunction( 0x05572A5F, "sceKernelExitGame" )]
 		// SDK location: /user/psploadexec.h:57

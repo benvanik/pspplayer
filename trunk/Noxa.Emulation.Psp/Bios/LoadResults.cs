@@ -61,6 +61,11 @@ namespace Noxa.Emulation.Psp.Bios
 		public List<StubExport> Exports;
 
 		/// <summary>
+		/// A list of the names of export modules.
+		/// </summary>
+		public List<string> ExportNames;
+
+		/// <summary>
 		/// List of missing imports.
 		/// </summary>
 		public FastLinkedList<DelayedImport> MissingImports;
