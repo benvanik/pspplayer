@@ -4,6 +4,9 @@
 = Screenshots and Movies =
 Although the emulator is pretty advanced, it is also in its early stages. This means that the screenshots you see here aren't that pretty yet. Newer images are at the top because I expect them to be cooler.
 
+== Movies ==
+* Short clips posted here: [http://youtube.com/user/benvanik]
+
 === 2007-07-16 - A-train ===
 Just a menu for now, and it looks horrible, but I'll figure that out :)
 
@@ -79,4 +82,3 @@ Here for posterity is the first thing, besides text, I ever got drawing. A prett
 The real first application was my own empty app, but this is one of the first interesting ones: the basic controller sample from the pspsdk. I'm actually controlling it with my Xbox 360 controller!
 
 [http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2006.07.10.01-ControllerSample.png]
-
