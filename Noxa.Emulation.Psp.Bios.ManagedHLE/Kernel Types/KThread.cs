@@ -94,7 +94,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public KWaitType WaitEventMode;		// Event wait mode (if WaitingOn = KThreadWaitEvent)
 		public uint WaitArgument;
 		public uint WaitAddress;			// For output parameters
-
+		public uint WaitAddressResult;
+		
 		public KThread( Kernel kernel, KModule module, KPartition partition, string name, uint entryAddress, int priority, KThreadAttributes attributes, uint stackSize )
 		{
 			Debug.Assert( partition != null );

@@ -24,7 +24,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x7C0DC2A0, "sceKernelCreateMsgPipe" )]
 		// SDK location: /user/pspthreadman.h:1114
 		// SDK declaration: SceUID sceKernelCreateMsgPipe(const char *name, int part, int attr, void *unk1, void *opt);
-		public int sceKernelCreateMsgPipe( int _name, int part, int attr, int unk1, int opt )
+		public int sceKernelCreateMsgPipe( int _name, int part, int attr, int size, int opt )
 		{
 			string name = _kernel.ReadString( ( uint )_name );
 
@@ -35,7 +35,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 			}
 
-			KMessagePipe handle = new KMessagePipe( _kernel, partition, name );
+			KMessagePipe handle = new KMessagePipe( _kernel, partition, name, size );
 			_kernel.AddHandle( handle );
 
 			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelCreateMsgPipe: opened pipe {0} with ID {1}, for partition {2}", name, handle.UID, part );
@@ -50,7 +50,20 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelDeleteMsgPipe(SceUID uid);
 		public int sceKernelDeleteMsgPipe( int uid )
 		{
-			return Module.NotImplementedReturn;
+			KMessagePipe pipe = _kernel.GetHandle<KMessagePipe>(uid);
+			if (pipe == null)
+				return unchecked((int)0x8002019E);
+
+			// Can't delete if someone is waiting... need to do something?
+			Debug.Assert(pipe.WaitingThreads.Count == 0);
+			if (pipe.WaitingThreads.Count > 0)
+			{
+				// Wake them?
+			}
+
+			_kernel.RemoveHandle(pipe.UID);
+
+			return 0;
 		}
 
 		[NotImplemented]
@@ -77,7 +90,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x884C9F90, "sceKernelTrySendMsgPipe" )]
 		// SDK location: /user/pspthreadman.h:1164
 		// SDK declaration: int sceKernelTrySendMsgPipe(SceUID uid, void *message, unsigned int size, int unk1, void *unk2);
-		public int sceKernelTrySendMsgPipe( int uid, int message, int size, int unk1, int unk2 )
+		public int sceKernelTrySendMsgPipe( int uid, int message, int size, int unk1, int outSize )
 		{
 			KMessagePipe handle = _kernel.GetHandle<KMessagePipe>( uid );
 			if( handle == null )
@@ -92,9 +105,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 			}
 
+			if (outSize != 0)
+			{
+				unsafe
+				{
+					uint* poutSize = (uint*)_memorySystem.Translate((uint)outSize);
+					*poutSize = (uint)size;
+				}
+			}
+
 			handle.Signal();
 
-			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: {0} {1:X8} {2} {3:X8} {4:X8}", uid, message, size, unk1, unk2 );
+			//Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelTrySendMsgPipe: {0} {1:X8} {2} {3:X8} {4:X8}", uid, message, size, unk1, readsize );
 			//handle.Stream.Seek(0, SeekOrigin.Begin);
 			return 0;
 		}
@@ -103,7 +125,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x74829B76, "sceKernelReceiveMsgPipe" )]
 		// SDK location: /user/pspthreadman.h:1178
 		// SDK declaration: int sceKernelReceiveMsgPipe(SceUID uid, void *message, unsigned int size, int unk1, void *unk2, unsigned int *timeout);
-		public int sceKernelReceiveMsgPipe( int uid, int message, int size, int unk1, int unk2, int timeout )
+		public int sceKernelReceiveMsgPipe( int uid, int message, int size, int unk1, int outSize, int timeout )
 		{
 			KMessagePipe handle = _kernel.GetHandle<KMessagePipe>( uid );
 			if( handle == null )
@@ -112,14 +134,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 			}
 
-			return handle.MaybeWait( message, size, unk1, unk2, timeout, false );
+			return handle.MaybeWait( message, size, unk1, outSize, timeout, false );
 		}
 
 		[Stateless]
 		[BiosFunction(0xFBFA697D, "sceKernelReceiveMsgPipeCB")]
 		// SDK location: /user/pspthreadman.h:1192
 		// SDK declaration: int sceKernelReceiveMsgPipeCB(SceUID uid, void *message, unsigned int size, int unk1, void *unk2, unsigned int *timeout);
-		public int sceKernelReceiveMsgPipeCB(int uid, int message, int size, int unk1, int unk2, int timeout)
+		public int sceKernelReceiveMsgPipeCB(int uid, int message, int size, int unk1, int outSize, int timeout)
 		{
 			KMessagePipe handle = _kernel.GetHandle<KMessagePipe>(uid);
 			if (handle == null)
@@ -128,7 +150,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				return -1;
 			}
 
-			return handle.MaybeWait(message, size, unk1, unk2, timeout, true);
+			return handle.MaybeWait(message, size, unk1, outSize, timeout, true);
 		}
 
 		[NotImplemented]
