@@ -7,6 +7,17 @@ Although the emulator is pretty advanced, it is also in its early stages. This m
 == Movies ==
 * Short clips posted here: [http://youtube.com/user/benvanik]
 
+=== 2008-03-12 - Puyo Puyo Fever ===
+It gets in game, but the drawing is wonky (only every 10th frame or so draws)
+
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2008.03.12.01-PuyoPuyoFever.png]
+
+=== 2008-01-19 - Every Extend Extra ===
+Besides a few rendering glitches, the game works great! This is the first 3D game working; I was getting worried that I'd only be doing 2D stuff :)
+
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2008.01.19.01-EveryExtendExtra.png]
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2008.01.19.02-EveryExtendExtra.png]
+
 === 2007-07-16 - A-train ===
 Just a menu for now, and it looks horrible, but I'll figure that out :)
 
