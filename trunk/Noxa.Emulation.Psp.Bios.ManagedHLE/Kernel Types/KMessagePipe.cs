@@ -16,12 +16,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public FastLinkedList<KThread> WaitingThreads;
 
-		public KMessagePipe( Kernel kernel, KPartition partition, string name )
+		public KMessagePipe( Kernel kernel, KPartition partition, string name, int size )
 		{
 			Kernel = kernel;
 			Partition = partition;
 			Name = name;
-			Stream = new System.IO.MemoryStream();
+			Stream = new System.IO.MemoryStream(size);
 			WaitingThreads = new FastLinkedList<KThread>();
 		}
 
@@ -40,6 +40,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					this.Kernel.Memory.WriteStream( ( int )entry.Value.WaitAddress, this.Stream, ( int )entry.Value.WaitArgument );
 					this.Stream.SetLength( 0 );
 
+					if (entry.Value.WaitAddressResult != 0)
+					{
+						unsafe
+						{
+							uint* poutSize = (uint*)Kernel.MemorySystem.Translate(entry.Value.WaitAddressResult);
+							*poutSize = entry.Value.WaitArgument;
+						}
+					}
+
 					entry.Value.Wake( 0 );
 					wokeThreads = true;
 				}
@@ -51,7 +60,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				Kernel.Schedule();
 		}
 
-		public int MaybeWait( int message, int size, int unk1, int unk2, int timeout, bool allowCallbacks )
+		public int MaybeWait( int message, int size, int unk1, int outSize, int timeout, bool allowCallbacks )
 		{
 			// Buffer has enough data, return instantly.
 			if( size <= this.Stream.Length )
@@ -60,18 +69,28 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				this.Stream.Seek( 0, SeekOrigin.Begin );
 				this.Kernel.Memory.WriteStream( message, this.Stream, size );
 				this.Stream.SetLength( 0 );
+
+				if (outSize != 0)
+				{
+					unsafe
+					{
+						uint* poutSize = (uint * )Kernel.MemorySystem.Translate((uint)outSize);
+						*poutSize = (uint)size;
+					}
+				}
+
 				return 0;
 			}
 
 			Log.WriteLine( Verbosity.Normal, Feature.Bios, "MaybeWaitSleep -> {0} ? {1}", size, this.Stream.Length );
-			this.Wait( message, size, unk1, unk2, timeout, allowCallbacks );
+			this.Wait( message, size, unk1, outSize, timeout, allowCallbacks );
 			return 0;
 
 		}
 
-		public void Wait( int message, int size, int unk1, int unk2, int timeout, bool allowCallbacks )
+		public void Wait( int message, int size, int unk1, int outSize, int timeout, bool allowCallbacks )
 		{
-			this.Kernel.ActiveThread.Wait( this, message, size, timeout, allowCallbacks );
+			this.Kernel.ActiveThread.Wait( this, message, size, outSize, timeout, allowCallbacks );
 		}
 	}
 }

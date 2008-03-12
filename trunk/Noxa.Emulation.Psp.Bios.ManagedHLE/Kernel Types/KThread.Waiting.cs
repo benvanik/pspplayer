@@ -311,7 +311,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.Kernel.Schedule();
 		}
 
-		public void Wait( KMessagePipe pipe, int message, int size, int timeout, bool canHandleCallbacks )
+		public void Wait( KMessagePipe pipe, int message, int size, int outSize, int timeout, bool canHandleCallbacks )
 		{
 			this.State = KThreadState.Waiting;
 			this.RemoveFromSchedule();
@@ -325,6 +325,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.WaitHandle = pipe;
 			this.WaitArgument = ( uint )size;
 			this.WaitAddress = ( uint )message;
+			this.WaitAddressResult = ( uint )outSize;
 
 			if( canHandleCallbacks == true )
 				this.Kernel.CheckCallbacks();
