@@ -249,7 +249,7 @@ namespace Noxa.Emulation.Psp.RemoteDebugger.Tools
 					Verbosity verbosity = ( Verbosity )( ( object[] )item.Tag )[ 0 ];
 					FeatureInfo feature = ( FeatureInfo )( ( object[] )item.Tag )[ 1 ];
 					string text = item.SubItems[ 1 ].Text;
-					sb.AppendFormat( "[{0}] {1}: {2}{3}", verbosity, feature.Name, text, Environment.NewLine );
+					sb.AppendFormat( "[{0,-8}] {1,10}: {2}{3}", verbosity, feature.Name, text, Environment.NewLine );
 				}
 			}
 			Clipboard.SetText( sb.ToString(), TextDataFormat.Text );
