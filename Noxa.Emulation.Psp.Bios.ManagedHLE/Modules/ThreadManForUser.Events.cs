@@ -121,11 +121,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					}
 				}
 
-				if( ( ( KWaitType )wait & KWaitType.ClearAll ) == KWaitType.ClearAll )
-					ev.Value = 0;
-				else if( ( ( KWaitType )wait & KWaitType.ClearPattern ) == KWaitType.ClearPattern )
-					ev.Value = ev.Value & ~( uint )bits;
-
+				ev.Clear((uint)bits, (KWaitType)wait);
 				return 0;
 			}
 			else
@@ -165,11 +161,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					}
 				}
 
-				if( ( ( KWaitType )wait & KWaitType.ClearAll ) == KWaitType.ClearAll )
-					ev.Value = 0;
-				else if( ( ( KWaitType )wait & KWaitType.ClearPattern ) == KWaitType.ClearPattern )
-					ev.Value = ev.Value & ~( uint )bits;
-
+				ev.Clear((uint)bits, (KWaitType)wait);
 				return 0;
 			}
 			else
@@ -205,11 +197,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					}
 				}
 
-				if( ( ( KWaitType )wait & KWaitType.ClearAll ) == KWaitType.ClearAll )
-					ev.Value = 0;
-				else if( ( ( KWaitType )wait & KWaitType.ClearPattern ) == KWaitType.ClearPattern )
-					ev.Value = ev.Value & ~( uint )bits;
-
+				ev.Clear((uint)bits, (KWaitType)wait);
 				return 0;
 			}
 

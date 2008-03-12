@@ -76,6 +76,22 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 		}
 
+		public bool Clear(uint userValue, KWaitType waitType)
+		{
+			if ((waitType & KWaitType.ClearAll) != 0)
+			{
+				this.Value = 0;
+				return true;
+			}
+			else if ((waitType & KWaitType.ClearPattern) != 0)
+			{
+				this.Value = this.Value & ~userValue;
+				return true;
+			}
+
+			return false;
+		}
+
 		public bool Signal()
 		{
 			bool needsSwitch = false;
@@ -103,10 +119,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						}
 					}
 
-					if( ( thread.WaitEventMode & KWaitType.ClearAll ) != 0 )
-						this.Value = 0;
-					else if( ( thread.WaitEventMode & KWaitType.ClearPattern ) != 0 )
-						this.Value = this.Value & ~thread.WaitArgument;
+					this.Clear(thread.WaitArgument, thread.WaitEventMode);
 
 					WaitingThreads.Remove( e );
 
