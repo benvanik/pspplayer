@@ -208,6 +208,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelCreateFpl(const char *name, int part, int attr, unsigned int size, unsigned int blocks, struct SceKernelFplOptParam *opt);
 		public int sceKernelCreateFpl( int name, int part, int attr, int size, int blocks, int opt )
 		{
+			_kernel.MemorySystem.DumpMainMemory( "memoryCreateFpl.bin" );
 			KPartition partition = _kernel.Partitions[ part ];
 			Debug.Assert( partition != null );
 			if( partition == null )
@@ -221,7 +222,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				pool.Dispose();
 				//return unchecked( ( int )0x800200E0 );
 				//return unchecked( ( int )0x800200D9 );
-				return -1;
+				return unchecked( ( int )0x80020190 );
 			}
 			_kernel.AddHandle( pool );
 
@@ -253,6 +254,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceKernelAllocateFpl(SceUID uid, void **data, unsigned int *timeout);
 		public int sceKernelAllocateFpl( int uid, int data, int timeout )
 		{
+			_kernel.MemorySystem.DumpMainMemory( "memoryAllocateFpl.bin" );
 			KFixedPool pool = _kernel.GetHandle<KFixedPool>( uid );
 			if( pool == null )
 				return -1;

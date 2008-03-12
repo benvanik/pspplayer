@@ -229,9 +229,7 @@ int niEnqueueList( void* startAddress, void* stallAddress, int callbackId, bool 
 	PulseEvent( _hWorkWaitingEvent );
 
 	// HACK: wait until stalled or done
-	while(
-		( list->Done == false ) &&
-		( list->Stalled == false ) )
+	while( ( list->Done == false ) && ( list->Stalled == false ) )
 	{
 		WaitForSingleObject( _hListSyncEvent, 1 );
 	}
@@ -276,12 +274,10 @@ void niUpdateList( int listId, void* stallAddress )
 	PulseEvent( _hWorkWaitingEvent );
 
 	// HACK: wait until stalled or done
-	/*while(
-		( list->Done == false ) &&
-		( list->Stalled == false ) )
+	while( ( list->Done == false ) && ( list->Stalled == false ) )
 	{
 		WaitForSingleObject( _hListSyncEvent, 1 );
-	}*/
+	}
 }
 
 void niCancelList( int listId )

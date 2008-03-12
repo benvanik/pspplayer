@@ -14,6 +14,9 @@
 PSP_MODULE_INFO( "reveng", 0, 1, 1 );
 PSP_MAIN_THREAD_ATTR( THREAD_ATTR_USER | THREAD_ATTR_VFPU );
 
+extern void sceKernelSetCompiledSdkVersion( uint a );
+extern void sceKernelSetCompilerVersion( uint a );
+
 // Exit callback
 int ExitCallback( int arg1, int arg2, void *common )
 {
@@ -38,7 +41,22 @@ int DummyCallback( int arg1, int arg2, void* arg )
 
 int main( int argc, char *argv[] )
 {
+	sceKernelSetCompiledSdkVersion(0x02070110);
+	sceKernelSetCompilerVersion(0x00030306);
+
 	pspDebugScreenInit();
+
+	char name[] = "hello";
+
+	uint freeBefore = sceKernelTotalFreeMemSize();
+	SceUID uid = sceKernelAllocPartitionMemory(0x00000002, name, 0x00000003, 0x00019000, 0x00001000);
+	uint freeAfter = sceKernelTotalFreeMemSize();
+
+	uint lower = sceKernelGetBlockHeadAddr( uid );
+
+	pspDebugScreenPrintf( "uid=%d, lower=%X", uid, lower );
+	pspDebugScreenPrintf( "before=%d, after=%d, delta=%d", freeBefore, freeAfter, freeAfter - freeBefore );
+
 
 	int thid = sceKernelCreateThread( "CallbackThread", CallbackThread, 0x11, 0xFA0, 0, 0 );
 	if( thid >= 0 )
@@ -75,9 +93,9 @@ int main( int argc, char *argv[] )
 	//fprintf( stdout, "%d %d %d %d %d\n", buf[ 0 ], buf[ 1 ], buf[ 2 ], buf[ 3 ], buf[ 4 ] );
 	// 124958 42083 41968 512 64
 
-	uint x = sceKernelLoadModule("libbase64.prx", 0, NULL); 
-	uint y = sceKernelLoadModule("libbase64.prx", 0, NULL); 
-	pspDebugScreenPrintf( "%X %X", x, y );
+	//uint x = sceKernelLoadModule("libbase64.prx", 0, NULL); 
+	//uint y = sceKernelLoadModule("libbase64.prx", 0, NULL); 
+	//pspDebugScreenPrintf( "%X %X", x, y );
 
 	//sceKernelSleepThreadCB();
 	for( ;; );

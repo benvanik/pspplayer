@@ -262,7 +262,7 @@ namespace Noxa.Emulation.Psp.Player.Configuration
 				if( Directory.Exists( searchPath ) == false )
 					continue;
 
-				foreach( string assemblyPath in Directory.GetFiles( searchPath, "*.dll", SearchOption.AllDirectories ) )
+				foreach( string assemblyPath in Directory.GetFiles( searchPath, "*.dll", SearchOption.TopDirectoryOnly ) )
 				{
 					Assembly assembly;
 					try

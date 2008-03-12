@@ -36,6 +36,7 @@ int ErrorDebugBreak( uint pc );
 int __readMemoryThunk( int pc, int targetAddress )
 {
 #ifdef DEBUGGING
+	Diag::Instance->Emulator->CurrentInstance->Cpu->Memory->MemorySystem->DumpMainMemory( "readErrorThunk.bin" );
 	R4000Ctx* ctx = _cpuCtx;
 	MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidRead, pc, targetAddress, 4 );
 	if( Diag::ThrowError( error ) == true )
@@ -50,6 +51,7 @@ int __readMemoryThunk( int pc, int targetAddress )
 void __writeMemoryThunk( uint pc, uint targetAddress, int width, uint value )
 {
 #ifdef DEBUGGING
+	Diag::Instance->Emulator->CurrentInstance->Cpu->Memory->MemorySystem->DumpMainMemory( "writeErrorThunk.bin" );
 	R4000Ctx* ctx = _cpuCtx;
 	MemoryError^ error = gcnew MemoryError( MemoryErrorCode::InvalidWrite, pc, targetAddress, ( byte )width, value );
 	if( Diag::ThrowError( error ) == true )
@@ -64,6 +66,14 @@ void __writeMemoryThunk( uint pc, uint targetAddress, int width, uint value )
 void EmitAddressLookup( R4000GenContext^ context, int address )
 {
 	g->and( EAX, 0x3FFFFFFF );
+
+#if 0
+	g->cmp( EAX, 0x08A43438 );
+	Label* skipDebug = g->DefineLabel();
+	g->jne( skipDebug );
+	g->int3();
+	g->MarkLabel( skipDebug );
+#endif
 
 	Label* l1 = g->DefineLabel();
 	Label* l2 = g->DefineLabel();
@@ -133,6 +143,14 @@ void EmitAddressLookup( R4000GenContext^ context, int address )
 // EAX = address, result in EAX
 void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 {
+#if 0
+	g->cmp( EAX, 0x08A43438 );
+	Label* skipDebug = g->DefineLabel();
+	g->jne( skipDebug );
+	g->int3();
+	g->MarkLabel( skipDebug );
+#endif
+
 	Label* l1 = g->DefineLabel();
 	Label* l2 = g->DefineLabel();
 	Label* l3 = g->DefineLabel();
@@ -182,15 +200,6 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 #endif
 
 	g->MarkLabel( l3 );
-
-	// TEST
-#if 0
-	Label blah
-	g->cmp( EAX, 0x08A43438 );
-	g->jne( skipTest );
-	g->int3();
-	g->label( skipTest );
-#endif
 
 	g->push( EAX );
 	g->push( ( uint )( address - 4 ) );

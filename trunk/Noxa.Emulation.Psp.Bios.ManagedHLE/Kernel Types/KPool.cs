@@ -152,10 +152,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			for( int n = 0; n < this.BlockCount; n++ )
 			{
-				KMemoryBlock block = this.Partition.Allocate( KAllocType.Low, 0, this.BlockSize );
+				KMemoryBlock block = this.Partition.Allocate( string.Format( "FPL {0} block", this.Name ), KAllocType.Low, 0, this.BlockSize );
 				if( block == null )
 					return false;
-				block.Name = string.Format( "FPL {0} block", this.Name );
 				Blocks.Enqueue( block );
 				FreeBlocks.Enqueue( block );
 			}
@@ -177,10 +176,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			for( int n = 0; n < GrowthCount; n++ )
 			{
-				KMemoryBlock block = Partition.Allocate( KAllocType.Low, 0, BlockSize );
+				KMemoryBlock block = Partition.Allocate( string.Format( "VPL {0} block", this.Name ), KAllocType.Low, 0, BlockSize );
 				if( block == null )
 					return false;
-				block.Name = string.Format( "VPL {0} block", this.Name );
 				Blocks.Enqueue( block );
 				FreeBlocks.Enqueue( block );
 			}

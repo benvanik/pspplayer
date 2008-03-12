@@ -11,7 +11,7 @@
 // Emit trace file
 //#define TRACE
 #define TRACEFILE		"Current.trace"
-#define TRACEAFTER		0x081F7520
+//#define TRACEAFTER		0x088EB8B4
 //#define TRACESYMBOLS			// Trace function names on calls - really slow, I think!
 #define TRACEREGISTERS			// Trace register values on each instruction - ULTRA SLOW
 //#define TRACEFPUREGS			// Trace the FPU registers (cop1)

@@ -26,9 +26,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		/// </summary>
 		Specific = 2,
 		/// <summary>
-		/// Allocate the largest contiguous block possible.
+		/// Allocate at lowest address possible, aligned.
 		/// </summary>
-		Maximum = 3,
+		LowAligned = 3,
+		/// <summary>
+		/// Allocate at highest address possible, aligned.
+		/// </summary>
+		HighAligned = 4,
 	}
 
 	class KPartition
@@ -61,7 +65,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			FreeList.Enqueue( block );
 		}
 
-		public KMemoryBlock Allocate( KAllocType type, uint address, uint size )
+		public KMemoryBlock Allocate( string name, KAllocType type, uint address, uint size )
 		{
 			KMemoryBlock newBlock = null;
 
@@ -69,13 +73,23 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			//if( ( size & 0x3 ) != 0 )
 			//    size += 4 - ( size & 0x3 );
 
-			// Quick check to see if we have the space free
-			if( type != KAllocType.Maximum )
+			if( ( type == KAllocType.LowAligned ) ||
+				( type == KAllocType.HighAligned ) )
 			{
-				Debug.Assert( FreeSize >= size );
-				if( FreeSize < size )
-					return null;
+				// TODO: align at 'address' (like 4096, etc)
+				address = 0;
+
+				// Other logic is the same
+				if( type == KAllocType.LowAligned )
+					type = KAllocType.Low;
+				else if( type == KAllocType.HighAligned )
+					type = KAllocType.High;
 			}
+
+			// Quick check to see if we have the space free
+			Debug.Assert( FreeSize >= size );
+			if( FreeSize < size )
+				return null;
 
 			switch( type )
 			{
@@ -134,7 +148,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						if( targetBlock == null )
 						{
 							// Try again with a smaller size
-							//Log.WriteLine( Verbosity.Critical, Feature.Bios, "KPartition::Allocate could not find enough space - recalling with max contig block size {0} - this is probably wrong!", maxContig );
+							Log.WriteLine( Verbosity.Critical, Feature.Bios, "KPartition::Allocate could not find enough space" );
 							//return this.Allocate( KAllocType.Maximum, 0, maxContig );
 							return null;
 						}
@@ -161,31 +175,25 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							e = e.Previous;
 						}
 						Debug.Assert( targetBlock != null );
+						if( targetBlock == null )
+						{
+							// Try again with a smaller size
+							Log.WriteLine( Verbosity.Critical, Feature.Bios, "KPartition::Allocate could not find enough space" );
+							//return this.Allocate( KAllocType.Maximum, 0, maxContig );
+							return null;
+						}
 						Debug.Assert( ( int )targetBlock.UpperBound - ( int )size >= 0 );
 						newBlock = this.SplitBlock( targetBlock, targetBlock.UpperBound - size, size );
 					}
 					break;
-				case KAllocType.Maximum:
-					{
-						KMemoryBlock largest = null;
-						LinkedListEntry<KMemoryBlock> e = FreeList.HeadEntry;
-						while( e != null )
-						{
-							if( largest == null )
-								largest = e.Value;
-							else if( largest.Size < e.Value.Size )
-								largest = e.Value;
-							e = e.Next;
-						}
-						Debug.Assert( largest != null );
-						newBlock = this.SplitBlock( largest, largest.Address, Math.Min( largest.Size, size ) );
-					}
-					break;
 			}
 
-			newBlock.IsFree = false;
 			if( newBlock != null )
+			{
+				newBlock.Name = name;
+				newBlock.IsFree = false;
 				FreeSize -= size;
+			}
 			this.Kernel.PrintMemoryInfo();
 			return newBlock;
 		}

@@ -7,6 +7,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Noxa.Emulation.Psp.Cpu
@@ -93,7 +95,7 @@ namespace Noxa.Emulation.Psp.Cpu
 			Debug.Assert( ( guestAddress & MainMemoryBase ) != 0 );
 			return ( MainMemory + ( ( guestAddress & 0x3FFFFFFF ) - MainMemoryBase ) );
 		}
-		
+
 		/// <summary>
 		/// Translate a guest address to a host address.
 		/// </summary>
@@ -222,6 +224,26 @@ namespace Noxa.Emulation.Psp.Cpu
 				{
 					*dest = 0;
 					//dest++;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Dump the contents of main memory to the given file.
+		/// </summary>
+		/// <param name="fileName">Target file for memory dump.</param>
+		public unsafe void DumpMainMemory( string fileName )
+		{
+			using( FileStream stream = File.OpenWrite( fileName ) )
+			using( BinaryWriter writer = new BinaryWriter( stream ) )
+			{
+				byte[] buffer = new byte[ 512 ];
+				byte* p = this.MainMemory;
+				for( int n = 0; n < MainMemorySize / 512; n++ )
+				{
+					Marshal.Copy( new IntPtr( ( void* )p ), buffer, 0, 512 );
+					writer.Write( buffer );
+					p += 512;
 				}
 			}
 		}
