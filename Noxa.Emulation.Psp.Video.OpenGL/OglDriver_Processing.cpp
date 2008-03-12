@@ -101,6 +101,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 		if( ( void* )list->Packets == list->StallAddress )
 		{
 			// Stalled
+			DummyTri( true );
 			list->Stalled = true;
 			PulseEvent( _hListSyncEvent );
 			goto abortList;
@@ -122,6 +123,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			if( nopCount > 10 )
 			{
 				// Consider this list dead if we have a bunch of nops
+				DummyTri( true );
 				list->Done = true;
 				goto abortList;
 			}
@@ -628,7 +630,6 @@ void ProcessList( OglContext* context, DisplayList* list )
 				if( areSprites == false )
 				{
 					// Normal vertex list
-
 					bool isIndexed = ( vertexType & ( VTIndex8 | VTIndex16 ) ) != 0;
 					byte* iptr = 0;
 					if( isIndexed == true )
@@ -1122,7 +1123,10 @@ void DummyTri( bool ortho )
 		glLoadIdentity();
 	}
 
+	glDisable( GL_TEXTURE_2D );
 	glBegin( GL_QUADS );
+
+	glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
 
 	// 0 ---- 1
 	// |      |
@@ -1138,6 +1142,7 @@ void DummyTri( bool ortho )
 	glVertex3f( 0, 100, 0 );
 
 	glEnd();
+	glEnable( GL_TEXTURE_2D );
 
 	if( ortho == true )
 	{

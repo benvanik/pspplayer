@@ -379,6 +379,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				// 0x08900000
 				//uint defaultLoad = 0x08880000;
 				uint defaultLoad = 0x08000000;
+				//uint defaultLoad = uint.MaxValue;
 
 				// s-hdrs
 				uint lextents = defaultLoad;
@@ -390,7 +391,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					if( ( shdr->sh_flags & ShFlags.Allocate ) == ShFlags.Allocate )
 					{
 						allocSections[ allocSectionsCount++ ] = shdr;
-						if( shdr->sh_addr < lextents )
+						if( ( shdr->sh_addr > 0 ) && ( shdr->sh_addr < lextents ) )
 							lextents = shdr->sh_addr;
 						uint upperBound = shdr->sh_addr + shdr->sh_size;
 						if( upperBound > extents )
@@ -429,8 +430,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					else
 					{
 						// Find the next block in RAM
-						moduleBlock = kernel.Partitions[ 2 ].Allocate( KAllocType.Low, 0, extents );
-						moduleBlock.Name = string.Format( "Module {0}", results.Name );
+						moduleBlock = kernel.Partitions[ 2 ].Allocate( string.Format( "Module {0}", results.Name ), KAllocType.Low, 0, extents );
 						baseAddress = moduleBlock.Address;
 					}
 
@@ -449,8 +449,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				if( type == ModuleType.Boot )
 				{
 					Debug.Assert( moduleBlock == null );
-					moduleBlock = kernel.Partitions[ 2 ].Allocate( KAllocType.Specific, results.LowerBounds, results.UpperBounds - results.LowerBounds );
-					moduleBlock.Name = string.Format( "Module {0}", results.Name );
+					moduleBlock = kernel.Partitions[ 2 ].Allocate( string.Format( "Module {0}", results.Name ), KAllocType.Specific, results.LowerBounds, results.UpperBounds - results.LowerBounds );
 				}
 				else
 				{
@@ -861,8 +860,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						kernel.AddHandle( module );
 
 						// Allocate room for args
-						KMemoryBlock argsBlock = kernel.Partitions[ 6 ].Allocate( KAllocType.High, 0, 0xFF ); // 256b of args - enough?
-						argsBlock.Name = string.Format( "Module {0} args", results.Name );
+						KMemoryBlock argsBlock = kernel.Partitions[ 6 ].Allocate( string.Format( "Module {0} args", results.Name ), KAllocType.High, 0, 0xFF ); // 256b of args - enough?
 
 						// Set arguments - we put these right below user space, and right above the stack
 						uint args = 0;
@@ -897,6 +895,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 						// Schedule so that our thread runs
 						kernel.Schedule();
+
+						kernel.MemorySystem.DumpMainMemory( "startup.bin" );
 					}
 				}
 			}

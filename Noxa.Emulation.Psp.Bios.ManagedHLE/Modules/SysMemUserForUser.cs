@@ -113,11 +113,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( name != 0 )
 				sname = _kernel.ReadString( ( uint )name );
 
-			KMemoryBlock block = partition.Allocate( ( KAllocType )type, ( uint )addr, ( uint )size );
+			KMemoryBlock block = partition.Allocate( sname, ( KAllocType )type, ( uint )addr, ( uint )size );
 			Debug.Assert( block != null );
 			if( block == null )
 				return -1;
-			block.Name = sname;
 			
 			_kernel.AddHandle( block );
 

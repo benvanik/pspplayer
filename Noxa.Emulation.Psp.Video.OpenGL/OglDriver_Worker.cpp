@@ -173,6 +173,8 @@ void NativeWorker( HDC hDC, OglContext* context )
 			while( ( _shutdown == false ) &&
 				( _workWaiting > 0 ) )
 			{
+				bool didFinish = false;
+
 				DisplayList* list = GetNextDisplayList();
 				if( list != NULL )
 				{
@@ -202,6 +204,8 @@ listAbort:
 #ifdef STATISTICS
 					_displayListsProcessed++;
 #endif
+					//if( list->Drawn == true )
+						didFinish = true;
 
 					//QueryPerformanceCounter( ( LARGE_INTEGER* )&endTime );
 					//if( ( ( endTime - startTime ) / freq ) > 0 )
@@ -210,7 +214,8 @@ listAbort:
 				else
 					break;
 
-				listsDone++;
+				if( didFinish == true )
+					listsDone++;
 
 				if( _vsyncWaiting == true )
 					break;
