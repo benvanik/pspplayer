@@ -68,7 +68,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( ev == null )
 				return -1;
 
-			ev.Value = ( uint )bits;
+			ev.Value |= ( uint )bits;
 			if( ev.Signal() == true )
 			{
 				// We woke something!
@@ -87,7 +87,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( ev == null )
 				return -1;
 
-			ev.Value = ev.Value & ~( uint )bits;
+			ev.Value &= ( uint )bits;
 			if( ev.Signal() == true )
 			{
 				// We woke something!
