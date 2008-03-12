@@ -66,13 +66,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			if( ( ( int )waitType & 0x1 ) == ( int )KWaitType.And )
 			{
 				// &
-				return ( Value & userValue ) > 0;
+				return ( Value & userValue ) == userValue;
 			}
 			else
 			{
 				// |
 				Debug.Assert( ( waitType & KWaitType.Or ) == KWaitType.Or );
-				return ( Value | userValue ) > 0;
+				return (Value & userValue) > 0;
 			}
 		}
 
