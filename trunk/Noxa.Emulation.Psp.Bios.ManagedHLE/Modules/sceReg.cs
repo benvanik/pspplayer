@@ -62,7 +62,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				{
 					string name = nodes.Current.GetAttribute( "name", "" );
 					string value = nodes.Current.Value;
-					Debug.Assert( false );
+					Debug.Assert( name != "" );
+					//Debug.Assert( false );
 					key.Children.Add( new RegistryKey( name, value ) );
 				}
 				else if( nodes.Current.Name == "directory" )
