@@ -196,12 +196,26 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[Stateless]
+		[BiosFunction( 0x342061E5, "sceKernelSetVersion" )]
+		// manual add - check? - I made the name up
+		public int sceKernelSetVersion( int version )
+		{
+			// I just made this name up :)
+			Version v = new Version(
+				( version >> 24 ) & 0xFF,
+				( version >> 16 ) & 0xFF,
+				( version >> 8 ) & 0xFF,
+				version & 0xFF );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceKernelSetVersion: set to version {0:X8} ({1})", version, v.ToString() );
+			return 0;
+		}
+
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x13A5ABEF, "sceKernelPrintf" )]
 		// manual add - printf( char* format, ... ) <-- right 2nd arg?
 		public int sceKernelPrintf( int format, int varg ){ return Module.NotImplementedReturn; }
-
 	}
 }
 
