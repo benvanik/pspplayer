@@ -204,7 +204,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			{
 				byte* p = _memorySystem.Translate((uint)info);
 				// If the sizeof is not 52, we are screwed
-				Debug.Assert( ( int* )p == 52 );
+				Debug.Assert( *( int* )p == 52 );
 				*((int*)(p + 0)) = 52;
 				
 				for (int i = 0; i < 31; i++)
