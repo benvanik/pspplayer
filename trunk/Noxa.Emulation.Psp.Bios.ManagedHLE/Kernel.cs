@@ -112,11 +112,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			Partitions = new KPartition[]{
 				new KPartition( this, 0x00000000, 0x00000000 ), // dummy
 				new KPartition( this, 0x08000000, 0x00300000 ), // kernel 1 (0x8...)
-				new KPartition( this, 0x08800000, 0x01B00000 ), // user
+				new KPartition( this, 0x08800000, 0x017FFFFF ), // user
 				new KPartition( this, 0x08000000, 0x00300000 ), // kernel 1
 				new KPartition( this, 0x08300000, 0x00100000 ), // kernel 2 (0x8...)
 				new KPartition( this, 0x08400000, 0x00400000 ), // kernel 3 (0x8...)
-				new KPartition( this, 0x09B00000, 0x004FFFFF ), // user (stack) ?
+				new KPartition( this, 0x09FFFFFF, 0x004FFFFF ), // user (stack) ? // 0x09B00000, 0x004FFFFF
 			};
 
             if (Emulator.MemoryStick != null)
