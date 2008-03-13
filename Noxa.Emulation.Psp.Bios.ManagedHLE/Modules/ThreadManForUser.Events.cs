@@ -161,7 +161,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					}
 				}
 
-				ev.Clear((uint)bits, (KWaitType)wait);
+				ev.Clear( ( uint )bits, ( KWaitType )wait );
 				return 0;
 			}
 			else
