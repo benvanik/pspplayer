@@ -91,14 +91,6 @@ namespace Noxa {
 						}
 					}
 
-					property DisplayProperties^ Properties
-					{
-						virtual DisplayProperties^ get()
-						{
-							return _props;
-						}
-					}
-
 					property IntPtr ControlHandle
 					{
 						virtual IntPtr get()
@@ -169,8 +161,23 @@ namespace Noxa {
 
 					virtual void Resize( int width, int height );
 
+					virtual DisplayProperties^ QueryDisplayProperties()
+					{
+						return _props;
+					}
+					
+					virtual bool SetMode( int mode, int width, int height );
+					virtual bool SetFrameBuffer( uint bufferAddres, uint bufferSize, PixelFormat pixelFormat, BufferSyncMode bufferSyncMode );
+
 					virtual void Suspend();
 					virtual bool Resume();
+
+					virtual int EnqueueList( uint listAddress, uint stallAddress, int callbackId, uint contextAddress, bool insertAtHead ){ return 0; }
+					virtual int UpdateList( int listId, uint stallAddress ){ return 0; }
+					virtual int SyncList( int listId, int syncType ){ return 0; }
+					virtual int SyncDraw( int syncType ){ return 0; }
+					virtual void Break(){}
+					virtual void Continue(){}
 
 					virtual Drawing::Bitmap^ CaptureScreen();
 

@@ -101,7 +101,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 		if( ( void* )list->Packets == list->StallAddress )
 		{
 			// Stalled
-			DummyTri( true );
+			//DummyTri( true );
 			list->Stalled = true;
 			PulseEvent( _hListSyncEvent );
 			goto abortList;
@@ -123,7 +123,7 @@ void ProcessList( OglContext* context, DisplayList* list )
 			if( nopCount > 10 )
 			{
 				// Consider this list dead if we have a bunch of nops
-				DummyTri( true );
+				//DummyTri( true );
 				list->Done = true;
 				goto abortList;
 			}

@@ -18,7 +18,7 @@ using Noxa.Emulation.Psp.Video;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
-	class sceGe_user : Module
+	unsafe class sceGe_user : Module
 	{
 		#region Properties
 
@@ -68,6 +68,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x1F6752AD, "sceGeEdramGetSize" )]
 		// SDK location: /ge/pspge.h:47
@@ -77,6 +78,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( int )MemorySystem.VideoMemorySize;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xE47E40E4, "sceGeEdramGetAddr" )]
 		// SDK location: /ge/pspge.h:54
@@ -114,47 +116,74 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceGeRestoreContext(const PspGeContext *context);
 		public int sceGeRestoreContext( int context ){ return Module.NotImplementedReturn; }
 
-		//[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xAB49E76A, "sceGeListEnQueue" )]
 		// SDK location: /ge/pspge.h:124
 		// SDK declaration: int sceGeListEnQueue(const void *list, void *stall, int cbid, void *arg);
-		public int sceGeListEnQueue( int list, int stall, int cbid, int arg ){ return Module.NotImplementedReturn; }
+		public int sceGeListEnQueue( int list, int stall, int cbid, int arg )
+		{
+			// Fix for cached addresses/etc
+			list &= 0x3FFFFFFF;
+			stall &= 0x3FFFFFFF;
 
-		//[NotImplemented]
+			return _driver.EnqueueList( ( uint )list, ( uint )stall, cbid, ( uint )arg, false );
+		}
+
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x1C0D95A6, "sceGeListEnQueueHead" )]
 		// SDK location: /ge/pspge.h:137
 		// SDK declaration: int sceGeListEnQueueHead(const void *list, void *stall, int cbid, void *arg);
-		public int sceGeListEnQueueHead( int list, int stall, int cbid, int arg ){ return Module.NotImplementedReturn; }
+		public int sceGeListEnQueueHead( int list, int stall, int cbid, int arg )
+		{
+			// Fix for cached addresses/etc
+			list &= 0x3FFFFFFF;
+			stall &= 0x3FFFFFFF;
 
-		//[NotImplemented]
+			return _driver.EnqueueList( ( uint )list, ( uint )stall, cbid, ( uint )arg, true );
+		}
+
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x5FB86AB0, "sceGeListDeQueue" )]
 		// SDK location: /ge/pspge.h:146
 		// SDK declaration: int sceGeListDeQueue(int qid);
-		public int sceGeListDeQueue( int qid ){ return Module.NotImplementedReturn; }
+		public int sceGeListDeQueue( int qid )
+		{
+			// Ignored on purpose
+			return -1;
+		}
 
-		//[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xE0D68148, "sceGeListUpdateStallAddr" )]
 		// SDK location: /ge/pspge.h:156
 		// SDK declaration: int sceGeListUpdateStallAddr(int qid, void *stall);
-		public int sceGeListUpdateStallAddr( int qid, int stall ){ return Module.NotImplementedReturn; }
+		public int sceGeListUpdateStallAddr( int qid, int stall )
+		{
+			return _driver.UpdateList( qid, ( uint )stall );
+		}
 
-		//[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x03444EB4, "sceGeListSync" )]
 		// SDK location: /ge/pspge.h:176
 		// SDK declaration: int sceGeListSync(int qid, int syncType);
-		public int sceGeListSync( int qid, int syncType ){ return Module.NotImplementedReturn; }
+		public int sceGeListSync( int qid, int syncType )
+		{
+			return _driver.SyncList( qid, syncType );
+		}
 
-		//[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xB287BD61, "sceGeDrawSync" )]
 		// SDK location: /ge/pspge.h:185
 		// SDK declaration: int sceGeDrawSync(int syncType);
-		public int sceGeDrawSync( int syncType ){ return Module.NotImplementedReturn; }
+		public int sceGeDrawSync( int syncType )
+		{
+			return _driver.SyncDraw( syncType );
+		}
 
 		[Stateless]
 		[BiosFunction( 0xA4FC06A4, "sceGeSetCallback" )]
@@ -186,23 +215,25 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		//[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xB448EC0D, "sceGeBreak" )]
 		// manual add
 		public int sceGeBreak( int mode, int unknown )
 		{
-			// Stop the GE from pulling lists?
+			// Stop the GE from pulling lists
+			_driver.Break();
 			return 0;
 		}
 
-		//[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x4C06E472, "sceGeContinue" )]
 		// manual add
 		public int sceGeContinue()
 		{
-			// Let GE continue pulling lists?
+			// Let GE continue pulling lists
+			_driver.Continue();
 			return 0;
 		}
 	}

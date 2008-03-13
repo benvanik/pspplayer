@@ -47,16 +47,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			NativeMethods.QueryPerformanceFrequency( out _frequency );
 
-			_driver.Suspend();
-			DisplayProperties props = _driver.Properties;
-			props.BufferAddress = MemorySystem.VideoMemoryBase;
-			props.BufferSize = 512;
-			props.Width = 480;
-			props.Height = 272;
-			props.PixelFormat = PixelFormat.Rgba8888;
-			props.SyncMode = BufferSyncMode.NextFrame;
-			props.Mode = 0;
-			_driver.Resume();
+			_driver.SetMode( 0, 480, 272 );
+			_driver.SetFrameBuffer( MemorySystem.VideoMemoryBase, 512, PixelFormat.Rgba8888, BufferSyncMode.NextFrame );
 		}
 
 		public override void Stop()
@@ -95,17 +87,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceDisplaySetMode(int mode, int width, int height);
 		public int sceDisplaySetMode( int mode, int width, int height )
 		{
-			_driver.Suspend();
-
-			DisplayProperties props = _driver.Properties;
-			props.Mode = mode;
-			props.Width = width;
-			props.Height = height;
-
-			if( _driver.Resume() == false )
-				return -1;
-			else
+			if( _driver.SetMode( mode, width, height ) == true )
 				return 0;
+			else
+				return -1;
 		}
 
 		[Stateless]
@@ -114,7 +99,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceDisplayGetMode(int *pmode, int *pwidth, int *pheight);
 		public int sceDisplayGetMode( int pmode, int pwidth, int pheight )
 		{
-			DisplayProperties props = _driver.Properties;
+			DisplayProperties props = _driver.QueryDisplayProperties();
 			if( pmode != 0 )
 				_memory.WriteWord( pmode, 4, props.Mode );
 			if( pwidth != 0 )
@@ -131,44 +116,35 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: void sceDisplaySetFrameBuf(void *topaddr, int bufferwidth, int pixelformat, int sync);
 		public int sceDisplaySetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int sync )
 		{
-			_driver.Suspend();
-
-			DisplayProperties props = _driver.Properties;
-			props.BufferAddress = ( uint )( topaddr & 0x0FFFFFFF );
-			props.BufferSize = ( uint )bufferwidth;
-			props.PixelFormat = ( PixelFormat )pixelformat;
-			props.SyncMode = ( BufferSyncMode )sync;
-			if( props.HasChanged == false )
+			if( _driver.SetFrameBuffer( ( uint )( topaddr & 0x0FFFFFFF ), ( uint )bufferwidth, ( PixelFormat )pixelformat, ( BufferSyncMode )sync ) == true )
 				return 0;
-
-			if( _driver.Resume() == false )
-				return -1;
 			else
-				return 0;
+				return 1;
 		}
 
 		[Stateless]
 		[BiosFunction( 0xEEDA2E54, "sceDisplayGetFrameBuf" )]
 		// SDK location: /display/pspdisplay.h:84
-		// SDK declaration: int sceDisplayGetFrameBuf(void **topaddr, int *bufferwidth, int *pixelformat, int *unk1);
+		// SDK declaration: int sceDisplayGetFrameBuf(void **topaddr, int *bufferwidth, int *pixelformat, int unk1);
 		public int sceDisplayGetFrameBuf( int topaddr, int bufferwidth, int pixelformat, int sync )
 		{
-			DisplayProperties props = _driver.Properties;
+			DisplayProperties props = _driver.QueryDisplayProperties();
 			if( topaddr != 0 )
 				_memory.WriteWord( topaddr, 4, ( int )props.BufferAddress );
 			if( bufferwidth != 0 )
 				_memory.WriteWord( bufferwidth, 4, ( int )props.BufferSize );
 			if( pixelformat != 0 )
 				_memory.WriteWord( pixelformat, 4, ( int )props.PixelFormat );
-			if( sync != 0 )
-				_memory.WriteWord( sync, 4, ( int )props.SyncMode );
 			return 0;
 		}
 
-		[NotImplemented]
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xB4F378FA, "sceDisplayIsForeground" )]
-		public int sceDisplayIsForeground(){ return Module.NotImplementedReturn; }
+		public int sceDisplayIsForeground()
+		{
+			return 1;
+		}
 
 		[SuggestNative]
 		[Stateless]
@@ -189,14 +165,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		[NotImplemented]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x210EAB3A, "sceDisplayGetAccumulatedHcount" )]
 		// manual add
 		public int sceDisplayGetAccumulatedHcount()
 		{
-			return Module.NotImplementedReturn;
+			ulong count = _driver.Vcount * 480 * 272;
+			return ( int )( uint )( count % 0x7FFFFFFF );
 		}
 
 		// 16.7ms is right, but that assumes we just missed the last one

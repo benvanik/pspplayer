@@ -255,7 +255,7 @@ namespace Noxa.Emulation.Psp.Player
 			_xmb = new CrossMediaBar.Manager( this, _host.Player.Handle, _host.Player.ControlHandle );
 #else
 #endif
-			
+
 			// Create thread
 			_thread = new Thread( new ThreadStart( this.RuntimeThread ) );
 			_thread.Name = "Host runtime thread";
@@ -416,7 +416,7 @@ namespace Noxa.Emulation.Psp.Player
 		public void UnlockSpeed()
 		{
 			_bios.SpeedLocked = false;
-			_bios.SpeedLocked = false;
+			_video.SpeedLocked = false;
 		}
 
 		public delegate void DummyDelegate();
@@ -466,6 +466,9 @@ namespace Noxa.Emulation.Psp.Player
 			{
 				if( _switchToXmb == true )
 					this.SwitchToXmb();
+
+				if( _video != null )
+					_video.Resume();
 
 				while( _shutDown == false )
 				{

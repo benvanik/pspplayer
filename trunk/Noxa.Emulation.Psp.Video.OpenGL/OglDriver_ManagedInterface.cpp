@@ -12,3 +12,13 @@
 using namespace Noxa::Emulation::Psp;
 using namespace Noxa::Emulation::Psp::Video;
 using namespace Noxa::Emulation::Psp::Video::Native;
+
+bool OglDriver::SetMode( int mode, int width, int height )
+{
+	return true;
+}
+
+bool OglDriver::SetFrameBuffer( uint bufferAddres, uint bufferSize, PixelFormat pixelFormat, BufferSyncMode bufferSyncMode )
+{
+	return true;
+}
