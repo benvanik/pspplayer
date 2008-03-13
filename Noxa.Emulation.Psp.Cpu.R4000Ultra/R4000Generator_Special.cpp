@@ -34,9 +34,11 @@ extern uint _syscallCounts[ 1024 ];
 #define NIRETURN		0
 
 // If defined, even syscalls with DontTrace marked will be logged
-//#define LOGALLSYSCALLS
+#define LOGALLSYSCALLS
 
 #define g context->Generator
+
+extern int _currentTcsId;
 
 void __logSyscall( int syscallId, int address, bool implemented )
 {
@@ -97,12 +99,13 @@ void __logSyscall( int syscallId, int address, bool implemented )
 			args = "";
 			break;
 		}
-		String^ log = String::Format( "{5}{0}::{1}({2}) from 0x{3:X8}{4}",
+		String^ log = String::Format( "{5}{0}::{1}({2}) from 0x{3:X8}{4} in {6}",
 			( function->Module != nullptr ) ? function->Module->Name : "*unknown*",
 			( function->Name != nullptr ) ? function->Name : String::Format( "{0:X8}", function->NID ),
 			args, address - 4,
 			function->IsImplemented ? "" : " (NI)",
-			function->IsMissing ? "(NOT FOUND) " : "" );
+			function->IsMissing ? "(NOT FOUND) " : "",
+			_currentTcsId );
 		Log::WriteLine( Verbosity::Verbose, Feature::Syscall, log );
 
 #if 0
@@ -121,7 +124,14 @@ void __logSyscall( int syscallId, int address, bool implemented )
 	}
 	else
 	{
-		String^ log = String::Format( "{0:X8}) from 0x{1:X8} (NOT FOUND)", syscallId, address - 4 );
+		R4000Ctx* ctx = ( R4000Ctx* )cpu->_ctx;
+		String^ args = args = String::Format( "{0:X8}, {1:X8}, {2:X8}, {3:X8}, {4:X8}, {5:X8}, {6:X8}, {7:X8}", ctx->Registers[ 4 ], ctx->Registers[ 5 ], ctx->Registers[ 6 ], ctx->Registers[ 7 ], ctx->Registers[ 8 ], ctx->Registers[ 9 ], ctx->Registers[ 10 ], ctx->Registers[ 11 ] );
+		String^ log = String::Format( "{4}{0}::{1}({2}) from 0x{3:X8} in {5}",
+			"*unknown*",
+			String::Format( "{0:X8}", function->NID ),
+			args, address - 4,
+			"(NOT FOUND)(UNKNOWN)",
+			_currentTcsId );
 		Log::WriteLine( Verbosity::Normal, Feature::Syscall, log );
 		Debugger::Break();
 	}
