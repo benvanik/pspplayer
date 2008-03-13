@@ -30,7 +30,7 @@ namespace Noxa.Emulation.Psp.Video
 		/// <summary>
 		/// 32-bit RGBA 8:8:8:8
 		/// </summary>
-		Rgba8888
+		Rgba8888,
 	}
 
 	/// <summary>
@@ -45,171 +45,64 @@ namespace Noxa.Emulation.Psp.Video
 		/// <summary>
 		/// Buffer change effective next frame.
 		/// </summary>
-		NextFrame = 1
+		NextFrame = 1,
 	}
 
 	/// <summary>
 	/// <see cref="IVideoDriver"/> display properties.
 	/// </summary>
-	public class DisplayProperties : ICloneable
+	public class DisplayProperties
 	{
-		private bool _hasChanged;
-		private int _mode;
-		private int _width;
-		private int _height;
-		private PixelFormat _pixelFormat;
-		private BufferSyncMode _syncMode;
-		private uint _bufferAddress;
-		private uint _bufferSize;
-
-		/// <summary>
-		/// <c>true</c> if the display properties have been changed.
-		/// </summary>
-		public bool HasChanged
-		{
-			get
-			{
-				return _hasChanged;
-			}
-			set
-			{
-				_hasChanged = value;
-			}
-		}
-
 		/// <summary>
 		/// The display mode.
 		/// </summary>
-		public int Mode
-		{
-			get
-			{
-				return _mode;
-			}
-			set
-			{
-				if( _mode != value )
-					_hasChanged = true;
-				_mode = value;
-			}
-		}
+		public int Mode;
 
 		/// <summary>
 		/// The width of the display, in pixels.
 		/// </summary>
-		public int Width
-		{
-			get
-			{
-				return _width;
-			}
-			set
-			{
-				if( _width != value )
-					_hasChanged = true;
-				_width = value;
-			}
-		}
-
+		public int Width;
+		
 		/// <summary>
 		/// The height of the display, in pixels.
 		/// </summary>
-		public int Height
-		{
-			get
-			{
-				return _height;
-			}
-			set
-			{
-				if( _height != value )
-					_hasChanged = true;
-				_height = value;
-			}
-		}
-
+		public int Height;
+		
 		/// <summary>
 		/// The pixel format used by the display.
 		/// </summary>
-		public PixelFormat PixelFormat
-		{
-			get
-			{
-				return _pixelFormat;
-			}
-			set
-			{
-				if( _pixelFormat != value )
-					_hasChanged = true;
-				_pixelFormat = value;
-			}
-		}
-
+		public PixelFormat PixelFormat;
+		
 		/// <summary>
 		/// The sync mode of the display.
 		/// </summary>
-		public BufferSyncMode SyncMode
-		{
-			get
-			{
-				return _syncMode;
-			}
-			set
-			{
-				if( _syncMode != value )
-					_hasChanged = true;
-				_syncMode = value;
-			}
-		}
-
+		public BufferSyncMode SyncMode;
+		
 		/// <summary>
 		/// The address of the frame buffer.
 		/// </summary>
-		public uint BufferAddress
-		{
-			get
-			{
-				return _bufferAddress;
-			}
-			set
-			{
-				_bufferAddress = value;
-			}
-		}
-
+		public uint BufferAddress;
+		
 		/// <summary>
 		/// The size of the frame buffer.
 		/// </summary>
-		public uint BufferSize
-		{
-			get
-			{
-				return _bufferSize;
-			}
-			set
-			{
-				if( _bufferSize != value )
-					_hasChanged = true;
-				_bufferSize = value;
-			}
-		}
+		public uint BufferSize;
 
 		/// <summary>
-		/// Clone the current <see cref="DisplayProperties"/> instance.
+		/// Return a copy of this property set.
 		/// </summary>
-		/// <returns>A clone of the current <see cref="DisplayProperties"/> instance.</returns>
-		public object Clone()
+		/// <returns>A copy of this property set.</returns>
+		public DisplayProperties Clone()
 		{
-			DisplayProperties clone = new DisplayProperties();
-			clone.Mode = _mode;
-			clone.Width = _width;
-			clone.Height = _height;
-			clone.PixelFormat = _pixelFormat;
-			clone.SyncMode = _syncMode;
-			clone.BufferAddress = _bufferAddress;
-			clone.BufferSize = _bufferSize;
-			clone.HasChanged = false;
-			return clone;
+			DisplayProperties copy = new DisplayProperties();
+			copy.BufferAddress = this.BufferAddress;
+			copy.BufferSize = this.BufferSize;
+			copy.Height = this.Height;
+			copy.Mode = this.Mode;
+			copy.PixelFormat = this.PixelFormat;
+			copy.SyncMode = this.SyncMode;
+			copy.Width = this.Width;
+			return copy;
 		}
 	}
 }

@@ -40,6 +40,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		//{
 		//}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x110DEC9A, "sceKernelUSec2SysClock" )]
 		// SDK location: /user/pspthreadman.h:1463
@@ -56,6 +57,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xC8CD158C, "sceKernelUSec2SysClockWide" )]
 		// SDK location: /user/pspthreadman.h:1472
@@ -65,6 +67,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( long )( ulong )( uint )usec;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xBA6B92E2, "sceKernelSysClock2USec" )]
 		// SDK location: /user/pspthreadman.h:1483
@@ -82,6 +85,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xE1619D7C, "sceKernelSysClock2USecWide" )]
 		// SDK location: /user/pspthreadman.h:1494
@@ -98,6 +102,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xDB738F35, "sceKernelGetSystemTime" )]
 		// SDK location: /user/pspthreadman.h:1503
@@ -117,6 +122,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x82BC5777, "sceKernelGetSystemTimeWide" )]
 		// SDK location: /user/pspthreadman.h:1510
@@ -129,6 +135,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return ( currentTick - _kernel.StartTick ) / ( _kernel.TickFrequency / 1000000 );
 		}
 
+		[SuggestNative]
 		[DontTrace]
 		[Stateless]
 		[BiosFunction( 0x369ED59D, "sceKernelGetSystemTimeLow" )]

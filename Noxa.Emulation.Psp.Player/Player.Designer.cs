@@ -53,7 +53,7 @@ namespace Noxa.Emulation.Psp.Player
 			this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
 			this.debugToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.attachToolStripButton = new System.Windows.Forms.ToolStripButton();
-			this.renderSurface = new System.Windows.Forms.Panel();
+			this.renderSurface = new RenderControl();
 			this.splashPicture = new System.Windows.Forms.PictureBox();
 			this.statusUpdateTimer = new System.Windows.Forms.Timer( this.components );
 			this.toolStrip1.SuspendLayout();
@@ -231,7 +231,7 @@ namespace Noxa.Emulation.Psp.Player
 						| System.Windows.Forms.AnchorStyles.Left )
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
 			this.renderSurface.BackColor = System.Drawing.Color.White;
-			this.renderSurface.Controls.Add( this.splashPicture );
+			//this.renderSurface.Controls.Add( this.splashPicture );
 			this.renderSurface.Location = new System.Drawing.Point( 0, 25 );
 			this.renderSurface.Name = "renderSurface";
 			this.renderSurface.Size = new System.Drawing.Size( 480, 272 );
@@ -286,7 +286,7 @@ namespace Noxa.Emulation.Psp.Player
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripButton stopToolStripButton;
 		private System.Windows.Forms.ToolStripButton restartToolStripButton;
-		private System.Windows.Forms.Panel renderSurface;
+		private RenderControl renderSurface;
 		private System.Windows.Forms.PictureBox splashPicture;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
 		private System.Windows.Forms.ToolStripSplitButton sizeToolStripSplitButton;

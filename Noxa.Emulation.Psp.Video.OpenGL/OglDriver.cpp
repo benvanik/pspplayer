@@ -77,15 +77,10 @@ bool OglDriver::Resume()
 	if( _thread == nullptr )
 		this->StartThread();
 
-	if( _props->HasChanged == false )
-		return true;
-
-	Log::WriteLine( Verbosity::Normal, Feature::Video, "video mode change" );
+	//Log::WriteLine( Verbosity::Normal, Feature::Video, "video mode change" );
 
 	_currentProps = ( DisplayProperties^ )_props->Clone();
-	_props->HasChanged = false;
-	_currentProps->HasChanged = false;
-
+	
 	return true;
 }
 

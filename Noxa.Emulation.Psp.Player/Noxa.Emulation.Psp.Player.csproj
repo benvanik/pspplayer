@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{1497FF04-09C9-4D55-A617-E4EB10747319}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -172,6 +172,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Properties\Settings.cs" />
+    <Compile Include="RenderControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RenderControl.Designer.cs">
+      <DependentUpon>RenderControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="ServiceTools\CheckCompatability.cs">
       <SubType>Form</SubType>
     </Compile>
