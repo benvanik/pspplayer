@@ -16,7 +16,6 @@ using Noxa.Utilities;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
-
 using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
@@ -37,86 +36,82 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#region State Management
 
-		private void loadXmlDirectory(XPathNavigator node, RegistryKey key)
+		private void LoadXmlDirectory( XPathNavigator node, RegistryKey key )
 		{
-			XPathNodeIterator nodes;
-			nodes = node.Select("*");
+			XPathNodeIterator nodes = node.Select( "*" );
 
-			while (nodes.MoveNext())
+			while( nodes.MoveNext() )
 			{
-				if (nodes.Current.Name == "integer")
+				if( nodes.Current.Name == "integer" )
 				{
-					string name = nodes.Current.GetAttribute("name", "");
+					string name = nodes.Current.GetAttribute( "name", "" );
 					int value = nodes.Current.ValueAsInt;
-					Debug.Assert(name != "");
+					Debug.Assert( name != "" );
 					//Log.WriteLine(Verbosity.Verbose, Feature.Bios, "xml: adding integer {0} to {1}: {2}", name, key.Name, value);
-					key.Children.Add(new RegistryKey(name, value));
+					key.Children.Add( new RegistryKey( name, value ) );
 				}
-				else if (nodes.Current.Name == "string")
+				else if( nodes.Current.Name == "string" )
 				{
-					string name = nodes.Current.GetAttribute("name", "");
+					string name = nodes.Current.GetAttribute( "name", "" );
 					string value = nodes.Current.Value;
-					Debug.Assert(name != "");
+					Debug.Assert( name != "" );
 					//Log.WriteLine(Verbosity.Verbose, Feature.Bios, "xml: adding string {0} to {1}: {2}", name, key.Name, value);
-					key.Children.Add(new RegistryKey(name, value));
+					key.Children.Add( new RegistryKey( name, value ) );
 				}
-				else if (nodes.Current.Name == "binary")
+				else if( nodes.Current.Name == "binary" )
 				{
-					string name = nodes.Current.GetAttribute("name", "");
+					string name = nodes.Current.GetAttribute( "name", "" );
 					string value = nodes.Current.Value;
-					Debug.Assert(false);
-					key.Children.Add(new RegistryKey(name, value));
+					Debug.Assert( false );
+					key.Children.Add( new RegistryKey( name, value ) );
 				}
-				else if (nodes.Current.Name == "directory")
+				else if( nodes.Current.Name == "directory" )
 				{
-					string name = nodes.Current.GetAttribute("name", "");
-					Debug.Assert(name != "");
+					string name = nodes.Current.GetAttribute( "name", "" );
+					Debug.Assert( name != "" );
 					//Log.WriteLine(Verbosity.Verbose, Feature.Bios, "xml: adding directory {0} to {1}", name, key.Name);
-					RegistryKey value = new RegistryKey(name);
-					this.loadXmlDirectory(nodes.Current, value);
-					key.Children.Add(value);
+					RegistryKey value = new RegistryKey( name );
+					this.LoadXmlDirectory( nodes.Current, value );
+					key.Children.Add( value );
 				}
 				else
 				{
-					Debug.Assert(false);
+					Debug.Assert( false );
 				}
 			}
 		}
 
-		protected void loadXml()
+		protected void LoadXml()
 		{
-			XPathDocument document;
-			XPathNavigator navigator;
-			XPathNavigator node;
-			
-			/*
-			IMediaFile file = (IMediaFile)_kernel.FindPath("ms0:/registry.xml");
-			Debug.Assert(file != null);
+			IMediaFile file = ( IMediaFile )_kernel.FindPath( "ms0:/registry.xml" );
+			Debug.Assert( file != null );
+			if( file == null )
+			{
+				Log.WriteLine( Verbosity.Critical, Feature.Bios, "Registry not found - make sure you have registry.xml (and font/) on your memory stick!" );
+				return;
+			}
 
-			Stream stream = file.Open(MediaFileMode.Normal, MediaFileAccess.Read);
-			Debug.Assert(stream != null);
-			
-			document = new XPathDocument(stream);
-			*/
-			
-			document = new XPathDocument("registry.xml");
-			navigator = document.CreateNavigator();
-			node = navigator.SelectSingleNode("/registry");
-			
-			this.loadXmlDirectory(node, _system);
+			using( Stream stream = file.Open( MediaFileMode.Normal, MediaFileAccess.Read ) )
+			{
+				Debug.Assert( stream != null );
+
+				XPathDocument document = new XPathDocument( stream );
+				XPathNavigator navigator = document.CreateNavigator();
+				XPathNavigator node = navigator.SelectSingleNode( "/registry" );
+
+				this.LoadXmlDirectory( node, _system );
+			}
 		}
 
 		public sceReg( Kernel kernel )
 			: base( kernel )
 		{
-			// TODO: build default registry
 			_system = new RegistryKey( "system" );
-
-			this.loadXml();
 		}
 
 		public override void Start()
 		{
+			this.LoadXml();
 		}
 
 		public override void Stop()
