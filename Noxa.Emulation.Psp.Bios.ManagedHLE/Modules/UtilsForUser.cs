@@ -48,15 +48,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x37FB5C42, "sceKernelGetGPI" )]
-		public int sceKernelGetGPI(){ return Module.NotImplementedReturn; }
+		public int sceKernelGetGPI()
+		{
+			return 0;
+		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x6AD345D7, "sceKernelSetGPO" )]
-		public int sceKernelSetGPO(){ return Module.NotImplementedReturn; }
+		public void sceKernelSetGPO()
+		{
+		}
 
 		#region Clock
 

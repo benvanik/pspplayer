@@ -1,0 +1,340 @@
+<registry>
+	<directory name="DATA">
+		<directory name="FONT">
+			<string name="path_name">ms0:/font</string>
+			<integer name="num_fonts">17</integer>
+			
+			<directory name="PROPERTY">
+				<directory name="INFO0">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">103</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">1</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro DB</string>
+					<string name="file_name">jpn0.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO1">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">1</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro Latin</string>
+					<string name="file_name">ltn0.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO2">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">2</integer>
+					<integer name="style">1</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-Matisse Pro Latin</string>
+					<string name="file_name">ltn1.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO3">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">2</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro Latin</string>
+					<string name="file_name">ltn2.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO4">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">2</integer>
+					<integer name="style">2</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-Matisse Pro Latin</string>
+					<string name="file_name">ltn3.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO5">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">5</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro Latin</string>
+					<string name="file_name">ltn4.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO6">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">2</integer>
+					<integer name="style">5</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-Matisse Pro Latin</string>
+					<string name="file_name">ltn5.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO7">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">6</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro Latin</string>
+					<string name="file_name">ltn6.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO8">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">2</integer>
+					<integer name="style">6</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-Matisse Pro Latin</string>
+					<string name="file_name">ltn7.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO9">
+					<integer name="h_size">448</integer>
+					<integer name="v_size">448</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">1</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro Latin</string>
+					<string name="file_name">ltn8.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO10">
+					<integer name="h_size">448</integer>
+					<integer name="v_size">448</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">2</integer>
+					<integer name="style">1</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-Matisse Pro Latin</string>
+					<string name="file_name">ltn9.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO11">
+					<integer name="h_size">448</integer>
+					<integer name="v_size">448</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">2</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro Latin</string>
+					<string name="file_name">ltn10.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO12">
+					<integer name="h_size">448</integer>
+					<integer name="v_size">448</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">2</integer>
+					<integer name="style">2</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-Matisse Pro Latin</string>
+					<string name="file_name">ltn11.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO13">
+					<integer name="h_size">448</integer>
+					<integer name="v_size">448</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">5</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro Latin</string>
+					<string name="file_name">ltn12.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO14">
+					<integer name="h_size">448</integer>
+					<integer name="v_size">448</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">2</integer>
+					<integer name="style">5</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-Matisse Pro Latin</string>
+					<string name="file_name">ltn13.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO15">
+					<integer name="h_size">448</integer>
+					<integer name="v_size">448</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">6</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-NewRodin Pro Latin</string>
+					<string name="file_name">ltn14.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+				
+				<directory name="INFO16">
+					<integer name="h_size">448</integer>
+					<integer name="v_size">448</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">2</integer>
+					<integer name="style">6</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">2</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">1</integer>
+					<string name="font_name">FTT-Matisse Pro Latin</string>
+					<string name="file_name">ltn15.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
+			</directory>
+		</directory>
+	</directory>
+	
+	<directory name="SYSPROFILE">
+		<directory name="RESOLUTION">
+			<integer name="horizontal">8210</integer>
+			<integer name="vertical">8210</integer>
+		</directory>
+	</directory>
+</registry>

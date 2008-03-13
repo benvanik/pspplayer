@@ -172,6 +172,9 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
 					case "K":
 						regionName = "KR";
 						break;
+					case "A":
+						regionName = "CN";
+						break;
 					default:
 						regionName = "??";
 						break;

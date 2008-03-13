@@ -9,11 +9,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Xml;
+using System.Xml.XPath;
 
 using Noxa.Utilities;
 using Noxa.Emulation.Psp;
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Cpu;
+
+using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
@@ -33,30 +37,82 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#region State Management
 
+		private void loadXmlDirectory(XPathNavigator node, RegistryKey key)
+		{
+			XPathNodeIterator nodes;
+			nodes = node.Select("*");
+
+			while (nodes.MoveNext())
+			{
+				if (nodes.Current.Name == "integer")
+				{
+					string name = nodes.Current.GetAttribute("name", "");
+					int value = nodes.Current.ValueAsInt;
+					Debug.Assert(name != "");
+					//Log.WriteLine(Verbosity.Verbose, Feature.Bios, "xml: adding integer {0} to {1}: {2}", name, key.Name, value);
+					key.Children.Add(new RegistryKey(name, value));
+				}
+				else if (nodes.Current.Name == "string")
+				{
+					string name = nodes.Current.GetAttribute("name", "");
+					string value = nodes.Current.Value;
+					Debug.Assert(name != "");
+					//Log.WriteLine(Verbosity.Verbose, Feature.Bios, "xml: adding string {0} to {1}: {2}", name, key.Name, value);
+					key.Children.Add(new RegistryKey(name, value));
+				}
+				else if (nodes.Current.Name == "binary")
+				{
+					string name = nodes.Current.GetAttribute("name", "");
+					string value = nodes.Current.Value;
+					Debug.Assert(false);
+					key.Children.Add(new RegistryKey(name, value));
+				}
+				else if (nodes.Current.Name == "directory")
+				{
+					string name = nodes.Current.GetAttribute("name", "");
+					Debug.Assert(name != "");
+					//Log.WriteLine(Verbosity.Verbose, Feature.Bios, "xml: adding directory {0} to {1}", name, key.Name);
+					RegistryKey value = new RegistryKey(name);
+					this.loadXmlDirectory(nodes.Current, value);
+					key.Children.Add(value);
+				}
+				else
+				{
+					Debug.Assert(false);
+				}
+			}
+		}
+
+		protected void loadXml()
+		{
+			XPathDocument document;
+			XPathNavigator navigator;
+			XPathNavigator node;
+			
+			/*
+			IMediaFile file = (IMediaFile)_kernel.FindPath("ms0:/registry.xml");
+			Debug.Assert(file != null);
+
+			Stream stream = file.Open(MediaFileMode.Normal, MediaFileAccess.Read);
+			Debug.Assert(stream != null);
+			
+			document = new XPathDocument(stream);
+			*/
+			
+			document = new XPathDocument("registry.xml");
+			navigator = document.CreateNavigator();
+			node = navigator.SelectSingleNode("/registry");
+			
+			this.loadXmlDirectory(node, _system);
+		}
+
 		public sceReg( Kernel kernel )
 			: base( kernel )
 		{
 			// TODO: build default registry
 			_system = new RegistryKey( "system" );
 
-			RegistryKey dataKey = new RegistryKey( "DATA" );
-			RegistryKey fontKey = new RegistryKey( "FONT" );
-			fontKey.Children.Add( new RegistryKey( "path_name", "flash0:/font/" ) );
-			fontKey.Children.Add( new RegistryKey( "num_fonts", 1 ) );
-			RegistryKey fontPropertyKey = new RegistryKey( "PROPERTY" );
-			// for each font...
-			RegistryKey fontInfo0 = new RegistryKey( "INFO0" );
-			fontPropertyKey.Children.Add( fontInfo0 );
-			fontKey.Children.Add( fontPropertyKey );
-			dataKey.Children.Add( fontKey );
-			_system.Children.Add( dataKey );
-
-			RegistryKey sysprofileKey = new RegistryKey( "SYSPROFILE" );
-			RegistryKey resolutionKey = new RegistryKey( "RESOLUTION" );
-			resolutionKey.Children.Add( new RegistryKey( "horizontal", 480 ) );
-			resolutionKey.Children.Add( new RegistryKey( "vertical", 272 ) );
-			sysprofileKey.Children.Add( resolutionKey );
-			_system.Children.Add( sysprofileKey );
+			this.loadXml();
 		}
 
 		public override void Start()

@@ -197,6 +197,7 @@ namespace Noxa.Emulation.Psp.Player
 			_regionImages.Add( "J", Resources.Flag3 );
 			_regionImages.Add( "E", Resources.Flag4 );
 			_regionImages.Add( "K", Resources.Flag5 );
+			//_regionImages.Add( "A", Resources.Flag6 );
 		}
 
 		public const int IconWidth = 90;
