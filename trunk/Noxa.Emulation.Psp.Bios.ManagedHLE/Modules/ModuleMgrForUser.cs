@@ -171,7 +171,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Create a thread
 			KThread thread = new KThread( _kernel,
 				module,
-				_kernel.Partitions[ 6 ],
+				_kernel.Partitions[ 2 ],
 				"module_start_thread",
 				module.ModuleStart,
 				0,
@@ -215,7 +215,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Create a thread
 			KThread thread = new KThread( _kernel,
 				module,
-				_kernel.Partitions[ 6 ],
+				_kernel.Partitions[ 2 ],
 				"module_stop_thread",
 				module.ModuleStop,
 				0,

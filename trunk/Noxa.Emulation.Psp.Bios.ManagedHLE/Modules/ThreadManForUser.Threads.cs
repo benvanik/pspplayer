@@ -81,7 +81,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			KThread thread = new KThread( _kernel,
 				module,
-				_kernel.Partitions[ 6 ],
+				_kernel.Partitions[ 2 ],
 				_kernel.ReadString( ( uint )name ),
 				( uint )entry,
 				initPriority,
@@ -373,10 +373,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			//    SceUInt     threadPreemptCount;
 			//    SceUInt     releaseCount;
 			//} SceKThreadInfo;
+			KThread thread;
 
-			KThread thread = _kernel.GetHandle<KThread>( thid );
-			if( thread == null )
-				return -1;
+			if (thid == 0)
+			{
+				thread = _kernel.ActiveThread;
+			}
+			else
+			{
+				thread = _kernel.GetHandle<KThread>( thid );
+				if( thread == null )
+					return -1;
+			}
 
 			// NOTE: this is wrong! It's not supported!
 			long runClocks = thread.RunClocks;

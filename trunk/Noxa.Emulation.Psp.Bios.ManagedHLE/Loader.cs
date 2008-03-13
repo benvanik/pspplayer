@@ -860,7 +860,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						kernel.AddHandle( module );
 
 						// Allocate room for args
-						KMemoryBlock argsBlock = kernel.Partitions[ 6 ].Allocate( string.Format( "Module {0} args", results.Name ), KAllocType.High, 0, 0xFF ); // 256b of args - enough?
+						KMemoryBlock argsBlock = kernel.Partitions[ 2 ].Allocate( string.Format( "Module {0} args", results.Name ), KAllocType.High, 0, 0xFF ); // 256b of args - enough?
 
 						// Set arguments - we put these right below user space, and right above the stack
 						uint args = 0;
@@ -878,7 +878,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						// Create a thread
 						KThread thread = new KThread( kernel,
 							module,
-							kernel.Partitions[ 6 ],
+							kernel.Partitions[ 2 ],
 							"kmodule_thread",
 							results.EntryAddress,
 							0,

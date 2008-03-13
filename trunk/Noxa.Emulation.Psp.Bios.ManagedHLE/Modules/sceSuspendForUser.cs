@@ -87,7 +87,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// manual add
 		public int sceKernelVolatileMemLock( int unk, int ptr, int size )
 		{
-			return this.sceKernelVolatileMemLock( unk, ptr, size );
+			return this.sceKernelVolatileMemTryLock( unk, ptr, size );
 		}
 
 		[SuggestNative]
