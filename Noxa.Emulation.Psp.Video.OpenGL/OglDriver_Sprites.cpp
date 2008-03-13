@@ -225,7 +225,8 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 			else if( context->LightingEnabled == true )
 				glColor4fv( context->AmbientMaterial );
 			else
-				glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+				glColor4f( 0.0f, 0.0f, 0.0f, context->AmbientMaterial[ 3 ] ); // hacky hacky hack hack
+				//glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 			glVertex3fv( vpos[ m ] );
 		}
 	}
