@@ -319,8 +319,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public LoadResults LoadModule( ModuleType type, Stream moduleStream, LoadParameters parameters )
 		{
-			Elf32_Shdr*[] allocSections = new Elf32_Shdr*[ 128 ];
-			Elf32_Shdr*[] relocSections = new Elf32_Shdr*[ 128 ];
+			Elf32_Shdr*[] allocSections = new Elf32_Shdr*[ 256 ];
+			Elf32_Shdr*[] relocSections = new Elf32_Shdr*[ 256 ];
 			int allocSectionsCount = 0;
 			int relocSectionsCount = 0;
 
