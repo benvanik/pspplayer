@@ -1,9 +1,16 @@
+<?xml version="1.0"?>
 <registry>
+	<directory name="SYSPROFILE">
+		<integer name="sound_reduction">0</integer>
+		<directory name="RESOLUTION">
+			<integer name="horizontal">8210</integer>
+			<integer name="vertical">8210</integer>
+		</directory>
+	</directory>
 	<directory name="DATA">
 		<directory name="FONT">
 			<string name="path_name">ms0:/font</string>
-			<integer name="num_fonts">17</integer>
-			
+			<integer name="num_fonts">18</integer>
 			<directory name="PROPERTY">
 				<directory name="INFO0">
 					<integer name="h_size">648</integer>
@@ -23,7 +30,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO1">
 					<integer name="h_size">648</integer>
 					<integer name="v_size">648</integer>
@@ -42,7 +48,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO2">
 					<integer name="h_size">648</integer>
 					<integer name="v_size">648</integer>
@@ -61,7 +66,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO3">
 					<integer name="h_size">648</integer>
 					<integer name="v_size">648</integer>
@@ -80,7 +84,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO4">
 					<integer name="h_size">648</integer>
 					<integer name="v_size">648</integer>
@@ -99,7 +102,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO5">
 					<integer name="h_size">648</integer>
 					<integer name="v_size">648</integer>
@@ -118,7 +120,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO6">
 					<integer name="h_size">648</integer>
 					<integer name="v_size">648</integer>
@@ -137,7 +138,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO7">
 					<integer name="h_size">648</integer>
 					<integer name="v_size">648</integer>
@@ -156,7 +156,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO8">
 					<integer name="h_size">648</integer>
 					<integer name="v_size">648</integer>
@@ -175,7 +174,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO9">
 					<integer name="h_size">448</integer>
 					<integer name="v_size">448</integer>
@@ -194,7 +192,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO10">
 					<integer name="h_size">448</integer>
 					<integer name="v_size">448</integer>
@@ -213,7 +210,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO11">
 					<integer name="h_size">448</integer>
 					<integer name="v_size">448</integer>
@@ -232,7 +228,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO12">
 					<integer name="h_size">448</integer>
 					<integer name="v_size">448</integer>
@@ -251,7 +246,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO13">
 					<integer name="h_size">448</integer>
 					<integer name="v_size">448</integer>
@@ -270,7 +264,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO14">
 					<integer name="h_size">448</integer>
 					<integer name="v_size">448</integer>
@@ -289,7 +282,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO15">
 					<integer name="h_size">448</integer>
 					<integer name="v_size">448</integer>
@@ -308,7 +300,6 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
-				
 				<directory name="INFO16">
 					<integer name="h_size">448</integer>
 					<integer name="v_size">448</integer>
@@ -327,14 +318,188 @@
 					<integer name="expire_date">0</integer>
 					<integer name="shadow_option">0</integer>
 				</directory>
+				<directory name="INFO17">
+					<integer name="h_size">648</integer>
+					<integer name="v_size">648</integer>
+					<integer name="h_resolution">8192</integer>
+					<integer name="v_resolution">8192</integer>
+					<integer name="extra_attributes">0</integer>
+					<integer name="weight">0</integer>
+					<integer name="family_code">1</integer>
+					<integer name="style">1</integer>
+					<integer name="sub_style">0</integer>
+					<integer name="language_code">3</integer>
+					<integer name="region_code">0</integer>
+					<integer name="country_code">3</integer>
+					<string name="font_name">AsiaNHH(512Johab)</string>
+					<string name="file_name">kr0.pgf</string>
+					<integer name="expire_date">0</integer>
+					<integer name="shadow_option">0</integer>
+				</directory>
 			</directory>
 		</directory>
 	</directory>
-	
-	<directory name="SYSPROFILE">
-		<directory name="RESOLUTION">
-			<integer name="horizontal">8210</integer>
-			<integer name="vertical">8210</integer>
+	<directory name="CONFIG">
+		<directory name="VIDEO">
+			<secret name="menu_language">en</secret>
+			<secret name="sound_language">00</secret>
+			<secret name="subtitle_language">en</secret>
+			<integer name="appended_volume">2</integer>
+			<integer name="lr_button_enable">1</integer>
 		</directory>
+		<directory name="PHOTO">
+			<integer name="slideshow_speed">0</integer>
+		</directory>
+		<directory name="SYSTEM">
+			<string name="owner_name">PSPPlayer User</string>
+			<integer name="backlight_brightness">0</integer>
+			<directory name="XMB">
+				<integer name="theme_type">0</integer>
+				<integer name="language">1</integer>
+				<integer name="button_assign">1</integer>
+				<directory name="THEME">
+					<integer name="color_mode">0</integer>
+					<integer name="wallpaper_mode">0</integer>
+					<integer name="system_color">1</integer>
+				</directory>
+			</directory>
+			<directory name="SOUND">
+				<integer name="main_volume">17</integer>
+				<integer name="mute">0</integer>
+				<integer name="avls">0</integer>
+				<integer name="equalizer_mode">0</integer>
+				<integer name="operation_sound_mode">1</integer>
+			</directory>
+			<directory name="POWER_SAVING">
+				<integer name="suspend_interval">300</integer>
+				<integer name="backlight_off_interval">120</integer>
+				<integer name="wlan_mode">0</integer>
+			</directory>
+			<directory name="LOCK">
+				<secret name="password">0000</secret>
+				<integer name="parental_level">0</integer>
+				<integer name="browser_start">0</integer>
+			</directory>
+			<directory name="CHARACTER_SET">
+				<integer name="oem">13</integer>
+				<integer name="ansi">13</integer>
+			</directory>
+		</directory>
+		<directory name="DATE">
+			<integer name="time_format">1</integer>
+			<integer name="date_format">2</integer>
+			<integer name="summer_time">1</integer>
+			<integer name="time_zone_offset">-360</integer>
+			<string name="time_zone_area">central_us_canada</string>
+		</directory>
+		<directory name="NETWORK">
+			<directory name="ADHOC">
+				<integer name="channel">0</integer>
+			</directory>
+			<directory name="INFRASTRUCTURE">
+				<directory name="1">
+					<integer name="version">1</integer>
+					<integer name="device">1</integer>
+					<string name="cnf_name">Connection 1</string>
+					<string name="ssid">NETGEAR</string>
+					<integer name="auth_proto">0</integer>
+					<secret name="wep_key"></secret>
+					<integer name="how_to_set_ip">0</integer>
+					<string name="ip_address">0.0.0.0</string>
+					<string name="netmask">255.255.255.0</string>
+					<string name="default_route">0.0.0.0</string>
+					<integer name="dns_flag">0</integer>
+					<string name="primary_dns">0.0.0.0</string>
+					<string name="secondary_dns">0.0.0.0</string>
+					<string name="auth_name"></string>
+					<string name="auth_key"></string>
+					<integer name="http_proxy_flag">0</integer>
+					<string name="http_proxy_server"></string>
+					<integer name="http_proxy_port">8080</integer>
+				</directory>
+				<integer name="latest_id">1</integer>
+				<integer name="eap_md5">0</integer>
+				<integer name="auto_setting">1</integer>
+				<directory name="0">
+					<integer name="version">2</integer>
+					<integer name="device">1</integer>
+					<string name="cnf_name"></string>
+					<string name="ssid"></string>
+					<integer name="auth_proto">0</integer>
+					<secret name="wep_key"></secret>
+					<integer name="how_to_set_ip">0</integer>
+					<string name="ip_address"></string>
+					<string name="netmask"></string>
+					<string name="default_route"></string>
+					<integer name="dns_flag">0</integer>
+					<string name="primary_dns"></string>
+					<string name="secondary_dns"></string>
+					<string name="auth_name"></string>
+					<string name="auth_key"></string>
+					<integer name="http_proxy_flag">0</integer>
+					<string name="http_proxy_server"></string>
+					<integer name="http_proxy_port">8080</integer>
+					<integer name="auth_8021x_type">0</integer>
+					<string name="auth_8021x_auth_name"></string>
+					<string name="auth_8021x_auth_key"></string>
+					<integer name="wpa_key_type">0</integer>
+					<secret name="wpa_key"></secret>
+					<integer name="browser_flag">0</integer>
+				</directory>
+			</directory>
+		</directory>
+		<directory name="BROWSER">
+			<string name="home_uri"></string>
+			<integer name="cookie_mode">1</integer>
+			<integer name="proxy_mode">2</integer>
+			<string name="proxy_address"></string>
+			<integer name="proxy_port">0</integer>
+			<integer name="picture">1</integer>
+			<integer name="animation">1</integer>
+			<integer name="javascript">1</integer>
+			<integer name="cache_size">512</integer>
+			<integer name="char_size">1</integer>
+			<integer name="disp_mode">0</integer>
+			<integer name="connect_mode">0</integer>
+			<integer name="flash_activated">1</integer>
+			<integer name="flash_play">1</integer>
+		</directory>
+		<directory name="LFTV">
+			<integer name="easy_reg_done">0</integer>
+			<string name="netav_domain_name"></string>
+			<string name="netav_ip_address">172.29.71.1</string>
+			<integer name="netav_port_no_home">5021</integer>
+			<integer name="netav_port_no_away">5021</integer>
+			<string name="netav_nonce"></string>
+			<string name="base_station_version">0.000</string>
+			<integer name="base_station_region">0</integer>
+			<integer name="tuner_type">0</integer>
+			<integer name="input_line">0</integer>
+			<integer name="tv_channel">0</integer>
+			<integer name="bitrate_home">0</integer>
+			<integer name="bitrate_away">0</integer>
+			<secret name="channel_setting_jp"></secret>
+			<secret name="channel_setting_us"></secret>
+			<secret name="channel_setting_us_catv"></secret>
+			<integer name="overwrite_netav_setting">1</integer>
+			<integer name="screen_mode">0</integer>
+			<integer name="remocon_setting_region">0</integer>
+			<secret name="remocon_setting"></secret>
+			<string name="remocon_setting_revision">0000.00</string>
+			<integer name="external_tuner_channel">0</integer>
+			<string name="ssid"></string>
+			<integer name="audio_gain">0</integer>
+			<integer name="broadcast_standard_video1">0</integer>
+			<integer name="broadcast_standard_video2">0</integer>
+		</directory>
+		<directory name="MUSIC">
+			<integer name="wma_play">1</integer>
+		</directory>
+		<directory name="RSS">
+			<integer name="download_items">5</integer>
+		</directory>
+	</directory>
+	<directory name="REGISTRY">
+		<integer name="category_version">27</integer>
 	</directory>
 </registry>
