@@ -111,7 +111,8 @@ namespace Noxa.Emulation.Psp.Player.GamePicker
             "US",
             "UK",
             "JP",
-            "KR"} );
+            "KR",
+			"CN"} );
 			this.regionComboBox.Location = new System.Drawing.Point( 477, 3 );
 			this.regionComboBox.Name = "regionComboBox";
 			this.regionComboBox.Size = new System.Drawing.Size( 44, 21 );

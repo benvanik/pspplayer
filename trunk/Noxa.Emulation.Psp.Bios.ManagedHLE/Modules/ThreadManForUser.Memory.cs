@@ -188,14 +188,35 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return Module.NotImplementedReturn;
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x39810265, "sceKernelReferVplStatus" )]
 		// SDK location: /user/pspthreadman.h:1340
 		// SDK declaration: int sceKernelReferVplStatus(SceUID uid, SceKernelVplInfo *info);
 		public int sceKernelReferVplStatus( int uid, int info )
 		{
-			return Module.NotImplementedReturn;
+			KVariablePool pool = _kernel.GetHandle<KVariablePool>(uid);
+			if (pool == null)
+				return -1;
+
+			Debug.Assert(info != 0);
+
+			unsafe
+			{
+				byte* p = _memorySystem.Translate((uint)info);
+				*((int*)(p + 0)) = 52;
+				
+				for (int i = 0; i < 31; i++)
+				{
+					*((char*)(p + 4 + i)) = (i < pool.Name.Length) ? pool.Name[i] : (char)0;
+				}
+
+				*((uint*)(p + 36)) = pool.Attributes;
+				*((uint*)(p + 40)) = pool.BlockSize * (uint)pool.Blocks.Count;
+				*((uint*)(p + 44)) = pool.BlockSize * (uint)pool.FreeBlocks.Count;
+				*((uint*)(p + 48)) = (uint)pool.WaitingThreads.Count;
+			}
+
+			return 0;
 		}
 
 		#endregion
