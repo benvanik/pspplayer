@@ -341,9 +341,9 @@
 	</directory>
 	<directory name="CONFIG">
 		<directory name="VIDEO">
-			<secret name="menu_language">en</secret>
-			<secret name="sound_language">00</secret>
-			<secret name="subtitle_language">en</secret>
+			<binary name="menu_language">en</binary>
+			<binary name="sound_language">00</binary>
+			<binary name="subtitle_language">en</binary>
 			<integer name="appended_volume">2</integer>
 			<integer name="lr_button_enable">1</integer>
 		</directory>
@@ -376,7 +376,7 @@
 				<integer name="wlan_mode">0</integer>
 			</directory>
 			<directory name="LOCK">
-				<secret name="password">0000</secret>
+				<binary name="password">0000</binary>
 				<integer name="parental_level">0</integer>
 				<integer name="browser_start">0</integer>
 			</directory>
@@ -403,7 +403,7 @@
 					<string name="cnf_name">Connection 1</string>
 					<string name="ssid">NETGEAR</string>
 					<integer name="auth_proto">0</integer>
-					<secret name="wep_key"></secret>
+					<binary name="wep_key"></binary>
 					<integer name="how_to_set_ip">0</integer>
 					<string name="ip_address">0.0.0.0</string>
 					<string name="netmask">255.255.255.0</string>
@@ -426,7 +426,7 @@
 					<string name="cnf_name"></string>
 					<string name="ssid"></string>
 					<integer name="auth_proto">0</integer>
-					<secret name="wep_key"></secret>
+					<binary name="wep_key"></binary>
 					<integer name="how_to_set_ip">0</integer>
 					<string name="ip_address"></string>
 					<string name="netmask"></string>
@@ -443,7 +443,7 @@
 					<string name="auth_8021x_auth_name"></string>
 					<string name="auth_8021x_auth_key"></string>
 					<integer name="wpa_key_type">0</integer>
-					<secret name="wpa_key"></secret>
+					<binary name="wpa_key"></binary>
 					<integer name="browser_flag">0</integer>
 				</directory>
 			</directory>
@@ -478,13 +478,13 @@
 			<integer name="tv_channel">0</integer>
 			<integer name="bitrate_home">0</integer>
 			<integer name="bitrate_away">0</integer>
-			<secret name="channel_setting_jp"></secret>
-			<secret name="channel_setting_us"></secret>
-			<secret name="channel_setting_us_catv"></secret>
+			<binary name="channel_setting_jp"></binary>
+			<binary name="channel_setting_us"></binary>
+			<binary name="channel_setting_us_catv"></binary>
 			<integer name="overwrite_netav_setting">1</integer>
 			<integer name="screen_mode">0</integer>
 			<integer name="remocon_setting_region">0</integer>
-			<secret name="remocon_setting"></secret>
+			<binary name="remocon_setting"></binary>
 			<string name="remocon_setting_revision">0000.00</string>
 			<integer name="external_tuner_channel">0</integer>
 			<string name="ssid"></string>
