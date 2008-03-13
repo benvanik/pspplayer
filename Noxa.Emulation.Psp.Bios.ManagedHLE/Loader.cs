@@ -924,7 +924,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						// Schedule so that our thread runs
 						kernel.Schedule();
 
-						kernel.MemorySystem.DumpMainMemory( "startup.bin" );
+						//kernel.MemorySystem.DumpMainMemory( "startup.bin" );
 					}
 				}
 			}
@@ -977,7 +977,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 								// TODO: Change function module, etc?
 
 								// Perform fixup
-								uint* pcode = ( uint* )function.StubAddress;
+								uint* pcode = ( uint* )kernel.MemorySystem.Translate( function.StubAddress );
 								{
 									// j {target}
 									// nop
