@@ -29,8 +29,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			if( this.State == KThreadState.WaitSuspended )
 				this.State = KThreadState.Suspended;
-			else if( ( this.State == KThreadState.Waiting ) &&
-				( this.WaitingOn == KThreadWait.Semaphore ) )
+			else if( this.State == KThreadState.Waiting )
 			{
 				this.State = KThreadState.Ready;
 				this.Kernel.Cpu.SetContextRegister( ContextID, 2, ( uint )returnValue );
