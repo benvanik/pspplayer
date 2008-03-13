@@ -147,7 +147,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				case 0x02415821:		// Register insert/eject callback
 					Debug.Assert( inlen == 4 );
 					{
-						Debug.Assert( _msInsertEjectCallback == null );
+						//Debug.Assert( _msInsertEjectCallback == null );
 						uint cbid = *( uint* )inp;
 						_msInsertEjectCallback = _kernel.GetHandle<KCallback>( cbid );
 						if( _msInsertEjectCallback != null )

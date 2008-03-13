@@ -729,19 +729,43 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
+		#region Module Loading
+
+		enum UtilityLoadModule
+		{
+			NetCommon,
+			NetInet,
+			NetParseUri,
+			NetParseHttp,
+			NetHttp,
+			NetSsl,
+		}
+
+		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x2A2B3DE0, "sceUtility_2A2B3DE0")]
-		public int sceUtility_2A2B3DE0()
+		[BiosFunction( 0x2A2B3DE0, "sceUtilityLoadModule" )]
+		public int sceUtilityLoadModule( int moduleType )
 		{
 			return 0x00112233;
 		}
 
+		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0xE49BFE92, "sceUtility_E49BFE92")]
-		public int sceUtility_E49BFE92()
+		[BiosFunction( 0xE49BFE92, "sceUtilityUnloadModule" )]
+		public int sceUtilityUnloadModule()
 		{
-			return 0x00223344;
+			return 0;
 		}
+
+		#endregion
+
+		//sceUtilityLoadModule 0x2AD8E239 
+//0x08A07D4C: "sceUtilityLoadModule(SCE_UTILITY_MODULE_NET_COMMON) failed. ret = 0x%x\n"
+//0x08A07D94: "sceUtilityLoadModule(SCE_UTILITY_MODULE_NET_INET) failed. ret = 0x%x\n"
+//0x08A07DDC: "sceUtilityLoadModule(SCE_UTILITY_MODULE_NET_PARSE_URI) failed. ret = 0x%x\n"
+//0x08A07E28: "sceUtilityLoadModule(SCE_UTILITY_MODULE_NET_PARSE_HTTP) failed. ret = 0x%x\n"
+//0x08A07E74: "sceUtilityLoadModule(SCE_UTILITY_MODULE_NET_HTTP) failed. ret = 0x%x\n"
+//0x08A07EBC: "sceUtilityLoadModule(SCE_UTILITY_MODULE_NET_SSL) failed. ret = 0x%x\n"
 	}
 }
 

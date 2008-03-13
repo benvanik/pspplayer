@@ -375,8 +375,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		[Stateless]
 		[NotImplemented]
+		[Stateless]
 		[BiosFunction( 0xF7D8D092, "sceUtilityUnloadAvModule" )]
 		// manual add
 		public int sceUtilityUnloadAvModule( int module )
