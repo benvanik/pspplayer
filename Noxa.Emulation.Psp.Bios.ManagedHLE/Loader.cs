@@ -246,6 +246,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		#region Helpers
 
+		private uint GetBssSize( byte* buffer )
+		{
+			Elf32_Ehdr* header = ( Elf32_Ehdr* )buffer;
+			if( header->e_phnum > 0 )
+			{
+				Elf32_Phdr* phdr = ( Elf32_Phdr* )( buffer + header->e_phoff );
+				return phdr->p_memsz - phdr->p_filesz;
+			}
+			else
+				return 0;
+		}
+
 		private Elf32_Shdr* FindSection( byte* buffer, string name )
 		{
 			Elf32_Ehdr* header = ( Elf32_Ehdr* )buffer;
@@ -402,6 +414,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						relocSections[ relocSectionsCount++ ] = shdr;
 				}
 
+				uint bssSize = this.GetBssSize( buffer );
+				extents += bssSize;
+
 				// Module info
 				Elf32_Shdr* moduleInfoShdr = FindSection( buffer, ".rodata.sceModuleInfo" );
 				Debug.Assert( moduleInfoShdr != null );
@@ -475,6 +490,19 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						case ShType.SHT_PROGBITS:
 							MemorySystem.CopyMemory( buffer + shdr->sh_offset, pdest, shdr->sh_size );
 							break;
+					}
+				}
+
+				// Zero out BSS if present
+				if( bssSize > 0 )
+				{
+					Elf32_Shdr* bssShdr = FindSection( buffer, ".bss" );
+					Debug.Assert( bssShdr != null );
+					if( bssShdr != null )
+					{
+						uint address = baseAddress + bssShdr->sh_addr;
+						byte* pdest = memory.Translate( address );
+						MemorySystem.ZeroMemory( pdest, bssSize );
 					}
 				}
 
