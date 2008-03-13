@@ -133,15 +133,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[BiosFunction( 0x68a46b95, "__sceSasGetEndFlag" )]
 		public int __sceSasGetEndFlag( int sasCore )
 		{
-			int f = 0;
-			for( int i = 0; i < 32; i++ )
-			{
-				if( voices[ i ].finished )
-				{
-					f |= ( 1 << i );
-				}
-			}
-			return f;
+			//int f = 0;
+			//for( int i = 0; i < 32; i++ )
+			//{
+			//    if( voices[ i ].finished )
+			//    {
+			//        f |= ( 1 << i );
+			//    }
+			//}
+			//return f;
+			return unchecked( ( int )0xFFFFFFFF );
 		}
 
 #if !USE
