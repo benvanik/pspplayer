@@ -80,6 +80,37 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			return 0;
 		}
+
+		[SuggestNative]
+		[Stateless]
+		[BiosFunction( 0x3E0271D3, "sceKernelVolatileMemLock" )]
+		// manual add
+		public int sceKernelVolatileMemLock( int unk, int ptr, int size )
+		{
+			return this.sceKernelVolatileMemLock( unk, ptr, size );
+		}
+
+		[SuggestNative]
+		[Stateless]
+		[BiosFunction( 0xA14F40B2, "sceKernelVolatileMemTryLock" )]
+		// manual add
+		public unsafe int sceKernelVolatileMemTryLock( int unk, int ptr, int size )
+		{
+			byte* pptr = _memorySystem.TranslateMainMemory( ptr );
+			*( ( uint* )pptr ) = 0x08400000;
+			byte* psize = _memorySystem.TranslateMainMemory( size );
+			*( ( uint* )psize ) = 0x00400000;
+			return 0;
+		}
+
+		[SuggestNative]
+		[Stateless]
+		[BiosFunction( 0xA569E425, "sceKernelVolatileMemUnlock" )]
+		// manual add
+		public int sceKernelVolatileMemUnlock()
+		{
+			return 0;
+		}
 	}
 }
 
