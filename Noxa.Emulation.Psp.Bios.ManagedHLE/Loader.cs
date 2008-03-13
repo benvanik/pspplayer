@@ -378,7 +378,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 				// 0x08900000
 				//uint defaultLoad = 0x08880000;
-				uint defaultLoad = 0x08000000;
+				uint defaultLoad = 0x08800000;
 				//uint defaultLoad = uint.MaxValue;
 
 				// s-hdrs
