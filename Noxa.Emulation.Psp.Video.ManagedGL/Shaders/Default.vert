@@ -6,6 +6,11 @@
 
 uniform mat4 worldMatrix;
 
+uniform bool isTransformed;
+uniform vec2 textureSize;
+uniform vec2 textureOffset;
+uniform vec2 textureScale;
+
 uniform int boneCount;
 uniform mat4 boneMatrices[ 8 ];
 attribute float boneWeights[ 8 ];
@@ -13,12 +18,22 @@ attribute float boneWeights[ 8 ];
 uniform int morphCount;
 uniform float morphWeights[ 8 ];
 
+uniform bool lightingEnabled;
+// .x = type, .y = mode, .z = convergence, .w = cutoff
+// type: 0 = directional, 1 = point, 2 = spot
+// mode: 0 = diffuse, 1 = diffuse + specular, 2 = powered specular ?
+uniform bool lightEnabled[ 4 ];
+uniform vec4 lightParameters[ 4 ];
+uniform vec3 lightPositions[ 4 ];
+uniform vec3 lightDirections[ 4 ];
+uniform vec3 lightColors[ 4 ];
+
 void main()
 {
 	vec4 position = gl_Vertex;
 	
-	// Texture setup
-	gl_TexCoord[ 0 ] = gl_TextureMatrix[ 0 ] * gl_MultiTexCoord0;
+	// Should this be here?
+	position = worldMatrix * position;
 	
 	// Morphing
 	if( morphCount != 0 )
@@ -30,7 +45,7 @@ void main()
 		// I have no clue how to do this ;)
 	}
 	
-	// Skinning
+	// -- Skinning --
 	vec3 normal = gl_Normal;
 	if( boneCount != 0 )
 	{
@@ -51,9 +66,73 @@ void main()
 		normal = normal1;
 	}
 	
-	// Lighting / materials
-	// ...
+	// -- Lighting / materials --
+	if( lightingEnabled == true )
+	{
+		vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 );
+		for( int n = 0; n < 4; n++ )
+		{
+			if( lightEnabled[ n ] == true )
+			{
+				// Light!
+			}
+		}
+		gl_FrontColor = color;
+	}
 	gl_FrontColor = gl_Color;
 	
-	gl_Position = gl_ModelViewProjectionMatrix * worldMatrix * position;
+	/*
+	struct gl_LightModelParameters {
+		vec4 ambient;
+	};
+	uniform gl_LightModelParameters gl_LightModel;
+	
+	struct gl_LightSourceParameters {
+		vec4 ambient;
+		vec4 diffuse;
+		vec4 specular;
+		vec4 position;
+		vec4 halfVector;
+		vec3 spotDirection;
+		float spotExponent;
+		float spotCutoff;
+		float spotCosCutoff;
+		float constantAttenuation;
+		float linearAttenuation;
+		float quadraticAttenuation;
+	};
+	uniform gl_LightSourceParameters gl_LightSource[gl_MaxLights];
+	
+	struct gl_LightProducts {
+		vec4 ambient;
+		vec4 diffuse;
+		vec4 specular;
+	};
+	uniform gl_LightProducts gl_FrontLightProduct[gl_MaxLights];
+	
+	struct gl_MaterialParameters {
+		vec4 emission;
+		vec4 ambient;
+		vec4 diffuse;
+		vec4 specular;
+		float shininess;
+	};
+	uniform gl_MaterialParameters gl_FrontMaterial;
+	*/
+	
+	// -- Texture setup --
+	vec4 texCoord = gl_MultiTexCoord0;
+	if( isTransformed == true )
+	{
+		texCoord.s /= textureSize.s;
+		texCoord.t /= textureSize.t;
+	}
+	else
+	{
+		texCoord.s = ( texCoord.s * textureScale.s ) + textureOffset.s;
+		texCoord.t = ( texCoord.t * textureScale.t ) + textureOffset.t;
+	}
+	gl_TexCoord[ 0 ] = gl_TextureMatrix[ 0 ] * texCoord;
+	
+	gl_Position = gl_ModelViewProjectionMatrix * position;
 }

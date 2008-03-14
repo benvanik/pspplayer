@@ -60,7 +60,10 @@
     <Compile Include="MGLCapabilities.cs" />
     <Compile Include="MGLDriver.cs" />
     <Compile Include="MGLDriver.Lists.cs" />
+    <Compile Include="MGLDriver.Primitives.cs" />
     <Compile Include="MGLDriver.Setup.cs" />
+    <Compile Include="MGLDriver.StateManagement.cs" />
+    <Compile Include="MGLDriver.TextureTransfer.cs" />
     <Compile Include="MGLDriver.Worker.cs" />
     <Compile Include="MGLDriverHook.cs" />
     <Compile Include="MGLListCache.cs" />
@@ -68,6 +71,7 @@
     <Compile Include="MGLStatistics.cs" />
     <Compile Include="MGLStatisticsSource.cs" />
     <Compile Include="MGLTextureCache.cs" />
+    <Compile Include="MGLUtilities.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GLProgram.cs" />

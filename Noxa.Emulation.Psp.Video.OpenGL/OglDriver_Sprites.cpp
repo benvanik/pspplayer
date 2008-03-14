@@ -170,6 +170,9 @@ void DrawSpriteList( OglContext* context, int vertexType, int vertexCount, int v
 		vpos[ 2 ][ 0 ] += 0.25f;
 		vpos[ 2 ][ 1 ] += 0.25f;*/
 
+		// Z is the same for all vertices - set v[2].z=v[0].z
+		vpos[ 2 ][ 2 ] = vpos[ 0 ][ 2 ];
+
 		// 0 ---- 1
 		// |      |
 		// |      |

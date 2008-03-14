@@ -22,7 +22,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 	{
 		public int ID;
 
-		public void* Pointer;
+		public uint* Pointer;
 		public uint StartAddress;
 		public uint StallAddress;
 
@@ -32,7 +32,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public uint ContextAddress; // If >0, a pointer to the stored context to restore
 
 		public uint Base;
-		public uint[] Stack = new uint[ 32 ];
+		public uint*[] Stack = new uint*[ 32 ];
 		public int StackIndex;
 	}
 }

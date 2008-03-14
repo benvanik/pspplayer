@@ -16,6 +16,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public static uint SkippedFrames;
 		public static uint DisplayListsProcessed;
 		public static uint AbortedLists;
+		public static uint StallCount;
+		public static uint SignalCount;
+		public static uint CommandsProcessed;
 
 		public static uint[] CommandCounts = new uint[ 256 ];
 
@@ -26,6 +29,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			Log.WriteLine( Verbosity.Normal, Feature.Video, "{0,-30} = {1}", "SkippedFrames", SkippedFrames );
 			Log.WriteLine( Verbosity.Normal, Feature.Video, "{0,-30} = {1}", "DisplayListsProcessed", DisplayListsProcessed );
 			Log.WriteLine( Verbosity.Normal, Feature.Video, "{0,-30} = {1}", "AbortedLists", AbortedLists );
+			Log.WriteLine( Verbosity.Normal, Feature.Video, "{0,-30} = {1}", "StallCount", StallCount );
+			Log.WriteLine( Verbosity.Normal, Feature.Video, "{0,-30} = {1}", "SignalCount", SignalCount );
+			Log.WriteLine( Verbosity.Normal, Feature.Video, "{0,-30} = {1}", "CommandsProcessed", CommandsProcessed );
 			for( int n = 0; n < CommandCounts.Length; n++ )
 			{
 				if( CommandCounts[ n ] <= 1 )
@@ -40,6 +46,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			SkippedFrames = 0;
 			DisplayListsProcessed = 0;
 			AbortedLists = 0;
+			StallCount = 0;
+			SignalCount = 0;
+			CommandsProcessed = 0;
 		}
 	}
 }

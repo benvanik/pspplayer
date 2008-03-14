@@ -13,7 +13,6 @@ using System.Threading;
 using System.Windows.Forms;
 using Tao.OpenGl;
 using Tao.Platform.Windows;
-using Noxa.Emulation.Psp.Debugging.Hooks;
 
 namespace Noxa.Emulation.Psp.Video.ManagedGL
 {
@@ -43,6 +42,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		private void NextFrame()
 		{
+			MGLStatistics.ProcessedFrames++;
+
 			// Needed?
 			Gl.glBindTexture( Gl.GL_TEXTURE_2D, 0 );
 
@@ -133,9 +134,227 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			//Gl.glClearColor( ( float )r.NextDouble(), ( float )r.NextDouble(), ( float )r.NextDouble(), 1.0f );
 			Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
 
-			this.NextFrame();
-			Debug.WriteLine( "finished list" );
-			list.State = DisplayListState.Done;
+			// Lists are processed until they stall or CMD_END
+			// CMD_FINISH means that the drawing is done and the frame can change (I think)
+			// NOTE: I don't support signals yet - a CMD_SIGNAL is always followed by a CMD_END - it's ignored!
+			// NOTE: CMD_SIGNAL can be used to simulate a jump, call, or ret - I DO support these
+
+			//MGLStatistics.Print();
+
+			uint* stallAddress = ( list.StallAddress > 0 ) ? ( uint* )this.MemorySystem.Translate( list.StallAddress ) : null;
+
+			bool listDone = false;
+			uint commandCount = 0;
+			while( listDone == false )
+			{
+				// Check for stall
+				if( list.Pointer == stallAddress )
+				{
+					MGLStatistics.StallCount++;
+					list.State = DisplayListState.Stalled;
+					listDone = true;
+					break;
+				}
+
+				uint p = *list.Pointer;
+				VideoCommand cmd = ( VideoCommand )( ( byte )( p >> 24 ) );
+				uint argi = p & 0x00FFFFFF;
+				uint argx = argi << 8;
+				float argf = *( ( float* )( ( uint* )( &argx ) ) );
+
+				uint x, y;
+
+				// Next packet
+				list.Pointer++;
+				commandCount++;
+
+				MGLStatistics.CommandCounts[ ( int )cmd ]++;
+				_ctx.Values[ ( int )cmd ] = argi;
+
+				switch( cmd )
+				{
+					// -- General -------------------------------------------------------
+					case VideoCommand.BASE:
+						list.Base = argx;
+						continue;
+
+					// -- Termination ---------------------------------------------------
+					case VideoCommand.FINISH:
+						this.NextFrame();
+						Debug.WriteLine( "finished list" );
+						list.State = DisplayListState.Done;
+						continue;
+					case VideoCommand.END:
+						listDone = true;
+						continue;
+					case VideoCommand.Unknown0x11:
+						// ?
+						continue;
+
+					// -- Flow control --------------------------------------------------
+					case VideoCommand.JUMP:
+						list.Pointer = ( uint* )this.MemorySystem.Translate( ( argi | list.Base ) & 0xFFFFFFFC );
+						continue;
+					case VideoCommand.CALL:
+						list.Stack[ list.StackIndex++ ] = list.Pointer;
+						list.Pointer = ( uint* )this.MemorySystem.Translate( ( argi | list.Base ) & 0xFFFFFFFC );
+						continue;
+					case VideoCommand.RET:
+						list.Pointer = list.Stack[ --list.StackIndex ];
+						continue;
+
+					// -- Signals -------------------------------------------------------
+					case VideoCommand.SIGNAL:
+						{
+							// Signal is ALWAYS followed by END - if not, we are dead
+							MGLStatistics.SignalCount++;
+							uint next = *list.Pointer;
+							list.Pointer++;
+							x = argi & 0x0000FFFF;
+							y = next & 0x0000FFFF;
+							switch( argi >> 16 )
+							{
+								case 0x01:
+								case 0x02:
+								case 0x03:
+									break;
+								case 0x10: // JUMP
+									y |= x << 16;
+									list.Pointer = ( uint* )this.MemorySystem.Translate( y & 0xFFFFFFFC );
+									break;
+								case 0x11: // CALL
+									y |= x << 16;
+									list.Stack[ list.StackIndex++ ] = list.Pointer;
+									list.Pointer = ( uint* )this.MemorySystem.Translate( y & 0xFFFFFFFC );
+									break;
+								case 0x12: // RET
+									list.Pointer = list.Stack[ --list.StackIndex ];
+									break;
+							}
+						}
+						continue;
+
+					// -- General State -------------------------------------------------
+					case VideoCommand.CLEAR:
+					case VideoCommand.SHADE:
+					case VideoCommand.BCE:
+					case VideoCommand.FFACE:
+					case VideoCommand.AAE:
+					case VideoCommand.FBP:
+					case VideoCommand.FBW:
+
+					// -- Alpha Testing -------------------------------------------------
+					case VideoCommand.ATE:
+					case VideoCommand.ATST:
+
+					// -- Depth Testing -------------------------------------------------
+					case VideoCommand.ZTE:
+					case VideoCommand.ZTST:
+					case VideoCommand.NEARZ:
+					case VideoCommand.FARZ:
+
+					// -- Alpha Testing -------------------------------------------------
+					case VideoCommand.ABE:
+					case VideoCommand.ALPHA:
+					case VideoCommand.SFIX:
+					case VideoCommand.DFIX:
+
+					// -- Viewport/Scissor ----------------------------------------------
+					case VideoCommand.SCISSOR1:
+					case VideoCommand.SCISSOR2:
+
+					// -- Fog -----------------------------------------------------------
+					case VideoCommand.FGE:
+					case VideoCommand.FCOL:
+					case VideoCommand.FFAR:
+					case VideoCommand.FDIST:
+
+					// -- Lighting/Materials --------------------------------------------
+					case VideoCommand.LTE:
+					case VideoCommand.LTE0:
+					case VideoCommand.LTE1:
+					case VideoCommand.LTE2:
+					case VideoCommand.LTE3:
+
+					case VideoCommand.ALA:
+					case VideoCommand.ALC:
+					case VideoCommand.AMA:
+					case VideoCommand.AMC:
+						continue;
+
+					// -- Primitive Drawing ---------------------------------------------
+					// VTYPE, VADDR, IADDR
+					case VideoCommand.PRIM:
+						this.DrawPrimitive( list.Base, argi );
+						continue;
+
+					// -- Patches/Splines -----------------------------------------------
+					// PSUB, PFACE
+					case VideoCommand.BEZIER:
+						this.DrawBezier( list.Base, argi );
+						continue;
+					case VideoCommand.SPLINE:
+						this.DrawSpline( list.Base, argi );
+						continue;
+
+					// -- Textures ------------------------------------------------------
+					case VideoCommand.TME:
+					case VideoCommand.TSYNC:
+					case VideoCommand.TMODE:
+					case VideoCommand.TPSM:
+					case VideoCommand.TFLT:
+					case VideoCommand.TWRAP:
+					case VideoCommand.TFUNC:
+					case VideoCommand.TEC:
+					case VideoCommand.TFLUSH:
+					case VideoCommand.USCALE:
+					case VideoCommand.VSCALE:
+					case VideoCommand.UOFFSET:
+					case VideoCommand.VOFFSET:
+					//case VideoCommand.TBPN:
+					//case VideoCommand.TBWN:
+					//case VideoCommand.TSIZEN:
+						continue;
+
+					// -- CLUT ----------------------------------------------------------
+
+					// -- Texture Transfer ----------------------------------------------
+					// TRXSBP, TRXSBW, TRXDBP, TRXDBW, TRXSIZE, TRXSPOS, TRXDPOS
+					case VideoCommand.TRXKICK:
+						this.TransferTexture( argi );
+						continue;
+
+					// -- Matrices ------------------------------------------------------
+					// PROJ, VIEW, WORLD, TMATRIX
+					case VideoCommand.PMS:
+						for( int n = 0; n < 16; n++ )
+						{
+							argx = ( *( list.Pointer++ ) & 0x00FFFFFF ) << 8;
+							_ctx.ProjectionMatrix[ n ] = *( ( float* )( ( uint* )( &argx ) ) );
+						}
+						list.Pointer += 16;
+						this.InvalidateMatrices();
+						continue;
+					case VideoCommand.VMS:
+						MGLUtilities.ReadMatrix3x4( list.Pointer, _ctx.ViewMatrix );
+						list.Pointer += 12;
+						this.InvalidateMatrices();
+						continue;
+					case VideoCommand.WMS:
+						MGLUtilities.ReadMatrix3x4( list.Pointer, _ctx.WorldMatrix );
+						list.Pointer += 12;
+						this.InvalidateMatrices();
+						continue;
+					case VideoCommand.TMS:
+						MGLUtilities.ReadMatrix3x4( list.Pointer, _ctx.TextureMatrix );
+						list.Pointer += 12;
+						this.InvalidateMatrices();
+						continue;
+				}
+			}
+
+			MGLStatistics.DisplayListsProcessed++;
+			MGLStatistics.CommandsProcessed += commandCount;
 		}
 	}
 }
