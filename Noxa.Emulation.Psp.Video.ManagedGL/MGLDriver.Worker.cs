@@ -20,6 +20,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 	{
 		private TimerQueue _timerQueue = new TimerQueue();
 		private Timer _vsyncTimer;
+		private bool _vsyncWaiting;
 
 		private void SetupWorker()
 		{
@@ -30,8 +31,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		private void VsyncTimer( Timer timer )
 		{
-			//_vcount++;
-			this.NextFrame();
+			_vcount++;
+			_vsyncWaiting = true;
 		}
 
 		#region Frame Advancement
@@ -55,7 +56,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				this.ReallyCaptureScreen();
 			}
 
-			_vcount++;
+			//_vcount++;
+			_vsyncWaiting = false;
 			_hasFinished = true;
 
 			if( _needResize == true )
@@ -134,6 +136,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		private void ProcessList( DisplayList list )
 		{
+			if( _vsyncWaiting == true )
+				this.NextFrame();
+
 			Random r = new Random();
 			//Gl.glClearColor( ( float )r.NextDouble(), ( float )r.NextDouble(), ( float )r.NextDouble(), 1.0f );
 			//Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
