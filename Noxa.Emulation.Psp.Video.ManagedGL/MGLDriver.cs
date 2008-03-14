@@ -13,6 +13,7 @@ using Tao.OpenGl;
 using Tao.Platform.Windows;
 using Noxa.Emulation.Psp.Cpu;
 using Noxa.Emulation.Psp.Debugging.Hooks;
+using Noxa.Emulation.Psp.Video.ManagedGL.Programs;
 
 namespace Noxa.Emulation.Psp.Video.ManagedGL
 {
@@ -35,6 +36,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public bool DisableTextures;
 
 		private MGLContext _ctx;
+		private DefaultProgram _defaultProgram;
 
 		public MGLDriver( IEmulationInstance emulator, ComponentParameters parameters )
 		{
