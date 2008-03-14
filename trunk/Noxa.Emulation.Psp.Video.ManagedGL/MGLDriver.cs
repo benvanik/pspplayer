@@ -34,6 +34,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public bool DrawWireframe;
 		public bool DisableTextures;
 
+		private MGLContext _ctx;
+
 		public MGLDriver( IEmulationInstance emulator, ComponentParameters parameters )
 		{
 			this.Emu = emulator;
@@ -66,6 +68,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		{
 			if( _isSetup == false )
 			{
+				_ctx = new MGLContext();
 				this.SetupGL();
 				this.SetupLists();
 				this.SetupWorker();

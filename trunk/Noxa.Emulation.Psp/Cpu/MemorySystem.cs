@@ -127,7 +127,18 @@ namespace Noxa.Emulation.Psp.Cpu
 				return ( byte* )0;
 			}
 		}
-		
+
+		/// <summary>
+		/// Align a value.
+		/// </summary>
+		/// <param name="n">Value to align.</param>
+		/// <param name="align">Alignment.</param>
+		/// <returns>The aligned value.</returns>
+		public static uint Align( uint n, uint align )
+		{
+			return ( n + ( align - 1 ) ) & ~( align - 1 );
+		}
+
 		/// <summary>
 		/// Copy a region of memory.
 		/// </summary>

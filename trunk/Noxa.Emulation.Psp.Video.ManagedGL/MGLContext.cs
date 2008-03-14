@@ -45,10 +45,10 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public int MipMapLevel;
 		public int TextureStorageMode;
 		//public MGLTexture[] Textures = new MGLTexture[ 8 ];
-		public ushort TextureFilterMin = Gl.GL_LINEAR;
-		public ushort TextureFilterMag = Gl.GL_LINEAR;
-		public ushort TextureWrapS = Gl.GL_REPEAT;
-		public ushort TextureWrapT = Gl.GL_REPEAT;
+		public int TextureFilterMin = Gl.GL_LINEAR;
+		public int TextureFilterMag = Gl.GL_LINEAR;
+		public int TextureWrapS = Gl.GL_REPEAT;
+		public int TextureWrapT = Gl.GL_REPEAT;
 		public int TextureEnvMode = Gl.GL_MODULATE;
 		public float TextureOffsetS;
 		public float TextureOffsetT;
@@ -67,28 +67,43 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		// Materials
 		public bool LightingEnabled;
 		public float[] AmbientMaterial = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
-
-		// Patches
-		public int PatchFrontFace;
-		public int PatchDivS;
-		public int PatchDivT;
-
-		// Texture transfer
-		public MGLTextureTransfer TextureTx = new MGLTextureTransfer();
+		public MGLLight[] Lights = new MGLLight[] { new MGLLight(), new MGLLight(), new MGLLight(), new MGLLight() };
+		public MGLMaterial Material = new MGLMaterial();
 	}
 
-	class MGLTextureTransfer
+	enum LightType
 	{
-		public uint SourceAddress;
-		public uint SourceLineWidth;
-		public uint DestinationAddress;
-		public uint DestinationLineWidth;
+		Directional = 0,
+		Point = 1,
+		Spot = 2,
+	}
 
-		public int PixelSize; // 0 = 16 bit, 1 = 32 bit
-		public int Width;
-		public int Height;
+	enum LightMode
+	{
+		Diffuse = 0,
+		DiffuseSpecular = 1,
+		PoweredDiffuseSpecular = 2,
+	}
 
-		public int SX, SY;
-		public int DX, DY;
+	class MGLLight
+	{
+		public bool Enabled = false;
+		public LightType Type = LightType.Directional;
+		public LightMode Mode = LightMode.Diffuse;
+		public float[] Position = new float[ 3 ];
+		public float[] Direction = new float[ 3 ];
+		public float[] Attenuation = new float[ 3 ];
+		public float Convergence = 1.0f;
+		public float Cutoff = 1.0f;
+		public float[] Color = new float[ 3 ];
+	}
+
+	class MGLMaterial
+	{
+		public float[] Ambient = new float[ 3 ];
+		public float[] Diffuse = new float[ 3 ];
+		public float[] Specular = new float[ 3 ];
+		public float Alpha = 1.0f;
+		public float SpecularCoefficient = 1.0f;
 	}
 }

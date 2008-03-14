@@ -41,7 +41,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			Debug.Assert( list.State == DisplayListState.Done );
 			list.State = DisplayListState.Stalled;
 
-			list.Pointer = ( void* )this.MemorySystem.Translate( listAddress );
+			list.Pointer = ( uint* )this.MemorySystem.Translate( listAddress );
 			list.StartAddress = listAddress;
 			list.StallAddress = stallAddress;
 			list.Base = 0x08000000;
