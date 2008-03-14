@@ -32,14 +32,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			if( primitiveType == 7 )
 				return;
 
-			Gl.glDisable( Gl.GL_CULL_FACE );
-			Gl.glDisable( Gl.GL_ALPHA_TEST );
-			Gl.glDisable( Gl.GL_DEPTH_TEST );
-			Gl.glDisable( Gl.GL_BLEND );
-			//Gl.glPushAttrib( Gl.GL_ENABLE_BIT );
-			Gl.glDisable( Gl.GL_CULL_FACE );
-			Gl.glDisable( Gl.GL_LIGHTING );
-
 			uint t = _ctx.Values[ ( int )VideoCommand.VTYPE ];
 			uint boneCount = ( t >> 14 ) & 0x3;
 			uint morphCount = ( t >> 18 ) & 0x3;
@@ -52,6 +44,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			uint iaddr = _ctx.Values[ ( int )VideoCommand.IADDR ] | listBase;
 
 			this.UpdateState( StateRequest.Drawing );
+			if( isTransformed == true )
+				this.SetState( FeatureState.CullFaceMask | FeatureState.DepthTestMask, 0 );
 
 			// Setup textures
 
@@ -63,10 +57,17 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 			// Setup shader
 			// TODO: choose the right one
-			this.SetDefaultProgram( isTransformed, boneCount, morphCount );
+			this.SetDefaultProgram( isTransformed, colorType, boneCount, morphCount );
 
 			// Setup state
-			this.EnableArrays( true, ( normalType != 0 ), ( colorType != 0 ), ( textureType != 0 ) );
+			uint arrayState = ArrayState.VertexArrayMask;
+			if( normalType != 0 )
+				arrayState |= ArrayState.NormalArrayMask;
+			if( colorType != 0 )
+				arrayState |= ArrayState.ColorArrayMask;
+			if( textureType != 0 )
+				arrayState |= ArrayState.TextureCoordArrayMask;
+			this.EnableArrays( arrayState );
 
 			byte* vertexBuffer = this.MemorySystem.Translate( vaddr );
 			byte* src = vertexBuffer;
@@ -142,13 +143,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					break;
 			}
 
-			// TODO: Ortho projection if isTransformed
-			if( isTransformed == true )
-			{
-				Gl.glPushAttrib( Gl.GL_ENABLE_BIT );
-				Gl.glDisable( Gl.GL_CULL_FACE );
-			}
-
 			if( isIndexed == false )
 			{
 				Gl.glDrawArrays( primitiveType, 0, vertexCount );
@@ -160,12 +154,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					Gl.glDrawElements( primitiveType, vertexCount, Gl.GL_UNSIGNED_BYTE, ( IntPtr )indexBuffer );
 				else if( ( vertexType & VertexType.Index16 ) != 0 )
 					Gl.glDrawElements( primitiveType, vertexCount, Gl.GL_UNSIGNED_SHORT, ( IntPtr )indexBuffer );
-			}
-
-			// TODO: restore matrices
-			if( isTransformed == true )
-			{
-				Gl.glPopAttrib();
 			}
 		}
 

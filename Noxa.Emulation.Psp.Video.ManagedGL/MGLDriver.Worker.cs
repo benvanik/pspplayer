@@ -258,12 +258,15 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					case VideoCommand.BCE:
 					case VideoCommand.FFACE:
 					case VideoCommand.AAE:
+						continue;
 					case VideoCommand.FBP:
 					case VideoCommand.FBW:
+						continue;
 
 					// -- Alpha Testing -------------------------------------------------
 					case VideoCommand.ATE:
 					case VideoCommand.ATST:
+						continue;
 
 					// -- Depth Testing -------------------------------------------------
 					case VideoCommand.ZTE:
@@ -288,16 +291,19 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					case VideoCommand.ALPHA:
 					case VideoCommand.SFIX:
 					case VideoCommand.DFIX:
+						continue;
 
 					// -- Viewport/Scissor ----------------------------------------------
 					case VideoCommand.SCISSOR1:
 					case VideoCommand.SCISSOR2:
+						continue;
 
 					// -- Fog -----------------------------------------------------------
 					case VideoCommand.FGE:
 					case VideoCommand.FCOL:
 					case VideoCommand.FFAR:
 					case VideoCommand.FDIST:
+						continue;
 
 					// -- Lighting/Materials --------------------------------------------
 					case VideoCommand.LTE:
@@ -305,6 +311,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					case VideoCommand.LTE1:
 					case VideoCommand.LTE2:
 					case VideoCommand.LTE3:
+						continue;
 
 					case VideoCommand.ALA:
 					case VideoCommand.ALC:

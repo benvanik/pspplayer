@@ -65,7 +65,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			Gl.glShadeModel( Gl.GL_SMOOTH );
 			Gl.glClearColor( 0.0f, 0.5f, 0.5f, 1.0f );
 			Gl.glClearDepth( 0.0f );
-			Gl.glEnable( Gl.GL_DEPTH_TEST );
+			//Gl.glEnable( Gl.GL_DEPTH_TEST );
 			Gl.glDepthFunc( Gl.GL_LEQUAL );
 			Gl.glDepthRange( 1.0f, 0.0f );
 			Gl.glHint( Gl.GL_PERSPECTIVE_CORRECTION_HINT, Gl.GL_NICEST );
