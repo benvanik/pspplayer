@@ -30,7 +30,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		private void VsyncTimer( Timer timer )
 		{
-			_vcount++;
+			//_vcount++;
+			this.NextFrame();
 		}
 
 		#region Frame Advancement
@@ -43,14 +44,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		private void NextFrame()
 		{
 			MGLStatistics.ProcessedFrames++;
-
-			if( _needResize == true )
-			{
-				Gl.glViewport( 0, 0, _screenWidth, _screenHeight );
-				Gl.glClearColor( 0.5f, 0.0f, 0.5f, 1.0f );
-				Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
-				_needResize = false;
-			}
 
 			Gl.glFlush();
 			Wgl.wglSwapBuffers( _hDC );
@@ -65,6 +58,14 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			_vcount++;
 			_hasFinished = true;
 
+			if( _needResize == true )
+			{
+				Gl.glViewport( 0, 0, _screenWidth, _screenHeight );
+				Gl.glClearColor( 0.5f, 0.0f, 0.5f, 1.0f );
+				Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
+				_needResize = false;
+			}
+
 #if DEBUG
 			bool oldPeriodDown = _periodDown;
 			bool oldSlashDown = _slashDown;
@@ -74,13 +75,11 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			if( _commaDown == true )
 			{
 				// Draw wireframe
-				Gl.glPolygonMode( Gl.GL_FRONT_AND_BACK, Gl.GL_LINE );
 				this.DrawWireframe = true;
 			}
 			else
 			{
 				// Draw solid (normal)
-				Gl.glPolygonMode( Gl.GL_FRONT_AND_BACK, Gl.GL_FILL );
 				this.DrawWireframe = false;
 			}
 			if( oldPeriodDown != _periodDown )
@@ -148,7 +147,13 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 			uint* stallAddress = ( list.StallAddress > 0 ) ? ( uint* )this.MemorySystem.Translate( list.StallAddress ) : null;
 
+			if( this.DrawWireframe == true )
+				Gl.glPolygonMode( Gl.GL_FRONT_AND_BACK, Gl.GL_LINE );
+			else
+				Gl.glPolygonMode( Gl.GL_FRONT_AND_BACK, Gl.GL_FILL );
+
 			bool listDone = false;
+			bool didRealDrawing = false;
 			uint commandCount = 0;
 			while( listDone == false )
 			{
@@ -186,8 +191,12 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 					// -- Termination ---------------------------------------------------
 					case VideoCommand.FINISH:
-						this.NextFrame();
-						Debug.WriteLine( "finished list" );
+						if( didRealDrawing == true )
+						{
+							Debug.WriteLine( "finished list" );
+							//this.NextFrame();
+							Gl.glFlush();
+						}
 						list.State = DisplayListState.Done;
 						continue;
 					case VideoCommand.END:
@@ -244,14 +253,28 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					case VideoCommand.CLEAR:
 						if( ( argi & 0x1 ) == 0x1 )
 						{
-							x = 0;
-							if( ( argi & 0x100 ) != 0 )
-								x |= Gl.GL_COLOR_BUFFER_BIT; // target
-							if( ( argi & 0x200 ) != 0 )
-								x |= Gl.GL_ACCUM_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT; // stencil/alpha
-							if( ( argi & 0x400 ) != 0 )
-								x |= Gl.GL_DEPTH_BUFFER_BIT; // zbuffer
-							Gl.glClear( ( int )x );
+							//x = 0;
+							//if( ( argi & 0x100 ) != 0 )
+							//{
+							//    x |= Gl.GL_COLOR_BUFFER_BIT; // target
+							//}
+							//if( ( argi & 0x200 ) != 0 )
+							//    x |= Gl.GL_ACCUM_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT; // stencil/alpha
+							//if( ( argi & 0x400 ) != 0 )
+							//    x |= Gl.GL_DEPTH_BUFFER_BIT; // zbuffer
+							//Gl.glClear( ( int )x );
+
+							//Gl.glDepthMask( ( data >> 10 ) & 1 ); // Update Z?
+							Gl.glDepthMask( 0 );
+							int colMask = ( int )( ( argi >> 8 ) & 1 );
+							int alphaMask = ( int )( ( argi >> 9 ) & 1 );
+							Gl.glColorMask( colMask, colMask, colMask, alphaMask );
+							Gl.glDisable( Gl.GL_BLEND );
+						}
+						else
+						{
+							Gl.glDepthMask( 1 );
+							Gl.glColorMask( 1, 1, 1, 1 );
 						}
 						continue;
 					case VideoCommand.SHADE:
@@ -322,15 +345,21 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					// -- Primitive Drawing ---------------------------------------------
 					// VTYPE, VADDR, IADDR
 					case VideoCommand.PRIM:
+						// Ignore clear mode
+						//if( ( _ctx.Values[ ( int )VideoCommand.CLEAR ] & 0x1 ) > 0 )
+						//	continue;
+						didRealDrawing = true;
 						this.DrawPrimitive( list.Base, argi );
 						continue;
 
 					// -- Patches/Splines -----------------------------------------------
 					// PSUB, PFACE
 					case VideoCommand.BEZIER:
+						didRealDrawing = true;
 						this.DrawBezier( list.Base, argi );
 						continue;
 					case VideoCommand.SPLINE:
+						didRealDrawing = true;
 						this.DrawSpline( list.Base, argi );
 						continue;
 
@@ -358,6 +387,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					// -- Texture Transfer ----------------------------------------------
 					// TRXSBP, TRXSBW, TRXDBP, TRXDBW, TRXSIZE, TRXSPOS, TRXDPOS
 					case VideoCommand.TRXKICK:
+						didRealDrawing = true;
 						this.TransferTexture( argi );
 						continue;
 
