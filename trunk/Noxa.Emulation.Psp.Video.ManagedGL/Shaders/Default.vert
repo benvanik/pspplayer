@@ -11,9 +11,10 @@ uniform vec2 textureSize;
 uniform vec2 textureOffset;
 uniform vec2 textureScale;
 
-uniform int boneCount;
+uniform bool isSkinned;
 uniform mat4 boneMatrices[ 8 ];
-attribute float boneWeights[ 8 ];
+attribute vec4 boneWeights03;
+attribute vec4 boneWeights47;
 
 uniform int morphCount;
 uniform float morphWeights[ 8 ];
@@ -46,8 +47,8 @@ void main()
 	}
 	
 	// -- Skinning --
-	vec3 normal = gl_Normal;
-	if( boneCount != 0 )
+	vec4 normal = vec4( gl_Normal.xyz, 0.0 );
+	if( isSkinned == true )
 	{
 		//  |x|                                  |b00, b03, b06||x| |b09|
 		//  |y|=sum(0..boneCount){ weight[i] * ( |b01, b04, b07||y|+|b10| ) }
@@ -55,15 +56,34 @@ void main()
 		// |Nx|                                  |b00, b03, b06||Nx|
 		// |Ny|=sum(0..boneCount){ weight[i] * ( |b01, b04, b07||Ny| ) }
 		// |Nz|                                  |b02, b05, b08||Nz|
-		vec3 position1 = vec3( 0, 0, 0 );
-		vec3 normal1 = vec3( 0, 0, 0, );
-		for( int n = 0; n < boneCount; n++ )
-		{
-			position1 += boneWeights[ n ] * ( boneMatrices[ n ] * position );
-			normal1 += boneWeights[ n ] * ( boneMatrices[ n ] * normal );
-		}
-		position = position1;
-		normal = normal1;
+		
+		// Spec does not allow this, so we just do everything below - note that this may be faster than a for loop anyway
+		// If we don't want a bone factored in, make sure its weight is set to 0!
+		//for( int n = 0; n < boneCount; n++ )
+		//{
+		//	position1 += boneWeights[ n ] * ( boneMatrices[ n ] * position );
+		//	normal1 += boneWeights[ n ] * ( boneMatrices[ n ] * normal );
+		//}
+		
+		position =
+			boneWeights03.x * ( boneMatrices[ 0 ] * position ) +
+			boneWeights03.y * ( boneMatrices[ 1 ] * position ) +
+			boneWeights03.z * ( boneMatrices[ 2 ] * position ) +
+			boneWeights03.w * ( boneMatrices[ 3 ] * position ) +
+			boneWeights47.x * ( boneMatrices[ 4 ] * position ) +
+			boneWeights47.y * ( boneMatrices[ 5 ] * position ) +
+			boneWeights47.z * ( boneMatrices[ 6 ] * position ) +
+			boneWeights47.w * ( boneMatrices[ 7 ] * position );
+		normal =
+			boneWeights03.x * ( boneMatrices[ 0 ] * normal ) +
+			boneWeights03.y * ( boneMatrices[ 1 ] * normal ) +
+			boneWeights03.z * ( boneMatrices[ 2 ] * normal ) +
+			boneWeights03.w * ( boneMatrices[ 3 ] * normal ) +
+			boneWeights47.x * ( boneMatrices[ 4 ] * normal ) +
+			boneWeights47.y * ( boneMatrices[ 5 ] * normal ) +
+			boneWeights47.z * ( boneMatrices[ 6 ] * normal ) +
+			boneWeights47.w * ( boneMatrices[ 7 ] * normal );
+		normal = vec4( normal.xyz, 0.0 );
 	}
 	
 	// -- Lighting / materials --

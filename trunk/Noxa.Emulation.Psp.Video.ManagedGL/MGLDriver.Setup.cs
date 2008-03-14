@@ -16,6 +16,7 @@ using System.Threading;
 using Tao.OpenGl;
 using Tao.Platform.Windows;
 using Noxa.Emulation.Psp.Debugging.Hooks;
+using Noxa.Emulation.Psp.Video.ManagedGL.Programs;
 
 namespace Noxa.Emulation.Psp.Video.ManagedGL
 {
@@ -75,10 +76,17 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 #endif
 
 			this.Resize( _screenWidth, _screenHeight );
+
+			_defaultProgram = new DefaultProgram();
+			_defaultProgram.Prepare();
 		}
 
 		private void DestroyGL()
 		{
+			if( _defaultProgram != null )
+				_defaultProgram.Dispose();
+			_defaultProgram = null;
+
 			Wgl.wglMakeCurrent( IntPtr.Zero, IntPtr.Zero );
 			if( _hRC != IntPtr.Zero )
 				Wgl.wglDeleteContext( _hRC );

@@ -75,6 +75,7 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GLProgram.cs" />
+    <Compile Include="Programs\DefaultProgram.cs" />
     <Compile Include="Types.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -102,10 +103,18 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Clut.frag" />
-    <None Include="Shaders\Default.frag" />
-    <None Include="Shaders\Default.vert" />
-    <None Include="Shaders\Sprite.vert" />
+    <Content Include="Shaders\Clut.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shaders\Default.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shaders\Default.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Shaders\Sprite.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
