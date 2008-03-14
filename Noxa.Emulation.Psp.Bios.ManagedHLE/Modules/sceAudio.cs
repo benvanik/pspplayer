@@ -238,6 +238,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction(0xB011922F, "sceAudio_B011922F")]
+		public int sceAudio_B011922F() { return 0; }
+
 		#region Input ?
 
 		[NotImplemented]
