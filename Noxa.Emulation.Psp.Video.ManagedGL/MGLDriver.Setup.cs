@@ -24,7 +24,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 	{
 		private int _screenWidth = 480;
 		private int _screenHeight = 272;
-		private bool _needResize = false;
+		private bool _needResize;
 
 		private IntPtr _hDC;
 		private IntPtr _hRC;
@@ -40,11 +40,10 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			//ZeroMemory( &pfd, sizeof( pfd ) );
 			pfd.nSize = ( short )sizeof( Gdi.PIXELFORMATDESCRIPTOR );
 			pfd.nVersion = 1;
-			pfd.dwFlags = Gdi.PFD_DRAW_TO_WINDOW | Gdi.PFD_SUPPORT_OPENGL | Gdi.PFD_TYPE_RGBA
+			pfd.dwFlags = Gdi.PFD_DRAW_TO_WINDOW | Gdi.PFD_SUPPORT_OPENGL | Gdi.PFD_TYPE_RGBA;
 #if VSYNC
- | Gdi.PFD_DOUBLEBUFFER
+			pfd.dwFlags |= Gdi.PFD_DOUBLEBUFFER;
 #endif
-;
 			pfd.iPixelType = Gdi.PFD_TYPE_RGBA;
 			pfd.cColorBits = 24;
 			pfd.cDepthBits = 32;
@@ -66,7 +65,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			Gl.glShadeModel( Gl.GL_SMOOTH );
 			Gl.glClearColor( 0.0f, 0.5f, 0.5f, 1.0f );
 			Gl.glClearDepth( 0.0f );
-			Gl.glClearStencil( 0 );
 			Gl.glEnable( Gl.GL_DEPTH_TEST );
 			Gl.glDepthFunc( Gl.GL_LEQUAL );
 			Gl.glDepthRange( 1.0f, 0.0f );
@@ -102,9 +100,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		{
 			_screenWidth = width;
 			_screenHeight = height;
-			if( _isSetup == false )
-				return;
-
 			_needResize = true;
 		}
 

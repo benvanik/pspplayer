@@ -81,5 +81,20 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL.Programs
 
 			return true;
 		}
+
+		public void Setup( MGLContext ctx, bool isTransformed, uint boneCount, uint morphCount )
+		{
+			fixed( float* p = &ctx.WorldMatrix[ 0 ] )
+				Gl.glUniformMatrix4fv( _vert_worldMatrix, 1, 0, ( IntPtr )p );
+
+			Gl.glUniform1i( _vert_isTransformed, isTransformed ? 1 : 0 );
+
+			Gl.glUniform2f( _vert_textureSize, 256, 256 ); // TODO
+			Gl.glUniform2f( _vert_textureOffset, ctx.TextureOffsetS, ctx.TextureOffsetT );
+			Gl.glUniform2f( _vert_textureScale, ctx.TextureScaleS, ctx.TextureScaleT );
+
+			Gl.glUniform1i( _frag_textureEnabled, 0 ); // TODO
+			Gl.glUniform1i( _frag_textureFormat, 0 ); // TODO
+		}
 	}
 }

@@ -25,8 +25,16 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			Drawing,
 		}
 
+		private static class StateField
+		{
+			public const int VertexArray = 0;
+			public const int NormalArray = 1;
+			public const int TextureCoordArray = 2;
+			public const int ColorArray = 3;
+		}
 		private BitArray _glEnabledState = new BitArray( 32 );
 		private bool _matricesValid;
+		private int _currentProgramId;
 
 		private void UpdateState( StateRequest request )
 		{
@@ -53,6 +61,57 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		private void InvalidateMatrices()
 		{
 			_matricesValid = false;
+		}
+
+		private void EnableArrays( bool vertex, bool normal, bool color, bool texture )
+		{
+			if( _glEnabledState[ StateField.VertexArray ] != vertex )
+			{
+				if( vertex == true )
+					Gl.glEnableClientState( Gl.GL_VERTEX_ARRAY );
+				else
+					Gl.glDisableClientState( Gl.GL_VERTEX_ARRAY );
+				_glEnabledState[ StateField.VertexArray ] = vertex;
+			}
+			if( _glEnabledState[ StateField.NormalArray ] != normal )
+			{
+				if( normal == true )
+					Gl.glEnableClientState( Gl.GL_NORMAL_ARRAY );
+				else
+					Gl.glDisableClientState( Gl.GL_NORMAL_ARRAY );
+				_glEnabledState[ StateField.NormalArray ] = normal;
+			}
+			if( _glEnabledState[ StateField.TextureCoordArray ] != texture )
+			{
+				if( texture == true )
+					Gl.glEnableClientState( Gl.GL_TEXTURE_COORD_ARRAY );
+				else
+					Gl.glDisableClientState( Gl.GL_TEXTURE_COORD_ARRAY );
+				_glEnabledState[ StateField.TextureCoordArray ] = texture;
+			}
+			if( _glEnabledState[ StateField.ColorArray ] != color )
+			{
+				if( color == true )
+					Gl.glEnableClientState( Gl.GL_COLOR_ARRAY );
+				else
+					Gl.glDisableClientState( Gl.GL_COLOR_ARRAY );
+				_glEnabledState[ StateField.ColorArray ] = color;
+			}
+		}
+
+		private void SetNoProgram()
+		{
+			if( _currentProgramId != 0 )
+				Gl.glUseProgram( 0 );
+			_currentProgramId = 0;
+		}
+
+		private void SetDefaultProgram( bool isTransformed, uint boneCount, uint morphCount )
+		{
+			if( _currentProgramId != _defaultProgram.ProgramID )
+				Gl.glUseProgram( _defaultProgram.ProgramID );
+			_currentProgramId = _defaultProgram.ProgramID;
+			_defaultProgram.Setup( _ctx, isTransformed, boneCount, morphCount );
 		}
 	}
 }

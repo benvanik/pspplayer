@@ -44,19 +44,17 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		{
 			MGLStatistics.ProcessedFrames++;
 
-			if (_needResize)
+			if( _needResize == true )
 			{
-				Gl.glViewport(0, _screenHeight, _screenWidth, _screenHeight);
-				Gl.glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
-				Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT);
+				Gl.glViewport( 0, 0, _screenWidth, _screenHeight );
+				Gl.glClearColor( 0.5f, 0.0f, 0.5f, 1.0f );
+				Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
 				_needResize = false;
 			}
 
-			// Needed?
-			Gl.glBindTexture( Gl.GL_TEXTURE_2D, 0 );
-
 			Gl.glFlush();
-			Gdi.SwapBuffers( _hDC );
+			Wgl.wglSwapBuffers( _hDC );
+			//Gdi.SwapBuffersFast( _hDC );
 
 			if( _screenshotPending == true )
 			{
@@ -76,7 +74,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			if( _commaDown == true )
 			{
 				// Draw wireframe
-				//glClear( GL_COLOR_BUFFER_BIT );
 				Gl.glPolygonMode( Gl.GL_FRONT_AND_BACK, Gl.GL_LINE );
 				this.DrawWireframe = true;
 			}
@@ -140,7 +137,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		{
 			Random r = new Random();
 			//Gl.glClearColor( ( float )r.NextDouble(), ( float )r.NextDouble(), ( float )r.NextDouble(), 1.0f );
-			Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
+			//Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
 
 			// Lists are processed until they stall or CMD_END
 			// CMD_FINISH means that the drawing is done and the frame can change (I think)
@@ -171,6 +168,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				float argf = *( ( float* )( ( uint* )( &argx ) ) );
 
 				uint x, y;
+				uint* pp;
 
 				// Next packet
 				list.Pointer++;
@@ -244,6 +242,18 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 					// -- General State -------------------------------------------------
 					case VideoCommand.CLEAR:
+						if( ( argi & 0x1 ) == 0x1 )
+						{
+							x = 0;
+							if( ( argi & 0x100 ) != 0 )
+								x |= Gl.GL_COLOR_BUFFER_BIT; // target
+							if( ( argi & 0x200 ) != 0 )
+								x |= Gl.GL_ACCUM_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT; // stencil/alpha
+							if( ( argi & 0x400 ) != 0 )
+								x |= Gl.GL_DEPTH_BUFFER_BIT; // zbuffer
+							Gl.glClear( ( int )x );
+						}
+						continue;
 					case VideoCommand.SHADE:
 					case VideoCommand.BCE:
 					case VideoCommand.FFACE:
@@ -258,8 +268,20 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					// -- Depth Testing -------------------------------------------------
 					case VideoCommand.ZTE:
 					case VideoCommand.ZTST:
+						continue;
 					case VideoCommand.NEARZ:
+						_ctx.NearZ = ( float )( int )( ( short )( ushort )argi );
+						continue;
 					case VideoCommand.FARZ:
+						if( _ctx.NearZ > argi )
+						{
+							_ctx.FarZ = _ctx.NearZ;
+							_ctx.NearZ = ( float )( int )( ( short )( ushort )argi );
+						}
+						else
+							_ctx.FarZ = ( float )( int )( ( short )( ushort )argi );
+						Gl.glDepthRange( _ctx.NearZ, _ctx.FarZ );
+						continue;
 
 					// -- Alpha Testing -------------------------------------------------
 					case VideoCommand.ABE:
@@ -319,9 +341,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					case VideoCommand.VSCALE:
 					case VideoCommand.UOFFSET:
 					case VideoCommand.VOFFSET:
-					//case VideoCommand.TBPN:
-					//case VideoCommand.TBWN:
-					//case VideoCommand.TSIZEN:
+						//case VideoCommand.TBPN:
+						//case VideoCommand.TBWN:
+						//case VideoCommand.TSIZEN:
 						continue;
 
 					// -- CLUT ----------------------------------------------------------
@@ -335,10 +357,12 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					// -- Matrices ------------------------------------------------------
 					// PROJ, VIEW, WORLD, TMATRIX
 					case VideoCommand.PMS:
+						pp = list.Pointer;
 						for( int n = 0; n < 16; n++ )
 						{
-							argx = ( *( list.Pointer++ ) & 0x00FFFFFF ) << 8;
+							argx = ( *pp & 0x00FFFFFF ) << 8;
 							_ctx.ProjectionMatrix[ n ] = *( ( float* )( ( uint* )( &argx ) ) );
+							pp++;
 						}
 						list.Pointer += 16;
 						this.InvalidateMatrices();

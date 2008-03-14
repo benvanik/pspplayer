@@ -20,19 +20,33 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 	{
 		private static readonly int[] PrimitiveMap = new int[] { Gl.GL_POINTS, Gl.GL_LINES, Gl.GL_LINE_STRIP, Gl.GL_TRIANGLES, Gl.GL_TRIANGLE_STRIP, Gl.GL_TRIANGLE_FAN, Gl.GL_QUADS };
 
+		private uint[] _colorBuffer = new uint[ 1024 * 10 ];
+		private float[] _textureCoordBuffer = new float[ 1024 * 10 ];
+
 		private void DrawPrimitive( uint listBase, uint argi )
 		{
 			int vertexCount = ( int )( argi & 0xFFFF );
 			if( vertexCount == 0 )
 				return;
 			int primitiveType = PrimitiveMap[ ( int )( ( argi >> 16 ) & 0x7 ) ];
+			if( primitiveType == 7 )
+				return;
+
+			Gl.glDisable( Gl.GL_CULL_FACE );
+			Gl.glDisable( Gl.GL_ALPHA_TEST );
+			Gl.glDisable( Gl.GL_DEPTH_TEST );
+			Gl.glDisable( Gl.GL_BLEND );
+			//Gl.glPushAttrib( Gl.GL_ENABLE_BIT );
+			Gl.glDisable( Gl.GL_CULL_FACE );
+			Gl.glDisable( Gl.GL_LIGHTING );
 
 			uint t = _ctx.Values[ ( int )VideoCommand.VTYPE ];
-			bool isTransformed = ( t >> 23 ) == 0;
 			uint boneCount = ( t >> 14 ) & 0x3;
 			uint morphCount = ( t >> 18 ) & 0x3;
 			uint vertexType = t & 0x00801FFF;
 			bool isIndexed = ( vertexType & ( VertexType.Index8 | VertexType.Index16 ) ) != 0;
+			bool isTransformed = ( vertexType & VertexType.TransformedMask ) != 0;
+			int vertexSize = ( int )DetermineVertexSize( vertexType );
 
 			uint vaddr = _ctx.Values[ ( int )VideoCommand.VADDR ] | listBase;
 			uint iaddr = _ctx.Values[ ( int )VideoCommand.IADDR ] | listBase;
@@ -41,7 +55,118 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 			// Setup textures
 
-			// Draw
+			uint positionType = ( vertexType & VertexType.PositionMask );
+			uint normalType = ( vertexType & VertexType.NormalMask );
+			uint textureType = ( vertexType & VertexType.TextureMask );
+			uint colorType = ( vertexType & VertexType.ColorMask );
+			uint weightType = ( vertexType & VertexType.WeightMask );
+
+			// Setup shader
+			// TODO: choose the right one
+			this.SetDefaultProgram( isTransformed, boneCount, morphCount );
+
+			// Setup state
+			this.EnableArrays( true, ( normalType != 0 ), ( colorType != 0 ), ( textureType != 0 ) );
+
+			byte* vertexBuffer = this.MemorySystem.Translate( vaddr );
+			byte* src = vertexBuffer;
+			switch( textureType )
+			{
+				case VertexType.TextureFixed8:
+					Debug.Assert( false );
+					src += 2;
+					break;
+				case VertexType.TextureFixed16:
+					Gl.glTexCoordPointer( 2, Gl.GL_SHORT, vertexSize, ( IntPtr )src );
+					src += 4;
+					break;
+				case VertexType.TextureFloat:
+					Gl.glTexCoordPointer( 4, Gl.GL_FLOAT, vertexSize, ( IntPtr )src );
+					src += 8;
+					break;
+			}
+			switch( colorType )
+			{
+				case 0:
+					Gl.glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+					break;
+				case VertexType.ColorBGR5650:
+					// TODO: nice way of doing this - in the shader?
+					Debug.Assert( false );
+					src += 2;
+					break;
+				case VertexType.ColorABGR4444:
+					// TODO: nice way of doing this - in the shader?
+					Gl.glColor4f( 1.0f, 0.0f, 1.0f, 1.0f );
+					src += 2;
+					break;
+				case VertexType.ColorABGR5551:
+					// TODO: nice way of doing this - in the shader?
+					Gl.glColor4f( 1.0f, 1.0f, 0.0f, 1.0f );
+					src += 2;
+					break;
+				case VertexType.ColorABGR8888:
+					Gl.glColorPointer( 4, Gl.GL_UNSIGNED_BYTE, vertexSize, ( IntPtr )src );
+					src += 4;
+					break;
+			}
+			switch( normalType )
+			{
+				case VertexType.NormalFixed8:
+					Gl.glNormalPointer( Gl.GL_BYTE, vertexSize, ( IntPtr )src );
+					src += 3;
+					break;
+				case VertexType.NormalFixed16:
+					Gl.glNormalPointer( Gl.GL_SHORT, vertexSize, ( IntPtr )src );
+					src += 6;
+					break;
+				case VertexType.NormalFloat:
+					Gl.glNormalPointer( Gl.GL_FLOAT, vertexSize, ( IntPtr )src );
+					src += 12;
+					break;
+			}
+			switch( positionType )
+			{
+				case VertexType.PositionFixed8:
+					Debug.Assert( false );
+					Gl.glVertexPointer( 3, Gl.GL_BYTE, vertexSize, ( IntPtr )src ); // This may not work!
+					src += 3;
+					break;
+				case VertexType.PositionFixed16:
+					Gl.glVertexPointer( 3, Gl.GL_SHORT, vertexSize, ( IntPtr )src );
+					src += 6;
+					break;
+				case VertexType.PositionFloat:
+					Gl.glVertexPointer( 3, Gl.GL_FLOAT, vertexSize, ( IntPtr )src );
+					src += 12;
+					break;
+			}
+
+			// TODO: Ortho projection if isTransformed
+			if( isTransformed == true )
+			{
+				Gl.glPushAttrib( Gl.GL_ENABLE_BIT );
+				Gl.glDisable( Gl.GL_CULL_FACE );
+			}
+
+			if( isIndexed == false )
+			{
+				Gl.glDrawArrays( primitiveType, 0, vertexCount );
+			}
+			else
+			{
+				byte* indexBuffer = this.MemorySystem.Translate( iaddr );
+				if( ( vertexType & VertexType.Index8 ) != 0 )
+					Gl.glDrawElements( primitiveType, vertexCount, Gl.GL_UNSIGNED_BYTE, ( IntPtr )indexBuffer );
+				else if( ( vertexType & VertexType.Index16 ) != 0 )
+					Gl.glDrawElements( primitiveType, vertexCount, Gl.GL_UNSIGNED_SHORT, ( IntPtr )indexBuffer );
+			}
+
+			// TODO: restore matrices
+			if( isTransformed == true )
+			{
+				Gl.glPopAttrib();
+			}
 		}
 
 		private void DrawBezier( uint listBase, uint argi )
