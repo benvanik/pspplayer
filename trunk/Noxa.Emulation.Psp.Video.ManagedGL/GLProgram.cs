@@ -130,7 +130,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			if( id < 0 )
 			{
 				Log.WriteLine( Verbosity.Critical, Feature.Video, "GLProgram::GetAttribute: could not find attribute {0}", name );
-				throw new ArgumentException();
+				//throw new ArgumentException();
+				return -1;
 			}
 			return id;
 		}

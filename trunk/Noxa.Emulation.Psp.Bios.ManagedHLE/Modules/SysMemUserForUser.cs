@@ -61,7 +61,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				maxSize = Math.Max( maxSize, e.Value.Size );
 				e = e.Next;
 			}
-			return ( int )maxSize;
+			// HACK: return a bit less, so that a stupid game can't use it all then try to launch threads
+			return ( int )maxSize - 1024 * 1024;
 		}
 
 		[Stateless]

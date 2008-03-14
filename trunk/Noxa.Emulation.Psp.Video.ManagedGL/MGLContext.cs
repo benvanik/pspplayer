@@ -31,9 +31,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		// Matrices
 		public float[] ProjectionMatrix = new float[ 16 ];
-		public float[] ViewMatrix = new float[ 16 ];
-		public float[] WorldMatrix = new float[ 16 ];
-		public float[] TextureMatrix = new float[ 16 ];
+		public float[] ViewMatrix = new float[ 16 ] { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+		public float[] WorldMatrix = new float[ 16 ]{ 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
+		public float[] TextureMatrix = new float[ 16 ] { 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f };
 
 		// Blending/etc
 		public uint SourceFix;

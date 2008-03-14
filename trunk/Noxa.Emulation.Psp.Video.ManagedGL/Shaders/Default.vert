@@ -4,6 +4,8 @@
 // Licensed under the LGPL - see License.txt in the project root for details
 // ----------------------------------------------------------------------------
 
+// Note: this matrix is precomputed for 480x272, -1 to 1 - may need to make this a uniform
+const mat4 orthoMatrix = mat4( 0.004166667, 0.0, 0.0, 0.0, 0.0, -0.007352941, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -1.0, 1.0, 0.0, 1.0 );
 uniform mat4 worldMatrix;
 
 uniform bool isTransformed;
@@ -34,7 +36,8 @@ void main()
 	vec4 position = gl_Vertex;
 	
 	// Should this be here?
-	position = worldMatrix * position;
+	if( isTransformed == false )
+		position = worldMatrix * position;
 	
 	// Morphing
 	if( morphCount != 0 )
@@ -87,7 +90,7 @@ void main()
 	}
 	
 	// -- Lighting / materials --
-	if( lightingEnabled == true )
+	/*if( lightingEnabled == true )
 	{
 		vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 );
 		for( int n = 0; n < 4; n++ )
@@ -98,7 +101,7 @@ void main()
 			}
 		}
 		gl_FrontColor = color;
-	}
+	}*/
 	gl_FrontColor = gl_Color;
 	
 	/*
@@ -154,5 +157,13 @@ void main()
 	}
 	gl_TexCoord[ 0 ] = gl_TextureMatrix[ 0 ] * texCoord;
 	
-	gl_Position = gl_ModelViewProjectionMatrix * position;
+	if( isTransformed == false )
+	{
+		//gl_Position = ftransform();
+		gl_Position = gl_ModelViewProjectionMatrix * position;
+	}
+	else
+	{
+		gl_Position = orthoMatrix * position;
+	}
 }
