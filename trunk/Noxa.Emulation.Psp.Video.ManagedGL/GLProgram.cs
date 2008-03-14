@@ -17,6 +17,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public int VertexShaderID;
 		public int FragmentShaderID;
 
+		public bool IsDirty;
+
 		public bool Load( string vertexShader, string fragmentShader )
 		{
 			this.ProgramID = Gl.glCreateProgram();

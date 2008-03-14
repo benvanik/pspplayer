@@ -8,7 +8,9 @@
 const mat4 orthoMatrix = mat4( 0.004166667, 0.0, 0.0, 0.0, 0.0, -0.007352941, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, -1.0, 1.0, 0.0, 1.0 );
 uniform mat4 worldMatrix;
 
-uniform bool isTransformed;
+uniform vec4 isTransformed; // {0,0,0,0} if raw, {1,1,1,1} if transformed
+uniform vec4 isRaw;			// inverse of isTransformed
+
 uniform vec2 textureSize;
 uniform vec2 textureOffset;
 uniform vec2 textureScale;
@@ -35,9 +37,8 @@ void main()
 {
 	vec4 position = gl_Vertex;
 	
-	// Should this be here?
-	if( isTransformed == false )
-		position = worldMatrix * position;
+	// position = isTransformed ? position : ( worldMatrix * position );
+	position = ( isTransformed * position ) + ( isRaw * ( worldMatrix * position ) );
 	
 	// Morphing
 	if( morphCount != 0 )
@@ -102,7 +103,8 @@ void main()
 		}
 		gl_FrontColor = color;
 	}*/
-	gl_FrontColor = gl_Color;
+	vec4 color = gl_Color;
+	gl_FrontColor = color;
 	
 	/*
 	struct gl_LightModelParameters {
@@ -145,25 +147,11 @@ void main()
 	
 	// -- Texture setup --
 	vec4 texCoord = gl_MultiTexCoord0;
-	if( isTransformed == true )
-	{
-		texCoord.s /= textureSize.s;
-		texCoord.t /= textureSize.t;
-	}
-	else
-	{
-		texCoord.s = ( texCoord.s * textureScale.s ) + textureOffset.s;
-		texCoord.t = ( texCoord.t * textureScale.t ) + textureOffset.t;
-	}
+	// texCoord = isTransformed ? ( texCoord / textureSize ) : ( ( texCoord * textureScale ) + textureOffset );
+	texCoord.s = ( isTransformed.x * ( texCoord.s / textureSize.s ) ) + ( isRaw.x * ( ( texCoord.s * textureScale.s ) + textureOffset.s ) );
+	texCoord.t = ( isTransformed.x * ( texCoord.t / textureSize.t ) ) + ( isRaw.x * ( ( texCoord.t * textureScale.t ) + textureOffset.t ) );
 	gl_TexCoord[ 0 ] = gl_TextureMatrix[ 0 ] * texCoord;
 	
-	if( isTransformed == false )
-	{
-		//gl_Position = ftransform();
-		gl_Position = gl_ModelViewProjectionMatrix * position;
-	}
-	else
-	{
-		gl_Position = orthoMatrix * position;
-	}
+	// gl_Position = isTransformed ? ( orthoMatrix * position ) : ( gl_MVP * position );
+	gl_Position = ( isTransformed * ( orthoMatrix * position ) ) + ( isRaw * ( gl_ModelViewProjectionMatrix * position ) );
 }

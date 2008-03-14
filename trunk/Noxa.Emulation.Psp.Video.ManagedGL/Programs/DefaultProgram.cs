@@ -18,6 +18,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL.Programs
 		private int _vert_worldMatrix;
 
 		private int _vert_isTransformed;
+		private int _vert_isRaw;
+
 		private int _vert_textureSize;
 		private int _vert_textureOffset;
 		private int _vert_textureScale;
@@ -41,6 +43,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL.Programs
 		private int _frag_texture;
 		private int _frag_textureFormat;
 
+		// Cache of values... glUniform isn't *fast*, so cache anything we expect to change infrequently
+		private bool _isTransformed;
+
 		public DefaultProgram()
 		{
 			string vertexShader = File.ReadAllText( "Shaders/Default.vert" );
@@ -56,6 +61,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL.Programs
 			_vert_worldMatrix = this.GetUniform( "worldMatrix" );
 
 			_vert_isTransformed = this.GetUniform( "isTransformed" );
+			_vert_isRaw = this.GetUniform( "isRaw" );
+
 			_vert_textureSize = this.GetUniform( "textureSize" );
 			_vert_textureOffset = this.GetUniform( "textureOffset" );
 			_vert_textureScale = this.GetUniform( "textureScale" );
@@ -79,22 +86,47 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL.Programs
 			_frag_texture = this.GetUniform( "texture" );
 			_frag_textureFormat = this.GetUniform( "textureFormat" );
 
+			// Defaults
+			Gl.glUniform4f( _vert_isTransformed, 0.0f, 0.0f, 0.0f, 0.0f );
+			Gl.glUniform4f( _vert_isRaw, 1.0f, 1.0f, 1.0f, 1.0f );
+
 			return true;
 		}
 
-		public void Setup( MGLContext ctx, bool isTransformed, uint boneCount, uint morphCount )
+		public void Setup( MGLContext ctx, bool isTransformed, uint colorType, uint boneCount, uint morphCount )
 		{
-			fixed( float* p = &ctx.WorldMatrix[ 0 ] )
-				Gl.glUniformMatrix4fv( _vert_worldMatrix, 1, 0, ( IntPtr )p );
+			if( this.IsDirty == true )
+			{
+				fixed( float* p = &ctx.WorldMatrix[ 0 ] )
+					Gl.glUniformMatrix4fv( _vert_worldMatrix, 1, 0, ( IntPtr )p );
+				this.IsDirty = false;
+			}
 
-			Gl.glUniform1i( _vert_isTransformed, isTransformed ? 1 : 0 );
+			// Cached because most games render a bunch of transformed then a bunch of raw
+			if( _isTransformed != isTransformed )
+			{
+				if( isTransformed == true )
+				{
+					Gl.glUniform4f( _vert_isTransformed, 1.0f, 1.0f, 1.0f, 1.0f );
+					Gl.glUniform4f( _vert_isRaw, 0.0f, 0.0f, 0.0f, 0.0f );
+				}
+				else
+				{
+					Gl.glUniform4f( _vert_isTransformed, 0.0f, 0.0f, 0.0f, 0.0f );
+					Gl.glUniform4f( _vert_isRaw, 1.0f, 1.0f, 1.0f, 1.0f );
+				}
+				_isTransformed = isTransformed;
+			}
 
-			Gl.glUniform2f( _vert_textureSize, 256, 256 ); // TODO
-			Gl.glUniform2f( _vert_textureOffset, ctx.TextureOffsetS, ctx.TextureOffsetT );
-			Gl.glUniform2f( _vert_textureScale, ctx.TextureScaleS, ctx.TextureScaleT );
+			if( ctx.TexturesEnabled == true )
+			{
+				Gl.glUniform2f( _vert_textureSize, 256, 256 ); // TODO
+				Gl.glUniform2f( _vert_textureOffset, ctx.TextureOffsetS, ctx.TextureOffsetT );
+				Gl.glUniform2f( _vert_textureScale, ctx.TextureScaleS, ctx.TextureScaleT );
 
-			Gl.glUniform1i( _frag_textureEnabled, 0 ); // TODO
-			Gl.glUniform1i( _frag_textureFormat, 0 ); // TODO
+				Gl.glUniform1i( _frag_textureEnabled, 0 ); // TODO
+				Gl.glUniform1i( _frag_textureFormat, 0 ); // TODO
+			}
 		}
 	}
 }
