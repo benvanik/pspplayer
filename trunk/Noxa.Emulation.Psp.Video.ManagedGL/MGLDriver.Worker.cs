@@ -44,6 +44,14 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		{
 			MGLStatistics.ProcessedFrames++;
 
+			if (_needResize)
+			{
+				Gl.glViewport(0, _screenHeight, _screenWidth, _screenHeight);
+				Gl.glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
+				Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT);
+				_needResize = false;
+			}
+
 			// Needed?
 			Gl.glBindTexture( Gl.GL_TEXTURE_2D, 0 );
 

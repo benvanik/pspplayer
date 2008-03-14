@@ -24,6 +24,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 	{
 		private int _screenWidth = 480;
 		private int _screenHeight = 272;
+		private bool _needResize = false;
 
 		private IntPtr _hDC;
 		private IntPtr _hRC;
@@ -63,7 +64,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			bool mc = Wgl.wglMakeCurrent( _hDC, _hRC );
 
 			Gl.glShadeModel( Gl.GL_SMOOTH );
-			Gl.glClearColor( 1.0f, 0.0f, 0.0f, 1.0f );
+			Gl.glClearColor( 0.0f, 0.5f, 0.5f, 1.0f );
 			Gl.glClearDepth( 0.0f );
 			Gl.glClearStencil( 0 );
 			Gl.glEnable( Gl.GL_DEPTH_TEST );
@@ -104,17 +105,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			if( _isSetup == false )
 				return;
 
-			try
-			{
-				Gl.glViewport( 0, height, width, height );
-			}
-			catch
-			{
-				// Figure out why this fails
-				Debug.WriteLine( "MGLDriver::Resize: failed glViewport call" );
-			}
-
-			// More stuff?
+			_needResize = true;
 		}
 
 		public DisplayProperties QueryDisplayProperties()
