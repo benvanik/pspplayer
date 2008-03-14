@@ -42,7 +42,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			pfd.nVersion = 1;
 			pfd.dwFlags = Gdi.PFD_DRAW_TO_WINDOW | Gdi.PFD_SUPPORT_OPENGL | Gdi.PFD_TYPE_RGBA;
 #if VSYNC
-			pfd.dwFlags |= Gdi.PFD_DOUBLEBUFFER;
+			//pfd.dwFlags |= Gdi.PFD_DOUBLEBUFFER;
 #endif
 			pfd.iPixelType = Gdi.PFD_TYPE_RGBA;
 			pfd.cColorBits = 24;
