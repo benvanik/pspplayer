@@ -66,9 +66,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		// Materials
 		public bool LightingEnabled;
-		public float[] AmbientMaterial = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
 		public MGLLight[] Lights = new MGLLight[] { new MGLLight(), new MGLLight(), new MGLLight(), new MGLLight() };
-		public MGLMaterial Material = new MGLMaterial();
+		public float[] AmbientModelColor = new float[ 4 ];
 	}
 
 	enum LightType
@@ -96,14 +95,5 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public float Convergence = 1.0f;
 		public float Cutoff = 1.0f;
 		public float[] Color = new float[ 3 ];
-	}
-
-	class MGLMaterial
-	{
-		public float[] Ambient = new float[ 3 ];
-		public float[] Diffuse = new float[ 3 ];
-		public float[] Specular = new float[ 3 ];
-		public float Alpha = 1.0f;
-		public float SpecularCoefficient = 1.0f;
 	}
 }

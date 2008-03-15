@@ -34,7 +34,7 @@ extern uint _syscallCounts[ 1024 ];
 #define NIRETURN		0
 
 // If defined, even syscalls with DontTrace marked will be logged
-#define LOGALLSYSCALLS
+//#define LOGALLSYSCALLS
 
 #define g context->Generator
 

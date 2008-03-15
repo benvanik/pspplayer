@@ -85,10 +85,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				this.EnableArrays( arrayState );
 
 				byte* src = vertexBuffer;
-				if( alignmentDelta > 0 )
-				{
-					int xxx = 5;
-				}
 				src += alignmentDelta;
 				switch( textureType )
 				{
@@ -105,13 +101,13 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						src += 8;
 						break;
 				}
-				//Gl.glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 				switch( colorType )
 				{
 					case 0:
 						Random rr = new Random();
 						//Gl.glColor4f( ( float )rr.NextDouble(), ( float )rr.NextDouble(), ( float )rr.NextDouble(), 1.0f );
-						Gl.glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+						//Gl.glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
+						Gl.glColor4fv( _ctx.AmbientModelColor );
 						break;
 					case VertexType.ColorBGR5650:
 						// TODO: nice way of doing this - in the shader?

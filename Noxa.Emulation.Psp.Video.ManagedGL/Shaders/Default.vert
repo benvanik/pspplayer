@@ -91,19 +91,20 @@ void main()
 	}
 	
 	// -- Lighting / materials --
-	/*if( lightingEnabled == true )
-	{
-		vec4 color = vec4( 0.0, 0.0, 0.0, 0.0 );
-		for( int n = 0; n < 4; n++ )
-		{
-			if( lightEnabled[ n ] == true )
-			{
-				// Light!
-			}
-		}
-		gl_FrontColor = color;
-	}*/
 	vec4 color = gl_Color;
+	//if( lightingEnabled == true )
+	//{
+	//	color = gl_FrontMaterial.emission + gl_LightModel * gl_FrontMaterial.ambient;
+	//	/*for( int n = 0; n < 4; n++ )
+	//	{
+	//		if( lightEnabled[ n ] == true )
+	//		{
+	//			// Light!
+	//		}
+	//	}*/
+	//	color += gl_Color;
+	//	color.a = gl_LightModel.ambient.a * gl_FrontMaterial.ambient.a;
+	//}
 	gl_FrontColor = color;
 	
 	/*
