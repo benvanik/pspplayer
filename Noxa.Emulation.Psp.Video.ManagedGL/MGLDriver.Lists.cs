@@ -60,13 +60,15 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		public int UpdateList( int listId, uint stallAddress )
 		{
-			if( listId == -1 )
-			{
-				// TODO: figure out if this is valid
-				Log.WriteLine( Verbosity.Critical, Feature.Video, "UpdateList called with listId = -1, using last list - probably wrong" );
-				listId = _displayListIndex;
-				//return unchecked( ( int )0x80000100 );
-			}
+			//if( listId == -1 )
+			//{
+			//    // TODO: figure out if this is valid
+			//    Log.WriteLine( Verbosity.Critical, Feature.Video, "UpdateList called with listId = -1, using last list - probably wrong" );
+			//    listId = _displayListIndex;
+			//    //return unchecked( ( int )0x80000100 );
+			//}
+			if( listId < 0 )
+				return 0;
 
 			DisplayList list = _displayLists[ listId ];
 			Debug.Assert( list.State == DisplayListState.Stalled );
