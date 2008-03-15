@@ -67,17 +67,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			/// </summary>
 			public int iPackets;			// 00
 			/// <summary>
-			/// (0x04) Number of packets that have been read?
+			/// (0x04) Unknown, set to 0.
+			/// </summary>
+			public int iUnk0;
+			/// <summary>
+			/// (0x08) Number of packets that have been read?
 			/// </summary>
 			public int iReadPackets;
 			/// <summary>
-			/// (0x08) Number of packets that have been written?
+			/// (0x0C) Number of packets that have been written?
 			/// </summary>
-			public int iWrittenPackets;
-			/// <summary>
-			/// (0x0C) Unknown, set to 0.
-			/// </summary>
-			public int iUnk2;
+			public int iWritePackets;
 			/// <summary>
 			/// (0x10) Unknown, set to 2048.
 			/// </summary>
@@ -337,7 +337,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			unsafe
 			{
-				*((uint*)(_memorySystem.Translate((uint)num))) = 0;
+				*((uint*)(_memorySystem.Translate((uint)num))) = 1;
 			}
 
 			return 0;
@@ -388,9 +388,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 				sceMpegRingbuffer *rb = (sceMpegRingbuffer *)_memorySystem.Translate(ringbuffer);
 
 				rb->iPackets = packets;
+				rb->iUnk0 = 0;
 				rb->iReadPackets = packets;
-				rb->iWrittenPackets = packets;
-				rb->iUnk2 = 0;
+				rb->iWritePackets = packets;
 				rb->iUnk3 = 2048;
 				rb->pData = allocated;
 				rb->Callback = callback;
