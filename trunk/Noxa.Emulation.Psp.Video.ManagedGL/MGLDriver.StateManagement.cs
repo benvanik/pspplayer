@@ -31,11 +31,13 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			public const int DepthTest = 1;
 			public const int AlphaTest = 2;
 			public const int Fog = 3;
+			public const int AlphaBlend = 4;
 
 			public const uint CullFaceMask = 0x1 << CullFace;
 			public const uint DepthTestMask = 0x1 << DepthTest;
 			public const uint AlphaTestMask = 0x1 << AlphaTest;
 			public const uint FogMask = 0x1 << Fog;
+			public const uint AlphaBlendMask = 0x1 << AlphaBlend;
 		}
 
 		private static class ArrayState
@@ -120,6 +122,13 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					Gl.glEnable( Gl.GL_FOG );
 				else
 					Gl.glDisable( Gl.GL_FOG );
+			}
+			if( ( diff & FeatureState.AlphaBlendMask ) != 0 )
+			{
+				if( ( values & FeatureState.AlphaBlendMask ) != 0 )
+					Gl.glEnable( Gl.GL_BLEND );
+				else
+					Gl.glDisable( Gl.GL_BLEND );
 			}
 			
 			_featureStateValue = ( _featureStateValue & ~mask ) | values;

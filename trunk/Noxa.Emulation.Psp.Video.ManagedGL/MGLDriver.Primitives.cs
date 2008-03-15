@@ -52,6 +52,26 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 			// Setup textures
 
+			uint positionType = ( vertexType & VertexType.PositionMask );
+			uint normalType = ( vertexType & VertexType.NormalMask );
+			uint textureType = ( vertexType & VertexType.TextureMask );
+			uint colorType = ( vertexType & VertexType.ColorMask );
+			uint weightType = ( vertexType & VertexType.WeightMask );
+
+			// Setup shader
+			// TODO: choose the right one
+			this.SetDefaultProgram( isTransformed, colorType, boneCount, morphCount );
+
+			// Setup state
+			uint arrayState = ArrayState.VertexArrayMask;
+			if( normalType != 0 )
+				arrayState |= ArrayState.NormalArrayMask;
+			if( colorType != 0 )
+				arrayState |= ArrayState.ColorArrayMask;
+			if( textureType != 0 )
+				arrayState |= ArrayState.TextureCoordArrayMask;
+			this.EnableArrays( arrayState );
+
 			// Real work
 			fixed( byte* colorBuffer = &_colorBuffer[ 0 ] )
 			fixed( byte* spriteBuffer = &_spriteBuffer[ 0 ] )
@@ -63,26 +83,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					vertexBuffer = spriteBuffer;
 					vertexCount *= 2; // adding 2x the vertices
 				}
-
-				uint positionType = ( vertexType & VertexType.PositionMask );
-				uint normalType = ( vertexType & VertexType.NormalMask );
-				uint textureType = ( vertexType & VertexType.TextureMask );
-				uint colorType = ( vertexType & VertexType.ColorMask );
-				uint weightType = ( vertexType & VertexType.WeightMask );
-
-				// Setup shader
-				// TODO: choose the right one
-				this.SetDefaultProgram( isTransformed, colorType, boneCount, morphCount );
-
-				// Setup state
-				uint arrayState = ArrayState.VertexArrayMask;
-				if( normalType != 0 )
-					arrayState |= ArrayState.NormalArrayMask;
-				if( colorType != 0 )
-					arrayState |= ArrayState.ColorArrayMask;
-				if( textureType != 0 )
-					arrayState |= ArrayState.TextureCoordArrayMask;
-				this.EnableArrays( arrayState );
 
 				byte* src = vertexBuffer + alignmentDelta;
 				switch( weightType )
@@ -115,7 +115,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				switch( colorType )
 				{
 					case 0:
-						Random rr = new Random();
+						//Random rr = new Random();
 						//Gl.glColor4f( ( float )rr.NextDouble(), ( float )rr.NextDouble(), ( float )rr.NextDouble(), 1.0f );
 						//Gl.glColor4f( 1.0f, 1.0f, 1.0f, 1.0f );
 						Gl.glColor4fv( _ctx.AmbientModelColor );
@@ -366,32 +366,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						break;
 				}
 			}
-		}
-
-		private void DrawBezier( uint listBase, uint argi )
-		{
-			uint t = _ctx.Values[ ( int )VideoCommand.VTYPE ];
-			bool isTransformed = ( t >> 23 ) == 0;
-			uint vertexType = t & 0x00801FFF;
-			bool isIndexed = ( vertexType & ( VertexType.Index8 | VertexType.Index16 ) ) != 0;
-
-			t = _ctx.Values[ ( int )VideoCommand.PSUB ];
-			uint divS = t & 0xFF;
-			uint divT = ( t >> 8 ) & 0xFF;
-			bool clockwise = ( _ctx.Values[ ( int )VideoCommand.PFACE ] & 0x1 ) == 0;
-
-			uint vaddr = _ctx.Values[ ( int )VideoCommand.VADDR ] | listBase;
-			uint iaddr = _ctx.Values[ ( int )VideoCommand.IADDR ] | listBase;
-
-			this.UpdateState( StateRequest.Drawing );
-
-			// Setup textures
-
-			// Draw
-		}
-
-		private void DrawSpline( uint listBase, uint argi )
-		{
 		}
 
 		private static uint DetermineVertexSize( uint vertexType, out uint alignmentDelta )
