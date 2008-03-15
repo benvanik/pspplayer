@@ -146,6 +146,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		private static readonly int[] AlphaBlendDestMap = new int[] { Gl.GL_SRC_COLOR, Gl.GL_ONE_MINUS_SRC_COLOR, Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA, Gl.GL_DST_ALPHA, Gl.GL_ONE_MINUS_DST_ALPHA,
 			Gl.GL_SRC_ALPHA /*x2*/, Gl.GL_ONE_MINUS_SRC_ALPHA /*x2*/, Gl.GL_DST_ALPHA /*x2*/, Gl.GL_ONE_MINUS_DST_ALPHA /*x2*/,
 			Gl.GL_ONE_MINUS_SRC_ALPHA /*GU_FIX*/ };
+		private static readonly int[] TextureFilterMap = new int[] { Gl.GL_NEAREST, Gl.GL_LINEAR, Gl.GL_LINEAR /*undef*/, Gl.GL_LINEAR /*undef*/, Gl.GL_NEAREST_MIPMAP_NEAREST, Gl.GL_LINEAR_MIPMAP_NEAREST, Gl.GL_NEAREST_MIPMAP_LINEAR, Gl.GL_LINEAR_MIPMAP_LINEAR };
+		private static readonly int[] TextureFunctionMap = new int[] { Gl.GL_MODULATE, Gl.GL_DECAL, Gl.GL_BLEND, Gl.GL_REPLACE, Gl.GL_ADD };
+		private static readonly int[] TextureWrapMap = new int[] { Gl.GL_REPEAT, Gl.GL_CLAMP_TO_EDGE };
 
 		private void ProcessList( DisplayList list )
 		{
@@ -187,6 +190,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				float argf = *( ( float* )( ( uint* )( &argx ) ) );
 
 				uint x, y;
+				int i;
 				uint* pp;
 				float[] vector4 = new float[ 4 ];
 
@@ -463,22 +467,87 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						continue;
 
 					// -- Textures ------------------------------------------------------
+					// TPSM
 					case VideoCommand.TME:
-					case VideoCommand.TSYNC:
-					case VideoCommand.TMODE:
-					case VideoCommand.TPSM:
-					case VideoCommand.TFLT:
-					case VideoCommand.TWRAP:
-					case VideoCommand.TFUNC:
-					case VideoCommand.TEC:
+						//this.SetState( FeatureState.TexturesMask, ( argi == 1 ) ? FeatureState.TexturesMask : 0 );
+						continue;
 					case VideoCommand.TFLUSH:
+					case VideoCommand.TSYNC:
+						// Something?
+						continue;
+					case VideoCommand.TMODE:
+						_ctx.TexturesSwizzled = ( ( argi & 0x1 ) == 1 ) ? true : false;
+						_ctx.MipMapLevel = ( int )( ( argi >> 16 ) & 0x4 );
+						continue;
+					case VideoCommand.TFLT:
+						// TODO: Mipmapping - the & 0x1 limits everything to normal, non-mipmapped textures
+						Gl.glTexParameterf( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, TextureFilterMap[ ( int )( ( argi & 0x7 ) & 0x1 ) ] );
+						Gl.glTexParameterf( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, TextureFilterMap[ ( int )( ( ( argi >> 8 ) & 0x7 ) & 0x1 ) ] );
+						continue;
+					case VideoCommand.TWRAP:
+						x = argi & 0x1;
+						y = ( argi >> 8 ) & 0x1;
+						this.SetState( FeatureState.ClampToEdgeMask, ( ( x | y ) > 0 ) ? FeatureState.ClampToEdgeMask : 0 );
+						Gl.glTexParameteri( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_S, TextureWrapMap[ ( int )x ] );
+						Gl.glTexParameteri( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_WRAP_T, TextureWrapMap[ ( int )y ] );
+						continue;
+					case VideoCommand.TFUNC:
+						Gl.glTexEnvi( Gl.GL_TEXTURE_ENV, Gl.GL_TEXTURE_ENV_MODE, TextureFunctionMap[ ( int )( argi & 0x7 ) ] );
+						continue;
+					case VideoCommand.TEC:
+						vector4[ 0 ] = ( int )( ( argi >> 16 ) & 0xFF ) / 255.0f;
+						vector4[ 1 ] = ( int )( ( argi >> 8 ) & 0xFF ) / 255.0f;
+						vector4[ 2 ] = ( int )( argi & 0xFF ) / 255.0f;
+						vector4[ 3 ] = 1.0f;
+						Gl.glTexEnvfv( Gl.GL_TEXTURE_ENV, Gl.GL_TEXTURE_ENV_COLOR, vector4 );
+						continue;
 					case VideoCommand.USCALE:
+						_ctx.TextureScaleS = argf;
+						continue;
 					case VideoCommand.VSCALE:
+						_ctx.TextureScaleT = argf;
+						continue;
 					case VideoCommand.UOFFSET:
+						_ctx.TextureOffsetS = argf;
+						continue;
 					case VideoCommand.VOFFSET:
-						//case VideoCommand.TBPN:
-						//case VideoCommand.TBWN:
-						//case VideoCommand.TSIZEN:
+						_ctx.TextureOffsetT = argf;
+						continue;
+					case VideoCommand.TBP0:
+					case VideoCommand.TBP1:
+					case VideoCommand.TBP2:
+					case VideoCommand.TBP3:
+					case VideoCommand.TBP4:
+					case VideoCommand.TBP5:
+					case VideoCommand.TBP6:
+					case VideoCommand.TBP7:
+						i = ( int )cmd - ( int )VideoCommand.TBP0;
+						_ctx.Textures[ i ].Address = ( _ctx.Textures[ i ].Address & 0xFF000000 ) | argi;
+						continue;
+					case VideoCommand.TBW0:
+					case VideoCommand.TBW1:
+					case VideoCommand.TBW2:
+					case VideoCommand.TBW3:
+					case VideoCommand.TBW4:
+					case VideoCommand.TBW5:
+					case VideoCommand.TBW6:
+					case VideoCommand.TBW7:
+						i = ( int )cmd - ( int )VideoCommand.TBW0;
+						_ctx.Textures[ i ].Address = ( ( argi << 8 ) & 0xFF000000 ) | ( _ctx.Textures[ i ].Address & 0x00FFFFFF );
+						_ctx.Textures[ i ].LineWidth = argi & 0x0000FFFF;
+						continue;
+					case VideoCommand.TSIZE0:
+					case VideoCommand.TSIZE1:
+					case VideoCommand.TSIZE2:
+					case VideoCommand.TSIZE3:
+					case VideoCommand.TSIZE4:
+					case VideoCommand.TSIZE5:
+					case VideoCommand.TSIZE6:
+					case VideoCommand.TSIZE7:
+						i = ( int )cmd - ( int )VideoCommand.TSIZE0;
+						_ctx.Textures[ i ].Width = ( uint )( 1 << ( int )( argi & 0x000000FF ) );
+						_ctx.Textures[ i ].Height = ( uint )( 1 << ( int )( ( argi >> 8 ) & 0x000000FF ) );
+						_ctx.Textures[ i ].PixelStorage = ( TexturePixelStorage )_ctx.Values[ ( int )VideoCommand.TPSM ];
 						continue;
 
 					// -- CLUT ----------------------------------------------------------

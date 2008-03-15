@@ -99,6 +99,19 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL.Programs
 			{
 				fixed( float* p = &ctx.WorldMatrix[ 0 ] )
 					Gl.glUniformMatrix4fv( _vert_worldMatrix, 1, 0, ( IntPtr )p );
+
+				if( ctx.TexturesEnabled == true )
+				{
+					Gl.glUniform2f( _vert_textureSize, ctx.Textures[ 0 ].Width, ctx.Textures[ 0 ].Height ); // TODO
+					Gl.glUniform2f( _vert_textureOffset, ctx.TextureOffsetS, ctx.TextureOffsetT );
+					Gl.glUniform2f( _vert_textureScale, ctx.TextureScaleS, ctx.TextureScaleT );
+
+					Gl.glUniform1i( _frag_textureEnabled, 1 );
+					Gl.glUniform1i( _frag_textureFormat, 0 ); // TODO
+				}
+				else
+					Gl.glUniform1i( _frag_textureEnabled, 0 );
+
 				this.IsDirty = false;
 			}
 
@@ -116,16 +129,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL.Programs
 					Gl.glUniform4f( _vert_isRaw, 1.0f, 1.0f, 1.0f, 1.0f );
 				}
 				_isTransformed = isTransformed;
-			}
-
-			if( ctx.TexturesEnabled == true )
-			{
-				Gl.glUniform2f( _vert_textureSize, 256, 256 ); // TODO
-				Gl.glUniform2f( _vert_textureOffset, ctx.TextureOffsetS, ctx.TextureOffsetT );
-				Gl.glUniform2f( _vert_textureScale, ctx.TextureScaleS, ctx.TextureScaleT );
-
-				Gl.glUniform1i( _frag_textureEnabled, 0 ); // TODO
-				Gl.glUniform1i( _frag_textureFormat, 0 ); // TODO
 			}
 		}
 	}

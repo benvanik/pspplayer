@@ -32,12 +32,16 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			public const int AlphaTest = 2;
 			public const int Fog = 3;
 			public const int AlphaBlend = 4;
+			public const int Textures = 5;
+			public const int ClampToEdge = 6;
 
 			public const uint CullFaceMask = 0x1 << CullFace;
 			public const uint DepthTestMask = 0x1 << DepthTest;
 			public const uint AlphaTestMask = 0x1 << AlphaTest;
 			public const uint FogMask = 0x1 << Fog;
 			public const uint AlphaBlendMask = 0x1 << AlphaBlend;
+			public const uint TexturesMask = 0x1 << Textures;
+			public const uint ClampToEdgeMask = 0x1 << ClampToEdge;
 		}
 
 		private static class ArrayState
@@ -129,6 +133,28 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					Gl.glEnable( Gl.GL_BLEND );
 				else
 					Gl.glDisable( Gl.GL_BLEND );
+			}
+			if( ( diff & FeatureState.TexturesMask ) != 0 )
+			{
+				if( ( values & FeatureState.TexturesMask ) != 0 )
+				{
+					_ctx.TexturesEnabled = true;
+					_defaultProgram.IsDirty = true;
+					Gl.glEnable( Gl.GL_TEXTURE_2D );
+				}
+				else
+				{
+					_ctx.TexturesEnabled = false;
+					_defaultProgram.IsDirty = true;
+					Gl.glDisable( Gl.GL_TEXTURE_2D );
+				}
+			}
+			if( ( diff & FeatureState.ClampToEdgeMask ) != 0 )
+			{
+				if( ( values & FeatureState.ClampToEdgeMask ) != 0 )
+					Gl.glEnable( Gl.GL_CLAMP_TO_EDGE );
+				else
+					Gl.glDisable( Gl.GL_CLAMP_TO_EDGE );
 			}
 			
 			_featureStateValue = ( _featureStateValue & ~mask ) | values;
