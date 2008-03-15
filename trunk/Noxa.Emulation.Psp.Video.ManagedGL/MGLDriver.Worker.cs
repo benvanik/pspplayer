@@ -377,7 +377,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						}
 						continue;
 
-					// -- Lighting/Materials --------------------------------------------
+					// -- Lighting ------------------------------------------------------
 					case VideoCommand.LTE:
 					case VideoCommand.LTE0:
 					case VideoCommand.LTE1:
@@ -387,8 +387,38 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 					case VideoCommand.ALA:
 					case VideoCommand.ALC:
-					case VideoCommand.AMA:
-					case VideoCommand.AMC:
+						continue;
+
+					// -- Materials -----------------------------------------------------
+					// AMA
+					// TODO: ensure AMC always follows AMA
+					case VideoCommand.AMC: // Ambient (alpha from AMA)
+						_ctx.AmbientModelColor[ 0 ] = ( int )( argi & 0xFF ) / 255.0f;
+						_ctx.AmbientModelColor[ 1 ] = ( int )( ( argi >> 8 ) & 0xFF ) / 255.0f;
+						_ctx.AmbientModelColor[ 2 ] = ( int )( ( argi >> 16 ) & 0xFF ) / 255.0f;
+						_ctx.AmbientModelColor[ 3 ] = ( int )( _ctx.Values[ ( int )VideoCommand.AMA ] & 0xFF ) / 255.0f;
+						Gl.glMaterialfv( Gl.GL_FRONT_AND_BACK, Gl.GL_AMBIENT, _ctx.AmbientModelColor );
+						continue;
+					case VideoCommand.DMC: // Diffuse
+						vector4[ 0 ] = ( int )( argi & 0xFF ) / 255.0f;
+						vector4[ 1 ] = ( int )( ( argi >> 8 ) & 0xFF ) / 255.0f;
+						vector4[ 2 ] = ( int )( ( argi >> 16 ) & 0xFF ) / 255.0f;
+						vector4[ 3 ] = 1.0f;
+						Gl.glMaterialfv( Gl.GL_FRONT_AND_BACK, Gl.GL_DIFFUSE, vector4 );
+						continue;
+					case VideoCommand.SMC: // Specular
+						vector4[ 0 ] = ( int )( argi & 0xFF ) / 255.0f;
+						vector4[ 1 ] = ( int )( ( argi >> 8 ) & 0xFF ) / 255.0f;
+						vector4[ 2 ] = ( int )( ( argi >> 16 ) & 0xFF ) / 255.0f;
+						vector4[ 3 ] = 1.0f;
+						Gl.glMaterialfv( Gl.GL_FRONT_AND_BACK, Gl.GL_SPECULAR, vector4 );
+						continue;
+					case VideoCommand.EMC: // Emissive
+						vector4[ 0 ] = ( int )( argi & 0xFF ) / 255.0f;
+						vector4[ 1 ] = ( int )( ( argi >> 8 ) & 0xFF ) / 255.0f;
+						vector4[ 2 ] = ( int )( ( argi >> 16 ) & 0xFF ) / 255.0f;
+						vector4[ 3 ] = 1.0f;
+						Gl.glMaterialfv( Gl.GL_FRONT_AND_BACK, Gl.GL_EMISSION, vector4 );
 						continue;
 
 					// -- Primitive Drawing ---------------------------------------------
