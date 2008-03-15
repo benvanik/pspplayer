@@ -63,7 +63,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			if( _needResize == true )
 			{
 				Gl.glViewport( 0, 0, _screenWidth, _screenHeight );
-				Gl.glClearColor( 0.5f, 0.0f, 0.5f, 1.0f );
+				Random r = new Random();
+				Gl.glClearColor( ( float )r.NextDouble(), ( float )r.NextDouble(), ( float )r.NextDouble(), 1.0f );
+				//Gl.glClearColor( 0.5f, 0.0f, 0.5f, 1.0f );
 				Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
 				_needResize = false;
 			}
@@ -134,14 +136,13 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			}
 		}
 
+		private static readonly int[] DepthFuncMap = new int[] { Gl.GL_NEVER, Gl.GL_ALWAYS, Gl.GL_EQUAL, Gl.GL_NOTEQUAL, Gl.GL_LESS, Gl.GL_LEQUAL, Gl.GL_GREATER, Gl.GL_GEQUAL };
+		private static readonly int[] AlphaTestMap = new int[] { Gl.GL_NEVER, Gl.GL_ALWAYS, Gl.GL_EQUAL, Gl.GL_NOTEQUAL, Gl.GL_LESS, Gl.GL_LEQUAL, Gl.GL_GREATER, Gl.GL_GEQUAL };
+
 		private void ProcessList( DisplayList list )
 		{
 			if( _vsyncWaiting == true )
 				this.NextFrame();
-
-			Random r = new Random();
-			//Gl.glClearColor( ( float )r.NextDouble(), ( float )r.NextDouble(), ( float )r.NextDouble(), 1.0f );
-			//Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
 
 			// Lists are processed until they stall or CMD_END
 			// CMD_FINISH means that the drawing is done and the frame can change (I think)
@@ -179,6 +180,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 				uint x, y;
 				uint* pp;
+				float[] vector4 = new float[ 4 ];
 
 				// Next packet
 				list.Pointer++;
@@ -284,8 +286,13 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						continue;
 					case VideoCommand.SHADE:
 					case VideoCommand.BCE:
+						this.SetState( FeatureState.CullFaceMask, ( argi == 1 ) ? FeatureState.CullFaceMask : 0 );
+						continue;
 					case VideoCommand.FFACE:
+						Gl.glFrontFace( ( argi == 1 ) ? Gl.GL_CW : Gl.GL_CCW );
+						continue;
 					case VideoCommand.AAE:
+						// TODO: antialiasing
 						continue;
 					case VideoCommand.FBP:
 					case VideoCommand.FBW:
@@ -293,12 +300,27 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 					// -- Alpha Testing -------------------------------------------------
 					case VideoCommand.ATE:
+						if( this.DrawWireframe == true )
+							this.SetState( FeatureState.AlphaTestMask, 0 );
+						else
+							this.SetState( FeatureState.AlphaTestMask, ( argi == 1 ) ? FeatureState.AlphaTestMask : 0 );
+						continue;
 					case VideoCommand.ATST:
+						argf = ( ( argi >> 8 ) & 0xFF ) / 255.0f;
+						if( argf > 0.0f )
+							Gl.glAlphaFunc( AlphaTestMap[ argi & 0xFF ], argf );
+						// maybe disable if invalid?
+						// @param mask - Specifies the mask that both values are ANDed with before comparison.
+						x = ( argi >> 16 ) & 0xFF;
+						Debug.Assert( ( x == 0x0 ) || ( x == 0xFF ) );
 						continue;
 
 					// -- Depth Testing -------------------------------------------------
 					case VideoCommand.ZTE:
+						this.SetState( FeatureState.DepthTestMask, ( argi == 1 ) ? FeatureState.DepthTestMask : 0 );
+						continue;
 					case VideoCommand.ZTST:
+						Gl.glDepthFunc( DepthFuncMap[ argi ] );
 						continue;
 					case VideoCommand.NEARZ:
 						_ctx.NearZ = ( float )( int )( ( short )( ushort )argi );
@@ -314,7 +336,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						Gl.glDepthRange( _ctx.NearZ, _ctx.FarZ );
 						continue;
 
-					// -- Alpha Testing -------------------------------------------------
+					// -- Alpha Blending ------------------------------------------------
 					case VideoCommand.ABE:
 					case VideoCommand.ALPHA:
 					case VideoCommand.SFIX:
@@ -328,9 +350,31 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 					// -- Fog -----------------------------------------------------------
 					case VideoCommand.FGE:
+						this.SetState( FeatureState.FogMask, ( argi == 1 ) ? FeatureState.FogMask : 0 );
+						continue;
 					case VideoCommand.FCOL:
+						vector4[ 0 ] = ( int )( argi & 0xFF ) / 255.0f;
+						vector4[ 1 ] = ( int )( ( argi >> 8 ) & 0xFF ) / 255.0f;
+						vector4[ 2 ] = ( int )( ( argi >> 16 ) & 0xFF ) / 255.0f;
+						vector4[ 3 ] = 1.0f;
+						Gl.glFogfv( Gl.GL_FOG_COLOR, vector4 );
+						continue;
 					case VideoCommand.FFAR:
+						_ctx.FogEnd = argf;
+						continue;
 					case VideoCommand.FDIST:
+						_ctx.FogDepth = argf;
+						// We get f precalculated, so need to derive start
+						{
+							if( ( _ctx.FogEnd != 0.0 ) &&
+								( _ctx.FogDepth != 0.0 ) )
+							{
+								float end = _ctx.FogEnd;
+								float start = end - ( 1 / argf );
+								Gl.glFogf( Gl.GL_FOG_START, start );
+								Gl.glFogf( Gl.GL_FOG_END, end );
+							}
+						}
 						continue;
 
 					// -- Lighting/Materials --------------------------------------------

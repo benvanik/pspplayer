@@ -68,7 +68,11 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			//Gl.glEnable( Gl.GL_DEPTH_TEST );
 			Gl.glDepthFunc( Gl.GL_LEQUAL );
 			Gl.glDepthRange( 1.0f, 0.0f );
+			Gl.glAlphaFunc( Gl.GL_GREATER, 0.03f );
 			Gl.glHint( Gl.GL_PERSPECTIVE_CORRECTION_HINT, Gl.GL_NICEST );
+			Gl.glFogi( Gl.GL_FOG_MODE, Gl.GL_LINEAR );
+			Gl.glFogf( Gl.GL_FOG_DENSITY, 0.1f );
+			Gl.glHint( Gl.GL_FOG_HINT, Gl.GL_DONT_CARE );
 
 #if !VSYNC
 			Wgl.wglSwapIntervalEXT( 0 );
@@ -98,9 +102,12 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		public void Resize( int width, int height )
 		{
-			_screenWidth = width;
-			_screenHeight = height;
-			_needResize = true;
+			if( ( _screenWidth != width ) && ( _screenHeight != height ) )
+			{
+				_screenWidth = width;
+				_screenHeight = height;
+				_needResize = true;
+			}
 		}
 
 		public DisplayProperties QueryDisplayProperties()
