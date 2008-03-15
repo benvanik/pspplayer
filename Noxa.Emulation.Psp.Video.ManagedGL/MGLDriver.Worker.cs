@@ -195,6 +195,10 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					case VideoCommand.BASE:
 						list.Base = argx;
 						continue;
+					case VideoCommand.ORIGINADDR:
+						continue;
+					case VideoCommand.OFFSETADDR:
+						continue;
 
 					// -- Termination ---------------------------------------------------
 					case VideoCommand.FINISH:
@@ -269,7 +273,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 							//    x |= Gl.GL_ACCUM_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT; // stencil/alpha
 							//if( ( argi & 0x400 ) != 0 )
 							//    x |= Gl.GL_DEPTH_BUFFER_BIT; // zbuffer
-							//Gl.glClear( ( int )x );
 
 							//Gl.glDepthMask( ( data >> 10 ) & 1 ); // Update Z?
 							Gl.glDepthMask( 0 );
@@ -277,6 +280,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 							int alphaMask = ( int )( ( argi >> 9 ) & 1 );
 							Gl.glColorMask( colMask, colMask, colMask, alphaMask );
 							Gl.glDisable( Gl.GL_BLEND );
+							//if( ( argi & 0x100 ) != 0 )
+							//Gl.glClear( Gl.GL_COLOR_BUFFER_BIT );
 						}
 						else
 						{
