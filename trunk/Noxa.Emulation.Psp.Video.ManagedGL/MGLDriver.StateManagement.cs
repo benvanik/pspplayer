@@ -29,9 +29,13 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		{
 			public const int CullFace = 0;
 			public const int DepthTest = 1;
+			public const int AlphaTest = 2;
+			public const int Fog = 3;
 
-			public const int CullFaceMask = 0x1 << CullFace;
-			public const int DepthTestMask = 0x1 << DepthTest;
+			public const uint CullFaceMask = 0x1 << CullFace;
+			public const uint DepthTestMask = 0x1 << DepthTest;
+			public const uint AlphaTestMask = 0x1 << AlphaTest;
+			public const uint FogMask = 0x1 << Fog;
 		}
 
 		private static class ArrayState
@@ -41,10 +45,10 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			public const int TextureCoordArray = 2;
 			public const int ColorArray = 3;
 
-			public const int VertexArrayMask = 0x1 << VertexArray;
-			public const int NormalArrayMask = 0x1 << NormalArray;
-			public const int TextureCoordArrayMask = 0x1 << TextureCoordArray;
-			public const int ColorArrayMask = 0x1 << ColorArray;
+			public const uint VertexArrayMask = 0x1 << VertexArray;
+			public const uint NormalArrayMask = 0x1 << NormalArray;
+			public const uint TextureCoordArrayMask = 0x1 << TextureCoordArray;
+			public const uint ColorArrayMask = 0x1 << ColorArray;
 		}
 
 		private uint _featureStateValue;
@@ -103,7 +107,21 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				else
 					Gl.glDisable( Gl.GL_DEPTH_TEST );
 			}
-
+			if( ( diff & FeatureState.AlphaTestMask ) != 0 )
+			{
+				if( ( values & FeatureState.AlphaTestMask ) != 0 )
+					Gl.glEnable( Gl.GL_ALPHA_TEST );
+				else
+					Gl.glDisable( Gl.GL_ALPHA_TEST );
+			}
+			if( ( diff & FeatureState.FogMask ) != 0 )
+			{
+				if( ( values & FeatureState.FogMask ) != 0 )
+					Gl.glEnable( Gl.GL_FOG );
+				else
+					Gl.glDisable( Gl.GL_FOG );
+			}
+			
 			_featureStateValue = ( _featureStateValue & ~mask ) | values;
 		}
 
