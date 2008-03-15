@@ -32,6 +32,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public int FolderOffset;
 		public Stream Stream;
 
+		public bool IsValid;
 		public bool IsOpen;
 		public bool CanWrite;
 		public bool CanSeek;
@@ -50,6 +51,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			IsOpen = true;
 			CanWrite = !( ( item.Attributes & MediaItemAttributes.ReadOnly ) == MediaItemAttributes.ReadOnly );
 			CanSeek = false;
+			IsValid = true;
 		}
 
 		public KFile( Kernel kernel, KDevice device, IMediaItem item, Stream stream )
@@ -65,6 +67,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			IsOpen = true;
 			CanWrite = stream.CanWrite;
 			CanSeek = stream.CanSeek;
+			IsValid = true;
 		}
 
 		public KFile( Kernel kernel )
@@ -73,6 +76,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			IsOpen = true;
 			CanWrite = true;
 			CanSeek = false;
+			IsValid = true;
+		}
+
+		public KFile(Kernel kernel, bool valid)
+		{
+			Kernel = kernel;
+			IsOpen = false;
+			CanWrite = true;
+			CanSeek = false;
+			IsValid = valid;
 		}
 	}
 

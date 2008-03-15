@@ -79,6 +79,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( handle.PendingClose == true )
 				_kernel.Handles.Remove( handle.UID );
 
+			if (handle.IsValid == false)
+			{
+				Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceIoPollAsync: kernel file handle not valid -> {0}, {1:X8}", handle.UID, handle.Result);
+				return 0;
+			}
+
 			return 0;
 		}
 
