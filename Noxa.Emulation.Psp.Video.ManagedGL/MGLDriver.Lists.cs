@@ -71,7 +71,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				return 0;
 
 			DisplayList list = _displayLists[ listId ];
-			Debug.Assert( list.State == DisplayListState.Stalled );
+			//Debug.Assert( list.State == DisplayListState.Stalled );
 			if( list.State != DisplayListState.Stalled )
 				return -1;
 

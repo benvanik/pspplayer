@@ -43,13 +43,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public bool TexturesEnabled;
 		public bool TexturesSwizzled;
 		public int MipMapLevel;
-		public int TextureStorageMode;
-		//public MGLTexture[] Textures = new MGLTexture[ 8 ];
-		public int TextureFilterMin = Gl.GL_LINEAR;
-		public int TextureFilterMag = Gl.GL_LINEAR;
-		public int TextureWrapS = Gl.GL_REPEAT;
-		public int TextureWrapT = Gl.GL_REPEAT;
-		public int TextureEnvMode = Gl.GL_MODULATE;
+		public MGLTexture[] Textures = new MGLTexture[ 8 ] { new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture() };
 		public float TextureOffsetS;
 		public float TextureOffsetT;
 		public float TextureScaleS = 1.0f;
@@ -68,6 +62,15 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public bool LightingEnabled;
 		public MGLLight[] Lights = new MGLLight[] { new MGLLight(), new MGLLight(), new MGLLight(), new MGLLight() };
 		public float[] AmbientModelColor = new float[ 4 ];
+	}
+
+	class MGLTexture
+	{
+		public TexturePixelStorage PixelStorage;
+		public uint Address;
+		public uint LineWidth;
+		public uint Width;
+		public uint Height;
 	}
 
 	enum LightType

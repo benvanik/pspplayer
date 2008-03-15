@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Noxa.Emulation.Psp.Video.ManagedGL
 {
-	public static class VertexType
+	static class VertexType
 	{
 		public const uint None = 0x0;
 
