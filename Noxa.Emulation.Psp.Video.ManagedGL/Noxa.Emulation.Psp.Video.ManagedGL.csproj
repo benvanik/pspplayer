@@ -63,6 +63,7 @@
     <Compile Include="MGLDriver.Primitives.cs" />
     <Compile Include="MGLDriver.Setup.cs" />
     <Compile Include="MGLDriver.StateManagement.cs" />
+    <Compile Include="MGLDriver.Patches.cs" />
     <Compile Include="MGLDriver.TextureTransfer.cs" />
     <Compile Include="MGLDriver.Worker.cs" />
     <Compile Include="MGLDriverHook.cs" />

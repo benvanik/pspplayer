@@ -69,6 +69,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
 				_needResize = false;
 			}
+			Gl.glClear( Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT | Gl.GL_STENCIL_BUFFER_BIT );
 
 #if DEBUG
 			bool oldPeriodDown = _periodDown;
@@ -138,6 +139,13 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		private static readonly int[] DepthFuncMap = new int[] { Gl.GL_NEVER, Gl.GL_ALWAYS, Gl.GL_EQUAL, Gl.GL_NOTEQUAL, Gl.GL_LESS, Gl.GL_LEQUAL, Gl.GL_GREATER, Gl.GL_GEQUAL };
 		private static readonly int[] AlphaTestMap = new int[] { Gl.GL_NEVER, Gl.GL_ALWAYS, Gl.GL_EQUAL, Gl.GL_NOTEQUAL, Gl.GL_LESS, Gl.GL_LEQUAL, Gl.GL_GREATER, Gl.GL_GEQUAL };
+		private static readonly int[] AlphaBlendEquMap = new int[] { Gl.GL_FUNC_ADD, Gl.GL_FUNC_SUBTRACT, Gl.GL_FUNC_REVERSE_SUBTRACT, Gl.GL_MIN, Gl.GL_MAX, Gl.GL_FUNC_ADD }; // TODO: last is really GU_ABS - somehow implement?
+		private static readonly int[] AlphaBlendSrcMap = new int[] { Gl.GL_DST_COLOR, Gl.GL_ONE_MINUS_DST_COLOR, Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA, Gl.GL_DST_ALPHA, Gl.GL_ONE_MINUS_DST_ALPHA,
+			Gl.GL_SRC_ALPHA /*x2*/, Gl.GL_ONE_MINUS_SRC_ALPHA /*x2*/, Gl.GL_DST_ALPHA /*x2*/, Gl.GL_ONE_MINUS_DST_ALPHA /*x2*/,
+			Gl.GL_SRC_ALPHA /*GU_FIX*/ };
+		private static readonly int[] AlphaBlendDestMap = new int[] { Gl.GL_SRC_COLOR, Gl.GL_ONE_MINUS_SRC_COLOR, Gl.GL_SRC_ALPHA, Gl.GL_ONE_MINUS_SRC_ALPHA, Gl.GL_DST_ALPHA, Gl.GL_ONE_MINUS_DST_ALPHA,
+			Gl.GL_SRC_ALPHA /*x2*/, Gl.GL_ONE_MINUS_SRC_ALPHA /*x2*/, Gl.GL_DST_ALPHA /*x2*/, Gl.GL_ONE_MINUS_DST_ALPHA /*x2*/,
+			Gl.GL_ONE_MINUS_SRC_ALPHA /*GU_FIX*/ };
 
 		private void ProcessList( DisplayList list )
 		{
@@ -206,7 +214,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						{
 							Debug.WriteLine( "finished list" );
 							//this.NextFrame();
-							Gl.glFlush();
+							//Gl.glFlush();
 						}
 						list.State = DisplayListState.Done;
 						continue;
@@ -287,6 +295,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						{
 							Gl.glDepthMask( 1 );
 							Gl.glColorMask( 1, 1, 1, 1 );
+							Gl.glEnable( Gl.GL_BLEND );
 						}
 						continue;
 					case VideoCommand.SHADE:
@@ -343,7 +352,12 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 					// -- Alpha Blending ------------------------------------------------
 					case VideoCommand.ABE:
+						this.SetState( FeatureState.AlphaBlendMask, ( argi == 1 ) ? FeatureState.AlphaBlendMask : 0 );
+						continue;
 					case VideoCommand.ALPHA:
+						Gl.glBlendEquation( AlphaBlendEquMap[ ( argi >> 8 ) & 0x3 ] );
+						Gl.glBlendFunc( AlphaBlendSrcMap[ argi & 0xF ], AlphaBlendDestMap[ ( argi >> 4 ) & 0xF ] );
+						continue;
 					case VideoCommand.SFIX:
 					case VideoCommand.DFIX:
 						continue;
@@ -432,6 +446,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						// Ignore clear mode
 						//if( ( _ctx.Values[ ( int )VideoCommand.CLEAR ] & 0x1 ) > 0 )
 						//	continue;
+						//Gl.glFlush();
 						didRealDrawing = true;
 						this.DrawPrimitive( list.Base, argi );
 						continue;
