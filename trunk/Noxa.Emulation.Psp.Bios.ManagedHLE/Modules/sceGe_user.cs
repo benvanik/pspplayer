@@ -116,6 +116,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: int sceGeRestoreContext(const PspGeContext *context);
 		public int sceGeRestoreContext( int context ){ return Module.NotImplementedReturn; }
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xAB49E76A, "sceGeListEnQueue" )]
@@ -130,6 +131,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return _driver.EnqueueList( ( uint )list, ( uint )stall, cbid, ( uint )arg, false );
 		}
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x1C0D95A6, "sceGeListEnQueueHead" )]
@@ -155,6 +157,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return -1;
 		}
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xE0D68148, "sceGeListUpdateStallAddr" )]
@@ -165,6 +168,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return _driver.UpdateList( qid, ( uint )stall );
 		}
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x03444EB4, "sceGeListSync" )]
@@ -175,6 +179,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return _driver.SyncList( qid, syncType );
 		}
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0xB287BD61, "sceGeDrawSync" )]

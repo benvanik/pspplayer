@@ -31,11 +31,11 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			int primitiveType = PrimitiveMap[ ( int )( ( argi >> 16 ) & 0x7 ) ];
 
 			uint t = _ctx.Values[ ( int )VideoCommand.VTYPE ];
-			uint boneCount = ( t >> 14 ) & 0x3;
+			uint boneCount = ( ( t >> 14 ) & 0x3 ) + 1;
 			uint morphCount = ( t >> 18 ) & 0x3;
 			if( morphCount > 0 )
-				return;
-			if( boneCount > 0 )
+				morphCount++;
+			if( morphCount > 1 )
 				return;
 			uint vertexType = t & 0x00801FFF;
 			bool isIndexed = ( vertexType & ( VertexType.Index8 | VertexType.Index16 ) ) != 0;
@@ -84,8 +84,19 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					arrayState |= ArrayState.TextureCoordArrayMask;
 				this.EnableArrays( arrayState );
 
-				byte* src = vertexBuffer;
-				src += alignmentDelta;
+				byte* src = vertexBuffer + alignmentDelta;
+				switch( weightType )
+				{
+					case VertexType.WeightFixed8:
+						src += 1 * boneCount;
+						break;
+					case VertexType.WeightFixed16:
+						src += 2 * boneCount;
+						break;
+					case VertexType.WeightFloat:
+						src += 4 * boneCount;
+						break;
+				}
 				switch( textureType )
 				{
 					case VertexType.TextureFixed8:
@@ -390,14 +401,14 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			uint positionType = ( vertexType & VertexType.PositionMask ) >> 7;
 			uint normalType = ( vertexType & VertexType.NormalMask ) >> 5;
 			uint textureType = ( vertexType & VertexType.TextureMask );
-			uint weightCount = ( vertexType & VertexType.WeightCountMask ) >> 14;
+			uint weightCount = ( ( vertexType & VertexType.WeightCountMask ) >> 14 ) + 1;
 			uint weightType = ( vertexType & VertexType.WeightMask ) >> 9;
 			uint colorType = ( vertexType & VertexType.ColorMask ) >> 2;
 			uint morphCount = ( vertexType & VertexType.MorphCountMask ) >> 18;
 
 			uint size = 0;
 			uint biggest = 0;
-			if( weightCount > 0 )
+			if( weightType > 0 )
 				GetVertexComponentSize( v_weightSizes, v_weightAlign, weightType, weightCount, ref biggest, ref size ); // WRONG - count?
 			if( textureType > 0 )
 				GetVertexComponentSize( v_textureSizes, v_textureAlign, textureType, 1, ref biggest, ref size );
