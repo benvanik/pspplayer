@@ -598,6 +598,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			Nickname = 1,
 			SystemLanguage = 8,
+			Unknown = 9,
 		}
 
 		[NotImplemented]
@@ -631,6 +632,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			{
 				case SystemParams.SystemLanguage:
 					*ptr = ( uint )Language.English;
+					break;
+				case SystemParams.Unknown:
+					*ptr = (uint)1;
 					break;
 				default:
 					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceUtilityGetSystemParamInt( {0} ) not implemented", id );

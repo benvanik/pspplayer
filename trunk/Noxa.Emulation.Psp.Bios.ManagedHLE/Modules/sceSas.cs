@@ -401,6 +401,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			return Module.NotImplementedReturn;
 		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction( 0xE175EF66, "sceSasCore_E175EF66") ]
+		public int sceSasCore_E175EF66()
+		{
+			return Module.NotImplementedReturn;
+		}
 	}
 }
 
