@@ -17,13 +17,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		Delay,			// Wait until a specific time
 		Semaphore,		// Waiting on semaphore signal
 		Event,			// Wait until an event matches
-		Mbx,			// mailbox something
+		Mbx,			// Wait until Messagebox has something
 		Vpl,			// Wait until VPL has space
 		Fpl,			// Wait until FPL has space
 		/// <summary>
 		///  Message Pipe
 		/// </summary>
-		Mpp,			// message pipe stuff
+		Mpp,			// Wait until there is data on message pipe
 		Join,			// Wait until the target thread ends
 		EventHandler,	// message pump something
 		Unknown2,		// ?? callbacks?

@@ -326,9 +326,33 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.WaitAddress = ( uint )message;
 			this.WaitAddressResult = ( uint )outSize;
 
-			if( canHandleCallbacks == true )
+			if (canHandleCallbacks == true)
+			{
 				this.Kernel.CheckCallbacks();
+			}
 
+			this.Kernel.Schedule();
+		}
+
+		public void Wait(KMessageBox box, int pmessage, int timeout, bool canHandleCallbacks)
+		{
+			this.State = KThreadState.Waiting;
+			this.RemoveFromSchedule();
+			
+			this.CanHandleCallbacks = canHandleCallbacks;
+			
+			box.WaitingThreads.Enqueue(this);
+			
+			this.WaitingOn = KThreadWait.Mbx;
+			this.WaitTimeoutSetup((uint)timeout);
+			this.WaitHandle = box;
+			this.WaitAddress = (uint)pmessage;
+
+			if (canHandleCallbacks == true)
+			{
+				this.Kernel.CheckCallbacks();
+			}
+			
 			this.Kernel.Schedule();
 		}
 	}

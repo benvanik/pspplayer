@@ -47,6 +47,7 @@
     <Compile Include="DebugDatabase.cs" />
     <Compile Include="Kernel Types\KCallback.cs" />
     <Compile Include="Kernel Types\KDevice.cs" />
+    <Compile Include="Kernel Types\KMessageBox.cs" />
     <Compile Include="Kernel Types\KMessagePipe.cs" />
     <Compile Include="Kernel Types\KMutex.cs" />
     <Compile Include="Kernel Types\KThread.Waiting.cs" />
@@ -109,7 +110,7 @@
     <Compile Include="Modules\ThreadManForUser.Callbacks.cs" />
     <Compile Include="Modules\ThreadManForUser.cs" />
     <Compile Include="Modules\ThreadManForUser.Events.cs" />
-    <Compile Include="Modules\ThreadManForUser.Mailboxes.cs" />
+    <Compile Include="Modules\ThreadManForUser.MsgBoxes.cs" />
     <Compile Include="Modules\ThreadManForUser.Memory.cs" />
     <Compile Include="Modules\ThreadManForUser.MsgPipes.cs" />
     <Compile Include="Modules\ThreadManForUser.Mutexes.cs" />
