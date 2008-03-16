@@ -102,12 +102,16 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL.Programs
 
 				if( ctx.TexturesEnabled == true )
 				{
-					Gl.glUniform2f( _vert_textureSize, ctx.Textures[ 0 ].Width, ctx.Textures[ 0 ].Height ); // TODO
-					Gl.glUniform2f( _vert_textureOffset, ctx.TextureOffsetS, ctx.TextureOffsetT );
-					Gl.glUniform2f( _vert_textureScale, ctx.TextureScaleS, ctx.TextureScaleT );
+					if( isTransformed == true )
+						Gl.glUniform2f( _vert_textureSize, ctx.Textures[ 0 ].Width, ctx.Textures[ 0 ].Height ); // TODO
+					else
+					{
+						Gl.glUniform2f( _vert_textureOffset, ctx.TextureOffsetS, ctx.TextureOffsetT );
+						Gl.glUniform2f( _vert_textureScale, ctx.TextureScaleS, ctx.TextureScaleT );
+					}
 
 					Gl.glUniform1i( _frag_textureEnabled, 1 );
-					Gl.glUniform1i( _frag_textureFormat, 0 ); // TODO
+					//Gl.glUniform1i( _frag_textureFormat, 0 ); // TODO
 				}
 				else
 					Gl.glUniform1i( _frag_textureEnabled, 0 );

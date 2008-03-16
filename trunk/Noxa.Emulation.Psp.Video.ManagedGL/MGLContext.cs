@@ -13,8 +13,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 {
 	unsafe class MGLContext
 	{
-		public const int ClutSize = 65536;
-
 		// The values of all the commands
 		public uint[] Values = new uint[ 256 ];
 
@@ -43,20 +41,12 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public bool TexturesEnabled;
 		public bool TexturesSwizzled;
 		public int MipMapLevel;
-		public MGLTexture[] Textures = new MGLTexture[ 8 ] { new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture(), new MGLTexture() };
+		public MGLTextureInfo[] Textures = new MGLTextureInfo[ 8 ] { new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo() };
 		public float TextureOffsetS;
 		public float TextureOffsetT;
 		public float TextureScaleS = 1.0f;
 		public float TextureScaleT = 1.0f;
-
-		// CLUT
-		public void* ClutTable;
-		public uint ClutPointer;
-		public uint ClutChecksum;
-		public int ClutFormat;
-		public int ClutShift;
-		public int ClutMask;
-		public int ClutStart;
+		public MGLClut Clut;
 
 		// Materials
 		public bool LightingEnabled;
@@ -64,7 +54,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public float[] AmbientModelColor = new float[ 4 ];
 	}
 
-	class MGLTexture
+	class MGLTextureInfo
 	{
 		public TexturePixelStorage PixelStorage;
 		public uint Address;

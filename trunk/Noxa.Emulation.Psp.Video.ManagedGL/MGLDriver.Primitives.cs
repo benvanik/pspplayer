@@ -51,6 +51,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				this.SetState( FeatureState.CullFaceMask | FeatureState.DepthTestMask, 0 );
 
 			// Setup textures
+			if( _ctx.TexturesEnabled == true )
+				this.SetTextures();
 
 			uint positionType = ( vertexType & VertexType.PositionMask );
 			uint normalType = ( vertexType & VertexType.NormalMask );
@@ -278,9 +280,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 							dp += 8 * 4;
 							break;
 					}
-					sv1 = sp;
+					sv1 += vertexSize * 2;
 					sv2 = sv1 + vertexSize;
-					dv1 = dp;
+					dv1 += vertexSize * 4;
 					dv2 = dv1 + vertexSize;
 					dv3 = dv2 + vertexSize;
 					dv4 = dv3 + vertexSize;
@@ -308,9 +310,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 							dp += 4 * 4;
 							break;
 					}
-					sv1 = sp;
+					sv1 += vertexSize * 2;
 					sv2 = sv1 + vertexSize;
-					dv1 = dp;
+					dv1 += vertexSize * 4;
 					dv2 = dv1 + vertexSize;
 					dv3 = dv2 + vertexSize;
 					dv4 = dv3 + vertexSize;

@@ -150,9 +150,7 @@ void main()
 	vec4 texCoord = gl_MultiTexCoord0;
 	// TODO: do a texture matrix multiplication instead?
 	//texCoord = isTransformed ? ( texCoord / textureSize ) : ( ( texCoord * textureScale ) + textureOffset );
-	texCoord.st = ( isTransformed.xy * ( texCoord.st / textureSize.st ) ) + ( isRaw.xy * ( ( texCoord.st * textureScale.st ) + textureOffset.s ) );
-	//texCoord.s = ( isTransformed.x * ( texCoord.s / textureSize.s ) ) + ( isRaw.x * ( ( texCoord.s * textureScale.s ) + textureOffset.s ) );
-	//texCoord.t = ( isTransformed.x * ( texCoord.t / textureSize.t ) ) + ( isRaw.x * ( ( texCoord.t * textureScale.t ) + textureOffset.t ) );
+	texCoord.st = ( isTransformed.xy * ( texCoord.st / textureSize.st ) ) + ( isRaw.xy * ( ( texCoord.st * textureScale.st ) + textureOffset.st ) );
 	gl_TexCoord[ 0 ] = gl_TextureMatrix[ 0 ] * texCoord;
 	
 	// gl_Position = isTransformed ? ( orthoMatrix * position ) : ( gl_MVP * position );

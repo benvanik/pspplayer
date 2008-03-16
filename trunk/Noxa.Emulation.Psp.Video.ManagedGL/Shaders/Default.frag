@@ -15,7 +15,9 @@ void main()
 	vec4 sample = gl_Color;
 	if( textureEnabled == true )
 	{
-		sample *= texture2D( texture, gl_TexCoord[ 0 ].st );
+		vec4 textureSample = texture2D( texture, gl_TexCoord[ 0 ].st );
+		sample.rgb *= textureSample.rgb;
+		sample.a = textureSample.a; // WRONG - maybe depends on lighting mode or something
 	}
 	
 	gl_FragColor = sample;
