@@ -72,6 +72,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			{
 				_ctx = new MGLContext();
 				_ctx.Clut = new MGLClut( this, _ctx );
+				_ctx.TextureCache = new MGLTextureCache( this, _ctx );
 				this.SetupGL();
 				this.SetupLists();
 				this.SetupWorker();

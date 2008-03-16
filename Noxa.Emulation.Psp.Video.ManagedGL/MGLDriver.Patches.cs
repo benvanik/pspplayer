@@ -35,8 +35,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			bool clockwise = ( _ctx.Values[ ( int )VideoCommand.PFACE ] & 0x1 ) == 0;
 
 			// We only support 4x4 patches right now
-			Debug.Assert( divS == 4 );
-			Debug.Assert( divT == 4 );
+			//Debug.Assert( divS == 4 );
+			//Debug.Assert( divT == 4 );
 
 			uint alignmentDelta;
 			int vertexSize = ( int )DetermineVertexSize( vertexType, out alignmentDelta );

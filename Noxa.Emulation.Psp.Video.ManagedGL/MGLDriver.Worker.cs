@@ -148,7 +148,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			Gl.GL_ONE_MINUS_SRC_ALPHA /*GU_FIX*/ };
 		private static readonly int[] TextureFilterMap = new int[] { Gl.GL_NEAREST, Gl.GL_LINEAR, Gl.GL_LINEAR /*undef*/, Gl.GL_LINEAR /*undef*/, Gl.GL_NEAREST_MIPMAP_NEAREST, Gl.GL_LINEAR_MIPMAP_NEAREST, Gl.GL_NEAREST_MIPMAP_LINEAR, Gl.GL_LINEAR_MIPMAP_LINEAR };
 		private static readonly int[] TextureFunctionMap = new int[] { Gl.GL_MODULATE, Gl.GL_DECAL, Gl.GL_BLEND, Gl.GL_REPLACE, Gl.GL_ADD };
-		private static readonly int[] TextureWrapMap = new int[] { Gl.GL_REPEAT, Gl.GL_CLAMP_TO_EDGE };
+		private static readonly int[] TextureWrapMap = new int[] { Gl.GL_REPEAT, Gl.GL_CLAMP };
 
 		private void ProcessList( DisplayList list )
 		{
@@ -481,8 +481,10 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						continue;
 					case VideoCommand.TFLT:
 						// TODO: Mipmapping - the & 0x1 limits everything to normal, non-mipmapped textures
-						Gl.glTexParameterf( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, TextureFilterMap[ ( int )( ( argi & 0x7 ) & 0x1 ) ] );
-						Gl.glTexParameterf( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, TextureFilterMap[ ( int )( ( ( argi >> 8 ) & 0x7 ) & 0x1 ) ] );
+						i = TextureFilterMap[ ( int )( ( argi & 0x7 ) & 0x1 ) ];
+						_ctx.TextureMinFilter = i;
+						Gl.glTexParameteri( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, i );
+						Gl.glTexParameteri( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, TextureFilterMap[ ( int )( ( ( argi >> 8 ) & 0x7 ) & 0x1 ) ] );
 						continue;
 					case VideoCommand.TWRAP:
 						x = argi & 0x1;
@@ -547,7 +549,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						i = ( int )cmd - ( int )VideoCommand.TSIZE0;
 						_ctx.Textures[ i ].Width = ( uint )( 1 << ( int )( argi & 0x000000FF ) );
 						_ctx.Textures[ i ].Height = ( uint )( 1 << ( int )( ( argi >> 8 ) & 0x000000FF ) );
-						_ctx.Textures[ i ].PixelStorage = ( TexturePixelStorage )_ctx.Values[ ( int )VideoCommand.TPSM ];
+						_ctx.Textures[ i ].PixelStorage = ( TexturePixelStorage )( _ctx.Values[ ( int )VideoCommand.TPSM ] & 0xF );
 						continue;
 
 					// -- CLUT ----------------------------------------------------------
