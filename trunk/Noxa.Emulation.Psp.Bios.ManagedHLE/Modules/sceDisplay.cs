@@ -109,6 +109,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x289D82FE, "sceDisplaySetFrameBuf" )]
@@ -146,6 +147,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 1;
 		}
 
+		[DontTrace]
 		[SuggestNative]
 		[Stateless]
 		[BiosFunction( 0x9C6EAAD7, "sceDisplayGetVcount" )]
