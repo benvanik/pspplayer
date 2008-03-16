@@ -224,8 +224,15 @@ namespace Noxa.Emulation.Psp.Games
 		#endregion
 
 		/// <summary>
+		/// Ignore game in listings.
+		/// </summary>
+		[NonSerialized]
+		public bool Ignore = false;
+
+		/// <summary>
 		/// Ignore Dispose calls; for internal use only.
 		/// </summary>
+		[NonSerialized]
 		public bool IgnoreDispose = false;
 
 		/// <summary>

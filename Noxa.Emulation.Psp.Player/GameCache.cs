@@ -68,7 +68,13 @@ namespace Noxa.Emulation.Psp.Player
 				foreach( GameInformation game in _list )
 				{
 					Debug.Assert( game.HostPath != null );
-					_lookup.Add( game.HostPath, game );
+					if( File.Exists( game.HostPath ) == true )
+						_lookup.Add( game.HostPath, game );
+					else
+					{
+						Log.WriteLine( Verbosity.Normal, Feature.General, "GameCache::Load ignoring {0} because path not found: {1}", game.Parameters.Title, game.HostPath );
+						game.Ignore = true;
+					}
 				}
 			}
 		}
@@ -152,7 +158,14 @@ namespace Noxa.Emulation.Psp.Player
 
 		public GameInformation[] GetGames()
 		{
-			return _list.ToArray();
+			List<GameInformation> games = new List<GameInformation>( _list.Count );
+			foreach( GameInformation game in _list )
+			{
+				if( game.Ignore == true )
+					continue;
+				games.Add( game );
+			}
+			return games.ToArray();
 		}
 
 		private string GetIconPath( GameInformation game )
