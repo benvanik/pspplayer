@@ -71,6 +71,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			if( _isSetup == false )
 			{
 				_ctx = new MGLContext();
+				_ctx.Clut = new MGLClut( this, _ctx );
 				this.SetupGL();
 				this.SetupLists();
 				this.SetupWorker();

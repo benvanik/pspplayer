@@ -7,10 +7,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Tao.OpenGl;
 
 namespace Noxa.Emulation.Psp.Video.ManagedGL
 {
-	class MGLTextureCache
+	unsafe class MGLTextureCache
 	{
 	}
 }

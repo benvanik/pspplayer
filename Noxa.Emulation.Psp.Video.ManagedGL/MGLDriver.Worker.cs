@@ -469,7 +469,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					// -- Textures ------------------------------------------------------
 					// TPSM
 					case VideoCommand.TME:
-						//this.SetState( FeatureState.TexturesMask, ( argi == 1 ) ? FeatureState.TexturesMask : 0 );
+						this.SetState( FeatureState.TexturesMask, ( argi == 1 ) ? FeatureState.TexturesMask : 0 );
 						continue;
 					case VideoCommand.TFLUSH:
 					case VideoCommand.TSYNC:
@@ -551,6 +551,12 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 						continue;
 
 					// -- CLUT ----------------------------------------------------------
+					// CBP, CBPH, CMODE
+					case VideoCommand.CLOAD:
+						x = ( ( _ctx.Values[ ( int )VideoCommand.CBPH ] << 8 ) & 0xFF000000 ) | _ctx.Values[ ( int )VideoCommand.CBP ];
+						y = _ctx.Values[ ( int )VideoCommand.CMODE ];
+						_ctx.Clut.Load( x, y, argi );
+						continue;
 
 					// -- Texture Transfer ----------------------------------------------
 					// TRXSBP, TRXSBW, TRXDBP, TRXDBW, TRXSIZE, TRXSPOS, TRXDPOS

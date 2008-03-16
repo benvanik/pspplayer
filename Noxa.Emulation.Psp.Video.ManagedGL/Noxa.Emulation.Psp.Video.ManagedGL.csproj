@@ -48,6 +48,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorOperations.cs" />
     <Compile Include="Configuration\VideoConfiguration.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -55,6 +56,7 @@
       <DependentUpon>VideoConfiguration.cs</DependentUpon>
     </Compile>
     <Compile Include="DisplayList.cs" />
+    <Compile Include="MGLClut.cs" />
     <Compile Include="MGLContext.cs" />
     <Compile Include="ManagedGLVideo.cs" />
     <Compile Include="MGLCapabilities.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="MGLPrimitiveCache.cs" />
     <Compile Include="MGLStatistics.cs" />
     <Compile Include="MGLStatisticsSource.cs" />
+    <Compile Include="MGLTexture.cs" />
     <Compile Include="MGLTextureCache.cs" />
     <Compile Include="MGLUtilities.cs" />
     <Compile Include="NativeMethods.cs" />

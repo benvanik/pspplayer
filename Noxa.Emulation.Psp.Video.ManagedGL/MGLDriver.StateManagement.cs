@@ -61,6 +61,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		private uint _arrayStateValue;
 
 		private bool _matricesValid;
+		private int _currentTextureId;
 		private int _currentProgramId;
 
 		private void UpdateState( StateRequest request )
@@ -156,7 +157,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				else
 					Gl.glDisable( Gl.GL_CLAMP_TO_EDGE );
 			}
-			
+
 			_featureStateValue = ( _featureStateValue & ~mask ) | values;
 		}
 
@@ -191,6 +192,41 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					Gl.glDisableClientState( Gl.GL_COLOR_ARRAY );
 			}
 			_arrayStateValue = values;
+		}
+
+		private void SetTextures()
+		{
+			MGLTextureInfo info = _ctx.Textures[ 0 ];
+			if( info.Address == 0 )
+			{
+				if( _currentTextureId != 0 )
+					Gl.glBindTexture( Gl.GL_TEXTURE_2D, 0 );
+				_currentTextureId = 0;
+				return;
+			}
+
+			// TODO: set all
+			_defaultProgram.IsDirty = true;
+
+			// Check valid
+			bool valid = !( ( info.Address == 0x0 ) || ( info.LineWidth == 0x0 ) || ( info.Width == 0 ) || ( info.Height == 0 ) );
+			// TODO: from framebuffer? - make sure this check is still valid!
+			valid = valid && !( ( info.Address == 0x0400000 ) && ( info.LineWidth == 0x4 ) && ( info.Width == 0x2 ) && ( info.Height == 0x2 ) );
+
+			// Check cache
+			MGLTexture texture = null;
+
+			// If found in cache, set and return
+			if( texture != null )
+			{
+				Gl.glBindTexture( Gl.GL_TEXTURE_2D, texture.TextureID );
+				_currentTextureId = texture.TextureID;
+				return;
+			}
+
+			// Not found - create
+			texture = MGLTexture.LoadTexture( this, _ctx, info, 0 );
+			_currentTextureId = texture.TextureID;
 		}
 
 		private void SetNoProgram()
