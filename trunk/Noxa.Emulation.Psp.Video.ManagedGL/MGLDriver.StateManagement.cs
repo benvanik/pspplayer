@@ -94,6 +94,11 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			_defaultProgram.IsDirty = true;
 		}
 
+		internal void InvalidateCurrentTexture()
+		{
+			_currentTextureId = 0;
+		}
+
 		private void SetState( uint mask, uint values )
 		{
 			uint diff = ( _featureStateValue & mask ) ^ values;
@@ -205,28 +210,41 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				return;
 			}
 
-			// TODO: set all
-			_defaultProgram.IsDirty = true;
-
 			// Check valid
 			bool valid = !( ( info.Address == 0x0 ) || ( info.LineWidth == 0x0 ) || ( info.Width == 0 ) || ( info.Height == 0 ) );
 			// TODO: from framebuffer? - make sure this check is still valid!
 			valid = valid && !( ( info.Address == 0x0400000 ) && ( info.LineWidth == 0x4 ) && ( info.Width == 0x2 ) && ( info.Height == 0x2 ) );
 
 			// Check cache
-			MGLTexture texture = null;
+			uint checksum;
+			MGLTexture texture = _ctx.TextureCache.Find( info, out checksum );
 
 			// If found in cache, set and return
 			if( texture != null )
 			{
-				Gl.glBindTexture( Gl.GL_TEXTURE_2D, texture.TextureID );
-				_currentTextureId = texture.TextureID;
+				if( _currentTextureId != texture.TextureID )
+				{
+					Gl.glBindTexture( Gl.GL_TEXTURE_2D, texture.TextureID );
+					_currentTextureId = texture.TextureID;
+
+					// HACK: required to get textures to work right - does something after the binding so that things show up
+					Gl.glTexParameteri( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MIN_FILTER, _ctx.TextureMinFilter );
+					//Gl.glTexParameteri( Gl.GL_TEXTURE_2D, Gl.GL_TEXTURE_MAG_FILTER, Gl.GL_NEAREST );
+
+					// TODO: set all
+					_defaultProgram.IsDirty = true;
+				}
 				return;
 			}
 
 			// Not found - create
-			texture = MGLTexture.LoadTexture( this, _ctx, info, 0 );
+			texture = MGLTexture.LoadTexture( this, _ctx, info, checksum );
 			_currentTextureId = texture.TextureID;
+
+			_ctx.TextureCache.Add( texture );
+
+			// TODO: set all
+			_defaultProgram.IsDirty = true;
 		}
 
 		private void SetNoProgram()

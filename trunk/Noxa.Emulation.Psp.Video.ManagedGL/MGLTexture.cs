@@ -63,7 +63,6 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 
 		#endregion
 
-		private static int _tt = 0;
 		public static MGLTexture LoadTexture( MGLDriver driver, MGLContext ctx, MGLTextureInfo info, uint checksum )
 		{
 			uint width = info.Width;
@@ -81,11 +80,10 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			texture.ClutChecksum = ctx.Clut.Checksum;
 
 			int textureId;
-			//Gl.glGenTextures( 1, out textureId );
-			//Gl.glBindTexture( Gl.GL_TEXTURE_2D, textureId );
-			//texture.TextureID = textureId;
-			texture.TextureID = _tt++;
-
+			Gl.glGenTextures( 1, out textureId );
+			Gl.glBindTexture( Gl.GL_TEXTURE_2D, textureId );
+			texture.TextureID = textureId;
+			
 			byte* address = driver.MemorySystem.Translate( info.Address );
 			TextureFormat format = TextureFormats[ ( int )info.PixelStorage ];
 			uint size = lineWidth * height * format.Size;
@@ -101,15 +99,15 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				switch( texture.PixelStorage )
 				{
 					case TexturePixelStorage.BGR5650:
-						ColorOperations.DecodeBGR5650( buffer, decodeBuffer, lineWidth * height );
+						texture.Checksum = ColorOperations.DecodeBGR5650( buffer, decodeBuffer, lineWidth * height );
 						buffer = decodeBuffer;
 						break;
 					case TexturePixelStorage.ABGR5551:
-						ColorOperations.DecodeABGR5551( buffer, decodeBuffer, lineWidth * height );
+						texture.Checksum = ColorOperations.DecodeABGR5551( buffer, decodeBuffer, lineWidth * height );
 						buffer = decodeBuffer;
 						break;
 					case TexturePixelStorage.ABGR4444:
-						ColorOperations.DecodeABGR4444( buffer, decodeBuffer, lineWidth * height );
+						texture.Checksum = ColorOperations.DecodeABGR4444( buffer, decodeBuffer, lineWidth * height );
 						buffer = decodeBuffer;
 						break;
 					case TexturePixelStorage.ABGR8888:
@@ -156,6 +154,10 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 				//texture.CookieOriginal = *( ( uint* )address );
 				//texture.Cookie = ( uint )textureId;
 				//*( ( uint* )address ) = ( uint )textureId;
+
+				// Calculate checksum if needed
+				if( texture.Checksum == 0 )
+					texture.Checksum = MGLTexture.CalculateChecksum( address, width, height, texture.PixelStorage );
 			}
 
 			return texture;

@@ -41,7 +41,9 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		public bool TexturesEnabled;
 		public bool TexturesSwizzled;
 		public int MipMapLevel;
+		public int TextureMinFilter;
 		public MGLTextureInfo[] Textures = new MGLTextureInfo[ 8 ] { new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo(), new MGLTextureInfo() };
+		public MGLTextureCache TextureCache;
 		public float TextureOffsetS;
 		public float TextureOffsetT;
 		public float TextureScaleS = 1.0f;
