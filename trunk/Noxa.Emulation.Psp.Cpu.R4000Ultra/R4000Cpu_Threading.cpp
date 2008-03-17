@@ -148,6 +148,11 @@ int R4000Cpu::AllocateContextStorage( uint pc, array<uint>^ registers )
 	if( _cpuCtx->Registers[ 28 ] != 0 )
 		context->Ctx.Registers[ 28 ] = _cpuCtx->Registers[ 28 ];
 
+	// FPU regs
+	uint nan = 0x7F800001;
+	for( int n = 0; n < 32; n++ )
+		context->Ctx.Cp1Registers[ n * 4 ] = ( float& )nan;
+
 	// Set safety callback
 	context->Ctx.Registers[ 31 ] = BIOS_SAFETY_DUMMY;
 
@@ -401,7 +406,7 @@ uint NativeExecute( bool* breakFlag )
 		if( _switchRequest.ResultCallbackValid == true )
 		{
 			bool exitEarly = MakeResultCallback( v0 );
-			if( exitEarly == false )
+			if( exitEarly == true )
 			{
 				*breakFlag = false;
 				return 0;

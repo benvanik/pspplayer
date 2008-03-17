@@ -92,6 +92,7 @@
     <Compile Include="Modules\sceMpeg.cs" />
     <Compile Include="Modules\sceNet.cs" />
     <Compile Include="Modules\sceNetApctl.cs" />
+    <Compile Include="Modules\sceNetIfhandle.cs" />
     <Compile Include="Modules\sceNetInet.cs" />
     <Compile Include="Modules\sceNetResolver.cs" />
     <Compile Include="Modules\scePower.cs" />

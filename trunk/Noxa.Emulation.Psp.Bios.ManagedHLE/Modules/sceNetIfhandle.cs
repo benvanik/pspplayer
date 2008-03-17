@@ -25,7 +25,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			get
 			{
-				return "sceNetIfhandle";
+				return "sceNetIfhandle_lib";
 			}
 		}
 
