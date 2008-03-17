@@ -283,7 +283,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			{
 				uint timestamp = ( uint )Environment.TickCount;
 				byte* p = _memorySystem.Translate( ( uint )pad_data );
-				for( int n = 0; n < 1; n++ )
+				for( int n = 0; n < count; n++ )
 				{
 					Sample sample;
 #if THREADED
@@ -301,7 +301,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 					p = WritePadData( p, sample, true );
 				}
-				return 0;
+				return count;
 			}
 			return 0;
 		}
@@ -316,7 +316,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( pad_data != 0 )
 			{
 				byte* p = _memorySystem.Translate( ( uint )pad_data );
-				for( int n = 0; n < 1; n++ )
+				for( int n = 0; n < count; n++ )
 				{
 					Sample sample;
 #if THREADED
