@@ -74,9 +74,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 #if THREADED
 				5,
 #else
-				25,
+ 25,
 #endif
-				TimerExecutionContext.TimerThread, false );
+ TimerExecutionContext.TimerThread, false );
 		}
 
 		public override void Stop()
@@ -301,7 +301,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 					p = WritePadData( p, sample, true );
 				}
-				return count;
+				return 0;
 			}
 			return 0;
 		}
