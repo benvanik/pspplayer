@@ -414,6 +414,11 @@ uint NativeExecute( bool* breakFlag )
 		MakeSafetyCallback( _currentTcsId, _currentTcs );
 		return 0;
 	}
+	else if( _cpuCtx->PC == INTERRUPT_RETURN_DUMMY )
+	{
+		PopState();
+		return 0;
+	}
 
 	uint instructionCount = 0;
 

@@ -29,23 +29,24 @@ using namespace Noxa::Emulation::Psp::Cpu::Native;
 
 extern R4000Ctx* _cpuCtx;
 
-extern int _pendingIntNo;
+extern uint _interruptMask;
+extern bool _inIntHandler;
+extern uint _pendingInterrupts;
 
 int niGetInterruptState()
 {
-	return _cpuCtx->InterruptMask;
+	return _interruptMask;
 }
 
 int niSetInterruptState( int newState )
 {
-	int old = _cpuCtx->InterruptMask;
-	_cpuCtx->InterruptMask = newState;
+	int old = _interruptMask;
+	_interruptMask = newState;
 
-	// Handle any pending interrupts?
-	if( newState != 0 )
+	if( ( newState & _pendingInterrupts ) != 0 )
 	{
-		if( _pendingIntNo >= 0 )
-			_cpuCtx->StopFlag = CtxInterruptPending;
+		// Handle pending interrupts
+		_cpuCtx->StopFlag = CtxInterruptPending;
 	}
 
 	return old;
@@ -53,11 +54,9 @@ int niSetInterruptState( int newState )
 
 void niSetPendingInterrupt( int intNumber )
 {
-	assert( _pendingIntNo == -1 );	// only support one at a time right now
-	_pendingIntNo = intNumber;
-
-	// Put stop request in
-	_cpuCtx->StopFlag = CtxInterruptPending;
+	_pendingInterrupts |= ( 1 << intNumber );
+	if( _inIntHandler == false )
+		_cpuCtx->StopFlag = CtxInterruptPending;
 }
 
 void niResume()

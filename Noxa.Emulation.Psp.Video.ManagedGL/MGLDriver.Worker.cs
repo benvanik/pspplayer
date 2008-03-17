@@ -26,13 +26,17 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 		{
 			// We need to ensure that vsync is always 'running'
 			// For now, we just fake this timer stuff so that the vcount goes up every 16ms
-			_vsyncTimer = _timerQueue.CreatePeriodicTimer( new TimerCallback( VsyncTimer ), 16, TimerExecutionContext.TimerThread, false );
+			// HACK: longer duration so the cpu isn't pegged firing interrupts
+			_vsyncTimer = _timerQueue.CreatePeriodicTimer( new TimerCallback( VsyncTimer ), 32, TimerExecutionContext.TimerThread, false );
 		}
 
 		private void VsyncTimer( Timer timer )
 		{
 			_vcount++;
 			_vsyncWaiting = true;
+
+			// HACK: this should happen in NextFrame()
+			this.Emu.Cpu.SetPendingInterrupt( 30 );
 		}
 
 		#region Frame Advancement
@@ -59,6 +63,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			//_vcount++;
 			_vsyncWaiting = false;
 			_hasFinished = true;
+			// TODO: do interrupt here?
 
 			if( _needResize == true )
 			{

@@ -33,9 +33,10 @@ using namespace Noxa::Emulation::Psp;
 #define SSE_ALIGN __declspec( align( 16 ) )
 
 // This address is used as $ra to detect the end of a marshalled call/interrupt
-#define CUSTOM_METHOD_TRAP	0xCAFE0000
-#define CALL_RETURN_DUMMY	CUSTOM_METHOD_TRAP + 1
-#define BIOS_SAFETY_DUMMY	CUSTOM_METHOD_TRAP + 2
+#define CUSTOM_METHOD_TRAP		0xCAFE0000
+#define CALL_RETURN_DUMMY		CUSTOM_METHOD_TRAP + 1
+#define BIOS_SAFETY_DUMMY		CUSTOM_METHOD_TRAP + 2
+#define INTERRUPT_RETURN_DUMMY	CUSTOM_METHOD_TRAP + 3
 
 // Callstack sentinel values
 #define CALLSTACK_SENTINEL	0xBABE0000
@@ -77,7 +78,7 @@ namespace Noxa {
 					int				NullifyDelay;			// +136
 					int				PCValid;				// +140
 					uint			PC;						// +144
-					int				InterruptMask;			// +148
+					int				InterruptMask;			// +148 ---- UNUSED
 					int				LL;						// +152
 					int				Cp1ConditionBit;		// +156
 					SSE_ALIGN
