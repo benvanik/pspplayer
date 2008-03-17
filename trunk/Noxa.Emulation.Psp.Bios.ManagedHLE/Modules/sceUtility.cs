@@ -17,25 +17,25 @@ using Noxa.Emulation.Psp.Cpu;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
+	public enum Language
+	{
+		Japanese = 0,
+		English = 1,
+		French = 2,
+		Spanish = 3,
+		German = 4,
+		Italian = 5,
+		Dutch = 6,
+		Portuguese = 7,
+		Russian = 8,
+		Korean = 9,
+		ChineseTraditional = 10,
+		ChineseSimplified = 11,
+	}
+
 	unsafe class sceUtility : Module
 	{
 		#region Common
-
-		private enum Language
-		{
-			Japanese = 0,
-			English = 1,
-			French = 2,
-			Spanish = 3,
-			German = 4,
-			Italian = 5,
-			Dutch = 6,
-			Portuguese = 7,
-			Russian = 8,
-			Korean = 9,
-			ChineseTraditional = 10,
-			ChineseSimplified = 11,
-		}
 
 		private enum UtilityStatus
 		{
@@ -745,11 +745,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			NetSsl,
 		}
 
-		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0x2A2B3DE0, "sceUtilityLoadModule" )]
 		public int sceUtilityLoadModule( int moduleType )
 		{
+			Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceUtilityLoadModule: would load module {0:X8}", moduleType );
 			return 0x00112233;
 		}
 
