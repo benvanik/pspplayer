@@ -43,11 +43,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					// Wait on it
 					System.Threading.Thread.Sleep( 1 );
 					this.HandleCompletedTimers();
+					if( this.CheckAnyCallback() == true )
+						return true;
 				}
 				else
 				{
-					Log.WriteLine( Verbosity.Critical, Feature.Bios, "Kernel::Schedule: ran out of threads to run - we're dead!" );
-					return false;
+					Log.WriteLine( Verbosity.Critical, Feature.Bios, "Kernel::Schedule: ran out of threads to run - maybe dead!" );
+					System.Threading.Thread.Sleep( 10 );
+					this.HandleCompletedTimers();
+					if( this.CheckAnyCallback() == true )
+						return true;
 				}
 			}
 
@@ -113,6 +118,21 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			return this.CheckCallbacks( thread );
 		}
 
+		public bool CheckAnyCallback()
+		{
+			foreach( KThread thread in this.Threads )
+			{
+				if( ( thread.State == KThreadState.Waiting ) &&
+					( thread.CanHandleCallbacks == true ) &&
+					( thread.NotifiedCallbacks.Count > 0 ) )
+				{
+					if( this.CheckCallbacks( thread ) == true )
+						return true;
+				}
+			}
+			return false;
+		}
+
 		public bool CheckCallbacks( KThread thread )
 		{
 			Debug.Assert( thread != null );
@@ -131,10 +151,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			}
 
 			_oldThreadState = thread.State;
-
-			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Kernel::CheckCallbacks: issuing callback {0} on thread {1} (thread was {2})", _runningCallback.UID.ToString( "X" ), this.ActiveThread.UID.ToString( "X" ), _oldThread.UID.ToString( "X" ) );
+			thread.State = KThreadState.Ready;
 
 			KCallback callback = thread.NotifiedCallbacks.Dequeue();
+
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "Kernel::CheckCallbacks: issuing callback {0} on thread {1} (thread was {2})", callback.UID.ToString( "X" ), this.ActiveThread.UID.ToString( "X" ), _oldThread.UID.ToString( "X" ) );
 
 			_runningCallback = callback;
 
@@ -163,6 +184,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			_runningCallback = null;
 
+			this.ActiveThread.State = _oldThreadState;
 			Debug.Assert( this.ActiveThread.State == _oldThreadState );
 
 			// See if there are more
@@ -174,6 +196,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				this.ActiveThread = _oldThread;
 				_oldThread = null;
 			}
+
+			this.Schedule();
 
 			return true;
 		}

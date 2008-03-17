@@ -144,6 +144,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					Debug.Assert( outlen == 4 );
 					*( uint* )outp = 1;
 					break;
+				case 0x02015804:		// Some MS thing
+					//Debug.Assert( inlen == 4 );
+					//{
+					//    uint data = *( uint* )inp;
+					//}
+					//break;
 				case 0x02415821:		// Register insert/eject callback
 					Debug.Assert( inlen == 4 );
 					{
@@ -153,7 +159,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 						if( _msInsertEjectCallback != null )
 						{
 							Log.WriteLine( Verbosity.Normal, Feature.Bios, "Registered MemoryStick insert/eject callback: {0} ({1:X8})", _msInsertEjectCallback.Name, _msInsertEjectCallback.UID );
-							//_kernel.AddOneShotTimer( new TimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 100 );
+							_kernel.AddOneShotTimer( new KernelTimerCallback( this.MemoryStickInserted ), _msInsertEjectCallback, 100 );
 						}
 						else
 							Log.WriteLine( Verbosity.Critical, Feature.Bios, "sceIoDevctl: could not find callback {0} for MemoryStick insert/eject", cbid );
@@ -181,16 +187,16 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					break;
 
 				default:
-					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDevctl: unknown command 0x" + cmd.ToString( "X8" ) );
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDevctl: unknown command 0x" + cmd.ToString( "X8" ) + " on device " + name );
 					return 0;
 			}
 
 			return 0;
 		}
 
-		private void MemoryStickInserted( Timer timer )
+		private void MemoryStickInserted( Timer timer, object state )
 		{
-			KCallback cb = ( KCallback )timer.State;
+			KCallback cb = ( KCallback )state;
 			// 1 = inserted, 2 = ejected
 			_kernel.NotifyCallback( cb, ( uint )1 );
 		}

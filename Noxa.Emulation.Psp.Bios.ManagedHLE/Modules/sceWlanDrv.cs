@@ -25,7 +25,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			get
 			{
-				return "sceWlanDrv";
+				return "sceWlanDrv_lib";
 			}
 		}
 
