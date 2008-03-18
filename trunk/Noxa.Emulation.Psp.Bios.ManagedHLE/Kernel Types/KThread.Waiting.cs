@@ -136,13 +136,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
 			WaitTimeout = waitTimeUs * 10;	// us -> ticks
 
-			uint waitTimeMs = waitTimeUs / 1000;
-			//if( waitTimeMs > 1000 )
-			//    Debugger.Break();
-			if( waitTimeMs <= 0 )
-				waitTimeMs = 1;
-
 			// Install timer
+			uint waitTimeMs = Math.Max( 5, waitTimeUs / 1000 );
 			Kernel.AddOneShotTimer( this.DelayCallback, this, waitTimeMs );
 
 			if( canHandleCallbacks == true )
@@ -172,9 +167,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			{
 				NativeMethods.QueryPerformanceCounter( out WaitTimestamp );
 				WaitTimeout = timeoutUs * 10;	// us -> ticks
-
-				// Install timer
-				Kernel.AddOneShotTimer( this.JoinCallback, this, timeoutUs / 1000 );
 			}
 			else
 				WaitTimeout = 0;
@@ -186,6 +178,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				this.Kernel.CheckCallbacks();
 
 			this.Kernel.Schedule();
+
+			if( timeoutUs > 0 )
+			{
+				// Install timer
+				uint timeoutMs = Math.Max( 5, timeoutUs / 1000 );
+				Kernel.AddOneShotTimer( this.JoinCallback, this, timeoutMs );
+			}
 		}
 
 		public const uint SCE_KERNEL_ERROR_WAIT_TIMEOUT = 0x800201A8;
@@ -225,7 +224,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				WaitTimeout = Math.Max( 1, WaitTimeout );
 
 				// Install timer
-				Kernel.AddOneShotTimer( this.WaitCallback, this, timeoutUs / 1000 );
+				uint timeoutMs = Math.Max( 5, timeoutUs / 1000 );
+				Kernel.AddOneShotTimer( this.WaitCallback, this, timeoutMs );
 			}
 			else
 				WaitTimeout = 0;
