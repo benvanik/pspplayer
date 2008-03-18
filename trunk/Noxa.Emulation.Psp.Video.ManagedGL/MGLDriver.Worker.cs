@@ -226,8 +226,14 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 							//Gl.glFlush();
 						}
 						list.State = DisplayListState.Done;
-						if( _callbacks.FinishFunction != 0 )
-							this.Emu.Cpu.MarshalCall( -1, _callbacks.FinishFunction, new uint[] { ( uint )list.ID, _callbacks.FinishArgument }, null, 0 );
+						if( list.CallbackID > 0 )
+						{
+							if( _callbacks.FinishFunction != 0 )
+							{
+								Log.WriteLine( Verbosity.Verbose, Feature.Video, "calling GE finish callback at 0x{0:X8} with arg 0x{1:X8}", _callbacks.FinishFunction, _callbacks.FinishArgument );
+								this.Emu.Cpu.MarshalCall( -1, _callbacks.FinishFunction, new uint[] { ( uint )list.ID, _callbacks.FinishArgument }, null, 0 );
+							}
+						}
 						continue;
 					case VideoCommand.END:
 						listDone = true;
