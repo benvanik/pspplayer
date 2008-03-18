@@ -136,9 +136,7 @@ namespace Noxa.Emulation.Psp.Audio
 			}
 
 			uint size = (uint)(this.Channels[channel].SampleCount * 2 * 2);
-			byte[] bytes = new byte[size];
-			Marshal.Copy(buffer, bytes, 0, (int)size);
-
+			
 			FMOD.CREATESOUNDEXINFO exinfo = new FMOD.CREATESOUNDEXINFO();
 			exinfo.cbsize = Marshal.SizeOf(exinfo);
 			exinfo.length = size;
@@ -147,30 +145,27 @@ namespace Noxa.Emulation.Psp.Audio
 			exinfo.format = FMOD.SOUND_FORMAT.PCM16;
 			exinfo.suggestedsoundtype = FMOD.SOUND_TYPE.RAW;
 
-			result = this.AudioSystem.createSound(bytes, FMOD.MODE.OPENMEMORY | FMOD.MODE.OPENRAW, ref exinfo, ref this.Channels[channel].Sound);
+			result = this.AudioSystem.createSound(buffer, FMOD.MODE.OPENMEMORY | FMOD.MODE.OPENRAW | FMOD.MODE.CREATESAMPLE | FMOD.MODE.SOFTWARE | FMOD.MODE._2D, ref exinfo, ref this.Channels[channel].Sound);
+			Debug.Assert(result == FMOD.RESULT.OK);
+			result = this.AudioSystem.playSound(FMOD.CHANNELINDEX.REUSE, this.Channels[channel].Sound, false, ref this.Channels[channel].Channel);
 			Debug.Assert(result == FMOD.RESULT.OK);
 
-			result = this.AudioSystem.playSound(FMOD.CHANNELINDEX.REUSE, this.Channels[channel].Sound, false, ref this.Channels[channel].Channel);
-			//Debug.Assert(result == FMOD.RESULT.OK);
-
-			/*
-			using (FileStream stream = File.OpenWrite(String.Format("sound_test_{0}.bin", counter++)))
-			using (BinaryWriter writer = new BinaryWriter(stream))
-			{
-				writer.Write(bytes);
-			}
-			 * */
+			//using (FileStream stream = File.OpenWrite(String.Format("sound_test_{0}.bin", counter++)))
+			//using (BinaryWriter writer = new BinaryWriter(stream))
+			//{
+			//    writer.Write(bytes);
+			//}
 		}
 
 		public void Output(int channel, IntPtr buffer, bool block, int leftVolume, int rightVolume)
 		{
-			using (FileStream stream = File.OpenWrite(String.Format("sound_test_{0}.bin", counter++)))
-			using (BinaryWriter writer = new BinaryWriter(stream))
-			{
-				byte[] bytes = new byte[512];
-				Marshal.Copy(buffer, bytes, 0, 512);
-				writer.Write(bytes);
-			}
+			//using (FileStream stream = File.OpenWrite(String.Format("sound_test_{0}.bin", counter++)))
+			//using (BinaryWriter writer = new BinaryWriter(stream))
+			//{
+			//    byte[] bytes = new byte[512];
+			//    Marshal.Copy(buffer, bytes, 0, 512);
+			//    writer.Write(bytes);
+			//}
 		}
 	}
 }
