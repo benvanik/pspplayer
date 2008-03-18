@@ -34,6 +34,7 @@
     <DocumentationFile>
     </DocumentationFile>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,6 +45,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Noxa.Utilities.XML</DocumentationFile>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -62,6 +64,7 @@
     <Compile Include="Range.cs" />
     <Compile Include="RangedLinkedList.cs" />
     <Compile Include="ReadOnlyDictionary.cs" />
+    <Compile Include="RingBuffer.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TimerQueue.cs" />
   </ItemGroup>

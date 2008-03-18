@@ -20,7 +20,7 @@ using Noxa.Emulation.Psp.Cpu;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 {
-	class sceMpeg : Module
+	unsafe class sceMpeg : Module
 	{
 		#region Properties
 
@@ -59,7 +59,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#region sceMpegRingbuffer
 
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 44)]
+		[StructLayout( LayoutKind.Sequential, Pack = 1, Size = 44 )]
 		public struct sceMpegRingbuffer
 		{
 			/// <summary>
@@ -67,21 +67,21 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			/// </summary>
 			public int iPackets;			// 00
 			/// <summary>
-			/// (0x04) Unknown, set to 0.
-			/// </summary>
-			public int iUnk0;
-			/// <summary>
-			/// (0x08) Number of packets that have been read?
+			/// (0x04) Number of packets that have been read?
 			/// </summary>
 			public int iReadPackets;
 			/// <summary>
-			/// (0x0C) Number of packets that have been written?
+			/// (0x08) Number of packets that have been written?
 			/// </summary>
 			public int iWritePackets;
 			/// <summary>
+			/// (0x0C) Unknown, set to 0.
+			/// </summary>
+			public int iUnk0;
+			/// <summary>
 			/// (0x10) Unknown, set to 2048.
 			/// </summary>
-			public int iUnk3;
+			public int iPacketSize;
 			/// <summary>
 			/// (0x14) Pointer to ringbuffer data.
 			/// </summary>
@@ -111,8 +111,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		#endregion
 
 		#region psmfHeader
-		
-		[StructLayout(LayoutKind.Sequential, Pack = 1, Size = 12)]
+
+		[StructLayout( LayoutKind.Sequential, Pack = 1, Size = 12 )]
 		public struct psmfHeader
 		{
 			public uint magic;
@@ -123,55 +123,49 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		#endregion
 
-		private uint Swap32(uint i)
+		private uint Swap32( uint i )
 		{
-			return ((i & 0xFF) << 24) | ((i & 0xFF00) << 8) | ((i & 0xFF0000) >> 8) | ((i >> 24) & 0xFF);
+			return ( ( i & 0xFF ) << 24 ) | ( ( i & 0xFF00 ) << 8 ) | ( ( i & 0xFF0000 ) >> 8 ) | ( ( i >> 24 ) & 0xFF );
 		}
 
 		[Stateless]
 		[BiosFunction( 0x21FF80E4, "sceMpegQueryStreamOffset" )]
-		public int sceMpegQueryStreamOffset(int mpeg, int buffer, int offset)
+		public int sceMpegQueryStreamOffset( int mpeg, int buffer, int offset )
 		{
-			Debug.Assert(offset != 0);
+			Debug.Assert( offset != 0 );
 
-			unsafe
+			psmfHeader* header = ( psmfHeader* )_memorySystem.Translate( ( uint )buffer );
+
+			if( header->magic != 0x464D5350 ) // PSMF
 			{
-				psmfHeader *header = (psmfHeader *)_memorySystem.Translate((uint)buffer);
-
-				if (header->magic != 0x464D5350) // PSMF
-				{
-					return unchecked((int)0x806101FE);
-				}
-				
-				*((uint*)(_memorySystem.Translate((uint)offset))) = Swap32(header->offset);
-
-				Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegQueryStreamOffset returns {0:X8}", Swap32(header->offset));
+				return unchecked( ( int )0x806101FE );
 			}
+
+			*( ( uint* )( _memorySystem.Translate( ( uint )offset ) ) ) = Swap32( header->offset );
+
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceMpegQueryStreamOffset returns {0:X8}", Swap32( header->offset ) );
 
 			return 0;
 		}
-		
+
 		[Stateless]
-		[BiosFunction(0x611E9E11, "sceMpegQueryStreamSize")]
-		public int sceMpegQueryStreamSize(int buffer, int size)
+		[BiosFunction( 0x611E9E11, "sceMpegQueryStreamSize" )]
+		public int sceMpegQueryStreamSize( int buffer, int size )
 		{
-			Debug.Assert(size != 0);
-			
-			unsafe
+			Debug.Assert( size != 0 );
+
+			psmfHeader* header = ( psmfHeader* )_memorySystem.Translate( ( uint )buffer );
+
+			if( ( Swap32( header->size ) & 0x07FF ) > 0 )
 			{
-				psmfHeader *header = (psmfHeader *)_memorySystem.Translate((uint)buffer);
-
-				if ((Swap32(header->size) & 0x07FF) > 0)
-				{
-					*((uint*)(_memorySystem.Translate((uint)size))) = 0;
-					return unchecked((int)0x806101FE);
-				}
-				
-				*((uint*)(_memorySystem.Translate((uint)size))) = Swap32(header->size);
-
-				Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegQueryStreamSize returns {0:X8}", Swap32(header->size));
+				*( ( uint* )( _memorySystem.Translate( ( uint )size ) ) ) = 0;
+				return unchecked( ( int )0x806101FE );
 			}
-			
+
+			*( ( uint* )( _memorySystem.Translate( ( uint )size ) ) ) = Swap32( header->size );
+
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceMpegQueryStreamSize returns {0:X8}", Swap32( header->size ) );
+
 			return 0;
 		}
 
@@ -191,17 +185,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[Stateless]
 		[BiosFunction( 0xC132E22F, "sceMpegQueryMemSize" )]
-		public int sceMpegQueryMemSize(int unk)
+		public int sceMpegQueryMemSize( int unk )
 		{
-			Debug.Assert(unk == 0);
+			Debug.Assert( unk == 0 );
 			return 1234;
 		}
 
 		[Stateless]
 		[BiosFunction( 0xD8C5F121, "sceMpegCreate" )]
-		public int sceMpegCreate(int mpeg, int data, int size, int ringbuffer, int framewidth, int unk1, int unk2)
+		public int sceMpegCreate( int mpeg, int data, int size, int ringbuffer, int framewidth, int unk1, int unk2 )
 		{
-			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegCreate({0:X8}, {1:X8}, {2}, {3:X8}, {4}, {5}, {6})", mpeg, data, size, ringbuffer, framewidth, unk1, unk2);
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceMpegCreate({0:X8}, {1:X8}, {2}, {3:X8}, {4}, {5}, {6})", mpeg, data, size, ringbuffer, framewidth, unk1, unk2 );
 			return 0;
 		}
 
@@ -210,46 +204,43 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 #endif
 		[Stateless]
 		[BiosFunction( 0x606A4649, "sceMpegDelete" )]
-		public int sceMpegDelete(int mpeg) { return DummyReturn; }
+		public int sceMpegDelete( int mpeg ) { return DummyReturn; }
 
 		[Stateless]
 		[BiosFunction( 0x42560F23, "sceMpegRegistStream" )]
-		public int sceMpegRegistStream(int mpeg, int streamid, int unk)
+		public int sceMpegRegistStream( int mpeg, int streamid, int unk )
 		{
-			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegRegistStream({0:X8}, {1}, {2})", mpeg, streamid, unk);
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceMpegRegistStream({0:X8}, {1}, {2})", mpeg, streamid, unk );
 			return 0x12345678;
 		}
 
 		[Stateless]
 		[BiosFunction( 0x591A4AA2, "sceMpegUnRegistStream" )]
-		public void sceMpegUnRegistStream(int mpeg, int stream) { }
+		public void sceMpegUnRegistStream( int mpeg, int stream ) { }
 
 		[Stateless]
 		[BiosFunction( 0xA780CF7E, "sceMpegMallocAvcEsBuf" )]
-		public int sceMpegMallocAvcEsBuf(int mpeg)
+		public int sceMpegMallocAvcEsBuf( int mpeg )
 		{
-			return unchecked((int)0xBEEFD00D);
+			return unchecked( ( int )0xBEEFD00D );
 		}
 
 		[Stateless]
 		[BiosFunction( 0xCEB870B1, "sceMpegFreeAvcEsBuf" )]
-		public int sceMpegFreeAvcEsBuf(int mpeg, int buffer)
+		public int sceMpegFreeAvcEsBuf( int mpeg, int buffer )
 		{
 			return 0;
 		}
 
 		[Stateless]
 		[BiosFunction( 0xF8DCB679, "sceMpegQueryAtracEsSize" )]
-		public int sceMpegQueryAtracEsSize(int mpeg, int essize, int outsize)
+		public int sceMpegQueryAtracEsSize( int mpeg, int essize, int outsize )
 		{
-			Debug.Assert(essize != 0);
-			Debug.Assert(outsize != 0);
+			Debug.Assert( essize != 0 );
+			Debug.Assert( outsize != 0 );
 
-			unsafe
-			{
-				*((uint*)(_memorySystem.Translate((uint)essize))) = 2112;
-				*((uint*)(_memorySystem.Translate((uint)outsize))) = 8192;
-			}
+			*( ( uint* )( _memorySystem.Translate( ( uint )essize ) ) ) = 2112;
+			*( ( uint* )( _memorySystem.Translate( ( uint )outsize ) ) ) = 8192;
 
 			return 0;
 		}
@@ -264,15 +255,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[Stateless]
 		[BiosFunction( 0x167AFD9E, "sceMpegInitAu" )]
-		public int sceMpegInitAu(int mpeg, int esbuffer, int au)
+		public int sceMpegInitAu( int mpeg, int esbuffer, int au )
 		{
-			unsafe
+			byte* p = _memorySystem.Translate( ( uint )au );
+			for( int i = 0; i < 24; i++ )
 			{
-				byte* p = _memorySystem.Translate((uint)au);
-				for (int i = 0; i < 24; i++)
-				{
-					*((byte*)(p + i)) = 0xCC;
-				}
+				*( ( byte* )( p + i ) ) = 0xCC;
 			}
 
 			return 0;
@@ -295,7 +283,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xFE246728, "sceMpegGetAvcAu" )]
-		public int sceMpegGetAvcAu(int mpeg, int stream, int au, int unk)
+		public int sceMpegGetAvcAu( int mpeg, int stream, int au, int unk )
 		{
 			return 0;
 		}
@@ -310,7 +298,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[NotImplemented]
 		[Stateless]
 		[BiosFunction( 0xE1CE83A7, "sceMpegGetAtracAu" )]
-		public int sceMpegGetAtracAu(int mpeg, int stream, int au, int unk)
+		public int sceMpegGetAtracAu( int mpeg, int stream, int au, int unk )
 		{
 			return 0;
 		}
@@ -331,14 +319,11 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[Stateless]
 		[BiosFunction( 0x0E3C2E9D, "sceMpegAvcDecode" )]
-		public int sceMpegAvcDecode(int mpeg, int au, int framewidth, int buffer, int num)
+		public int sceMpegAvcDecode( int mpeg, int au, int framewidth, int buffer, int num )
 		{
-			Debug.Assert(num != 0);
+			Debug.Assert( num != 0 );
 
-			unsafe
-			{
-				*((uint*)(_memorySystem.Translate((uint)num))) = 1;
-			}
+			*( ( uint* )( _memorySystem.Translate( ( uint )num ) ) ) = 1;
 
 			return 0;
 		}
@@ -352,9 +337,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[Stateless]
 		[BiosFunction( 0xA11C7026, "sceMpegAvcDecodeMode" )]
-		public int sceMpegAvcDecodeMode(int mpeg, int mode)
+		public int sceMpegAvcDecodeMode( int mpeg, int mode )
 		{
-			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceMpegAvcDecodeMode({0:X8}, {1:X8})", mpeg, mode);
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceMpegAvcDecodeMode({0:X8}, {1:X8})", mpeg, mode );
 			return 0;
 		}
 
@@ -367,67 +352,93 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[Stateless]
 		[BiosFunction( 0x800C44DF, "sceMpegAtracDecode" )]
-		public int sceMpegAtracDecode(int mpeg, int au, int buffer, int init)
+		public int sceMpegAtracDecode( int mpeg, int au, int buffer, int init )
 		{
 			return 0;
 		}
 
 		[Stateless]
 		[BiosFunction( 0xD7A29F46, "sceMpegRingbufferQueryMemSize" )]
-		public int sceMpegRingbufferQueryMemSize(int packets)
+		public int sceMpegRingbufferQueryMemSize( int packets )
 		{
-			return (packets * 104) + (packets * 2048);
+			return ( packets * 104 ) + ( packets * 2048 );
 		}
 
 		[Stateless]
 		[BiosFunction( 0x37295ED8, "sceMpegRingbufferConstruct" )]
-		public int sceMpegRingbufferConstruct(uint ringbuffer, int packets, int allocated, int size, int callback, int cbparam)
+		public int sceMpegRingbufferConstruct( uint ringbuffer, int packets, int allocated, int size, int callback, int cbparam )
 		{
-			unsafe
-			{
-				sceMpegRingbuffer *rb = (sceMpegRingbuffer *)_memorySystem.Translate(ringbuffer);
+			sceMpegRingbuffer* rb = ( sceMpegRingbuffer* )_memorySystem.Translate( ringbuffer );
 
-				rb->iPackets = packets;
-				rb->iUnk0 = 0;
-				rb->iReadPackets = packets;
-				rb->iWritePackets = packets;
-				rb->iUnk3 = 2048;
-				rb->pData = allocated;
-				rb->Callback = callback;
-				rb->pCBparam = cbparam;
-				rb->pDataUpperBound = allocated + (packets * 104) + (packets * 2048);
-				rb->iUnk5 = 0xBAADF00D;
-				rb->pSceMpeg = 0;
-			}
-			
+			rb->iPackets = packets;
+			rb->iReadPackets = 0;
+			rb->iWritePackets = 0;
+			rb->iUnk0 = packets; // using this as remaining for now
+			rb->iPacketSize = 2048;
+			rb->pData = allocated;
+			rb->Callback = callback;
+			rb->pCBparam = cbparam;
+			rb->pDataUpperBound = allocated + ( packets * 104 ) + ( packets * 2048 );
+			rb->iUnk5 = 0xBAADF00D;
+			rb->pSceMpeg = 0;
+
 			return 0;
 		}
 
 		[Stateless]
 		[BiosFunction( 0x13407F13, "sceMpegRingbufferDestruct" )]
-		public int sceMpegRingbufferDestruct(int ringbuffer)
+		public int sceMpegRingbufferDestruct( int ringbuffer )
 		{
 			return 0;
 		}
 
 		[Stateless]
 		[BiosFunction( 0xB240A59E, "sceMpegRingbufferPut" )]
-		public int sceMpegRingbufferPut(int ringbuffer, int packets, int available)
+		public int sceMpegRingbufferPut( int ringbuffer, int packets, int available )
 		{
+			sceMpegRingbuffer* rb = ( sceMpegRingbuffer* )_memorySystem.Translate( ( uint )ringbuffer );
 
+			int toWrite = Math.Min( rb->iUnk0, packets );
+			if( toWrite == 0 )
+			{
+				// Full
+				return 0;
+			}
 
-			return 3;
+			// Write position
+			byte* ptr = RingBuffer.BeginWrite( ( byte* )rb->pData, rb->iPackets, rb->iPacketSize, rb->iWritePackets );
+
+			// int callback( ringbuffer, packets, cbparam )
+			_kernel.Cpu.MarshalCall( _kernel.ActiveThread.ContextID, ( uint )rb->Callback, new uint[] { ( uint )ptr, ( uint )toWrite, ( uint )rb->pCBparam }, RingbufferPutComplete, ringbuffer );
+
+			return toWrite;
+		}
+
+		private bool RingbufferPutComplete( int tcsId, int state, int result )
+		{
+			sceMpegRingbuffer* rb = ( sceMpegRingbuffer* )_memorySystem.Translate( ( uint )state );
+
+			if( result >= 0 )
+			{
+				// Ok
+				RingBuffer.EndWrite( ( byte* )rb->pData, rb->iPackets, rb->iPacketSize, ref rb->iWritePackets, result );
+				rb->iUnk0 -= result;
+			}
+			else
+			{
+				// Failed
+			}
+			_kernel.Cpu.SetContextRegister( _kernel.ActiveThread.ContextID, 2, ( uint )result );
+
+			return true;
 		}
 
 		[Stateless]
 		[BiosFunction( 0xB5F6DC87, "sceMpegRingbufferAvailableSize" )]
-		public int sceMpegRingbufferAvailableSize(int ringbuffer)
+		public int sceMpegRingbufferAvailableSize( int ringbuffer )
 		{
-			unsafe
-			{
-				sceMpegRingbuffer* rb = (sceMpegRingbuffer*)_memorySystem.Translate((uint)ringbuffer);
-				return rb->iPackets;
-			}
+			sceMpegRingbuffer* rb = ( sceMpegRingbuffer* )_memorySystem.Translate( ( uint )ringbuffer );
+			return rb->iUnk0;
 		}
 
 #if !PRETENDVALID
@@ -481,20 +492,20 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x211A057C, "sceMpegAvcQueryYCbCrSize")]
+		[BiosFunction( 0x211A057C, "sceMpegAvcQueryYCbCrSize" )]
 		public int sceMpegAvcQueryYCbCrSize() { return 0; }
 
 		[NotImplemented]
 		[Stateless]
-		[BiosFunction(0x67179b1b, "sceMpegAvcInitYCbCr")]
+		[BiosFunction( 0x67179b1b, "sceMpegAvcInitYCbCr" )]
 		public int sceMpegAvcInitYCbCr() { return 0; }
 
 		[Stateless]
-		[BiosFunction(0xF0EB1125, "sceMpegAvcDecodeYCbCr")]
+		[BiosFunction( 0xF0EB1125, "sceMpegAvcDecodeYCbCr" )]
 		public int sceMpegAvcDecodeYCbCr() { return 0; }
 
 		[Stateless]
-		[BiosFunction(0x31BD0272, "sceMpegAvcCsc")]
+		[BiosFunction( 0x31BD0272, "sceMpegAvcCsc" )]
 		public int sceMpegAvcCsc() { return 0; }
 	}
 }
