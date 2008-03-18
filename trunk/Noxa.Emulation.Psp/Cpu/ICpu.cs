@@ -202,10 +202,10 @@ namespace Noxa.Emulation.Psp.Cpu
 		/// <summary>
 		/// Suspend the current thread and execute the given user code, resuming at the prior address.
 		/// </summary>
-		/// <param name="tcsId">The thread context storage ID to run the callback on.</param>
+		/// <param name="tcsId">The thread context storage ID to run the callback on (<c>-1</c> for the current thread).</param>
 		/// <param name="address">The user address of the code to execute.</param>
 		/// <param name="arguments">A list of arguments to pass to the user code (placed in $a0+).</param>
-		/// <param name="resultCallback">Caller-defined handler to execute once the callback has completed.</param>
+		/// <param name="resultCallback">Caller-defined handler to execute once the callback has completed or <c>null</c> for none.</param>
 		/// <param name="state">Caller-defined state to be passed to the handler.</param>
 		/// <remarks>
 		/// <paramref name="resultCallback"/> is called before execution resumes.

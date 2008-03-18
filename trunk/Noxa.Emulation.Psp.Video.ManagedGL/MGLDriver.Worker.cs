@@ -226,6 +226,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 							//Gl.glFlush();
 						}
 						list.State = DisplayListState.Done;
+						if( _callbacks.FinishFunction != 0 )
+							this.Emu.Cpu.MarshalCall( -1, _callbacks.FinishFunction, new uint[] { ( uint )list.ID, _callbacks.FinishArgument }, null, 0 );
 						continue;
 					case VideoCommand.END:
 						listDone = true;
@@ -260,6 +262,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 								case 0x01:
 								case 0x02:
 								case 0x03:
+									Log.WriteLine( Verbosity.Critical, Feature.Video, "would have issued a signal" );
 									break;
 								case 0x10: // JUMP
 									y |= x << 16;

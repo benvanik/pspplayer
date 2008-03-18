@@ -487,6 +487,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		[NotImplemented]
 #endif
 		[Stateless]
+		[BiosFunction( 0x4571CC64, "sceMpegAvcDecodeFlush" )]
+		public int sceMpegAvcDecodeFlush() { return DummyReturn; }
+
+
+#if !PRETENDVALID
+		[NotImplemented]
+#endif
+		[Stateless]
 		[BiosFunction( 0x988E9E12, "sceMpeg_988E9E12" )]
 		public int sceMpeg_988E9E12() { return DummyReturn; }
 

@@ -230,12 +230,16 @@ void R4000Cpu::SwitchContext( int newTcsId )
 
 void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, MarshalCompleteDelegate^ resultCallback, int state )
 {
-	if( tcsId < 0 )
+	if( tcsId < -1 )
 	{
 		// Happens
 		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "MarshalCall: attempted to marshal call on to thread with tcsId={0}", tcsId );
 		return;
 	}
+
+	// Current thread
+	if( tcsId == -1 )
+		tcsId = _currentTcsId;
 
 	LOCK;
 	ThreadContext* targetContext = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
@@ -243,6 +247,11 @@ void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, Mar
 
 	// Don't support more than one at a time right now
 	Debug::Assert( _switchRequest.MakeCall == false );
+	if( _switchRequest.MakeCall == true )
+	{
+		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "MarshalCall: attempted to marshal a call while one was already pending - THIS NEEDS TO BE FIXED" );
+		return;
+	}
 
 	// Marshal context setup
 	_switchRequest.Previous = _currentTcs;
