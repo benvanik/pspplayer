@@ -15,6 +15,7 @@ namespace Noxa.Emulation.Psp.Audio
 			public AudioFormat Format;
 			public int SampleCount;
 			public FMOD.Sound Sound;
+			public FMOD.Channel Channel;
 		};
 
 		private AudioChannel[] Channels = new AudioChannel[8];
@@ -90,6 +91,8 @@ namespace Noxa.Emulation.Psp.Audio
 			this.Channels[channel].Reserved = true;
 			this.Channels[channel].Format = format;
 			this.Channels[channel].SampleCount = sampleCount;
+			this.Channels[channel].Sound = null;
+			this.Channels[channel].Channel = null;
 			return channel;
 		}
 
@@ -119,6 +122,18 @@ namespace Noxa.Emulation.Psp.Audio
 			{
 				return;
 			}
+			
+			if (this.Channels[channel].Channel != null)
+			{
+				this.Channels[channel].Channel.stop();
+				this.Channels[channel].Channel = null;
+			}
+			
+			if (this.Channels[channel].Sound != null)
+			{
+				this.Channels[channel].Sound.release();
+				this.Channels[channel].Sound = null;
+			}
 
 			uint size = (uint)(this.Channels[channel].SampleCount * 2 * 2);
 			byte[] bytes = new byte[size];
@@ -130,19 +145,21 @@ namespace Noxa.Emulation.Psp.Audio
 			exinfo.numchannels = this.Channels[channel].Format == AudioFormat.Mono ? 1 : 2;
 			exinfo.defaultfrequency = 44100;
 			exinfo.format = FMOD.SOUND_FORMAT.PCM16;
-			//exinfo.suggestedsoundtype = FMOD.SOUND_TYPE.RAW;
+			exinfo.suggestedsoundtype = FMOD.SOUND_TYPE.RAW;
 
 			result = this.AudioSystem.createSound(bytes, FMOD.MODE.OPENMEMORY | FMOD.MODE.OPENRAW, ref exinfo, ref this.Channels[channel].Sound);
 			Debug.Assert(result == FMOD.RESULT.OK);
-			FMOD.Channel refchannel = null;
-			result = this.AudioSystem.playSound(FMOD.CHANNELINDEX.FREE, this.Channels[channel].Sound, false, ref refchannel);
-			Debug.Assert(result == FMOD.RESULT.OK);
 
+			result = this.AudioSystem.playSound(FMOD.CHANNELINDEX.REUSE, this.Channels[channel].Sound, false, ref this.Channels[channel].Channel);
+			//Debug.Assert(result == FMOD.RESULT.OK);
+
+			/*
 			using (FileStream stream = File.OpenWrite(String.Format("sound_test_{0}.bin", counter++)))
 			using (BinaryWriter writer = new BinaryWriter(stream))
 			{
 				writer.Write(bytes);
 			}
+			 * */
 		}
 
 		public void Output(int channel, IntPtr buffer, bool block, int leftVolume, int rightVolume)
