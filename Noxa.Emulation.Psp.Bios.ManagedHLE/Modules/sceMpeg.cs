@@ -99,9 +99,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			/// </summary>
 			public int pDataUpperBound;
 			/// <summary>
-			/// (0x24) Unknown, set to 0xBAADF00D.
+			/// (0x24) Semaphore.
 			/// </summary>
-			public uint iUnk5;
+			public uint iSemaphoreID;
 			/// <summary>
 			/// (0x28) Pointer to associated SceMpeg?
 			/// </summary>
@@ -379,7 +379,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			rb->Callback = callback;
 			rb->pCBparam = cbparam;
 			rb->pDataUpperBound = allocated + ( packets * 104 ) + ( packets * 2048 );
-			rb->iUnk5 = 0xBAADF00D;
+			rb->iSemaphoreID = 123456;
 			rb->pSceMpeg = 0;
 
 			return 0;
