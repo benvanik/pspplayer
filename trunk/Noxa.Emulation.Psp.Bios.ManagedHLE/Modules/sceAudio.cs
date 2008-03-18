@@ -142,7 +142,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 			if( _driver == null )
 				return 0;
-
+			if (buf == 0)
+				return 0;
 			IntPtr buffer;
 			unsafe
 			{

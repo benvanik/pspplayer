@@ -409,6 +409,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			return Module.NotImplementedReturn;
 		}
+
+		[NotImplemented]
+		[Stateless]
+		[BiosFunction(0x07F58C24, "sceSasCore_07F58C24")]
+		public int sceSasCore_07F58C24()
+		{
+			return Module.NotImplementedReturn;
+		}
 	}
 }
 
