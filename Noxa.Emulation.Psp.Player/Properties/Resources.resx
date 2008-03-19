@@ -226,4 +226,79 @@
   <data name="Flag5" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\flag5.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="BreakpointIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\BreakpointIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BreakpointOffIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\BreakpointOffIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="BreakpointsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\BreakpointsIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CallstackIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CallstackIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DeleteAllBreakpointsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DeleteAllBreakpointsIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DeleteBreakpointIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DeleteBreakpointIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="DisassemblyIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DisassemblyIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="FindBreakpointIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\FindBreakpointIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="HighlightIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\HighlightIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MemoryIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MemoryIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NewBreakpointIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\NewBreakpointIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\OsIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RegistersIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RegistersIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RenameIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RenameIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="StatementDeadIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\StatementDeadIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="StatementIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\StatementIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="StatisticsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\StatisticsIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="StepIntoIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\StepIntoIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="StepOutIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\StepOutIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="StepOverIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\StepOverIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ThreadsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ThreadsIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ToggleAllBreakpointsIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ToggleAllBreakpointsIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ToggleBreakpointIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ToggleBreakpointIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="WatchesIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WatchesIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PlayIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PlayIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

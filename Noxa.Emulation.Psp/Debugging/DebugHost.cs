@@ -10,9 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
 
 using Noxa.Emulation.Psp.Debugging.DebugData;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
@@ -25,21 +22,8 @@ namespace Noxa.Emulation.Psp.Debugging
 	/// <summary>
 	/// The local debugging host.
 	/// </summary>
-	public class DebugHost : MarshalByRefObject
+	public class DebugHost
 	{
-		#region Constants
-
-		/// <summary>
-		/// The port the <see cref="DebugHost"/> listens on.
-		/// </summary>
-		public const int ServerPort = 30001;
-		/// <summary>
-		/// The port the <see cref="IDebugger"/> listens on.
-		/// </summary>
-		public const int ClientPort = 30002;
-
-		#endregion
-
 		private bool _isAttached;
 		private IDebugger _client;
 		private IHook[] _hooks;
@@ -113,9 +97,6 @@ namespace Noxa.Emulation.Psp.Debugging
 			_attachedEvent = new ManualResetEvent( false );
 
 			this.HostString = string.Format( "{0}@{1}", Environment.UserName, Environment.MachineName );
-
-			bool setupOk = this.SetupRemoting();
-			Debug.Assert( setupOk == true );
 		}
 
 		/// <summary>
@@ -198,7 +179,7 @@ namespace Noxa.Emulation.Psp.Debugging
 		/// </summary>
 		public void OnInstanceStarted()
 		{
-			Emulator.AttachDebugger();
+			this.Emulator.AttachDebugger();
 
 			IEmulationInstance emu = this.Emulator.CurrentInstance;
 			List<IHook> hooks = new List<IHook>();
@@ -246,44 +227,6 @@ namespace Noxa.Emulation.Psp.Debugging
 				return;
 
 			_client.OnStopped();
-		}
-
-		#endregion
-
-		#region Remoting services
-
-		private bool SetupRemoting()
-		{
-			BinaryServerFormatterSinkProvider serverProvider = new BinaryServerFormatterSinkProvider();
-			serverProvider.TypeFilterLevel = System.Runtime.Serialization.Formatters.TypeFilterLevel.Full;
-			BinaryClientFormatterSinkProvider clientProvider = new BinaryClientFormatterSinkProvider();
-
-			Hashtable serverProps = new Hashtable();
-			serverProps[ "port" ] = ServerPort;
-			serverProps[ "timeout" ] = Timeout.Infinite;
-
-			try
-			{
-				TcpChannel channel = new TcpChannel( serverProps, clientProvider, serverProvider );
-				ChannelServices.RegisterChannel( channel, false );
-
-				RemotingServices.Marshal( this, "DebugHost" );
-			}
-			catch
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-		/// <summary>
-		/// Remoting support: prevents the GC from getting this object.
-		/// </summary>
-		/// <returns><c>null</c>.</returns>
-		public override object InitializeLifetimeService()
-		{
-			return null;
 		}
 
 		#endregion

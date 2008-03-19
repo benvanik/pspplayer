@@ -1002,7 +1002,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			// Our loader thread ended - kill it!
 			Kernel kernel = _bios._kernel;
 			KThread thread = kernel.GetHandle<KThread>( ( uint )state );
-			Debug.Assert( thread != null );
 			if( thread != null )
 			{
 				Log.WriteLine( Verbosity.Verbose, Feature.Loader, "killing kmodule loading thread with UID {0}", thread.UID );
@@ -1010,10 +1009,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				thread.Exit( 0 );
 				kernel.RemoveHandle( thread.UID );
 
-				kernel.Schedule();
-
 				thread.Delete();
 			}
+
+			kernel.Schedule();
 		}
 	}
 }
