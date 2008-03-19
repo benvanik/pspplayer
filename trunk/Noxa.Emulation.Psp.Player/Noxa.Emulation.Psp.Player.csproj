@@ -44,6 +44,18 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Puzzle.CoreLib.NET2, Version=1.0.6.14896, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Puzzle.CoreLib.NET2.dll</HintPath>
+    </Reference>
+    <Reference Include="Puzzle.SyntaxBox.NET2, Version=1.4.10.14897, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Puzzle.SyntaxBox.NET2.dll</HintPath>
+    </Reference>
+    <Reference Include="Puzzle.SyntaxDocument.NET2, Version=1.4.10.14896, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\Puzzle.SyntaxDocument.NET2.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -53,6 +65,10 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.2.2864.18696, Culture=neutral, PublicKeyToken=d481317c817cec47, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttachDebuggerDialog.cs">
@@ -66,6 +82,92 @@
     </Compile>
     <Compile Include="Configuration\ConfigurationHost.Designer.cs">
       <DependentUpon>ConfigurationHost.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\DebuggerState.cs" />
+    <Compile Include="Debugger\DebuggerTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\DebuggerTool.Designer.cs">
+      <DependentUpon>DebuggerTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\DebuggerWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\DebuggerWindow.Designer.cs">
+      <DependentUpon>DebuggerWindow.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\InprocDebugger.cs" />
+    <Compile Include="Debugger\Tools\BreakpointsTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\BreakpointsTool.Designer.cs">
+      <DependentUpon>BreakpointsTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\CallstackTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\CallstackTool.Designer.cs">
+      <DependentUpon>CallstackTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\CodeTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\CodeTool.Designer.cs">
+      <DependentUpon>CodeTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\HandlesTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\HandlesTool.Designer.cs">
+      <DependentUpon>HandlesTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\MemoryTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\MemoryTool.Designer.cs">
+      <DependentUpon>MemoryTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\ModulesTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\ModulesTool.Designer.cs">
+      <DependentUpon>ModulesTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\RegistersTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\RegistersTool.Designer.cs">
+      <DependentUpon>RegistersTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\StatisticsTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\StatisticsTool.Designer.cs">
+      <DependentUpon>StatisticsTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\StringsTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\StringsTool.Designer.cs">
+      <DependentUpon>StringsTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\SyscallsTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\SyscallsTool.Designer.cs">
+      <DependentUpon>SyscallsTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\ThreadsTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\ThreadsTool.Designer.cs">
+      <DependentUpon>ThreadsTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\WatchTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\WatchTool.Designer.cs">
+      <DependentUpon>WatchTool.cs</DependentUpon>
     </Compile>
     <Compile Include="GameCache.cs" />
     <Compile Include="GamePicker\AdvancedGameListing.cs">
@@ -107,8 +209,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="AttachDebuggerDialog.resx">
-      <SubType>Designer</SubType>
       <DependentUpon>AttachDebuggerDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Configuration\ConfigurationHost.resx">
       <SubType>Designer</SubType>
@@ -117,6 +219,10 @@
     <EmbeddedResource Include="Configuration\Options.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Debugger\DebuggerWindow.resx">
+      <DependentUpon>DebuggerWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="GamePicker\AdvancedGameListing.resx">
       <SubType>Designer</SubType>
@@ -239,9 +345,17 @@
     <None Include="Resources\InvalidIcon.png" />
     <Content Include="Resources\AddIcon.png" />
     <Content Include="Resources\AeroWait.gif" />
+    <None Include="Resources\BreakpointIcon.png" />
+    <None Include="Resources\BreakpointOffIcon.png" />
+    <None Include="Resources\BreakpointsIcon.png" />
+    <None Include="Resources\CallstackIcon.png" />
     <Content Include="Resources\ClearIcon.png" />
     <None Include="Resources\ErrorIcon.png" />
     <None Include="Resources\CopyIcon.png" />
+    <None Include="Resources\DeleteAllBreakpointsIcon.png" />
+    <None Include="Resources\DeleteBreakpointIcon.png" />
+    <None Include="Resources\DisassemblyIcon.png" />
+    <None Include="Resources\FindBreakpointIcon.png" />
     <Content Include="Resources\Flag0.png" />
     <Content Include="Resources\Flag1.png" />
     <Content Include="Resources\Flag2.png" />
@@ -249,10 +363,17 @@
     <Content Include="Resources\Flag4.png" />
     <Content Include="Resources\Flag5.png" />
     <Content Include="Resources\Google.png" />
+    <None Include="Resources\HighlightIcon.png" />
     <Content Include="Resources\IconBackground.png" />
     <None Include="Resources\InfoIcon.png" />
+    <None Include="Resources\MemoryIcon.png" />
     <Content Include="Resources\MemoryStickIcon.png" />
+    <None Include="Resources\NewBreakpointIcon.png" />
+    <None Include="Resources\OsIcon.png" />
     <None Include="Resources\OutputIcon.png" />
+    <None Include="Resources\RegistersIcon.png" />
+    <None Include="Resources\RenameIcon.png" />
+    <None Include="Resources\PlayIcon.png" />
     <Content Include="Resources\SearchIcon.png" />
     <Content Include="Resources\ReportIcon.png" />
     <Content Include="Resources\psp.ico" />
@@ -269,8 +390,18 @@
     <Content Include="Resources\PauseIcon.png" />
     <Content Include="Resources\RestartIcon.png" />
     <None Include="Resources\StatementCallIcon.png" />
+    <None Include="Resources\StatementDeadIcon.png" />
+    <None Include="Resources\StatementIcon.png" />
+    <None Include="Resources\StatisticsIcon.png" />
+    <None Include="Resources\StepIntoIcon.png" />
+    <None Include="Resources\StepOutIcon.png" />
+    <None Include="Resources\StepOverIcon.png" />
     <Content Include="Resources\StopIcon.png" />
+    <None Include="Resources\ThreadsIcon.png" />
+    <None Include="Resources\ToggleAllBreakpointsIcon.png" />
+    <None Include="Resources\ToggleBreakpointIcon.png" />
     <Content Include="Resources\UmdIcon.png" />
+    <None Include="Resources\WatchesIcon.png" />
     <None Include="Web References\CompatibilityService\AddResult1.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
