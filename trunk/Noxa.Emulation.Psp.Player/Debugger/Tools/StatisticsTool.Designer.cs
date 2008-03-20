@@ -28,7 +28,18 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
+			this.SuspendLayout();
+			// 
+			// StatisticsTool
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
+			this.ClientSize = new System.Drawing.Size( 746, 626 );
+			this.CloseButton = false;
+			this.Name = "StatisticsTool";
+			this.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.Document;
+			this.TabText = "Statistics";
+			this.ResumeLayout( false );
+
 		}
 
 		#endregion

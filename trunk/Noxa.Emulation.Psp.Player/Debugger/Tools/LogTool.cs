@@ -20,13 +20,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 	{
 		public LogTool()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		public LogTool( InprocDebugger debugger )
 			: base( debugger )
 		{
-			InitializeComponent();
+			this.InitializeComponent();
+
+			Bitmap image = Properties.Resources.OutputIcon as Bitmap;
+			this.Icon = Icon.FromHandle( image.GetHicon() );
 		}
 
 		public void WriteLine( Verbosity verbosity, Feature feature, string value )

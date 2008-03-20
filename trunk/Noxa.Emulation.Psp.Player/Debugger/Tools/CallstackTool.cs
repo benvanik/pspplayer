@@ -19,21 +19,72 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 	{
 		public CallstackTool()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		public CallstackTool( InprocDebugger debugger )
 			: base( debugger )
 		{
 			this.InitializeComponent();
+
+			Bitmap image = Properties.Resources.CallstackIcon as Bitmap;
+			this.Icon = Icon.FromHandle( image.GetHicon() );
+		}
+
+		public void Clear()
+		{
+			this.callView.BeginUpdate();
+			this.callView.Items.Clear();
+			this.callView.EndUpdate();
+			this.callView.Enabled = false;
 		}
 
 		public void RefreshCallstack()
 		{
-			Frame[] frames = this.Debugger.DebugHost.CpuHook.GetCallstack();
-			System.Diagnostics.Debug.WriteLine( "CALLSTACK:" );
-			foreach( Frame frame in frames )
-				System.Diagnostics.Debug.WriteLine( string.Format( "   0x{0:X8} {1}", frame.Address, frame.Type ) );
+			Frame[] callStack = this.Debugger.DebugHost.CpuHook.GetCallstack();
+			if( ( callStack == null ) || ( callStack.Length == 0 ) )
+			{
+				this.Clear();
+				return;
+			}
+			
+			this.callView.BeginUpdate();
+			this.callView.Items.Clear();
+			foreach( Frame frame in callStack )
+			{
+				string pretty;
+				bool grey = false;
+				switch( frame.Type )
+				{
+					case FrameType.BiosBarrier:
+						pretty = "[BIOS Barrier]";
+						grey = true;
+						break;
+					case FrameType.CallMarshal:
+						pretty = "[Call Marshal]";
+						grey = true;
+						break;
+					case FrameType.Interrupt:
+						pretty = "[Interrupt]";
+						grey = true;
+						break;
+					default:
+					case FrameType.UserCode:
+						// Try to resolve the name
+						pretty = "(unknown)";
+						break;
+				}
+				ListViewItem item = new ListViewItem( new string[]{
+					"", pretty,
+					grey ? "" : string.Format( "0x{0:X8}", frame.Address ) } );
+				item.Tag = frame;
+				item.UseItemStyleForSubItems = true;
+				if( grey == true )
+					item.ForeColor = SystemColors.InactiveCaptionText;
+				this.callView.Items.Add( item );
+			}
+			this.callView.EndUpdate();
+			this.callView.Enabled = true;
 		}
 	}
 }

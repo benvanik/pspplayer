@@ -60,6 +60,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.Tools.Add( this.CodeTool );
 			this.LogTool = new LogTool( this );
 			this.Tools.Add( this.LogTool );
+			this.RegistersTool = new RegistersTool( this );
+			this.Tools.Add( this.RegistersTool );
+			this.StatisticsTool = new StatisticsTool( this );
+			this.Tools.Add( this.StatisticsTool );
 			// ...
 
 			this.Window.Show();

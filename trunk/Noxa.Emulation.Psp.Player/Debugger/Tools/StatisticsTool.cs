@@ -18,7 +18,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 	{
 		public StatisticsTool()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
+		}
+
+		public StatisticsTool( InprocDebugger debugger )
+			: base( debugger )
+		{
+			this.InitializeComponent();
+
+			Bitmap image = Properties.Resources.StatisticsIcon as Bitmap;
+			this.Icon = Icon.FromHandle( image.GetHicon() );
 		}
 	}
 }

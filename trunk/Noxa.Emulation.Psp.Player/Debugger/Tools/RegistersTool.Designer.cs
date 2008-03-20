@@ -28,7 +28,22 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
+			this.SuspendLayout();
+			// 
+			// RegistersTool
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
+			this.ClientSize = new System.Drawing.Size( 218, 592 );
+			this.CloseButton = false;
+			this.DockAreas = ( ( WeifenLuo.WinFormsUI.Docking.DockAreas )( ( ( ( ( WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.DockLeft )
+						| WeifenLuo.WinFormsUI.Docking.DockAreas.DockRight )
+						| WeifenLuo.WinFormsUI.Docking.DockAreas.DockTop )
+						| WeifenLuo.WinFormsUI.Docking.DockAreas.DockBottom ) ) );
+			this.Name = "RegistersTool";
+			this.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.DockLeft;
+			this.TabText = "Registers";
+			this.ResumeLayout( false );
+
 		}
 
 		#endregion
