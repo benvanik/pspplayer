@@ -11,31 +11,30 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking;
 
 namespace Noxa.Emulation.Psp.Player.Debugger
 {
 	partial class DebuggerWindow : Form
 	{
+		public readonly InprocDebugger Debugger;
+
 		public DebuggerWindow()
 		{
 			InitializeComponent();
 		}
 
-		private void ExitToolsStripMenuItem_Click( object sender, EventArgs e )
+		public DebuggerWindow( InprocDebugger debugger )
+			: this()
+		{
+			this.Debugger = debugger;
+		}
+
+		public DockPanel DockPanel { get { return this.dockPanel; } }
+
+		private void exitToolsStripMenuItem_Click( object sender, EventArgs e )
 		{
 			this.Close();
-		}
-
-		private void CutToolStripMenuItem_Click( object sender, EventArgs e )
-		{
-		}
-
-		private void CopyToolStripMenuItem_Click( object sender, EventArgs e )
-		{
-		}
-
-		private void PasteToolStripMenuItem_Click( object sender, EventArgs e )
-		{
 		}
 	}
 }

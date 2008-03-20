@@ -8,25 +8,30 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Noxa.Emulation.Psp.Debugging;
 
-namespace Noxa.Emulation.Psp.Player.Debugger
+namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 {
-	abstract partial class DebuggerTool : WeifenLuo.WinFormsUI.Docking.DockContent
+	partial class LogTool : Noxa.Emulation.Psp.Player.Debugger.DebuggerTool, ILogger
 	{
-		public readonly InprocDebugger Debugger;
-
-		public DebuggerTool()
+		public LogTool()
 		{
 			InitializeComponent();
 		}
 
-		public DebuggerTool( InprocDebugger debugger )
-			: this()
+		public LogTool( InprocDebugger debugger )
+			: base( debugger )
 		{
-			this.Debugger = debugger;
+			InitializeComponent();
+		}
+
+		public void WriteLine( Verbosity verbosity, Feature feature, string value )
+		{
+			Debug.WriteLine( string.Format( "{0}: {1}", feature, value ) );
 		}
 	}
 }
