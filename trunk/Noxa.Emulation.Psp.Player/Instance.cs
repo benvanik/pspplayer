@@ -24,6 +24,8 @@ using Noxa.Emulation.Psp.Media;
 
 namespace Noxa.Emulation.Psp.Player
 {
+	delegate void DummyDelegate();
+
 	class Instance : IEmulationInstance
 	{
 		protected Host _host;
@@ -418,8 +420,6 @@ namespace Noxa.Emulation.Psp.Player
 			_bios.SpeedLocked = false;
 			_video.SpeedLocked = false;
 		}
-
-		public delegate void DummyDelegate();
 
 		public void SwitchToXmb()
 		{

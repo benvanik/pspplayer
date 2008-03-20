@@ -97,6 +97,14 @@
       <DependentUpon>DebuggerWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Debugger\InprocDebugger.cs" />
+    <Compile Include="Debugger\InprocDebugger.Handlers.cs" />
+    <Compile Include="Debugger\Model\BreakpointEventArgs.cs" />
+    <Compile Include="Debugger\Model\BreakpointManager.cs" />
+    <Compile Include="Debugger\Model\InstructionFormatter.cs" />
+    <Compile Include="Debugger\Model\InstructionTables.cs" />
+    <Compile Include="Debugger\Model\MethodBody.cs" />
+    <Compile Include="Debugger\Model\RegisterBanks.cs" />
+    <Compile Include="Debugger\Model\TableEntry.cs" />
     <Compile Include="Debugger\Tools\BreakpointsTool.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -114,6 +122,12 @@
     </Compile>
     <Compile Include="Debugger\Tools\CodeTool.Designer.cs">
       <DependentUpon>CodeTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\LogTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\LogTool.Designer.cs">
+      <DependentUpon>LogTool.cs</DependentUpon>
     </Compile>
     <Compile Include="Debugger\Tools\HandlesTool.cs">
       <SubType>Form</SubType>

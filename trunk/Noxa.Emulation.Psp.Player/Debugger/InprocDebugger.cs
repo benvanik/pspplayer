@@ -6,76 +6,117 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
-using Noxa.Emulation.Psp.Debugging.Protocol;
+using System.Threading;
 using Noxa.Emulation.Psp.Debugging;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.Debugging.Protocol;
+using Noxa.Emulation.Psp.Games;
+using Noxa.Emulation.Psp.Player.Debugger.Model;
+using Noxa.Emulation.Psp.Player.Debugger.Tools;
 
 namespace Noxa.Emulation.Psp.Player.Debugger
 {
-	class InprocDebugger : IDebugger, IDebugHandler
+	partial class InprocDebugger : IDebugger, IDebugHandler
 	{
+		public readonly Host Host;
+		public readonly DebugHost DebugHost;
+		public readonly DebuggerWindow Window;
+		public readonly List<DebuggerTool> Tools;
+
+		public readonly BreakpointsTool BreakpointsTool;
+		public readonly CallstackTool CallstackTool;
+		public readonly CodeTool CodeTool;
+		public readonly HandlesTool HandlesTool;
+		public readonly LogTool LogTool;
+		public readonly MemoryTool MemoryTool;
+		public readonly ModulesTool ModulesTool;
+		public readonly RegistersTool RegistersTool;
+		public readonly StatisticsTool StatisticsTool;
+		public readonly StringsTool StringsTool;
+		public readonly SyscallsTool SyscallsTool;
+		public readonly ThreadsTool ThreadsTool;
+		public readonly WatchTool WatchTool;
+
+		public DebuggerState State;
+		public BreakpointManager Breakpoints;
+
 		public InprocDebugger( Host host )
 		{
+			this.Host = host;
+			this.DebugHost = host.Debugger;
+			this.Window = new DebuggerWindow( this );
+			this.Tools = new List<DebuggerTool>();
+
+			this.State = DebuggerState.Idle;
+			this.Breakpoints = new BreakpointManager( this );
+
+			// Initialize tools...
+			// ...
+			this.CallstackTool = new CallstackTool( this );
+			this.Tools.Add( this.CallstackTool );
+			this.LogTool = new LogTool( this );
+			this.Tools.Add( this.LogTool );
+			// ...
+
+			this.Window.Show();
+			foreach( DebuggerTool tool in this.Tools )
+				tool.Show( this.Window.DockPanel );
+
+			this.Host.Debugger.Activate( this, Environment.MachineName, Environment.UserName, "InprocDebugger 1.0" );
 		}
 
 		#region IDebugger Members
 
-		public ILogger Logger
-		{
-			get { throw new NotImplementedException(); }
-		}
-
+		public ILogger Logger { get { return this.LogTool; } }
 		public IDebugHandler Handler { get { return this; } }
 
-		public void OnStarted( Noxa.Emulation.Psp.Games.GameInformation game, System.IO.Stream bootStream )
+		private int _lastId = 100;
+		public int AllocateID()
 		{
-			throw new NotImplementedException();
+			return Interlocked.Increment( ref _lastId );
+		}
+
+		public void OnStarted( GameInformation game, Stream bootStream )
+		{
+			// Need to marshal all UI calls to the proper thread
+			DummyDelegate del = delegate
+			{
+				this.State = DebuggerState.Running;
+				this.OnStateChanged();
+			};
+			this.Window.Invoke( del );
+
+			// TEST
+			Breakpoint bp = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, 0x088003D4 );
+			this.Breakpoints.Add( bp );
 		}
 
 		public void OnStopped()
 		{
-			throw new NotImplementedException();
-		}
-
-		public int AllocateID()
-		{
-			throw new NotImplementedException();
-		}
-
-		#endregion
-
-		#region IDebugHandler Members
-
-		public void OnContinue( bool steppingForward )
-		{
-			throw new NotImplementedException();
-		}
-
-		public void OnStepComplete( uint address )
-		{
-			throw new NotImplementedException();
-		}
-
-		public void OnBreakpointHit( int id )
-		{
-			throw new NotImplementedException();
-		}
-
-		public void OnEvent( Noxa.Emulation.Psp.Debugging.DebugModel.Event biosEvent )
-		{
-			throw new NotImplementedException();
-		}
-
-		public bool OnError( Noxa.Emulation.Psp.Debugging.DebugModel.Error error )
-		{
-			throw new NotImplementedException();
+			DummyDelegate del = delegate
+			{
+				this.State = DebuggerState.Detached;
+				this.OnStateChanged();
+			};
+			this.Window.Invoke( del );
 		}
 
 		#endregion
 
 		public void BringToFront()
 		{
-			throw new NotImplementedException();
+			// Needs invoke?
+			this.Window.BringToFront();
+		}
+
+		public event EventHandler StateChanged;
+		private void OnStateChanged()
+		{
+			EventHandler handler = this.StateChanged;
+			if( handler != null )
+				handler( this, EventArgs.Empty );
 		}
 	}
 }

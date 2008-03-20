@@ -276,6 +276,7 @@ namespace Noxa.Emulation.Psp.Player
 				return;
 			}
 			_debugClient = new InprocDebugger( this );
+			_debugClient.BringToFront();
 		}
 
 		private delegate bool AskForDebuggerDelegate( string message );
