@@ -56,6 +56,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			// ...
 			this.CallstackTool = new CallstackTool( this );
 			this.Tools.Add( this.CallstackTool );
+			this.CodeTool = new CodeTool( this );
+			this.Tools.Add( this.CodeTool );
 			this.LogTool = new LogTool( this );
 			this.Tools.Add( this.LogTool );
 			// ...

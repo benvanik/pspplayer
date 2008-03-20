@@ -86,7 +86,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.CodeTool.Activate();
 
 			// Jump in code
-			//this.CodeTool.SetAddress( address );
+			this.CodeTool.SetAddress( address );
 
 			this.CallstackTool.RefreshCallstack();
 		}
