@@ -28,9 +28,39 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
+			this.disassemblyControl = new Noxa.Emulation.Psp.Player.Debugger.Tools.DisassemblyControl();
+			this.SuspendLayout();
+			// 
+			// disassemblyControl
+			// 
+			this.disassemblyControl.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+						| System.Windows.Forms.AnchorStyles.Left )
+						| System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.disassemblyControl.DisplayHex = true;
+			this.disassemblyControl.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+			this.disassemblyControl.FormattingEnabled = true;
+			this.disassemblyControl.Location = new System.Drawing.Point( 12, 12 );
+			this.disassemblyControl.Name = "disassemblyControl";
+			this.disassemblyControl.ScrollAlwaysVisible = true;
+			this.disassemblyControl.Size = new System.Drawing.Size( 672, 485 );
+			this.disassemblyControl.TabIndex = 0;
+			// 
+			// CodeTool
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
+			this.ClientSize = new System.Drawing.Size( 696, 511 );
+			this.CloseButton = false;
+			this.Controls.Add( this.disassemblyControl );
+			this.DockAreas = ( ( WeifenLuo.WinFormsUI.Docking.DockAreas )( ( WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.Document ) ) );
+			this.Name = "CodeTool";
+			this.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.Document;
+			this.TabText = "Disassembly";
+			this.ResumeLayout( false );
+
 		}
 
 		#endregion
+
+		private DisassemblyControl disassemblyControl;
 	}
 }

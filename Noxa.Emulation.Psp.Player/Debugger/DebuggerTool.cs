@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace Noxa.Emulation.Psp.Player.Debugger
 {
-	abstract partial class DebuggerTool : WeifenLuo.WinFormsUI.Docking.DockContent
+	partial class DebuggerTool : WeifenLuo.WinFormsUI.Docking.DockContent
 	{
 		public readonly InprocDebugger Debugger;
 
