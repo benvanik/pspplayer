@@ -269,6 +269,11 @@ void R4000Hook::SetMemory( uint startAddress, array<byte>^ buffer, int offset, i
 {
 }
 
+IntPtr R4000Hook::GetMemoryPointer( uint address )
+{
+	return IntPtr( this->Cpu->_memory->NativeSystem->Translate( address ) );
+}
+
 array<uint>^ R4000Hook::SearchMemory( uint64 value, int width )
 {
 	return nullptr;

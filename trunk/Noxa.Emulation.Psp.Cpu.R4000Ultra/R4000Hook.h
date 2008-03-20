@@ -57,6 +57,7 @@ namespace Noxa {
 
 					virtual array<byte>^ GetMemory( uint startAddress, int length );
 					virtual void SetMemory( uint startAddress, array<byte>^ buffer, int offset, int length );
+					virtual IntPtr GetMemoryPointer( uint address );
 
 					virtual array<uint>^ SearchMemory( uint64 value, int width );
 					virtual uint Checksum( uint startAddress, int length );

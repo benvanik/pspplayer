@@ -154,6 +154,13 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		void SetMemory( uint startAddress, byte[] buffer, int offset, int length );
 
 		/// <summary>
+		/// Get the pointer to the given memory address; only works when in the same process.
+		/// </summary>
+		/// <param name="address">The address (in user space) to get.</param>
+		/// <returns>A pointer to the given <paramref name="address"/>.</returns>
+		IntPtr GetMemoryPointer( uint address );
+
+		/// <summary>
 		/// Search for the given value and return all instances.
 		/// </summary>
 		/// <param name="value">The value to search for.</param>

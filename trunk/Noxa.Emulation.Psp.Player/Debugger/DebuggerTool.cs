@@ -28,5 +28,13 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			this.Debugger = debugger;
 		}
+
+		public virtual void OnAttached()
+		{
+		}
+
+		public virtual void OnStarted()
+		{
+		}
 	}
 }
