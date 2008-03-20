@@ -60,6 +60,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.Tools.Add( this.CodeTool );
 			this.LogTool = new LogTool( this );
 			this.Tools.Add( this.LogTool );
+			this.MemoryTool = new MemoryTool( this );
+			this.Tools.Add( this.MemoryTool );
 			this.RegistersTool = new RegistersTool( this );
 			this.Tools.Add( this.RegistersTool );
 			this.StatisticsTool = new StatisticsTool( this );
@@ -71,6 +73,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 				tool.Show( this.Window.DockPanel );
 
 			this.Host.Debugger.Activate( this, Environment.MachineName, Environment.UserName, "InprocDebugger 1.0" );
+
+			foreach( DebuggerTool tool in this.Tools )
+				tool.OnAttached();
 		}
 
 		#region IDebugger Members
@@ -91,6 +96,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			{
 				this.State = DebuggerState.Running;
 				this.OnStateChanged();
+
+				foreach( DebuggerTool tool in this.Tools )
+					tool.OnStarted();
 			};
 			this.Window.Invoke( del );
 

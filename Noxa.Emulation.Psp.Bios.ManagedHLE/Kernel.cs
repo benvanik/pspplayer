@@ -40,7 +40,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public FastLinkedList<KThread> SchedulableThreads;
 		public KThread ActiveThread;
 
-        public List<KDevice> Devices;
+		public List<KDevice> Devices;
 		public Dictionary<string, KDevice> DeviceLookup;
 		public IMediaFolder CurrentPath;
 		public KStdFile StdIn;
@@ -53,7 +53,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		{
 			public const int Exit = 0;		// Issued on 'home' press
 			public const int Umd = 1;		// Issed on UMD state change
-			
+
 			public const int CallbackCount = 2;
 		}
 
@@ -75,8 +75,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			CpuCore = Cpu.Cores[ 0 ];
 			Memory = Cpu.Memory;
 			MemorySystem = Memory.MemorySystem;
-            
-            Devices = new List<KDevice>();
+
+			Devices = new List<KDevice>();
 
 			UserModules = new List<KModule>( 10 );
 
@@ -119,10 +119,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				new KPartition( this, 0x09FFFFFF, 0x004FFFFF ), // user (stack) ? // 0x09B00000, 0x004FFFFF
 			};
 
-            if (Emulator.MemoryStick != null)
-                Devices.Add(new KDevice(this, "ms0", new string[] { "ms0", "fatms0", "ms", "fatms" }, Emulator.MemoryStick));
-            if (Emulator.Umd != null)
-			    Devices.Add(new KDevice( this, "umd0", new string[]{ "umd0", "umd1", "disc0", "umd", "isofs", "isofs0" }, Emulator.Umd ));
+			if( Emulator.MemoryStick != null )
+				Devices.Add( new KDevice( this, "ms0", new string[] { "ms0", "fatms0", "ms", "fatms" }, Emulator.MemoryStick ) );
+			if( Emulator.Umd != null )
+				Devices.Add( new KDevice( this, "umd0", new string[] { "umd0", "umd1", "disc0", "umd", "isofs", "isofs0" }, Emulator.Umd ) );
 
 			DeviceLookup = new Dictionary<string, KDevice>();
 			foreach( KDevice device in Devices )
@@ -247,12 +247,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				return null;
 		}
 
-		public T GetHandleOrNull<T>(int uid) where T : KHandle
+		public T GetHandleOrNull<T>( int uid ) where T : KHandle
 		{
 			KHandle handle;
-			if (Handles.TryGetValue((uint)uid, out handle) == true)
-				if (handle is T)
-					return (T)handle;
+			if( Handles.TryGetValue( ( uint )uid, out handle ) == true )
+				if( handle is T )
+					return ( T )handle;
 				else
 					return null;
 			else

@@ -197,7 +197,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			using( Graphics g = Graphics.FromHwnd( this.Handle ) )
 			{
 				_gutterWidth = 15;
-				_addressWidth = ( int )( g.MeasureString( "0x00000000", _addressFont ).Width + 0.5f ) + 5;
+				_addressWidth = ( int )( g.MeasureString( "00000000", _addressFont ).Width + 0.5f ) + 5;
 				_instrWidth = 260;
 
 				_addressLeft = _gutterWidth + 1;
@@ -291,7 +291,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			// Address
 			g.FillRectangle( _addressBrush, x, y, _addressWidth, height );
 			{
-				string addressString = string.Format( "0x{0:X8}", instr.Address );
+				string addressString = string.Format( "{0:X8}", instr.Address );
 				Brush brush = ( this.Enabled ) ? _addressFontBrush : _disabledFontBrush;
 				g.DrawString( addressString, _addressFont, brush, x + 2, y );
 			}
