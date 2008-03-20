@@ -18,7 +18,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 	{
 		public RegistersTool()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
+		}
+
+		public RegistersTool( InprocDebugger debugger )
+			: base( debugger )
+		{
+			this.InitializeComponent();
+
+			Bitmap image = Properties.Resources.RegistersIcon as Bitmap;
+			this.Icon = Icon.FromHandle( image.GetHicon() );
 		}
 	}
 }

@@ -28,7 +28,18 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
+			this.SuspendLayout();
+			// 
+			// LogTool
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
+			this.ClientSize = new System.Drawing.Size( 829, 182 );
+			this.CloseButton = false;
+			this.Name = "LogTool";
+			this.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.DockBottom;
+			this.TabText = "Log";
+			this.ResumeLayout( false );
+
 		}
 
 		#endregion

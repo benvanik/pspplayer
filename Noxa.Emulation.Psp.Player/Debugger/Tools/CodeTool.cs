@@ -8,13 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Noxa.Emulation.Psp.Debugging.DebugData;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Player.Debugger.Model;
-using System.Diagnostics;
-using Noxa.Emulation.Psp.Debugging.DebugData;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 {
@@ -22,13 +22,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 	{
 		public CodeTool()
 		{
-			InitializeComponent();
+			this.InitializeComponent();
 		}
 
 		public CodeTool( InprocDebugger debugger )
 			: base( debugger )
 		{
 			this.InitializeComponent();
+
+			Bitmap image = Properties.Resources.DisassemblyIcon as Bitmap;
+			this.Icon = Icon.FromHandle( image.GetHicon() );
 
 			this.disassemblyControl.Debugger = debugger;
 			//this.disassemblyControl.RegisterValueChanged += new EventHandler( disassemblyControl_RegisterValueChanged );
