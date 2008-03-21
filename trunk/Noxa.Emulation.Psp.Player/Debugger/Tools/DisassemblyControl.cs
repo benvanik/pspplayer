@@ -152,10 +152,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.EndUpdate();
 		}
 
-		public void SetAddress( uint address )
+		public void SetCurrentAddress( uint address )
 		{
 			this.CurrentAddress = address;
 
+			this.SetAddress( address );
+		}
+
+		public void SetAddress( uint address )
+		{
 			uint offset = ( address - this.MethodBody.Address ) >> 2;
 			this.SelectedIndex = ( int )offset;
 

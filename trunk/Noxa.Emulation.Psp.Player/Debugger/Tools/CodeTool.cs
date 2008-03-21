@@ -44,7 +44,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.disassemblyControl.Enabled = false;
 		}
 
-		public void SetAddress( uint address )
+		public void SetAddress( uint address, bool isCurrentStatement )
 		{
 			this.disassemblyControl.Enabled = true;
 
@@ -58,7 +58,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				( this.disassemblyControl.MethodBody != null ) &&
 				( this.disassemblyControl.MethodBody.Address == method.Address ) )
 			{
-				this.disassemblyControl.SetAddress( address );
+				if( isCurrentStatement == true )
+					this.disassemblyControl.SetCurrentAddress( address );
+				else
+					this.disassemblyControl.SetAddress( address );
 			}
 			else
 			{
@@ -66,7 +69,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				Debug.Assert( methodBody != null );
 
 				this.disassemblyControl.SetMethod( methodBody );
-				this.disassemblyControl.SetAddress( address );
+				if( isCurrentStatement == true )
+					this.disassemblyControl.SetCurrentAddress( address );
+				else
+					this.disassemblyControl.SetAddress( address );
 
 				//this.ShowRegisters( this.CurrentRegisterSet );
 			}
@@ -93,7 +99,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		public void ShowNextStatement()
 		{
 			CoreState state = this.Debugger.DebugHost.CpuHook.GetCoreState( 0 );
-			this.SetAddress( state.ProgramCounter );
+			this.SetAddress( state.ProgramCounter, true );
 		}
 
 		#region Registers

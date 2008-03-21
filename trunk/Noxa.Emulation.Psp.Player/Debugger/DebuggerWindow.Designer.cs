@@ -40,6 +40,16 @@
 			this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
 			this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpMenu = new System.Windows.Forms.ToolStripMenuItem();
+			this.jumpToOperandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.jumpToAddressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+			this.nextLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.previousLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+			this.toggleBookmarkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.nextBookmarkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.previousBookmarkToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.clearAllBookmarksToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.searchMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.debugMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -195,9 +205,92 @@
 			// 
 			// jumpMenu
 			// 
+			this.jumpMenu.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
+            this.jumpToOperandToolStripMenuItem,
+            this.jumpToAddressToolStripMenuItem,
+            this.toolStripMenuItem4,
+            this.nextLocationToolStripMenuItem,
+            this.previousLocationToolStripMenuItem,
+            this.toolStripMenuItem5,
+            this.toggleBookmarkToolStripMenuItem,
+            this.nextBookmarkToolStripMenuItem,
+            this.previousBookmarkToolStripMenuItem,
+            this.clearAllBookmarksToolStripMenuItem} );
 			this.jumpMenu.Name = "jumpMenu";
 			this.jumpMenu.Size = new System.Drawing.Size( 48, 20 );
 			this.jumpMenu.Text = "&Jump";
+			// 
+			// jumpToOperandToolStripMenuItem
+			// 
+			this.jumpToOperandToolStripMenuItem.Name = "jumpToOperandToolStripMenuItem";
+			this.jumpToOperandToolStripMenuItem.Size = new System.Drawing.Size( 180, 22 );
+			this.jumpToOperandToolStripMenuItem.Text = "Jump to &Operand";
+			this.jumpToOperandToolStripMenuItem.Click += new System.EventHandler( this.jumpToOperandToolStripMenuItem_Click );
+			// 
+			// jumpToAddressToolStripMenuItem
+			// 
+			this.jumpToAddressToolStripMenuItem.Name = "jumpToAddressToolStripMenuItem";
+			this.jumpToAddressToolStripMenuItem.Size = new System.Drawing.Size( 180, 22 );
+			this.jumpToAddressToolStripMenuItem.Text = "Jump to &Address";
+			this.jumpToAddressToolStripMenuItem.Click += new System.EventHandler( this.jumpToAddressToolStripMenuItem_Click );
+			// 
+			// toolStripMenuItem4
+			// 
+			this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+			this.toolStripMenuItem4.Size = new System.Drawing.Size( 177, 6 );
+			// 
+			// nextLocationToolStripMenuItem
+			// 
+			this.nextLocationToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.NextLocationIcon;
+			this.nextLocationToolStripMenuItem.Name = "nextLocationToolStripMenuItem";
+			this.nextLocationToolStripMenuItem.Size = new System.Drawing.Size( 180, 22 );
+			this.nextLocationToolStripMenuItem.Text = "&Next Location";
+			this.nextLocationToolStripMenuItem.Click += new System.EventHandler( this.nextLocationToolStripMenuItem_Click );
+			// 
+			// previousLocationToolStripMenuItem
+			// 
+			this.previousLocationToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PreviousLocationIcon;
+			this.previousLocationToolStripMenuItem.Name = "previousLocationToolStripMenuItem";
+			this.previousLocationToolStripMenuItem.Size = new System.Drawing.Size( 180, 22 );
+			this.previousLocationToolStripMenuItem.Text = "&Previous Location";
+			this.previousLocationToolStripMenuItem.Click += new System.EventHandler( this.previousLocationToolStripMenuItem_Click );
+			// 
+			// toolStripMenuItem5
+			// 
+			this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+			this.toolStripMenuItem5.Size = new System.Drawing.Size( 177, 6 );
+			// 
+			// toggleBookmarkToolStripMenuItem
+			// 
+			this.toggleBookmarkToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.BookmarkIcon;
+			this.toggleBookmarkToolStripMenuItem.Name = "toggleBookmarkToolStripMenuItem";
+			this.toggleBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 180, 22 );
+			this.toggleBookmarkToolStripMenuItem.Text = "&Toggle Bookmark";
+			this.toggleBookmarkToolStripMenuItem.Click += new System.EventHandler( this.toggleBookmarkToolStripMenuItem_Click );
+			// 
+			// nextBookmarkToolStripMenuItem
+			// 
+			this.nextBookmarkToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.NextBookmarkIcon;
+			this.nextBookmarkToolStripMenuItem.Name = "nextBookmarkToolStripMenuItem";
+			this.nextBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 180, 22 );
+			this.nextBookmarkToolStripMenuItem.Text = "Next &Bookmark";
+			this.nextBookmarkToolStripMenuItem.Click += new System.EventHandler( this.nextBookmarkToolStripMenuItem_Click );
+			// 
+			// previousBookmarkToolStripMenuItem
+			// 
+			this.previousBookmarkToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PreviousBookmarkIcon;
+			this.previousBookmarkToolStripMenuItem.Name = "previousBookmarkToolStripMenuItem";
+			this.previousBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 180, 22 );
+			this.previousBookmarkToolStripMenuItem.Text = "P&revious Bookmark";
+			this.previousBookmarkToolStripMenuItem.Click += new System.EventHandler( this.previousBookmarkToolStripMenuItem_Click );
+			// 
+			// clearAllBookmarksToolStripMenuItem
+			// 
+			this.clearAllBookmarksToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.DeleteAllBookmarksIcon;
+			this.clearAllBookmarksToolStripMenuItem.Name = "clearAllBookmarksToolStripMenuItem";
+			this.clearAllBookmarksToolStripMenuItem.Size = new System.Drawing.Size( 180, 22 );
+			this.clearAllBookmarksToolStripMenuItem.Text = "&Clear All Bookmarks";
+			this.clearAllBookmarksToolStripMenuItem.Click += new System.EventHandler( this.clearAllBookmarksToolStripMenuItem_Click );
 			// 
 			// searchMenu
 			// 
@@ -818,6 +911,16 @@
 		private System.Windows.Forms.ToolStripMenuItem jumpMenu;
 		private System.Windows.Forms.ToolStripMenuItem searchMenu;
 		private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
+		private System.Windows.Forms.ToolStripMenuItem jumpToOperandToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem jumpToAddressToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+		private System.Windows.Forms.ToolStripMenuItem nextLocationToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem previousLocationToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+		private System.Windows.Forms.ToolStripMenuItem toggleBookmarkToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem nextBookmarkToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem previousBookmarkToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem clearAllBookmarksToolStripMenuItem;
 	}
 }
 

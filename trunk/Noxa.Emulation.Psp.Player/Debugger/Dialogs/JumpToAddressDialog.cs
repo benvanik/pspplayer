@@ -18,6 +18,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Dialogs
 {
 	partial class JumpToAddressDialog : Form
 	{
+		public NavigationTarget Target;
 		public uint Address;
 
 		public JumpToAddressDialog()
@@ -26,6 +27,23 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Dialogs
 
 			this.DialogResult = DialogResult.Cancel;
 			this.addressTextBox.Text = this.Address.ToString( "X8" );
+		}
+
+		protected override void OnShown( EventArgs e )
+		{
+			base.OnShown( e );
+
+			this.Text = "Jump to Address";
+			switch( this.Target )
+			{
+				default:
+				case NavigationTarget.Code:
+					this.Text += " - Code";
+					break;
+				case NavigationTarget.Memory:
+					this.Text += " - Memory";
+					break;
+			}
 		}
 
 		private void jumpButton_Click( object sender, EventArgs e )
