@@ -13,6 +13,7 @@ using Noxa.Emulation.Psp.Debugging;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Debugging.Protocol;
 using Noxa.Emulation.Psp.Games;
+using Noxa.Emulation.Psp.Player.Debugger.Dialogs;
 using Noxa.Emulation.Psp.Player.Debugger.Model;
 using Noxa.Emulation.Psp.Player.Debugger.Tools;
 
@@ -51,6 +52,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 
 			this.State = DebuggerState.Idle;
 			this.Breakpoints = new BreakpointManager( this );
+
+			this.SetupNavigation();
 
 			// Initialize tools...
 			// ...

@@ -2173,12 +2173,16 @@ namespace Be.Windows.Forms
 
 		private void DrawShared( PaintEventArgs e )
 		{
-			e.Graphics.FillRectangle( _gutterBrush, 2, e.ClipRectangle.Y + 2, _gutterWidth, e.ClipRectangle.Height - 4 );
-			e.Graphics.DrawLine( _vertGridPen, 2 + _gutterWidth, e.ClipRectangle.Y + 2, 2 + _gutterWidth, e.ClipRectangle.Height - 3 );
-			e.Graphics.FillRectangle( _addressBrush, 2 + _gutterWidth + 1, e.ClipRectangle.Y + 2, _gutterWidth + 1 + _addressWidth, e.ClipRectangle.Height - 4 );
-			e.Graphics.DrawLine( _vertGridPen, 2 + _gutterWidth + 1 + _addressWidth + 1, e.ClipRectangle.Y + 2, 2 + _gutterWidth + 1 + _addressWidth + 1, e.ClipRectangle.Height - 3 );
+			if( _lineInfoVisible == true )
+			{
+				e.Graphics.FillRectangle( _gutterBrush, 2, e.ClipRectangle.Y + 2, _gutterWidth, e.ClipRectangle.Height - 4 );
+				e.Graphics.DrawLine( _vertGridPen, 2 + _gutterWidth, e.ClipRectangle.Y + 2, 2 + _gutterWidth, e.ClipRectangle.Height - 3 );
+				e.Graphics.FillRectangle( _addressBrush, 2 + _gutterWidth + 1, e.ClipRectangle.Y + 2, _gutterWidth + 1 + _addressWidth, e.ClipRectangle.Height - 4 );
+				e.Graphics.DrawLine( _vertGridPen, 2 + _gutterWidth + 1 + _addressWidth + 1, e.ClipRectangle.Y + 2, 2 + _gutterWidth + 1 + _addressWidth + 1, e.ClipRectangle.Height - 3 );
+			}
 
-			e.Graphics.DrawLine( _vertGridPen, _recHex.Right - 10, e.ClipRectangle.Y + 2, _recHex.Right - 10, e.ClipRectangle.Height - 3 );
+			if( _stringViewVisible == true )
+				e.Graphics.DrawLine( _vertGridPen, _recHex.Right - 10, e.ClipRectangle.Y + 2, _recHex.Right - 10, e.ClipRectangle.Height - 3 );
 		}
 
 		/// <summary>
