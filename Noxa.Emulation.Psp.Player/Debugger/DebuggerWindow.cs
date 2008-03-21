@@ -36,5 +36,54 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			this.Close();
 		}
+
+		#region Jump/Navigation
+
+		private void jumpToOperandToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void jumpToAddressToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			NavigationTarget target = NavigationTarget.Memory;
+			if( this.dockPanel.ActiveContent == this.Debugger.MemoryTool )
+				target = NavigationTarget.Memory;
+			else if( this.dockPanel.ActiveContent == this.Debugger.CodeTool )
+				target = NavigationTarget.Code;
+			this.Debugger.ShowJumpToAddressDialog( target );
+		}
+
+		private void nextLocationToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void previousLocationToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void toggleBookmarkToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void nextBookmarkToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void previousBookmarkToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void clearAllBookmarksToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		#endregion
 	}
 }

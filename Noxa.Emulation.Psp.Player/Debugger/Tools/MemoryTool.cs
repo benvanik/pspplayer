@@ -38,9 +38,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		public override void OnStarted()
 		{
 			_vramProvider = new MappedByteProvider( ( byte* )this.Debugger.DebugHost.CpuHook.GetMemoryPointer( MemorySystem.VideoMemoryBase ), MemorySystem.VideoMemoryBase, MemorySystem.VideoMemorySize );
-			_userProvider = new MappedByteProvider( ( byte* )this.Debugger.DebugHost.CpuHook.GetMemoryPointer( MemorySystem.MainMemoryBase ), MemorySystem.MainMemoryBase, MemorySystem.MainMemorySize );
+			_userProvider = new MappedByteProvider( ( byte* )this.Debugger.DebugHost.CpuHook.GetMemoryPointer( 0x08400000 ), 0x08400000, 0x01BFFFFF );
 
-			sectionComboBox.Items.Add( "User: 0x08000000-0x09FFFFFF" );
+			sectionComboBox.Items.Add( "User: 0x08400000-0x09FFFFFF" );
 			sectionComboBox.Items.Add( "VRAM: 0x04000000-0x041FFFFF" );
 			sectionComboBox.SelectedIndex = 0;
 		}

@@ -113,6 +113,7 @@
     <Compile Include="Debugger\InprocDebugger.cs" />
     <Compile Include="Debugger\InprocDebugger.Handlers.cs" />
     <Compile Include="Debugger\InprocDebugger.Navigation.cs" />
+    <Compile Include="Debugger\Model\Bookmark.cs" />
     <Compile Include="Debugger\Model\BreakpointEventArgs.cs" />
     <Compile Include="Debugger\Model\BreakpointManager.cs" />
     <Compile Include="Debugger\Model\InstructionFormatter.cs" />
@@ -424,6 +425,7 @@
     <None Include="Resources\BreakpointOffIcon.png" />
     <None Include="Resources\BreakpointsIcon.png" />
     <None Include="Resources\CallstackIcon.png" />
+    <None Include="Resources\BookmarkIcon.png" />
     <Content Include="Resources\ClearIcon.png" />
     <None Include="Resources\ErrorIcon.png" />
     <None Include="Resources\CopyIcon.png" />
@@ -431,6 +433,7 @@
     <None Include="Resources\DeleteBreakpointIcon.png" />
     <None Include="Resources\DisassemblyIcon.png" />
     <None Include="Resources\FindBreakpointIcon.png" />
+    <None Include="Resources\DeleteAllBookmarksIcon.png" />
     <Content Include="Resources\Flag0.png" />
     <Content Include="Resources\Flag1.png" />
     <Content Include="Resources\Flag2.png" />
@@ -449,6 +452,10 @@
     <None Include="Resources\RegistersIcon.png" />
     <None Include="Resources\RenameIcon.png" />
     <None Include="Resources\PlayIcon.png" />
+    <None Include="Resources\NextBookmarkIcon.png" />
+    <None Include="Resources\PreviousBookmarkIcon.png" />
+    <None Include="Resources\NextLocationIcon.png" />
+    <None Include="Resources\PreviousLocationIcon.png" />
     <Content Include="Resources\SearchIcon.png" />
     <Content Include="Resources\ReportIcon.png" />
     <Content Include="Resources\psp.ico" />

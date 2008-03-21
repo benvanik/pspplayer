@@ -31,7 +31,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			DummyDelegate del = delegate
 			{
-				this.ShowSourceView( address );
+				this.JumpToAddress( NavigationTarget.Code, address, true );
 
 				this.State = DebuggerState.Broken;
 				this.OnStateChanged();
@@ -51,7 +51,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 
 			DummyDelegate del = delegate
 			{
-				this.ShowSourceView( bp.Address );
+				this.JumpToAddress( NavigationTarget.Code, bp.Address, true );
 
 				this.State = DebuggerState.Broken;
 				this.OnStateChanged();
@@ -69,7 +69,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			DummyDelegate del = delegate
 			{
-				this.ShowSourceView( error.PC );
+				this.JumpToAddress( NavigationTarget.Code, error.PC, true );
 
 				this.State = DebuggerState.Broken;
 				this.OnStateChanged();
@@ -77,18 +77,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.Window.Invoke( del );
 
 			return true;
-		}
-
-		private void ShowSourceView( uint address )
-		{
-			this.CodeTool.Show( this.Window.DockPanel );
-			this.CodeTool.BringToFront();
-			this.CodeTool.Activate();
-
-			// Jump in code
-			this.CodeTool.SetAddress( address );
-
-			this.CallstackTool.RefreshCallstack();
 		}
 	}
 }
