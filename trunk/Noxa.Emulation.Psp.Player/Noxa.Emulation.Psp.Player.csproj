@@ -98,8 +98,21 @@
     <Compile Include="Debugger\DebuggerWindow.Designer.cs">
       <DependentUpon>DebuggerWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Debugger\Dialogs\FindDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Dialogs\FindDialog.Designer.cs">
+      <DependentUpon>FindDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Dialogs\JumpToAddressDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Debugger\Dialogs\JumpToAddressDialog.Designer.cs">
+      <DependentUpon>JumpToAddressDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Debugger\InprocDebugger.cs" />
     <Compile Include="Debugger\InprocDebugger.Handlers.cs" />
+    <Compile Include="Debugger\InprocDebugger.Navigation.cs" />
     <Compile Include="Debugger\Model\BreakpointEventArgs.cs" />
     <Compile Include="Debugger\Model\BreakpointManager.cs" />
     <Compile Include="Debugger\Model\InstructionFormatter.cs" />
@@ -244,6 +257,14 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Debugger\DebuggerWindow.resx">
       <DependentUpon>DebuggerWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Debugger\Dialogs\FindDialog.resx">
+      <DependentUpon>FindDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Debugger\Dialogs\JumpToAddressDialog.resx">
+      <DependentUpon>JumpToAddressDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Debugger\Tools\CallstackTool.resx">
