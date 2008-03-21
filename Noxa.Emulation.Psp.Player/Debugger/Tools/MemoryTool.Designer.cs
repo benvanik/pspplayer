@@ -46,7 +46,6 @@
 			this.hexBox.Name = "hexBox";
 			this.hexBox.SelectionBackColor = System.Drawing.SystemColors.Highlight;
 			this.hexBox.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-			this.hexBox.ShadowSelectionColor = System.Drawing.SystemColors.InactiveCaption;
 			this.hexBox.Size = new System.Drawing.Size( 489, 540 );
 			this.hexBox.StringViewVisible = true;
 			this.hexBox.TabIndex = 0;
