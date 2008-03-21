@@ -85,5 +85,27 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		}
 
 		#endregion
+
+		#region Control
+
+		private void resumeToolStripButton_Click( object sender, EventArgs e )
+		{
+			this.Debugger.DebugHost.Controller.Run();
+		}
+
+		private void breakToolStripButton_Click( object sender, EventArgs e )
+		{
+			this.Debugger.DebugHost.Controller.Break();
+		}
+
+		private void stopToolStripButton_Click( object sender, EventArgs e )
+		{
+		}
+
+		private void restartToolStripButton_Click( object sender, EventArgs e )
+		{
+		}
+
+		#endregion
 	}
 }

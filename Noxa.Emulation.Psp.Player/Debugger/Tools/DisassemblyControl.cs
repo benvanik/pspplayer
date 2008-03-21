@@ -128,7 +128,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		public void SetMethod( MethodBody methodBody )
 		{
 			this.MethodBody = methodBody;
-			this.CurrentAddress = 0;
 
 			this.BeginUpdate();
 
@@ -164,6 +163,12 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			uint offset = ( address - this.MethodBody.Address ) >> 2;
 			this.SelectedIndex = ( int )offset;
 
+			this.Invalidate();
+		}
+
+		public void ClearAddress()
+		{
+			this.CurrentAddress = 0;
 			this.Invalidate();
 		}
 

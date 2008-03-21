@@ -604,6 +604,7 @@
 			this.resumeToolStripButton.Size = new System.Drawing.Size( 23, 22 );
 			this.resumeToolStripButton.Text = "Resume";
 			this.resumeToolStripButton.ToolTipText = "Resume Execution";
+			this.resumeToolStripButton.Click += new System.EventHandler( this.resumeToolStripButton_Click );
 			// 
 			// breakToolStripButton
 			// 
@@ -614,6 +615,7 @@
 			this.breakToolStripButton.Size = new System.Drawing.Size( 23, 22 );
 			this.breakToolStripButton.Text = "Break";
 			this.breakToolStripButton.ToolTipText = "Break Execution";
+			this.breakToolStripButton.Click += new System.EventHandler( this.breakToolStripButton_Click );
 			// 
 			// stopToolStripButton
 			// 
@@ -624,6 +626,7 @@
 			this.stopToolStripButton.Size = new System.Drawing.Size( 23, 22 );
 			this.stopToolStripButton.Text = "Stop";
 			this.stopToolStripButton.ToolTipText = "Stop Execution";
+			this.stopToolStripButton.Click += new System.EventHandler( this.stopToolStripButton_Click );
 			// 
 			// restartToolStripButton
 			// 
@@ -633,6 +636,7 @@
 			this.restartToolStripButton.Name = "restartToolStripButton";
 			this.restartToolStripButton.Size = new System.Drawing.Size( 23, 22 );
 			this.restartToolStripButton.Text = "Restart";
+			this.restartToolStripButton.Click += new System.EventHandler( this.restartToolStripButton_Click );
 			// 
 			// toolStripSeparator9
 			// 
