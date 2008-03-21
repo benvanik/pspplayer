@@ -2142,12 +2142,54 @@ namespace Be.Windows.Forms
 		#endregion
 
 		#region Paint methods
+
+		private Pen _vertGridPen;
+		private Brush _gutterBrush;
+		private Brush _addressBrush;
+		private Brush _instrBrush;
+		private Brush _vizBrush;
+
+		private int _gutterWidth = 15;
+		private int _addressWidth;
+
+		private void SetupGraphics()
+		{
+			_vertGridPen = SystemPens.ControlLight;
+
+			Color c = SystemColors.ControlLight;
+			Color lightest = Color.FromArgb(
+				Math.Min( c.R + 20, 255 ),
+				Math.Min( c.G + 20, 255 ),
+				Math.Min( c.B + 20, 255 ) );
+			Color light = Color.FromArgb(
+				Math.Min( c.R + 25, 255 ),
+				Math.Min( c.G + 25, 255 ),
+				Math.Min( c.B + 25, 255 ) );
+			_gutterBrush = new SolidBrush( lightest );
+			_addressBrush = new SolidBrush( light );
+			_instrBrush = SystemBrushes.Window;
+			_vizBrush = new SolidBrush( light );
+		}
+
+		private void DrawShared( PaintEventArgs e )
+		{
+			e.Graphics.FillRectangle( _gutterBrush, 2, e.ClipRectangle.Y + 2, _gutterWidth, e.ClipRectangle.Height - 4 );
+			e.Graphics.DrawLine( _vertGridPen, 2 + _gutterWidth, e.ClipRectangle.Y + 2, 2 + _gutterWidth, e.ClipRectangle.Height - 3 );
+			e.Graphics.FillRectangle( _addressBrush, 2 + _gutterWidth + 1, e.ClipRectangle.Y + 2, _gutterWidth + 1 + _addressWidth, e.ClipRectangle.Height - 4 );
+			e.Graphics.DrawLine( _vertGridPen, 2 + _gutterWidth + 1 + _addressWidth + 1, e.ClipRectangle.Y + 2, 2 + _gutterWidth + 1 + _addressWidth + 1, e.ClipRectangle.Height - 3 );
+
+			e.Graphics.DrawLine( _vertGridPen, _recHex.Right - 10, e.ClipRectangle.Y + 2, _recHex.Right - 10, e.ClipRectangle.Height - 3 );
+		}
+
 		/// <summary>
 		/// Paints the background.
 		/// </summary>
 		/// <param name="e">A PaintEventArgs that contains the event data.</param>
 		protected override void OnPaintBackground( PaintEventArgs e )
 		{
+			if( _vertGridPen == null )
+				this.SetupGraphics();
+
 			switch( _borderStyle )
 			{
 				case BorderStyle.Fixed3D:
@@ -2175,11 +2217,13 @@ namespace Be.Windows.Forms
 
 							Rectangle rectContent = vsr.GetBackgroundContentRectangle( e.Graphics, this.ClientRectangle );
 							e.Graphics.FillRectangle( new SolidBrush( backColor ), rectContent );
+							this.DrawShared( e );
 						}
 						else
 						{
 							// draw background
 							e.Graphics.FillRectangle( new SolidBrush( BackColor ), ClientRectangle );
+							this.DrawShared( e );
 
 							// draw default border
 							ControlPaint.DrawBorder3D( e.Graphics, ClientRectangle, Border3DStyle.Sunken );
@@ -2191,6 +2235,7 @@ namespace Be.Windows.Forms
 					{
 						// draw background
 						e.Graphics.FillRectangle( new SolidBrush( BackColor ), ClientRectangle );
+						this.DrawShared( e );
 
 						// draw fixed single border
 						ControlPaint.DrawBorder( e.Graphics, ClientRectangle, Color.Black, ButtonBorderStyle.Solid );
@@ -2564,9 +2609,9 @@ namespace Be.Windows.Forms
 
 			// calc content bounds
 			_recContent = ClientRectangle;
-			_recContent.X += _recBorderLeft;
+			_recContent.X += _recBorderLeft + _gutterWidth + 1;
 			_recContent.Y += _recBorderTop;
-			_recContent.Width -= _recBorderRight + _recBorderLeft;
+			_recContent.Width -= _recBorderRight + _recBorderLeft + _gutterWidth + 1;
 			_recContent.Height -= _recBorderBottom + _recBorderTop;
 
 			if( _vScrollBarVisible )
@@ -2584,7 +2629,7 @@ namespace Be.Windows.Forms
 			{
 				_recLineInfo = new Rectangle( _recContent.X + marginLeft,
 					_recContent.Y,
-					( int )( _charSize.Width * 10 ),
+					( int )( _charSize.Width * 8 ) + 4,
 					_recContent.Height );
 			}
 			else
@@ -2592,9 +2637,10 @@ namespace Be.Windows.Forms
 				_recLineInfo = Rectangle.Empty;
 				_recLineInfo.X = marginLeft;
 			}
+			_addressWidth = _recLineInfo.Width;
 
 			// calc hex bounds and grid
-			_recHex = new Rectangle( _recLineInfo.X + _recLineInfo.Width,
+			_recHex = new Rectangle( _recLineInfo.X + _recLineInfo.Width + 5,
 				_recLineInfo.Y,
 				_recContent.Width - _recLineInfo.Width,
 				_recContent.Height );
