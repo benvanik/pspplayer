@@ -18,8 +18,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			DummyDelegate del = delegate
 			{
-				//if( steppingForward == false )
-				//	this.Code.Disable();
+				if( steppingForward == false )
+					this.CodeTool.Disable();
 
 				this.State = DebuggerState.Running;
 				this.OnStateChanged();

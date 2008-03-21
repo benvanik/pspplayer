@@ -42,6 +42,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		public void Disable()
 		{
 			this.disassemblyControl.Enabled = false;
+			this.disassemblyControl.ClearAddress();
 		}
 
 		public void SetAddress( uint address, bool isCurrentStatement )
