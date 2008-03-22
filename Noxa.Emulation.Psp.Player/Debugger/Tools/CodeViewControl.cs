@@ -201,7 +201,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		#region Painting
 
-		internal Font _font = new Font( "Courier New", 8.0f );
+		internal Font _font = new Font( "Courier New", 8.0f, FontStyle.Regular );
+		//internal Font _font = new Font( "Consolas", 8.0f, FontStyle.Bold );
 		internal Brush _addressFontBrush = SystemBrushes.ControlText;
 		internal Brush _instrFontBrush = SystemBrushes.ControlText;
 		internal Brush _disabledFontBrush = SystemBrushes.GrayText;
@@ -220,13 +221,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		private int _gutterWidth = 15;
 		private int _addressWidth;
 		private int _labelWidth = 120;
-		private int _opcodeWidth = 65;
+		private int _opcodeWidth = 55;
 
 		private void SetupGraphics()
 		{
-			_font = new Font( "Courier New", 9.0f, FontStyle.Regular, GraphicsUnit.Point );
 			using( Graphics g = Graphics.FromHwnd( this.Handle ) )
+			{
+				g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 				_charSize = g.MeasureString( "00000000", _font, 100, _stringFormat );
+			}
 			_charSize.Width /= 8.0f;
 
 			_stringFormat = new StringFormat( StringFormat.GenericTypographic );
@@ -251,6 +254,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			_vizBrush = new SolidBrush( light );
 
 			_addressWidth = ( int )( _charSize.Width * 8 + 2 + 0.5f );
+			_opcodeWidth = ( int )( _charSize.Width * 6 + 2 + 0.5f );
 		}
 
 		protected override void OnPaintBackground( PaintEventArgs e )
@@ -294,6 +298,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		protected override void OnPaint( PaintEventArgs e )
 		{
 			base.OnPaint( e );
+			e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
 			this.UpdateVisibleLines();
 

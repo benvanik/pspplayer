@@ -57,8 +57,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			List<MemoryReference> memRefs = new List<MemoryReference>();
 			uint[] currentRegisters = new uint[ 32 ];
 			uint validRegisters = 0;
+			bool inDelay = false;
 			foreach( Instruction instruction in instructions )
 			{
+				bool wasInDelay = inDelay;
+				inDelay = false;
 				if( instruction.IsBranch == true )
 				{
 					uint target = 0;
@@ -72,9 +75,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 					}
 					if( target > 0 )
 						this.AddLabelReference( labels, instruction, target );
-
-					// TODO: allow some to fall through the branch?
-					validRegisters = 0;
+					inDelay = true;
 				}
 				else if( instruction.IsJump == true )
 				{
@@ -91,7 +92,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 						this.AddLabelReference( labels, instruction, target );
 					else
 						this.AddCodeReference( codeRefs, instruction, target );
-					validRegisters = 0;
+					inDelay = true;
 				}
 				else if( instruction.IsLoad == true )
 				{
@@ -170,6 +171,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 				//lui $n, NNN
 				//s* $m, NNN($n)
+
+				if( wasInDelay == true )
+					validRegisters = 0;
 			}
 
 			// Sort all
@@ -275,6 +279,22 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			instruction.Reference = newMemRef;
 			memRefs.Add( newMemRef );
 		}
+
+		public void FinalizeReferences()
+		{
+			// Add ExternalReferences to instructions that need them
+			foreach( Instruction instruction in this.Instructions )
+			{
+				foreach( ExternalReference extRef in this.OutgoingReferences )
+				{
+					if( extRef.SourceAddress == instruction.Address )
+					{
+						instruction.ExternalReference = extRef;
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	abstract class Reference
@@ -332,6 +352,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		public Label Label;
 		public Reference Reference;
+		public ExternalReference ExternalReference;
 
 		public const int InvalidBreakpointID = -1;
 		public int BreakpointID = InvalidBreakpointID;
@@ -372,6 +393,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			for( int n = 0; n < this.Operands.Length; n++ )
 			{
 				Operand op = this.Operands[ n ];
+				sb.Append( ' ' );
 				if( this.Reference != null )
 				{
 					if( op.Type == OperandType.JumpTarget )
@@ -380,40 +402,33 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 						Label label = this.Reference as Label;
 						if( label != null )
 						{
-							sb.Append( " " + label.Name );
+							sb.Append( label.Name );
 						}
 						else
 						{
-							bool found = false;
-							foreach( ExternalReference extRef in method.OutgoingReferences )
-							{
-								if( extRef.SourceAddress == this.Address )
-								{
-									found = true;
-									sb.Append( " " + extRef.Method.Name );
-									break;
-								}
-							}
-							if( found == false )
-								sb.Append( " " + op.ToString() );
+							if( this.ExternalReference != null )
+								sb.Append( this.ExternalReference.Method.Name );
+							else
+								sb.Append( op.ToString() );
 						}
 					}
 					else if( op.Type == OperandType.BranchTarget )
 					{
 						// Find label
 						Label label = this.Reference as Label;
-						sb.Append( " " + label.Name );
+						sb.Append( label.Name );
 					}
 					else if( op.Type == OperandType.MemoryAccess )
 					{
 						// Find memory reference ??
-						sb.Append( " " + op.ToString() );
+						sb.Append( op.ToString() );
+						sb.AppendFormat( " - {0:X8}", this.Reference.Address );
 					}
 					else
-						sb.Append( " " + op.ToString() );
+						sb.Append( op.ToString() );
 				}
 				else
-					sb.Append( " " + op.ToString() );
+					sb.Append( op.ToString() );
 				bool last = ( n == this.Operands.Length - 1 );
 				if( last == false )
 					sb.Append( ',' );
@@ -665,23 +680,23 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				case OperandType.Annotation:
 					return this.Annotation;
 				case OperandType.BranchTarget:
-					return this.Immediate.ToString();
+					return this.Immediate.ToString( "X4" );
 				case OperandType.JumpTarget:
 					if( this.Register != null )
 						return this.Register.ToString();
 					else
 						return string.Format( "0x{0:X8}", this.Immediate );
 				case OperandType.MemoryAccess:
-					return string.Format( "{0}({1})", this.Immediate, this.Register.ToString() );
+					return string.Format( "{0:X}({1})", this.Immediate, this.Register.ToString() );
 				case OperandType.Register:
 					return this.Register.ToString();
 				case OperandType.VfpuRegister:
 					return Operand.GetVRNotation( this );
 				case OperandType.Immediate:
 					if( this.Annotation != null )
-						return string.Format( "{0}[{1}]", this.Annotation, this.Immediate );
+						return string.Format( "{0:X}[{1}]", this.Annotation, this.Immediate );
 					else
-						return this.Immediate.ToString();
+						return this.Immediate.ToString( "X" );
 				case OperandType.ImmediateFloat:
 					return this.ImmediateFloat.ToString();
 			}
