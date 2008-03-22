@@ -116,7 +116,13 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public Method[] GetMethods( MethodType methodType )
 		{
-			throw new Exception( "The method or operation is not implemented." );
+			List<Method> methods = new List<Method>( _methods.Count );
+			foreach( Method method in _methods )
+			{
+				if( method.Type == methodType )
+					methods.Add( method );
+			}
+			return methods.ToArray();
 		}
 
 		#endregion

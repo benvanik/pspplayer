@@ -42,6 +42,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 
 		public DebuggerState State;
 		public BreakpointManager Breakpoints;
+		public CodeCache CodeCache;
 
 		public InprocDebugger( Host host )
 		{
@@ -52,6 +53,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 
 			this.State = DebuggerState.Idle;
 			this.Breakpoints = new BreakpointManager( this );
+			this.CodeCache = new CodeCache( this );
 
 			this.SetupNavigation();
 
@@ -120,6 +122,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			{
 				this.State = DebuggerState.Detached;
 				this.OnStateChanged();
+			};
+			this.Window.Invoke( del );
+		}
+
+		public void OnModuleLoaded()
+		{
+			DummyDelegate del = delegate
+			{
+				this.CodeCache.Update();
+				this.CodeTool.InvalidateAll();
 			};
 			this.Window.Invoke( del );
 		}

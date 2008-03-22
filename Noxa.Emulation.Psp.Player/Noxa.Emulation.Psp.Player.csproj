@@ -116,6 +116,7 @@
     <Compile Include="Debugger\Model\Bookmark.cs" />
     <Compile Include="Debugger\Model\BreakpointEventArgs.cs" />
     <Compile Include="Debugger\Model\BreakpointManager.cs" />
+    <Compile Include="Debugger\Model\CodeCache.cs" />
     <Compile Include="Debugger\Model\InstructionFormatter.cs" />
     <Compile Include="Debugger\Model\InstructionTables.cs" />
     <Compile Include="Debugger\Model\MethodBody.cs" />
@@ -138,6 +139,12 @@
     </Compile>
     <Compile Include="Debugger\Tools\CodeTool.Designer.cs">
       <DependentUpon>CodeTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Debugger\Tools\CodeViewControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\CodeViewControl.Designer.cs">
+      <DependentUpon>CodeViewControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Debugger\Tools\DisassemblyControl.cs">
       <SubType>Component</SubType>

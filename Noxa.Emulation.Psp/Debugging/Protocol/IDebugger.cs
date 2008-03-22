@@ -49,6 +49,11 @@ namespace Noxa.Emulation.Psp.Debugging.Protocol
 		void OnStopped();
 
 		/// <summary>
+		/// Fired when a module is loaded.
+		/// </summary>
+		void OnModuleLoaded();
+
+		/// <summary>
 		/// Allocate a new unique ID for breakpoints/etc.
 		/// </summary>
 		/// <returns>A unique ID.</returns>

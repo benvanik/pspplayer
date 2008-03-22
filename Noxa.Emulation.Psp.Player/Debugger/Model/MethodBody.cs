@@ -13,6 +13,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 {
 	class MethodBody
 	{
+		public uint TotalLines;
+
 		public readonly uint Address;
 		public readonly uint Length;
 
@@ -22,6 +24,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		{
 			this.Address = address;
 			this.Length = length;
+			this.TotalLines = length / 4;
+
 			this.Instructions = instructions;
 		}
 	}
