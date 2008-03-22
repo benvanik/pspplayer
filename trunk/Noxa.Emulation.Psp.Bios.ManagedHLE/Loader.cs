@@ -630,10 +630,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					}
 				}
 
+				IDebugDatabase db = null;
 				if( parameters.AppendDatabase == true )
 				{
 					Debug.Assert( Diag.Instance.Database != null );
-					Diag.Instance.Database.BeginUpdate();
+					db = Diag.Instance.Database;
+					db.BeginUpdate();
 				}
 
 				int variableExportCount = 0;
@@ -769,22 +771,18 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						}
 
 						// Add to debug database
-						if( parameters.AppendDatabase == true )
+						if( db != null )
 						{
-							Debug.Assert( Diag.Instance.Database != null );
 							Method method = new Method( MethodType.Bios, function.StubAddress, 8, new BiosFunctionToken( stubImport.Function ) );
-							Diag.Instance.Database.AddSymbol( method );
+							db.AddSymbol( method );
 						}
 					}
 				}
 
 				// If symbols are present, use those to add methods and variables
 				// Otherwise, we need to try to figure them out (good luck!)
-				if( parameters.AppendDatabase == true )
+				if( db != null )
 				{
-					Debug.Assert( Diag.Instance.Database != null );
-					IDebugDatabase db = Diag.Instance.Database;
-
 					// Find symbol table
 					Elf32_Shdr* symtabShdr = FindSection( buffer, ".symtab" );
 					if( ( symtabShdr != null ) &&
@@ -846,7 +844,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					}
 
 					// End update, started above
-					Diag.Instance.Database.EndUpdate();
+					db.EndUpdate();
 
 					//foreach( Method method in db.GetMethods() )
 					//    Debug.WriteLine( method.ToString() );

@@ -38,12 +38,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 			this.Disable();
 
-			this.codeViewControl1.Setup( debugger );
+			this.codeView.Setup( debugger );
+
+			// TODO: bind to button
+			this.codeView.UseHex = true;
 		}
 
 		public void InvalidateAll()
 		{
-			this.codeViewControl1.InvalidateAll();
+			this.codeView.InvalidateAll();
 		}
 
 		public void Disable()

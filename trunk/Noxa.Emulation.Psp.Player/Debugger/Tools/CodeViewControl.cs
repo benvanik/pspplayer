@@ -87,6 +87,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		#endregion
 
+		public bool UseHex { get; set; }
+
 		#region Sizing/locations/etc
 
 		private int _totalLines;
@@ -206,6 +208,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		internal Brush _addressFontBrush = SystemBrushes.ControlText;
 		internal Brush _instrFontBrush = SystemBrushes.ControlText;
 		internal Brush _disabledFontBrush = SystemBrushes.GrayText;
+		internal Brush _commentFontBrush = Brushes.Green;
+		internal Pen _commentLinePen = Pens.Green;
+		internal Brush _referenceFontBrush = Brushes.Blue;
+		internal Brush _labelFontBrush = Brushes.Blue;
 
 		private StringFormat _stringFormat;
 		private SizeF _charSize;
@@ -220,8 +226,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private int _gutterWidth = 15;
 		private int _addressWidth;
-		private int _labelWidth = 120;
-		private int _opcodeWidth = 55;
+		private int _labelWidth = 100;
+		private int _opcodeWidth = 50;
 
 		private void SetupGraphics()
 		{
@@ -254,7 +260,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			_vizBrush = new SolidBrush( light );
 
 			_addressWidth = ( int )( _charSize.Width * 8 + 2 + 0.5f );
-			_opcodeWidth = ( int )( _charSize.Width * 6 + 2 + 0.5f );
+			_opcodeWidth = ( int )( _charSize.Width * 8 + 2 + 0.5f );
 		}
 
 		protected override void OnPaintBackground( PaintEventArgs e )
@@ -326,7 +332,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		{
 			int addressx = x + _gutterWidth + 1;
 			int codex = addressx + _addressWidth + 1 + 6;
-			int opcodex = codex + _labelWidth / 2 + 6;
+			int opcodex = codex + _labelWidth / 3 + 6;
 			int operandx = opcodex + _opcodeWidth;
 
 			Brush codeBrush = this.Enabled ? _instrFontBrush : _disabledFontBrush;
@@ -335,7 +341,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			// -- method info --
 			if( lineOffset == 0 )
 			{
-				g.DrawString( string.Format( "// {0} ====================================================", body.Name ), _font, _instrFontBrush, codex, y );
+				g.DrawString( string.Format( "// {0}", body.Name ), _font, _commentFontBrush, codex, y );
+				g.DrawLine( _commentLinePen, codex + ( _charSize.Width * ( body.Name.Length + 4 ) ), y + ( _charSize.Height / 2.0f ), this.ClientRectangle.Width - 10, y + ( _charSize.Height / 2.0f ) );
 				y += _lineHeight;
 			}
 			else
@@ -349,7 +356,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				// Label marker
 				if( instr.Label != null )
 				{
-					g.DrawString( instr.Label.Name + ":", _font, codeBrush, codex, y, _stringFormat );
+					g.DrawString( instr.Label.Name + ":", _font, _labelFontBrush, codex, y, _stringFormat );
 					y += _lineHeight;
 				}
 
@@ -363,7 +370,38 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				g.DrawString( instr.Opcode.ToString(), _font, codeBrush, opcodex, y, _stringFormat );
 
 				// Operands
-				g.DrawString( instr.GetResolvedOperandString( body ), _font, codeBrush, operandx, y, _stringFormat );
+				int realx = operandx;
+				for( int m = 0; m < instr.Operands.Length; m++ )
+				{
+					Operand op = instr.Operands[ m ];
+					string resolved = instr.GetResolvedOperandString( op, this.UseHex );
+					Brush fontBrush = codeBrush;
+					switch( op.Type )
+					{
+						case OperandType.BranchTarget:
+							fontBrush = _referenceFontBrush;
+							break;
+						case OperandType.JumpTarget:
+							fontBrush = _referenceFontBrush;
+							break;
+					}
+					g.DrawString( resolved, _font, fontBrush, realx, y, _stringFormat );
+					realx += ( int )_charSize.Width * resolved.Length;
+
+					bool last = ( m == instr.Operands.Length - 1 );
+					if( last == false )
+					{
+						g.DrawString( ", ", _font, codeBrush, realx - 2, y, _stringFormat );
+						realx += ( int )_charSize.Width * 2 - 2;
+					}
+				}
+
+				// Annotations
+				if( instr.Annotation != null )
+					g.DrawString( instr.Annotation, _font, _referenceFontBrush, realx + 10, y, _stringFormat );
+
+				// Comments
+				// TODO _commentFontBrush
 
 				y += _lineHeight;
 			}
