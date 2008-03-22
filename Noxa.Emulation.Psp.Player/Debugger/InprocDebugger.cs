@@ -106,8 +106,12 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.Window.Invoke( del );
 
 			// TEST
-			Breakpoint bp = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, 0x088003D4 );
-			this.Breakpoints.Add( bp );
+			Breakpoint bp1 = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, 0x088003D4 );
+			this.Breakpoints.Add( bp1 );
+			Breakpoint bp2 = new Breakpoint( this.AllocateID(), 0x09FFFEF4, Noxa.Emulation.Psp.Debugging.Hooks.MemoryAccessType.ReadWrite );
+			this.Breakpoints.Add( bp2 );
+			Breakpoint bp3 = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, 0x08800330 );
+			this.Breakpoints.Add( bp3 );
 		}
 
 		public void OnStopped()
