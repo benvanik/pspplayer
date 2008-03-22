@@ -1,0 +1,83 @@
+﻿// ----------------------------------------------------------------------------
+// PSP Player Emulation Suite
+// Copyright (C) 2008 Ben Vanik (noxa)
+// Licensed under the LGPL - see License.txt in the project root for details
+// ----------------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
+
+namespace Noxa.Emulation.Psp.Player.Debugger.Model
+{
+	class CodeCache
+	{
+		public readonly InprocDebugger Debugger;
+		public List<MethodBody> Methods;
+
+		public CodeCache( InprocDebugger debugger )
+		{
+			this.Debugger = debugger;
+			this.Methods = new List<MethodBody>();
+		}
+
+		public void Update()
+		{
+			Method[] userMethods = this.Debugger.DebugHost.Database.GetMethods( MethodType.User );
+			this.Methods.Clear();
+			foreach( Method method in userMethods )
+			{
+				//MethodBody body = new MethodBody( method.Address, method.Length, null );
+				MethodBody body = this.BuildMethodBody( method );
+				// Name, etc?
+				this.Methods.Add( body );
+			}
+			this.Methods.Sort( delegate( MethodBody a, MethodBody b )
+			{
+				return a.Address.CompareTo( b.Address );
+			} );
+		}
+
+		private MethodBody BuildMethodBody( Method method )
+		{
+			Debug.Assert( this.Debugger.DebugHost.CpuHook != null );
+			uint[] codes = this.Debugger.DebugHost.CpuHook.GetMethodBody( method );
+
+			uint instrAddress = method.Address;
+			List<Instruction> instrs = new List<Instruction>( ( int )method.Length / 4 );
+			for( int n = 0; n < codes.Length; n++ )
+			{
+				Instruction instr = new Instruction( instrAddress, codes[ n ] );
+				instrs.Add( instr );
+				instrAddress += 4;
+			}
+			MethodBody methodBody = new MethodBody( method.Address, ( uint )method.Length, instrs.ToArray() );
+
+			return methodBody;
+		}
+
+		public MethodBody this[ uint address ]
+		{
+			get
+			{
+				int first = 0;
+				int last = this.Methods.Count - 1;
+				while( first <= last )
+				{
+					int middle = ( first + last ) / 2;
+					MethodBody body = this.Methods[ middle ];
+					if( ( address >= body.Address ) &&
+						( address < body.Address + body.Length ) )
+						return body;
+					else if( body.Address < address )
+						first = middle + 1;
+					else
+						last = middle - 1;
+				}
+				return null;
+			}
+		}
+	}
+}

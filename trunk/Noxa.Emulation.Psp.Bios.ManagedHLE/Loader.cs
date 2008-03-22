@@ -934,6 +934,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					Marshal.FreeHGlobal( pbuffer );
 			}
 
+			if( Diag.IsAttached == true )
+				Diag.Instance.Client.OnModuleLoaded();
+
 			return results;
 		}
 

@@ -29,6 +29,7 @@
 		private void InitializeComponent()
 		{
 			this.disassemblyControl = new Noxa.Emulation.Psp.Player.Debugger.Tools.DisassemblyControl();
+			this.codeViewControl1 = new Noxa.Emulation.Psp.Player.Debugger.Tools.CodeViewControl();
 			this.SuspendLayout();
 			// 
 			// disassemblyControl
@@ -42,14 +43,26 @@
 			this.disassemblyControl.Location = new System.Drawing.Point( 12, 12 );
 			this.disassemblyControl.Name = "disassemblyControl";
 			this.disassemblyControl.ScrollAlwaysVisible = true;
-			this.disassemblyControl.Size = new System.Drawing.Size( 672, 485 );
+			this.disassemblyControl.Size = new System.Drawing.Size( 672, 186 );
 			this.disassemblyControl.TabIndex = 0;
+			// 
+			// codeViewControl1
+			// 
+			this.codeViewControl1.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+						| System.Windows.Forms.AnchorStyles.Left )
+						| System.Windows.Forms.AnchorStyles.Right ) ) );
+			this.codeViewControl1.Location = new System.Drawing.Point( 12, 204 );
+			this.codeViewControl1.Name = "codeViewControl1";
+			this.codeViewControl1.Size = new System.Drawing.Size( 672, 295 );
+			this.codeViewControl1.TabIndex = 1;
+			this.codeViewControl1.Text = "codeViewControl1";
 			// 
 			// CodeTool
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
 			this.ClientSize = new System.Drawing.Size( 696, 511 );
 			this.CloseButton = false;
+			this.Controls.Add( this.codeViewControl1 );
 			this.Controls.Add( this.disassemblyControl );
 			this.DockAreas = ( ( WeifenLuo.WinFormsUI.Docking.DockAreas )( ( WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.Document ) ) );
 			this.Name = "CodeTool";
@@ -62,5 +75,6 @@
 		#endregion
 
 		private DisassemblyControl disassemblyControl;
+		private CodeViewControl codeViewControl1;
 	}
 }
