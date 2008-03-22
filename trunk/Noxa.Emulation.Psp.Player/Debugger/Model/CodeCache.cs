@@ -82,6 +82,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 						return a.SourceAddress.CompareTo( b.SourceAddress );
 					} );
 				}
+				if( ( method.IncomingReferences.Count > 0 ) || ( method.OutgoingReferences.Count > 0 ) )
+					method.FinalizeReferences();
 			}
 		}
 

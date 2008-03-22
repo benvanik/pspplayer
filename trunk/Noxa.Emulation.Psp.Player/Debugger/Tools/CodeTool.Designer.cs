@@ -55,7 +55,7 @@
 			this.codeViewControl1.Name = "codeViewControl1";
 			this.codeViewControl1.Size = new System.Drawing.Size( 672, 295 );
 			this.codeViewControl1.TabIndex = 1;
-			this.codeViewControl1.Text = "codeViewControl1";
+			this.codeViewControl1.Text = "codeView";
 			// 
 			// CodeTool
 			// 
