@@ -219,6 +219,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private int _gutterWidth = 15;
 		private int _addressWidth;
+		private int _labelWidth = 120;
+		private int _opcodeWidth = 65;
 
 		private void SetupGraphics()
 		{
@@ -319,11 +321,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		{
 			int addressx = x + _gutterWidth + 1;
 			int codex = addressx + _addressWidth + 1 + 6;
+			int opcodex = codex + _labelWidth / 2 + 6;
+			int operandx = opcodex + _opcodeWidth;
+
+			Brush codeBrush = this.Enabled ? _instrFontBrush : _disabledFontBrush;
+			Brush addressBrush = this.Enabled ? _addressFontBrush : _disabledFontBrush;
 
 			// -- method info --
 			if( lineOffset == 0 )
 			{
-				g.DrawString( string.Format( "Method: {0:X8}", body.Address ), _font, _instrFontBrush, codex, y );
+				g.DrawString( string.Format( "// {0} ====================================================", body.Name ), _font, _instrFontBrush, codex, y );
 				y += _lineHeight;
 			}
 			else
@@ -334,13 +341,24 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			{
 				Instruction instr = body.Instructions[ n ];
 
+				// Label marker
+				if( instr.Label != null )
+				{
+					g.DrawString( instr.Label.Name + ":", _font, codeBrush, codex, y, _stringFormat );
+					y += _lineHeight;
+				}
+
 				// Gutter
 				// TODO
 
 				// Address
-				g.DrawString( string.Format( "{0:X8}", instr.Address ), _font, _addressFontBrush, addressx + 6, y, _stringFormat );
+				g.DrawString( string.Format( "{0:X8}", instr.Address ), _font, addressBrush, addressx + 6, y, _stringFormat );
 
-				// Code
+				// Opcode
+				g.DrawString( instr.Opcode.ToString(), _font, codeBrush, opcodex, y, _stringFormat );
+
+				// Operands
+				g.DrawString( instr.GetResolvedOperandString( body ), _font, codeBrush, operandx, y, _stringFormat );
 
 				y += _lineHeight;
 			}
