@@ -54,6 +54,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		{
 			return ( int )( code & 0xFFFF );
 		}
+		private static int SIMM16( uint code )
+		{
+			return ( int )( ( short )( code & 0xFFFF ) );
+		}
 
 		private static Register VD( uint code )
 		{
@@ -136,22 +140,22 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			//else
 			//    sprintf(out, "%s\t%s, %s, ->$%08x",name,RN(rt),RN(rs),off);
 
-			int imm = IMM16( code ) << 2;
+			int imm = SIMM16( code ) << 2;
 			opcode = new Opcode( entry );
 			operands = new Operand[]{
 				new Operand( RT( code ) ),
 				new Operand( RS( code ) ),
-				new Operand( OperandType.BranchTarget, imm ),
+				new Operand( OperandType.BranchTarget, ( int )address + 4 + imm ),
 			};
 			return true;
 		}
 		public static bool RelBranch( uint address, uint code, InstructionEntry entry, out Opcode opcode, out Operand[] operands )
 		{
-			int imm = IMM16( code ) << 2;
+			int imm = SIMM16( code ) << 2;
 			opcode = new Opcode( entry );
 			operands = new Operand[]{
 				new Operand( RS( code ) ),
-				new Operand( OperandType.BranchTarget, imm ),
+				new Operand( OperandType.BranchTarget, ( int )address + 4 + imm ),
 			};
 			return true;
 		}
@@ -168,7 +172,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			operands = new Operand[]{
 				new Operand( RT( code ) ),
 				new Operand( RS( code ) ),
-				new Operand( IMM16( code ), 2 ),
+				new Operand( SIMM16( code ), 2 ),
 			};
 			return true;
 		}
@@ -186,7 +190,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			opcode = new Opcode( entry );
 			operands = new Operand[]{
 				new Operand( RT( code ) ),
-				new Operand( OperandType.MemoryAccess, RS( code ), IMM16( code ) ),
+				new Operand( OperandType.MemoryAccess, RS( code ), SIMM16( code ) ),
 			};
 			return true;
 		}
@@ -262,7 +266,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			opcode = new Opcode( entry );
 			operands = new Operand[]{
 				new Operand( FT( code ) ),
-				new Operand( OperandType.MemoryAccess, RS( code ), IMM16( code ) ),
+				new Operand( OperandType.MemoryAccess, RS( code ), SIMM16( code ) ),
 			};
 			return true;
 		}
@@ -277,10 +281,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		}
 		public static bool FPUBranch( uint address, uint code, InstructionEntry entry, out Opcode opcode, out Operand[] operands )
 		{
-			int imm = IMM16( code ) << 2;
+			int imm = SIMM16( code ) << 2;
 			opcode = new Opcode( entry );
 			operands = new Operand[]{
-				new Operand( OperandType.BranchTarget, imm ),
+				new Operand( OperandType.BranchTarget, ( int )address + 4 + imm ),
 			};
 			return true;
 		}
@@ -443,7 +447,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			DataSize sz = GetMtxSize( code );
 			opcode = new Opcode( entry, VSuff( code ) );
 			operands = new Operand[]{
-				new Operand( VD( code ), sz ), // Matrix
+				new Operand( VD( code ), sz ),			// Matrix
 			};
 			return true;
 		}
@@ -452,8 +456,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			DataSize sz = GetMtxSize( code );
 			opcode = new Opcode( entry, VSuff( code ) );
 			operands = new Operand[]{
-				new Operand( VD( code ), sz ), // Matrix
-				new Operand( VS( code ), sz ), // Matrix
+				new Operand( VD( code ), sz ),			// Matrix
+				new Operand( VS( code ), sz ),			// Matrix
 			};
 			return true;
 		}
@@ -462,9 +466,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			DataSize sz = GetMtxSize( code );
 			opcode = new Opcode( entry, VSuff( code ) );
 			operands = new Operand[]{
-				new Operand( VD( code ), sz ), // Matrix
-				new Operand( VS( code ), sz ), // Matrix
-				new Operand( VT( code ), sz ), // Matrix
+				new Operand( VD( code ), sz ),			// Matrix
+				new Operand( VS( code ), sz ),			// Matrix
+				new Operand( VT( code ), sz ),			// Matrix
 			};
 			return true;
 		}
@@ -473,9 +477,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			DataSize sz = GetMtxSize( code );
 			opcode = new Opcode( entry, VSuff( code ) );
 			operands = new Operand[]{
-				new Operand( VD( code ), sz ), // Matrix
-				new Operand( VS( code ), sz, true ), // Matrix
-				new Operand( VT( code ), sz ), // Matrix
+				new Operand( VD( code ), sz ),			// Matrix
+				new Operand( VS( code ), sz, true ),	// Matrix
+				new Operand( VT( code ), sz ),			// Matrix
 			};
 			return true;
 		}
@@ -887,7 +891,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			opcode = new Opcode( entry );
 			operands = new Operand[]{
 				new Operand( ( int )imm3, 4, "CC" ),
-				new Operand( OperandType.BranchTarget, IMM16( code ) ),
+				new Operand( OperandType.BranchTarget, ( int )address + 4 + ( SIMM16( code ) << 2 ) ),
 			};
 			return true;
 		}
