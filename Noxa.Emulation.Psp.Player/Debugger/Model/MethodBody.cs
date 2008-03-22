@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Model
 {
@@ -15,6 +16,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 	{
 		public string Name;
 		public uint TotalLines;
+		public BiosFunctionToken Function;
 
 		public readonly uint Address;
 		public readonly uint Length;
@@ -277,6 +279,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				newMemRef.Writes++;
 			newMemRef.Instruction = instruction;
 			instruction.Reference = newMemRef;
+			instruction.Annotation = ( isRead ? "r " : "w " ) + target.ToString( "X8" );
 			memRefs.Add( newMemRef );
 		}
 
@@ -307,7 +310,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 	class Label : Reference
 	{
 		public string Name;
-		public List<Instruction> References = new List<Instruction>();
 		public override string ToString()
 		{
 			return string.Format( "{0} ({1:X8}) - {2} refs", this.Name, this.Address, this.References.Count );
@@ -354,6 +356,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public Reference Reference;
 		public ExternalReference ExternalReference;
 
+		public string Annotation;
+
 		public const int InvalidBreakpointID = -1;
 		public int BreakpointID = InvalidBreakpointID;
 
@@ -387,53 +391,57 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			return sb.ToString();
 		}
 
-		public string GetResolvedOperandString( MethodBody method )
+		public string GetResolvedOperandString( bool hex )
 		{
 			StringBuilder sb = new StringBuilder();
 			for( int n = 0; n < this.Operands.Length; n++ )
 			{
 				Operand op = this.Operands[ n ];
 				sb.Append( ' ' );
-				if( this.Reference != null )
-				{
-					if( op.Type == OperandType.JumpTarget )
-					{
-						// Find external reference
-						Label label = this.Reference as Label;
-						if( label != null )
-						{
-							sb.Append( label.Name );
-						}
-						else
-						{
-							if( this.ExternalReference != null )
-								sb.Append( this.ExternalReference.Method.Name );
-							else
-								sb.Append( op.ToString() );
-						}
-					}
-					else if( op.Type == OperandType.BranchTarget )
-					{
-						// Find label
-						Label label = this.Reference as Label;
-						sb.Append( label.Name );
-					}
-					else if( op.Type == OperandType.MemoryAccess )
-					{
-						// Find memory reference ??
-						sb.Append( op.ToString() );
-						sb.AppendFormat( " - {0:X8}", this.Reference.Address );
-					}
-					else
-						sb.Append( op.ToString() );
-				}
-				else
-					sb.Append( op.ToString() );
+				sb.Append( this.GetResolvedOperandString( op, hex ) );
 				bool last = ( n == this.Operands.Length - 1 );
 				if( last == false )
 					sb.Append( ',' );
 			}
 			return sb.ToString();
+		}
+
+		public string GetResolvedOperandString( Operand op, bool hex )
+		{
+			if( this.Reference != null )
+			{
+				if( op.Type == OperandType.JumpTarget )
+				{
+					// Find external reference
+					Label label = this.Reference as Label;
+					if( label != null )
+					{
+						return label.Name;
+					}
+					else
+					{
+						if( this.ExternalReference != null )
+							return this.ExternalReference.Method.Name;
+						else
+							return op.ToString( hex );
+					}
+				}
+				else if( op.Type == OperandType.BranchTarget )
+				{
+					// Find label
+					Label label = this.Reference as Label;
+					return label.Name;
+				}
+				else if( op.Type == OperandType.MemoryAccess )
+				{
+					// Find memory reference ??
+					return op.ToString( hex );
+				}
+				else
+					return op.ToString( hex );
+			}
+			else
+				return op.ToString( hex );
 		}
 
 		public bool IsBranch
@@ -674,20 +682,31 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		public override string ToString()
 		{
+			return this.ToString( true );
+		}
+
+		public string ToString( bool hex )
+		{
 			switch( this.Type )
 			{
 				default:
 				case OperandType.Annotation:
 					return this.Annotation;
 				case OperandType.BranchTarget:
-					return this.Immediate.ToString( "X4" );
+					if( hex == true )
+						return ( ( ( this.Immediate <= 9 ) && ( this.Immediate >= 0 ) ) ? string.Empty : "0x" ) + this.Immediate.ToString( "X4" );
+					else
+						return this.Immediate.ToString();
 				case OperandType.JumpTarget:
 					if( this.Register != null )
 						return this.Register.ToString();
 					else
 						return string.Format( "0x{0:X8}", this.Immediate );
 				case OperandType.MemoryAccess:
-					return string.Format( "{0:X}({1})", this.Immediate, this.Register.ToString() );
+					if( hex == true )
+						return ( ( ( this.Immediate <= 9 ) && ( this.Immediate >= 0 ) ) ? string.Empty : "0x" ) + string.Format( "{0:X}({1})", ( this.Immediate & 0xFFFF ), this.Register.ToString() );
+					else
+						return string.Format( "{0}({1})", this.Immediate, this.Register.ToString() );
 				case OperandType.Register:
 					return this.Register.ToString();
 				case OperandType.VfpuRegister:
@@ -695,8 +714,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				case OperandType.Immediate:
 					if( this.Annotation != null )
 						return string.Format( "{0:X}[{1}]", this.Annotation, this.Immediate );
+					else if( hex == true )
+						return ( ( ( this.Immediate <= 9 ) && ( this.Immediate >= 0 ) ) ? string.Empty : "0x" ) + ( this.Immediate & 0xFFFF ).ToString( "X" );
 					else
-						return this.Immediate.ToString( "X" );
+						return this.Immediate.ToString();
 				case OperandType.ImmediateFloat:
 					return this.ImmediateFloat.ToString();
 			}

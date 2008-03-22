@@ -25,9 +25,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		public void Update()
 		{
-			Method[] userMethods = this.Debugger.DebugHost.Database.GetMethods( MethodType.User );
+			//Method[] userMethods = this.Debugger.DebugHost.Database.GetMethods( MethodType.User );
+			Method[] methods = this.Debugger.DebugHost.Database.GetMethods();
 			this.Methods.Clear();
-			foreach( Method method in userMethods )
+			foreach( Method method in methods )
 			{
 				//MethodBody body = new MethodBody( method.Address, method.Length, null );
 				MethodBody body = this.BuildMethodBody( method );
@@ -101,6 +102,14 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				instrAddress += 4;
 			}
 			MethodBody methodBody = new MethodBody( method.Address, ( uint )method.Length, instrs.ToArray() );
+			if( method.Type == MethodType.Bios )
+			{
+				if( method.Function.MethodName != null )
+					methodBody.Name = method.Function.MethodName;
+				else
+					methodBody.Name = method.Function.ModuleName + "::" + method.Function.NID.ToString( "X8" );
+				methodBody.Function = method.Function;
+			}
 
 			return methodBody;
 		}

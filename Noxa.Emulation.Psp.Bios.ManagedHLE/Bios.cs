@@ -11,8 +11,8 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-
 using Noxa.Emulation.Psp.Cpu;
+using Noxa.Emulation.Psp.Debugging.DebugData;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Games;
 
