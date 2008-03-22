@@ -38,6 +38,51 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			{
 				return a.Address.CompareTo( b.Address );
 			} );
+
+			this.LinkReferences();
+		}
+
+		private void LinkReferences()
+		{
+			// nlogn, in theory
+			foreach( MethodBody method in this.Methods )
+			{
+				foreach( CodeReference codeRef in method.CodeReferences )
+				{
+					if( codeRef.Address == 0 )
+						continue;
+					MethodBody other = this[ codeRef.Address ];
+					if( other == null )
+						continue;
+					ExternalReference extRef = new ExternalReference();
+					extRef.Method = method;
+					extRef.SourceAddress = codeRef.Instruction.Address;
+					extRef.TargetAddress = codeRef.Address;
+					other.IncomingReferences.Add( extRef );
+					extRef = new ExternalReference();
+					extRef.Method = other;
+					extRef.SourceAddress = codeRef.Instruction.Address;
+					extRef.TargetAddress = codeRef.Address;
+					method.OutgoingReferences.Add( extRef );
+				}
+				if( method.OutgoingReferences.Count > 0 )
+				{
+					method.OutgoingReferences.Sort( delegate( ExternalReference a, ExternalReference b )
+					{
+						return a.TargetAddress.CompareTo( b.TargetAddress );
+					} );
+				}
+			}
+			foreach( MethodBody method in this.Methods )
+			{
+				if( method.IncomingReferences.Count > 0 )
+				{
+					method.IncomingReferences.Sort( delegate( ExternalReference a, ExternalReference b )
+					{
+						return a.SourceAddress.CompareTo( b.SourceAddress );
+					} );
+				}
+			}
 		}
 
 		private MethodBody BuildMethodBody( Method method )
