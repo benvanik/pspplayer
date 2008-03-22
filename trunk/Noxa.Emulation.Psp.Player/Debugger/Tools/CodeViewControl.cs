@@ -323,7 +323,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			// -- method info --
 			if( lineOffset == 0 )
 			{
-				g.DrawString( string.Format( "METHOD: {0:X8}", body.Address ), _font, _instrFontBrush, codex, y );
+				g.DrawString( string.Format( "Method: {0:X8}", body.Address ), _font, _instrFontBrush, codex, y );
 				y += _lineHeight;
 			}
 			else

@@ -20,14 +20,104 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		public Instruction[] Instructions;
 
+		public int LocalsSize;
+		public Label[] Labels;
+
 		public MethodBody( uint address, uint length, Instruction[] instructions )
 		{
 			this.Address = address;
 			this.Length = length;
 			this.TotalLines = length / 4;
 
-			this.Instructions = instructions;
+			if( instructions != null )
+				this.Populate( instructions );
 		}
+
+		public void Populate( Instruction[] instructions )
+		{
+			this.Instructions = instructions;
+
+			// - determine locals (loop for first addiu $sp, $sp, [size]
+			// - find all labels (branch targets)
+
+			bool foundSpMod = false;
+			List<Label> labels = new List<Label>();
+			foreach( Instruction instruction in instructions )
+			{
+				if( instruction.IsBranch == true )
+				{
+					uint target = 0;
+					foreach( Operand op in instruction.Operands )
+					{
+						if( op.Type == OperandType.BranchTarget )
+						{
+							target = ( uint )op.Immediate;
+							break;
+						}
+					}
+					if( target > 0 )
+						this.AddLabelReference( labels, instruction,target );
+				}
+				else if( instruction.IsJump == true )
+				{
+					uint target = 0;
+					foreach( Operand op in instruction.Operands )
+					{
+						if( op.Type == OperandType.JumpTarget )
+						{
+							target = ( uint )op.Immediate;
+							break;
+						}
+					}
+					if( ( target >= this.Address ) && ( target < ( this.Address + this.Length ) ) )
+						this.AddLabelReference( labels, instruction, target );
+				}
+				else if( instruction.IsLoad == true )
+				{
+				}
+				else if( instruction.IsStore == true )
+				{
+				}
+				if( ( foundSpMod == false ) && ( instruction.Opcode.InstructionEntry.Name == "addiu" ) )
+				{
+					foundSpMod = true;
+					int adjustment = instruction.Operands[ 2 ].Immediate / 4;
+					this.LocalsSize = -adjustment;
+				}
+			}
+
+			// Sort labels
+			labels.Sort( delegate( Label a, Label b )
+			{
+				return a.Address.CompareTo( b.Address );
+			} );
+			this.Labels = labels.ToArray();
+		}
+
+		private void AddLabelReference( List<Label> labels, Instruction instruction, uint target )
+		{
+			foreach( Label label in labels )
+			{
+				if( label.Address == target )
+				{
+					label.References.Add( instruction );
+					//instruction.Reference = new CodeReference(
+					return;
+				}
+			}
+			Label newLabel = new Label();
+			newLabel.Name = string.Format( "loc_{0:X8}", target );
+			newLabel.Address = target;
+			newLabel.References.Add( instruction );
+			labels.Add( newLabel );
+		}
+	}
+
+	class Label
+	{
+		public string Name;
+		public uint Address;
+		public List<Instruction> References = new List<Instruction>();
 	}
 
 	class Instruction
@@ -70,6 +160,38 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				sb.AppendFormat( " {0}{1}", op.ToString(), last ? "" : "," );
 			}
 			return sb.ToString();
+		}
+
+		public bool IsBranch
+		{
+			get
+			{
+				return ( this.Opcode.InstructionEntry.Flags & InstructionTables.IS_CONDBRANCH ) > 0;
+			}
+		}
+
+		public bool IsJump
+		{
+			get
+			{
+				return ( this.Opcode.InstructionEntry.Flags & InstructionTables.IS_JUMP ) > 0;
+			}
+		}
+
+		public bool IsLoad
+		{
+			get
+			{
+				return ( this.Opcode.InstructionEntry.Flags & InstructionTables.IN_MEM ) > 0;
+			}
+		}
+
+		public bool IsStore
+		{
+			get
+			{
+				return ( this.Opcode.InstructionEntry.Flags & InstructionTables.OUT_MEM ) > 0;
+			}
 		}
 	}
 

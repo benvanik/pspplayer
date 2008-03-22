@@ -161,8 +161,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			new InstructionEntry( "srlv", Formatters.VarShiftType, OUT_RD | IN_RT | IN_RS_SHIFT ),
 			new InstructionEntry( "srav", Formatters.VarShiftType, OUT_RD | IN_RT | IN_RS_SHIFT ),
 			//8
-			new InstructionEntry( "jr", Formatters.JumpRegType, 0 ),
-			new InstructionEntry( "jalr", Formatters.JumpRegType, 0 ),
+			new InstructionEntry( "jr", Formatters.JumpRegType, IS_JUMP | DELAYSLOT | IN_RS ),
+			new InstructionEntry( "jalr", Formatters.JumpRegType, IS_JUMP | DELAYSLOT | IN_RS | OUT_RD ),
 			new InstructionEntry( "movz", Formatters.RType3, OUT_RD | IN_RS | IN_RT ),
 			new InstructionEntry( "movn", Formatters.RType3, OUT_RD | IN_RS | IN_RT ),
 			new InstructionEntry( "syscall", Formatters.Syscall, 0 ),
