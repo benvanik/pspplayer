@@ -55,6 +55,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			List<Label> labels = new List<Label>();
 			List<CodeReference> codeRefs = new List<CodeReference>();
 			List<MemoryReference> memRefs = new List<MemoryReference>();
+			uint[] currentRegisters = new uint[ 32 ];
+			uint validRegisters = 0;
 			foreach( Instruction instruction in instructions )
 			{
 				if( instruction.IsBranch == true )
@@ -70,6 +72,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 					}
 					if( target > 0 )
 						this.AddLabelReference( labels, instruction, target );
+
+					// TODO: allow some to fall through the branch?
+					validRegisters = 0;
 				}
 				else if( instruction.IsJump == true )
 				{
@@ -86,12 +91,27 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 						this.AddLabelReference( labels, instruction, target );
 					else
 						this.AddCodeReference( codeRefs, instruction, target );
+					validRegisters = 0;
 				}
 				else if( instruction.IsLoad == true )
 				{
+					int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
+					if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
+					{
+						uint target = currentRegisters[ reg1 ];
+						target = ( uint )( ( int )target + instruction.Operands[ 1 ].Immediate );
+						this.AddMemoryReference( memRefs, instruction, target, true );
+					}
 				}
 				else if( instruction.IsStore == true )
 				{
+					int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
+					if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
+					{
+						uint target = currentRegisters[ reg1 ];
+						target = ( uint )( ( int )target + instruction.Operands[ 1 ].Immediate );
+						this.AddMemoryReference( memRefs, instruction, target, false );
+					}
 				}
 				if( ( foundSpMod == false ) && ( instruction.Opcode.InstructionEntry.Name == "addiu" ) )
 				{
@@ -99,9 +119,65 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 					int adjustment = instruction.Operands[ 2 ].Immediate / 4;
 					this.LocalsSize = -adjustment;
 				}
+				else
+				{
+					uint flags = instruction.Opcode.InstructionEntry.Flags;
+					if( instruction.Opcode.InstructionEntry.Name == "lui" )
+					{
+						int reg = instruction.Operands[ 0 ].Register.Ordinal;
+						validRegisters |= ( uint )( 1 << reg );
+						currentRegisters[ reg ] = ( uint )instruction.Operands[ 1 ].Immediate << 16;
+					}
+					else if( ( flags & InstructionTables.OUT_RT ) > 0 )
+					{
+						if( instruction.Opcode.InstructionEntry.Name == "addiu" )
+						{
+							int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
+							if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
+							{
+								int reg2 = instruction.Operands[ 0 ].Register.Ordinal;
+								validRegisters |= ( uint )( 1 << reg2 );
+								currentRegisters[ reg2 ] = ( uint )( ( int )currentRegisters[ reg1 ] + instruction.Operands[ 2 ].Immediate );
+							}
+						}
+						else if( instruction.Opcode.InstructionEntry.Name == "ori" )
+						{
+							int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
+							if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
+							{
+								int reg2 = instruction.Operands[ 0 ].Register.Ordinal;
+								validRegisters |= ( uint )( 1 << reg2 );
+								currentRegisters[ reg2 ] = currentRegisters[ reg1 ] | ( uint )instruction.Operands[ 2 ].Immediate;
+							}
+						}
+						else
+						{
+							// Changed - no longer valid
+							int reg = instruction.Operands[ 0 ].Register.Ordinal;
+							validRegisters &= ~( uint )( 1 << reg );
+						}
+					}
+				}
+
+				//lui $n, NNN
+				//addiu $n, $n, NNN
+
+				//lui $n, NNN
+				//ori $n, $n, NNN
+
+				//lui $n, NNN
+				//l* $m, NNN($n)
+
+				//lui $n, NNN
+				//s* $m, NNN($n)
 			}
 
 			// Sort all
+			this.SortAndSet( labels, codeRefs, memRefs );
+		}
+
+		private void SortAndSet( List<Label> labels, List<CodeReference> codeRefs, List<MemoryReference> memRefs )
+		{
 			labels.Sort( delegate( Label a, Label b )
 			{
 				return a.Address.CompareTo( b.Address );
@@ -157,6 +233,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		private void AddMemoryReference( List<MemoryReference> memRefs, Instruction instruction, uint target, bool isRead )
 		{
+			//Debug.WriteLine( string.Format( "adding memory reference at {0:X8} ({1}) to {2:X8} for {3}", instruction.Address, instruction, target, isRead ? "read" : "write" ) );
 			foreach( MemoryReference memRef in memRefs )
 			{
 				if( memRef.Address == target )
