@@ -174,6 +174,21 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 			// Sort all
 			this.SortAndSet( labels, codeRefs, memRefs );
+
+			// Add labels to instructions
+			foreach( Label label in this.Labels )
+			{
+				foreach( Instruction instruction in this.Instructions )
+				{
+					if( label.Address == instruction.Address )
+					{
+						instruction.Label = label;
+						break;
+					}
+				}
+			}
+
+			this.TotalLines = ( uint )( this.Instructions.Length + this.Labels.Length );
 		}
 
 		private void SortAndSet( List<Label> labels, List<CodeReference> codeRefs, List<MemoryReference> memRefs )
@@ -202,6 +217,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				if( label.Address == target )
 				{
 					label.References.Add( instruction );
+					instruction.Reference = label;
 					return;
 				}
 			}
@@ -209,6 +225,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			newLabel.Name = string.Format( "loc_{0:X8}", target );
 			newLabel.Address = target;
 			newLabel.References.Add( instruction );
+			instruction.Reference = newLabel;
 			labels.Add( newLabel );
 		}
 
@@ -260,22 +277,21 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		}
 	}
 
-	class Label
-	{
-		public string Name;
-		public uint Address;
-		public List<Instruction> References = new List<Instruction>();
-		public override string ToString()
-		{
-			return string.Format( "{0} ({1:X8}) - {2} refs", this.Name, this.Address, this.References.Count );
-		}
-	}
-
 	abstract class Reference
 	{
 		public Instruction Instruction;
 		public uint Address;
 		public List<Instruction> References = new List<Instruction>();
+	}
+
+	class Label : Reference
+	{
+		public string Name;
+		public List<Instruction> References = new List<Instruction>();
+		public override string ToString()
+		{
+			return string.Format( "{0} ({1:X8}) - {2} refs", this.Name, this.Address, this.References.Count );
+		}
 	}
 
 	class MemoryReference : Reference
@@ -314,6 +330,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public readonly Opcode Opcode;
 		public readonly Operand[] Operands;
 
+		public Label Label;
 		public Reference Reference;
 
 		public const int InvalidBreakpointID = -1;
@@ -345,6 +362,61 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				Operand op = this.Operands[ n ];
 				bool last = ( n == this.Operands.Length - 1 );
 				sb.AppendFormat( " {0}{1}", op.ToString(), last ? "" : "," );
+			}
+			return sb.ToString();
+		}
+
+		public string GetResolvedOperandString( MethodBody method )
+		{
+			StringBuilder sb = new StringBuilder();
+			for( int n = 0; n < this.Operands.Length; n++ )
+			{
+				Operand op = this.Operands[ n ];
+				if( this.Reference != null )
+				{
+					if( op.Type == OperandType.JumpTarget )
+					{
+						// Find external reference
+						Label label = this.Reference as Label;
+						if( label != null )
+						{
+							sb.Append( " " + label.Name );
+						}
+						else
+						{
+							bool found = false;
+							foreach( ExternalReference extRef in method.OutgoingReferences )
+							{
+								if( extRef.SourceAddress == this.Address )
+								{
+									found = true;
+									sb.Append( " " + extRef.Method.Name );
+									break;
+								}
+							}
+							if( found == false )
+								sb.Append( " " + op.ToString() );
+						}
+					}
+					else if( op.Type == OperandType.BranchTarget )
+					{
+						// Find label
+						Label label = this.Reference as Label;
+						sb.Append( " " + label.Name );
+					}
+					else if( op.Type == OperandType.MemoryAccess )
+					{
+						// Find memory reference ??
+						sb.Append( " " + op.ToString() );
+					}
+					else
+						sb.Append( " " + op.ToString() );
+				}
+				else
+					sb.Append( " " + op.ToString() );
+				bool last = ( n == this.Operands.Length - 1 );
+				if( last == false )
+					sb.Append( ',' );
 			}
 			return sb.ToString();
 		}
