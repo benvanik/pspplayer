@@ -189,8 +189,11 @@ int __debugHandlerM( int breakpointId )
 
 	breakpoint->HitCount++;
 
-	// Make sure the PC state is valid
-	_cpuCtx->PC = ( int )breakpoint->Address;
+	if( breakpoint->Type != BreakpointType::MemoryAccess )
+	{
+		// Make sure the PC state is valid - if a memory access, the state should be valid before we get here
+		_cpuCtx->PC = ( int )breakpoint->Address;
+	}
 
 	switch( breakpoint->Mode )
 	{
@@ -287,6 +290,15 @@ int ErrorDebugBreak( uint pc )
 	Diag::Instance->CpuHook->AddBreakpoint( bp );
 	int handleResult = __debugHandlerM( bp->ID );
 	Diag::Instance->CpuHook->RemoveBreakpoint( bp->ID );
+	// handleResult should be 0 for continue, non-zero for death?
+	assert( handleResult == 0 );
+	return handleResult;
+}
+
+int TriggerMemoryBreakpoint( uint pc, bool isRead, int bpId )
+{
+	_cpuCtx->PC = pc;
+	int handleResult = __debugHandlerM( bpId );
 	// handleResult should be 0 for continue, non-zero for death?
 	assert( handleResult == 0 );
 	return handleResult;
@@ -408,6 +420,9 @@ byte* FindInstructionStart( CodeBlock* block, uint address, int* size )
 	return ( ( byte* )block->Pointer + sum );
 }
 
+extern void AddMemoryBreakpoint( int id, uint address, bool isRead );
+extern void RemoveMemoryBreakpoint( uint address, bool isRead );
+
 void SetBreakpoint( Breakpoint^ breakpoint )
 {
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
@@ -438,6 +453,19 @@ void SetBreakpoint( Breakpoint^ breakpoint )
 		}
 		break;
 	case BreakpointType::MemoryAccess:
+		switch( breakpoint->AccessType )
+		{
+		case MemoryAccessType::Read:
+			AddMemoryBreakpoint( breakpoint->ID, breakpoint->Address, true );
+			break;
+		case MemoryAccessType::Write:
+			AddMemoryBreakpoint( breakpoint->ID, breakpoint->Address, false );
+			break;
+		case MemoryAccessType::ReadWrite:
+			AddMemoryBreakpoint( breakpoint->ID, breakpoint->Address, true );
+			AddMemoryBreakpoint( breakpoint->ID, breakpoint->Address, false );
+			break;
+		}
 		break;
 	}
 }
@@ -465,6 +493,19 @@ void UnsetBreakpoint( Breakpoint^ breakpoint )
 		}
 		break;
 	case BreakpointType::MemoryAccess:
+		switch( breakpoint->AccessType )
+		{
+		case MemoryAccessType::Read:
+			RemoveMemoryBreakpoint( breakpoint->Address, true );
+			break;
+		case MemoryAccessType::Write:
+			RemoveMemoryBreakpoint( breakpoint->Address, false );
+			break;
+		case MemoryAccessType::ReadWrite:
+			RemoveMemoryBreakpoint( breakpoint->Address, true );
+			RemoveMemoryBreakpoint( breakpoint->Address, false );
+			break;
+		}
 		break;
 	}
 }

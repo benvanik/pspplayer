@@ -51,7 +51,18 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 
 			DummyDelegate del = delegate
 			{
-				this.JumpToAddress( NavigationTarget.Code, bp.Address, true );
+				switch( bp.Type )
+				{
+					case BreakpointType.CodeExecute:
+					case BreakpointType.Stepping:
+						this.JumpToAddress( NavigationTarget.Code, bp.Address, true );
+						break;
+					case BreakpointType.MemoryAccess:
+						uint pc = this.DebugHost.CpuHook.GetCoreState( 0 ).ProgramCounter;
+						this.JumpToAddress( NavigationTarget.Memory, bp.Address, true );
+						this.JumpToAddress( NavigationTarget.Code, pc, true );
+						break;
+				}
 
 				this.State = DebuggerState.Broken;
 				this.OnStateChanged();

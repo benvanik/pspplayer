@@ -33,7 +33,7 @@ void EmitAddressTranslation( R4000Generator *gen )
 // R4000Controller.cpp
 int ErrorDebugBreak( uint pc );
 
-int __readMemoryThunk( int pc, int targetAddress )
+int __readMemoryThunk( uint pc, uint targetAddress )
 {
 #ifdef DEBUGGING
 	Diag::Instance->Emulator->CurrentInstance->Cpu->Memory->MemorySystem->DumpMainMemory( "readErrorThunk.bin" );
@@ -48,7 +48,7 @@ int __readMemoryThunk( int pc, int targetAddress )
 	return 0;
 }
 
-void __writeMemoryThunk( uint pc, uint targetAddress, int width, uint value )
+void __writeMemoryThunk( uint pc, uint targetAddress, uint width, uint value )
 {
 #ifdef DEBUGGING
 	Diag::Instance->Emulator->CurrentInstance->Cpu->Memory->MemorySystem->DumpMainMemory( "writeErrorThunk.bin" );
@@ -62,8 +62,78 @@ void __writeMemoryThunk( uint pc, uint targetAddress, int width, uint value )
 	//R4000Cpu::GlobalCpu->Memory->WriteWord( targetAddress, width, value );
 }
 
+extern int TriggerMemoryBreakpoint( uint pc, bool isRead, int bpId );
+
+#pragma unmanaged
+
+#define MAXIMUM_MEMORY_BREAKPOINTS 128
+int readBreakpointCount = 0;
+int writeBreakpointCount = 0;
+uint readBreakpoints[ MAXIMUM_MEMORY_BREAKPOINTS ] = { -1 };
+uint writeBreakpoints[ MAXIMUM_MEMORY_BREAKPOINTS ] = { -1 };
+int readBreakpointIds[ MAXIMUM_MEMORY_BREAKPOINTS ];
+int writeBreakpointIds[ MAXIMUM_MEMORY_BREAKPOINTS ];
+
+void __memoryBreakpointCheck( uint pc, uint targetAddress, bool isRead )
+{
+	int* breakpointIds = ( isRead == true ) ? readBreakpointIds : writeBreakpointIds;
+	uint* breakpoints = ( isRead == true ) ? readBreakpoints : writeBreakpoints;
+	int realCount = ( isRead == true ) ? readBreakpointCount : writeBreakpointCount;
+	for( int n = 0, validCount = 0; n < MAXIMUM_MEMORY_BREAKPOINTS, validCount < realCount; n++ )
+	{
+		if( breakpoints[ n ] == targetAddress )
+		{
+			// Breakpoint hit!
+			TriggerMemoryBreakpoint( pc, isRead, breakpointIds[ n ] );
+			break;
+		}
+		else if( breakpoints[ n ] >= 0 )
+			validCount++;
+	}
+}
+
+#pragma managed
+
+void AddMemoryBreakpoint( int id, uint address, bool isRead )
+{
+	if( isRead == true )
+		readBreakpointCount++;
+	else
+		writeBreakpointCount++;
+	int* breakpointIds = ( isRead == true ) ? readBreakpointIds : writeBreakpointIds;
+	uint* breakpoints = ( isRead == true ) ? readBreakpoints : writeBreakpoints;
+	for( int n = 0; n < MAXIMUM_MEMORY_BREAKPOINTS; n++ )
+	{
+		if( breakpoints[ n ] == -1 )
+		{
+			breakpointIds[ n ] = id;
+			breakpoints[ n ] = address;
+			break;
+		}
+	}
+}
+
+void RemoveMemoryBreakpoint( uint address, bool isRead )
+{
+	if( isRead == true )
+		readBreakpointCount--;
+	else
+		writeBreakpointCount--;
+	int* breakpointIds = ( isRead == true ) ? readBreakpointIds : writeBreakpointIds;
+	uint* breakpoints = ( isRead == true ) ? readBreakpoints : writeBreakpoints;
+	for( int n = 0; n < MAXIMUM_MEMORY_BREAKPOINTS; n++ )
+	{
+		if( breakpoints[ n ] == address )
+		{
+			breakpointIds[ n ] = -1;
+			breakpoints[ n ] = -1;
+			break;
+		}
+	}
+}
+
 // EAX = address in guest space, result in EAX
-void EmitAddressLookup( R4000GenContext^ context, int address )
+void EmitAddressLookup( R4000GenContext^ context, int address, bool isRead )
 {
 	g->and( EAX, 0x3FFFFFFF );
 
@@ -73,6 +143,24 @@ void EmitAddressLookup( R4000GenContext^ context, int address )
 	g->jne( skipDebug );
 	g->int3();
 	g->MarkLabel( skipDebug );
+#endif
+
+#ifdef DEBUGGING
+	Label* noBreakpoints = g->DefineLabel();
+	if( isRead == true )
+		g->cmp( g->dword_ptr[ &readBreakpointCount ], 0 );
+	else
+		g->cmp( g->dword_ptr[ &writeBreakpointCount ], 0 );
+	g->je( noBreakpoints );
+	g->push( EAX );
+	g->push( (uint)isRead );
+	g->push( EAX );
+	g->push( ( uint )( address - 4 ) );
+	g->mov( EBX, (int)&__memoryBreakpointCheck );
+	g->call( EBX );
+	g->add( ESP, 12 );
+	g->pop( EAX );
+	g->MarkLabel( noBreakpoints );
 #endif
 
 	Label* l1 = g->DefineLabel();
@@ -151,6 +239,21 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 	g->MarkLabel( skipDebug );
 #endif
 
+#ifdef DEBUGGING
+	Label* noBreakpoints = g->DefineLabel();
+	g->cmp( g->dword_ptr[ &readBreakpointCount ], 0 );
+	g->je( noBreakpoints );
+	g->push( EAX );
+	g->push( (uint)1 );
+	g->push( EAX );
+	g->push( ( uint )( address - 4 ) );
+	g->mov( EBX, (int)&__memoryBreakpointCheck );
+	g->call( EBX );
+	g->add( ESP, 12 );
+	g->pop( EAX );
+	g->MarkLabel( noBreakpoints );
+#endif
+
 	Label* l1 = g->DefineLabel();
 	Label* l2 = g->DefineLabel();
 	Label* l3 = g->DefineLabel();
@@ -217,6 +320,23 @@ void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 // EAX = address, EBX = data
 void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 {
+#ifdef DEBUGGING
+	Label* noBreakpoints = g->DefineLabel();
+	g->cmp( g->dword_ptr[ &writeBreakpointCount ], 0 );
+	g->je( noBreakpoints );
+	g->push( EAX );
+	g->push( EBX );
+	g->push( EBX );
+	g->push( EAX );
+	g->push( ( uint )( address - 4 ) );
+	g->mov( EBX, (int)&__memoryBreakpointCheck );
+	g->call( EBX );
+	g->add( ESP, 12 );
+	g->pop( EBX );
+	g->pop( EAX );
+	g->MarkLabel( noBreakpoints );
+#endif
+
 	Label* l1 = g->DefineLabel();
 	Label* l2 = g->DefineLabel();
 	Label* l3 = g->DefineLabel();

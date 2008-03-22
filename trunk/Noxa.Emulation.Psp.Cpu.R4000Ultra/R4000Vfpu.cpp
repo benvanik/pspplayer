@@ -382,7 +382,7 @@ bool VfpuGenVPFX( R4000GenContext^ context, int address, uint code )
 #define VMATRIXWIDTH( code ) ( VfpuWidth )( ( ( code >> 7 ) & 0x1 ) + ( ( ( code >> 15 ) & 0x1 ) << 1 ) + 3 )
 
 // EAX = address in guest space, result in EAX
-void EmitAddressLookup( R4000GenContext^ context, int address );
+void EmitAddressLookup( R4000GenContext^ context, int address, bool isRead );
 
 // EmitVfpuRead and EmitVfpuWrite are taken from ector's code - they are pretty nuts :)
 
@@ -482,7 +482,7 @@ bool VfpuGenLVS( R4000GenContext^ context, int address, uint code )
 	int imm = ( int )( ( short )( code & 0x0000FFFC ) );
 	if( imm != 0 )
 		g->add( EAX, imm );
-	EmitAddressLookup( context, address );
+	EmitAddressLookup( context, address, true );
 	// EAX = address of memory start
 
 	// Perform load
@@ -498,7 +498,7 @@ bool VfpuGenLVQ( R4000GenContext^ context, int address, uint code )
 	int imm = ( int )( ( short )( code & 0x0000FFFC ) );
 	if( imm != 0 )
 		g->add( EAX, imm );
-	EmitAddressLookup( context, address );
+	EmitAddressLookup( context, address, true );
 	// EAX = address of memory start
 
 	// Perform load
@@ -514,7 +514,7 @@ bool VfpuGenSVS( R4000GenContext^ context, int address, uint code )
 	int imm = ( int )( ( short )( code & 0x0000FFFC ) );
 	if( imm != 0 )
 		g->add( EAX, imm );
-	EmitAddressLookup( context, address );
+	EmitAddressLookup( context, address, false );
 	// EAX = address of memory start
 
 	// Perform store
@@ -530,7 +530,7 @@ bool VfpuGenSVQ( R4000GenContext^ context, int address, uint code )
 	int imm = ( int )( ( short )( code & 0x0000FFFC ) );
 	if( imm != 0 )
 		g->add( EAX, imm );
-	EmitAddressLookup( context, address );
+	EmitAddressLookup( context, address, false );
 	// EAX = address of memory start
 
 	// Perform store

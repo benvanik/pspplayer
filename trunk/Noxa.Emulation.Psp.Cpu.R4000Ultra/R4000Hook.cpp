@@ -68,7 +68,7 @@ void R4000Hook::RefreshBreakpointTable()
 					address = pair->Value->CachedFunction->StubAddress;
 				break;
 			case BreakpointType::MemoryAccess:
-				Debug::Assert( false );
+				address = pair->Value->Address;
 				break;
 			}
 			this->BreakpointLookup->Add( address, pair->Key );
@@ -82,9 +82,6 @@ void R4000Hook::RefreshBreakpointTable()
 
 void R4000Hook::AddBreakpoint( Breakpoint^ breakpoint )
 {
-	// Don't support memory access breakpoints yet
-	Debug::Assert( breakpoint->Type != BreakpointType::MemoryAccess );
-
 	Debug::Assert( breakpoint != nullptr );
 	if( this->Breakpoints->ContainsKey( breakpoint->ID ) == true )
 	{
