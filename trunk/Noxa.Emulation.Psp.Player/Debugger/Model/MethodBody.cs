@@ -62,106 +62,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			bool inDelay = false;
 			foreach( Instruction instruction in instructions )
 			{
-				bool wasInDelay = inDelay;
-				inDelay = false;
-				if( instruction.IsBranch == true )
-				{
-					uint target = 0;
-					foreach( Operand op in instruction.Operands )
-					{
-						if( op.Type == OperandType.BranchTarget )
-						{
-							target = ( uint )( ( int )instruction.Address + 4 + op.Immediate );
-							break;
-						}
-					}
-					if( target > 0 )
-						this.AddLabelReference( labels, instruction, target );
-					inDelay = true;
-				}
-				else if( instruction.IsJump == true )
-				{
-					uint target = 0;
-					foreach( Operand op in instruction.Operands )
-					{
-						if( op.Type == OperandType.JumpTarget )
-						{
-							target = ( uint )op.Immediate;
-							break;
-						}
-					}
-					if( ( target >= this.Address ) && ( target < ( this.Address + this.Length ) ) )
-						this.AddLabelReference( labels, instruction, target );
-					else
-						this.AddCodeReference( codeRefs, instruction, target );
-					inDelay = true;
-				}
-				else if( instruction.IsLoad == true )
-				{
-					int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
-					if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
-					{
-						uint target = currentRegisters[ reg1 ];
-						target = ( uint )( ( int )target + instruction.Operands[ 1 ].Immediate );
-						this.AddMemoryReference( memRefs, instruction, target, true );
-					}
-				}
-				else if( instruction.IsStore == true )
-				{
-					int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
-					if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
-					{
-						uint target = currentRegisters[ reg1 ];
-						target = ( uint )( ( int )target + instruction.Operands[ 1 ].Immediate );
-						this.AddMemoryReference( memRefs, instruction, target, false );
-					}
-				}
-				if( ( foundSpMod == false ) && ( instruction.Opcode.InstructionEntry.Name == "addiu" ) )
-				{
-					foundSpMod = true;
-					int adjustment = instruction.Operands[ 2 ].Immediate / 4;
-					this.LocalsSize = -adjustment;
-				}
-				else
-				{
-					uint flags = instruction.Opcode.InstructionEntry.Flags;
-					if( instruction.Opcode.InstructionEntry.Name == "lui" )
-					{
-						int reg = instruction.Operands[ 0 ].Register.Ordinal;
-						validRegisters |= ( uint )( 1 << reg );
-						currentRegisters[ reg ] = ( uint )instruction.Operands[ 1 ].Immediate << 16;
-					}
-					else if( ( flags & InstructionTables.OUT_RT ) > 0 )
-					{
-						if( instruction.Opcode.InstructionEntry.Name == "addiu" )
-						{
-							int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
-							if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
-							{
-								int reg2 = instruction.Operands[ 0 ].Register.Ordinal;
-								validRegisters |= ( uint )( 1 << reg2 );
-								currentRegisters[ reg2 ] = ( uint )( ( int )currentRegisters[ reg1 ] + instruction.Operands[ 2 ].Immediate );
-							}
-						}
-						else if( instruction.Opcode.InstructionEntry.Name == "ori" )
-						{
-							int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
-							if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
-							{
-								int reg2 = instruction.Operands[ 0 ].Register.Ordinal;
-								validRegisters |= ( uint )( 1 << reg2 );
-								currentRegisters[ reg2 ] = currentRegisters[ reg1 ] | ( uint )instruction.Operands[ 2 ].Immediate;
-							}
-						}
-						else
-						{
-							// Changed - no longer valid
-							int reg = instruction.Operands[ 0 ].Register.Ordinal;
-							validRegisters &= ~( uint )( 1 << reg );
-						}
-					}
-				}
-
 				//lui $n, NNN
 				//addiu $n, $n, NNN
 
@@ -174,6 +74,108 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				//lui $n, NNN
 				//s* $m, NNN($n)
 
+				bool wasInDelay = inDelay;
+				inDelay = false;
+				if( instruction.Opcode != null )
+				{
+					if( instruction.IsBranch == true )
+					{
+						uint target = 0;
+						foreach( Operand op in instruction.Operands )
+						{
+							if( op.Type == OperandType.BranchTarget )
+							{
+								target = ( uint )( ( int )instruction.Address + 4 + op.Immediate );
+								break;
+							}
+						}
+						if( target > 0 )
+							this.AddLabelReference( labels, instruction, target );
+						inDelay = true;
+					}
+					else if( instruction.IsJump == true )
+					{
+						uint target = 0;
+						foreach( Operand op in instruction.Operands )
+						{
+							if( op.Type == OperandType.JumpTarget )
+							{
+								target = ( uint )op.Immediate;
+								break;
+							}
+						}
+						if( ( target >= this.Address ) && ( target < ( this.Address + this.Length ) ) )
+							this.AddLabelReference( labels, instruction, target );
+						else
+							this.AddCodeReference( codeRefs, instruction, target );
+						inDelay = true;
+					}
+					else if( instruction.IsLoad == true )
+					{
+						int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
+						if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
+						{
+							uint target = currentRegisters[ reg1 ];
+							target = ( uint )( ( int )target + instruction.Operands[ 1 ].Immediate );
+							this.AddMemoryReference( memRefs, instruction, target, true );
+						}
+					}
+					else if( instruction.IsStore == true )
+					{
+						int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
+						if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
+						{
+							uint target = currentRegisters[ reg1 ];
+							target = ( uint )( ( int )target + instruction.Operands[ 1 ].Immediate );
+							this.AddMemoryReference( memRefs, instruction, target, false );
+						}
+					}
+					if( ( foundSpMod == false ) && ( instruction.Opcode.InstructionEntry.Name == "addiu" ) )
+					{
+						foundSpMod = true;
+						int adjustment = instruction.Operands[ 2 ].Immediate / 4;
+						this.LocalsSize = -adjustment;
+					}
+					else
+					{
+						uint flags = instruction.Opcode.InstructionEntry.Flags;
+						if( instruction.Opcode.InstructionEntry.Name == "lui" )
+						{
+							int reg = instruction.Operands[ 0 ].Register.Ordinal;
+							validRegisters |= ( uint )( 1 << reg );
+							currentRegisters[ reg ] = ( uint )instruction.Operands[ 1 ].Immediate << 16;
+						}
+						else if( ( flags & InstructionTables.OUT_RT ) > 0 )
+						{
+							if( instruction.Opcode.InstructionEntry.Name == "addiu" )
+							{
+								int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
+								if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
+								{
+									int reg2 = instruction.Operands[ 0 ].Register.Ordinal;
+									validRegisters |= ( uint )( 1 << reg2 );
+									currentRegisters[ reg2 ] = ( uint )( ( int )currentRegisters[ reg1 ] + instruction.Operands[ 2 ].Immediate );
+								}
+							}
+							else if( instruction.Opcode.InstructionEntry.Name == "ori" )
+							{
+								int reg1 = instruction.Operands[ 1 ].Register.Ordinal;
+								if( ( validRegisters & ( 1 << reg1 ) ) > 0 )
+								{
+									int reg2 = instruction.Operands[ 0 ].Register.Ordinal;
+									validRegisters |= ( uint )( 1 << reg2 );
+									currentRegisters[ reg2 ] = currentRegisters[ reg1 ] | ( uint )instruction.Operands[ 2 ].Immediate;
+								}
+							}
+							else
+							{
+								// Changed - no longer valid
+								int reg = instruction.Operands[ 0 ].Register.Ordinal;
+								validRegisters &= ~( uint )( 1 << reg );
+							}
+						}
+					}
+				}
 				if( wasInDelay == true )
 					validRegisters = 0;
 			}
@@ -367,20 +369,31 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			this.Code = code;
 
 			InstructionEntry instructionEntry = InstructionTables.GetInstruction( code );
-			Debug.Assert( instructionEntry != null );
-			Debug.Assert( instructionEntry.Formatter != null );
+			if( instructionEntry == null )
+			{
+				Debug.WriteLine( string.Format( "Instruction::ctor: no entry found for code {0:X8} at {1:X8}", code, address ) );
+			}
+			else
+			{
+				Debug.Assert( instructionEntry.Formatter != null );
 
-			bool formatted = instructionEntry.Formatter( address, code, instructionEntry, out this.Opcode, out this.Operands );
-			Debug.Assert( formatted == true );
+				bool formatted = instructionEntry.Formatter( address, code, instructionEntry, out this.Opcode, out this.Operands );
+				Debug.Assert( formatted == true );
+			}
 		}
 
 		public override string ToString()
 		{
-			return this.Opcode.ToString() + this.GetOperandsString();
+			if( this.Opcode == null )
+				return "UNKNOWN";
+			else
+				return this.Opcode.ToString() + this.GetOperandsString();
 		}
 
 		public string GetOperandsString()
 		{
+			if( this.Operands == null )
+				return string.Empty;
 			StringBuilder sb = new StringBuilder();
 			for( int n = 0; n < this.Operands.Length; n++ )
 			{
@@ -393,6 +406,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		public string GetResolvedOperandString( bool hex )
 		{
+			if( this.Operands == null )
+				return string.Empty;
 			StringBuilder sb = new StringBuilder();
 			for( int n = 0; n < this.Operands.Length; n++ )
 			{
@@ -448,6 +463,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		{
 			get
 			{
+				if( this.Opcode == null )
+					return false;
 				return ( this.Opcode.InstructionEntry.Flags & InstructionTables.IS_CONDBRANCH ) > 0;
 			}
 		}
@@ -456,6 +473,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		{
 			get
 			{
+				if( this.Opcode == null )
+					return false;
 				return ( this.Opcode.InstructionEntry.Flags & InstructionTables.IS_JUMP ) > 0;
 			}
 		}
@@ -464,6 +483,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		{
 			get
 			{
+				if( this.Opcode == null )
+					return false;
 				return ( this.Opcode.InstructionEntry.Flags & InstructionTables.IN_MEM ) > 0;
 			}
 		}
@@ -472,6 +493,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		{
 			get
 			{
+				if( this.Opcode == null )
+					return false;
 				return ( this.Opcode.InstructionEntry.Flags & InstructionTables.OUT_MEM ) > 0;
 			}
 		}
