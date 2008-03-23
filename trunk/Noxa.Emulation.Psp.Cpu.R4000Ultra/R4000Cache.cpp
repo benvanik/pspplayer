@@ -195,9 +195,9 @@ int R4000Cache::Search( int address, CodeBlock** buffer )
 {
 	uint addr = ( ( uint )address ) >> 2;
 
-	uint b0 = addr >> 20;
-	uint b1 = ( addr >> L2SHIFT ) & L2MASK;
-	uint b2 = addr & L3MASK;
+	int b0 = addr >> 20;
+	int b1 = ( addr >> L2SHIFT ) & L2MASK;
+	int b2 = addr & L3MASK;
 
 	LOCK;
 	{
@@ -211,7 +211,7 @@ int R4000Cache::Search( int address, CodeBlock** buffer )
 			CodeBlock** block0 = _lookup[ b0 ];
 			if( block0 == NULL )
 			{
-				if( b0 == 0 )
+				if( b0 <= 0 )
 					break;
 				b0--;
 				continue;
@@ -220,10 +220,10 @@ int R4000Cache::Search( int address, CodeBlock** buffer )
 			CodeBlock* block1 = block0[ b1 ];
 			if( block1 == NULL )
 			{
-				if( b1 == 0 )
+				if( b1 <= 0 )
 				{
-					b1 = L1SIZE - 1;
-					if( b0 == 0 )
+					b1 = L2SIZE - 1;
+					if( b0 <= 0 )
 						break;
 					b0--;
 				}
@@ -245,10 +245,10 @@ int R4000Cache::Search( int address, CodeBlock** buffer )
 					return n;
 				}
 
-				if( b2 == 0 )
+				if( b2 <= 0 )
 				{
-					b2 = L2SIZE - 1;
-					if( b1 == 0 )
+					b2 = L3SIZE - 1;
+					if( b1 <= 0 )
 						break;
 					b1--;
 				}
@@ -263,10 +263,10 @@ int R4000Cache::Search( int address, CodeBlock** buffer )
 			buffer[ n++ ] = block;
 
 			// -- continue trying to find more
-			if( b2 == 0 )
+			if( b2 <= 0 )
 			{
 				b2 = L2SIZE - 1;
-				if( b1 == 0 )
+				if( b1 <= 0 )
 					break;
 				b1--;
 			}
@@ -386,8 +386,8 @@ void R4000Cache::Clear( bool realloc )
 
 		if( realloc == true )
 		{
-			_lookup = ( CodeBlock*** )calloc( L1SIZE, sizeof( CodeBlock** ) );
-			_ptrLookup = ( int*** )calloc( L1SIZE, sizeof( int** ) );
+			_lookup = ( CodeBlock*** )calloc( L1SIZE + 1, sizeof( CodeBlock** ) );
+			_ptrLookup = ( int*** )calloc( L1SIZE + 1, sizeof( int** ) );
 			CCLookupTable = _ptrLookup;
 		}
 	}

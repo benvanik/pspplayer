@@ -820,7 +820,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							else if( symType == 0x2 )
 							{
 								// FUNC
-								symbol = new Method( MethodType.User, address, sym->st_size );//, name );
+								symbol = new Method( MethodType.User, address, sym->st_size, name );
 							}
 							if( symbol != null )
 								db.AddSymbol( symbol );
