@@ -33,7 +33,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		public readonly LogTool LogTool;
 		public readonly MemoryTool MemoryTool;
 		public readonly ModulesTool ModulesTool;
-		public readonly RegistersTool RegistersTool;
 		public readonly StatisticsTool StatisticsTool;
 		public readonly StringsTool StringsTool;
 		public readonly SyscallsTool SyscallsTool;
@@ -68,15 +67,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.Tools.Add( this.LogTool );
 			this.MemoryTool = new MemoryTool( this );
 			this.Tools.Add( this.MemoryTool );
-			this.RegistersTool = new RegistersTool( this );
-			this.Tools.Add( this.RegistersTool );
 			this.StatisticsTool = new StatisticsTool( this );
 			this.Tools.Add( this.StatisticsTool );
 			// ...
 
 			this.Window.Show();
 			foreach( DebuggerTool tool in this.Tools )
+			{
 				tool.Show( this.Window.DockPanel );
+			}
 
 			this.Host.Debugger.Activate( this, Environment.MachineName, Environment.UserName, "InprocDebugger 1.0" );
 

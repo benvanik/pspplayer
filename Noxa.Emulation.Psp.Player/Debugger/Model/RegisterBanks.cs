@@ -70,9 +70,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 	static class RegisterBanks
 	{
-		public static RegisterBank General;
-		public static RegisterBank Fpu;
-		public static RegisterBank Vfpu;
+		public readonly static RegisterBank General;
+		public readonly static RegisterBank Fpu;
+		public readonly static RegisterBank Vfpu;
 
 		static RegisterBanks()
 		{

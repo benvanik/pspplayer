@@ -28,53 +28,77 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.disassemblyControl = new Noxa.Emulation.Psp.Player.Debugger.Tools.DisassemblyControl();
+			this.splitContainer = new System.Windows.Forms.SplitContainer();
 			this.codeView = new Noxa.Emulation.Psp.Player.Debugger.Tools.CodeViewControl();
+			this.registersControl = new Noxa.Emulation.Psp.Player.Debugger.Tools.RegistersControl();
+			this.splitContainer.Panel1.SuspendLayout();
+			this.splitContainer.Panel2.SuspendLayout();
+			this.splitContainer.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// disassemblyControl
+			// splitContainer
 			// 
-			this.disassemblyControl.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
+			this.splitContainer.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
 						| System.Windows.Forms.AnchorStyles.Left )
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.disassemblyControl.DisplayHex = true;
-			this.disassemblyControl.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-			this.disassemblyControl.FormattingEnabled = true;
-			this.disassemblyControl.Location = new System.Drawing.Point( 12, 12 );
-			this.disassemblyControl.Name = "disassemblyControl";
-			this.disassemblyControl.ScrollAlwaysVisible = true;
-			this.disassemblyControl.Size = new System.Drawing.Size( 672, 186 );
-			this.disassemblyControl.TabIndex = 0;
+			this.splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+			this.splitContainer.IsSplitterFixed = true;
+			this.splitContainer.Location = new System.Drawing.Point( 4, 4 );
+			this.splitContainer.Name = "splitContainer";
 			// 
-			// codeViewControl1
+			// splitContainer.Panel1
 			// 
-			this.codeView.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
-						| System.Windows.Forms.AnchorStyles.Left )
-						| System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.codeView.Location = new System.Drawing.Point( 12, 204 );
-			this.codeView.Name = "codeViewControl1";
-			this.codeView.Size = new System.Drawing.Size( 672, 295 );
-			this.codeView.TabIndex = 1;
+			this.splitContainer.Panel1.Controls.Add( this.codeView );
+			this.splitContainer.Panel1MinSize = 300;
+			// 
+			// splitContainer.Panel2
+			// 
+			this.splitContainer.Panel2.Controls.Add( this.registersControl );
+			this.splitContainer.Size = new System.Drawing.Size( 688, 503 );
+			this.splitContainer.SplitterDistance = 600;
+			this.splitContainer.TabIndex = 2;
+			// 
+			// codeView
+			// 
+			this.codeView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.codeView.Location = new System.Drawing.Point( 0, 0 );
+			this.codeView.Name = "codeView";
+			this.codeView.Size = new System.Drawing.Size( 600, 503 );
+			this.codeView.TabIndex = 2;
 			this.codeView.Text = "codeView";
+			this.codeView.UseHex = false;
+			// 
+			// registersControl
+			// 
+			this.registersControl.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.registersControl.Location = new System.Drawing.Point( 0, 0 );
+			this.registersControl.Name = "registersControl";
+			this.registersControl.Size = new System.Drawing.Size( 84, 503 );
+			this.registersControl.TabIndex = 3;
+			this.registersControl.Text = "registersControl1";
 			// 
 			// CodeTool
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
 			this.ClientSize = new System.Drawing.Size( 696, 511 );
 			this.CloseButton = false;
-			this.Controls.Add( this.codeView );
-			this.Controls.Add( this.disassemblyControl );
+			this.Controls.Add( this.splitContainer );
 			this.DockAreas = ( ( WeifenLuo.WinFormsUI.Docking.DockAreas )( ( WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.Document ) ) );
 			this.Name = "CodeTool";
 			this.ShowHint = WeifenLuo.WinFormsUI.Docking.DockState.Document;
 			this.TabText = "Disassembly";
+			this.splitContainer.Panel1.ResumeLayout( false );
+			this.splitContainer.Panel2.ResumeLayout( false );
+			this.splitContainer.ResumeLayout( false );
 			this.ResumeLayout( false );
 
 		}
 
 		#endregion
 
-		private DisassemblyControl disassemblyControl;
+		private System.Windows.Forms.SplitContainer splitContainer;
 		private CodeViewControl codeView;
+		private RegistersControl registersControl;
+
 	}
 }

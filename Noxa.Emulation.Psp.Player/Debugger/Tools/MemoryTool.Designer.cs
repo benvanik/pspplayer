@@ -42,11 +42,12 @@
 			this.hexBox.Font = new System.Drawing.Font( "Courier New", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
 			this.hexBox.LineInfoForeColor = System.Drawing.Color.Empty;
 			this.hexBox.LineInfoVisible = true;
-			this.hexBox.Location = new System.Drawing.Point( 12, 33 );
+			this.hexBox.Location = new System.Drawing.Point( 4, 33 );
 			this.hexBox.Name = "hexBox";
 			this.hexBox.SelectionBackColor = System.Drawing.SystemColors.Highlight;
 			this.hexBox.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-			this.hexBox.Size = new System.Drawing.Size( 489, 540 );
+			this.hexBox.ShadowSelectionColor = System.Drawing.Color.FromArgb( ( ( int )( ( ( byte )( 100 ) ) ) ), ( ( int )( ( ( byte )( 60 ) ) ) ), ( ( int )( ( ( byte )( 188 ) ) ) ), ( ( int )( ( ( byte )( 255 ) ) ) ) );
+			this.hexBox.Size = new System.Drawing.Size( 505, 548 );
 			this.hexBox.StringViewVisible = true;
 			this.hexBox.TabIndex = 0;
 			this.hexBox.UseFixedBytesPerLine = true;

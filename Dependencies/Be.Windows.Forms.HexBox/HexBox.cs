@@ -2257,6 +2257,8 @@ namespace Be.Windows.Forms
 		{
 			base.OnPaint( e );
 
+			e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+
 			if( _byteProvider == null )
 				return;
 
