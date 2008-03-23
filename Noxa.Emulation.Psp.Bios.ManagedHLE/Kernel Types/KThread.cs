@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
 
 namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 {
@@ -162,6 +163,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			ContextID = Kernel.Cpu.AllocateContextStorage( EntryAddress, registers );
 
 			State = KThreadState.Ready;
+
+			if( Diag.IsAttached == true )
+			{
+				Breakpoint bp = new Breakpoint( Diag.Instance.Client.AllocateID(), BreakpointType.Stepping, this.EntryAddress );
+				Diag.Instance.CpuHook.AddBreakpoint( bp );
+			}
 
 			Kernel.Threads.Add( this );
 			this.AddToSchedule();

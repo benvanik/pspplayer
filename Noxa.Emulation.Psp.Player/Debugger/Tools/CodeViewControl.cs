@@ -550,6 +550,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			int codex = addressx + _addressWidth + 1 + 6;
 			int opcodex = codex + _labelWidth / 3 + 6;
 			int operandx = opcodex + _opcodeWidth;
+			int refx = 300;
 
 			Brush codeBrush = this.Enabled ? _instrFontBrush : _disabledFontBrush;
 			Brush addressBrush = this.Enabled ? _addressFontBrush : _disabledFontBrush;
@@ -630,9 +631,21 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 								}
 							}
 
+							MemoryReference memRef = instr.Reference as MemoryReference;
+							if( memRef != null )
+							{
+								Variable var = _debugger.DebugHost.Database.FindSymbol( memRef.Address ) as Variable;
+								string name;
+								if( ( var != null ) && ( var.Name != null ) )
+									name = var.Name;
+								else
+									name = memRef.Address.ToString( "X8" );
+								g.DrawString( name, _font, _referenceFontBrush, refx, y, _stringFormat );
+							}
+
 							// Annotations
-							if( instr.Annotation != null )
-								g.DrawString( instr.Annotation, _font, _referenceFontBrush, realx + 10, y, _stringFormat );
+							//if( instr.Annotation != null )
+							//	g.DrawString( instr.Annotation, _font, _referenceFontBrush, realx + 10, y, _stringFormat );
 
 							// Comments
 							// TODO _commentFontBrush

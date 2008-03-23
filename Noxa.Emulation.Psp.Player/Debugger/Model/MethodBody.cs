@@ -290,7 +290,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			else
 				newMemRef.Writes++;
 			instruction.Reference = newMemRef;
-			instruction.Annotation = ( isRead ? "r " : "w " ) + target.ToString( "X8" );
 			memRefs.Add( newMemRef );
 		}
 

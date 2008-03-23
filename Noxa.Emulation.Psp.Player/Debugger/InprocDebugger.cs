@@ -120,8 +120,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 
 		public void OnBootModuleLoaded( uint entryAddress )
 		{
-			Breakpoint startupBp = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, entryAddress );
-			this.Breakpoints.Add( startupBp );
+			//Breakpoint startupBp = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, entryAddress );
+			//this.Breakpoints.Add( startupBp );
 
 			// TEST
 			//Breakpoint bp2 = new Breakpoint( this.AllocateID(), 0x09FFFEF4, Noxa.Emulation.Psp.Debugging.Hooks.MemoryAccessType.ReadWrite );

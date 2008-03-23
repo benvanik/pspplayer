@@ -116,6 +116,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 					methodBody.Name = method.Function.ModuleName + "::" + method.Function.NID.ToString( "X8" );
 				methodBody.Function = method.Function;
 			}
+			else
+			{
+				if( method.Name != null )
+					methodBody.Name = method.Name;
+			}
 
 			return methodBody;
 		}
