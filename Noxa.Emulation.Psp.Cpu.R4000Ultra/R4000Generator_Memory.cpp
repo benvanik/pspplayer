@@ -137,28 +137,26 @@ void EmitAddressLookup( R4000GenContext^ context, int address, bool isRead )
 {
 	g->and( EAX, 0x3FFFFFFF );
 
-#if 0
-	g->cmp( EAX, 0x08A43438 );
-	Label* skipDebug = g->DefineLabel();
-	g->jne( skipDebug );
-	g->int3();
-	g->MarkLabel( skipDebug );
-#endif
-
 #ifdef DEBUGGING
 	Label* noBreakpoints = g->DefineLabel();
 	if( isRead == true )
-		g->cmp( g->dword_ptr[ &readBreakpointCount ], 0 );
+		g->cmp( g->dword_ptr[ &readBreakpointCount ], ( uint )0 );
 	else
-		g->cmp( g->dword_ptr[ &writeBreakpointCount ], 0 );
-	g->je( noBreakpoints );
+		g->cmp( g->dword_ptr[ &writeBreakpointCount ], ( uint )0 );
+	g->jz( noBreakpoints );
 	g->push( EAX );
-	g->push( (uint)isRead );
+	g->push( EBX );
+	g->push( ECX );
+	g->push( EDX );
+	g->push( ( uint )isRead );
 	g->push( EAX );
 	g->push( ( uint )( address - 4 ) );
 	g->mov( EBX, (int)&__memoryBreakpointCheck );
 	g->call( EBX );
 	g->add( ESP, 12 );
+	g->pop( EDX );
+	g->pop( ECX );
+	g->pop( EBX );
 	g->pop( EAX );
 	g->MarkLabel( noBreakpoints );
 #endif
@@ -231,25 +229,23 @@ void EmitAddressLookup( R4000GenContext^ context, int address, bool isRead )
 // EAX = address, result in EAX
 void EmitDirectMemoryRead( R4000GenContext^ context, int address )
 {
-#if 0
-	g->cmp( EAX, 0x08A43438 );
-	Label* skipDebug = g->DefineLabel();
-	g->jne( skipDebug );
-	g->int3();
-	g->MarkLabel( skipDebug );
-#endif
-
 #ifdef DEBUGGING
 	Label* noBreakpoints = g->DefineLabel();
-	g->cmp( g->dword_ptr[ &readBreakpointCount ], 0 );
-	g->je( noBreakpoints );
+	g->cmp( g->dword_ptr[ &readBreakpointCount ], ( uint )0 );
+	g->jz( noBreakpoints );
 	g->push( EAX );
-	g->push( (uint)1 );
+	g->push( EBX );
+	g->push( ECX );
+	g->push( EDX );
+	g->push( ( uint )1 );
 	g->push( EAX );
 	g->push( ( uint )( address - 4 ) );
 	g->mov( EBX, (int)&__memoryBreakpointCheck );
 	g->call( EBX );
 	g->add( ESP, 12 );
+	g->pop( EDX );
+	g->pop( ECX );
+	g->pop( EBX );
 	g->pop( EAX );
 	g->MarkLabel( noBreakpoints );
 #endif
@@ -322,16 +318,20 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 {
 #ifdef DEBUGGING
 	Label* noBreakpoints = g->DefineLabel();
-	g->cmp( g->dword_ptr[ &writeBreakpointCount ], 0 );
-	g->je( noBreakpoints );
+	g->cmp( g->dword_ptr[ &writeBreakpointCount ], ( uint )0 );
+	g->jz( noBreakpoints );
 	g->push( EAX );
 	g->push( EBX );
-	g->push( EBX );
+	g->push( ECX );
+	g->push( EDX );
+	g->push( ( uint )0 );
 	g->push( EAX );
 	g->push( ( uint )( address - 4 ) );
 	g->mov( EBX, (int)&__memoryBreakpointCheck );
 	g->call( EBX );
 	g->add( ESP, 12 );
+	g->pop( EDX );
+	g->pop( ECX );
 	g->pop( EBX );
 	g->pop( EAX );
 	g->MarkLabel( noBreakpoints );
@@ -347,31 +347,6 @@ void EmitDirectMemoryWrite( R4000GenContext^ context, int address, int width )
 	g->jb( l1 );
 	g->cmp( EAX, MainMemoryBound );
 	g->ja( l1 );
-
-#if 0
-	Label* skipTest = g->DefineLabel();
-	Label* hitTest = g->DefineLabel();
-	g->cmp( EAX, 0x08A43438 );
-	g->je( hitTest );
-	/*g->cmp( EAX, 0x97BF6BD );
-	g->je( hitTest );
-	g->cmp( EAX, 0x97BF6BE );
-	g->je( hitTest );
-	g->cmp( EAX, 0x97BF6BF );
-	g->je( hitTest );
-	g->cmp( EAX, 0x97BF6C0 );
-	g->je( hitTest );
-	g->cmp( EAX, 0x97BF6C1 );
-	g->je( hitTest );*/
-	g->jmp( skipTest );
-	g->MarkLabel( hitTest );
-	g->int3();
-	// Just so I know what the PC is
-	g->push( EAX );
-	g->mov( EAX, ( uint )address );
-	g->pop( EAX );
-	g->MarkLabel( skipTest );
-#endif
 
 	// else, do a direct read
 	g->sub( EAX, MainMemoryBase ); // get to offset in main memory
