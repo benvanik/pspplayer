@@ -37,9 +37,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.InitializeComponent();
 
 			this.SetStyle( ControlStyles.UserPaint, true );
-			this.SetStyle( ControlStyles.DoubleBuffer, true );
 			this.SetStyle( ControlStyles.AllPaintingInWmPaint, true );
 			this.SetStyle( ControlStyles.ResizeRedraw, true );
+			this.SetStyle( ControlStyles.Opaque, true );
+			this.SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
+			this.SetStyle( ControlStyles.Selectable, true );
 
 			_verticalScrollBar = new VScrollBar();
 			_verticalScrollBar.Scroll += new ScrollEventHandler( _verticalScrollBar_Scroll );
@@ -137,6 +139,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			body.UserCache = lines;
 			body.UserLines = ( uint )lines.Count;
 			return lines;
+		}
+
+		#endregion
+
+		#region Focus
+
+		protected override void OnMouseDown( MouseEventArgs e )
+		{
+			base.OnMouseDown( e );
+			this.Focus();
 		}
 
 		#endregion
@@ -241,6 +253,78 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				this.Invalidate();
 		}
 
+		protected override void OnMouseWheel( MouseEventArgs e )
+		{
+			base.OnMouseWheel( e );
+
+			int targetLine = _firstVisibleLine;
+			int units = Math.Min( 1, e.Delta / SystemInformation.MouseWheelScrollDelta );
+			if( ( Control.ModifierKeys & Keys.Shift ) == Keys.Shift )
+				targetLine -= ( units * ( _visibleLines - 4 ) );
+			else
+				targetLine -= ( units * SystemInformation.MouseWheelScrollLines );
+			targetLine = Math.Max( Math.Min( targetLine, _totalLines ), 0 );
+
+			_scrollLine = targetLine;
+			_verticalScrollBar.Value = targetLine;
+			_verticalScrollBar.Enabled = true;
+			_verticalScrollBar.Invalidate();
+			if( this.UpdateVisibleLines() == true )
+				this.Invalidate();
+		}
+
+		protected override void OnKeyDown( KeyEventArgs e )
+		{
+			int targetLine = _firstVisibleLine;
+			switch( e.KeyCode )
+			{
+				case Keys.Home:
+					if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control )
+						targetLine = 0;
+					else
+					{
+						// TODO: jump to current method top
+					}
+					break;
+				case Keys.End:
+					if( ( Control.ModifierKeys & Keys.Control ) == Keys.Control )
+						targetLine = _totalLines - _visibleLines;
+					else
+					{
+						// TODO: jump to current method bottom
+					}
+					break;
+				case Keys.PageUp:
+					targetLine = Math.Max( 0, targetLine - _visibleLines - 4 );
+					break;
+				case Keys.PageDown:
+					targetLine = Math.Min( _totalLines - _visibleLines, targetLine + _visibleLines - 4 );
+					break;
+				case Keys.Up:
+					if( targetLine > 0 )
+						targetLine--;
+					break;
+				case Keys.Down:
+					if( targetLine < ( _totalLines - _visibleLines ) )
+						targetLine++;
+					break;
+			}
+
+			if( _scrollLine != targetLine )
+			{
+				e.Handled = true;
+				_scrollLine = targetLine;
+				_verticalScrollBar.Value = targetLine;
+				_verticalScrollBar.Enabled = true;
+				_verticalScrollBar.Invalidate();
+				if( this.UpdateVisibleLines() == true )
+					this.Invalidate();
+				return;
+			}
+
+			base.OnKeyDown( e );
+		}
+
 		private bool UpdateVisibleLines()
 		{
 			int firstVisibleLine = _scrollLine;
@@ -258,6 +342,12 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		#endregion
 
 		#region Painting
+
+		private Image _breakpointOnIcon;
+		private Image _breakpointOffIcon;
+		private Image _statementIcon;
+		private Image _statementCallIcon;
+		private Image _statementDeadIcon;
 
 		internal Font _font = new Font( "Courier New", 8.0f, FontStyle.Regular );
 		//internal Font _font = new Font( "Consolas", 8.0f, FontStyle.Bold );
@@ -287,6 +377,12 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private void SetupGraphics()
 		{
+			_breakpointOnIcon = Properties.Resources.BreakpointIcon;
+			_breakpointOffIcon = Properties.Resources.BreakpointOffIcon;
+			_statementIcon = Properties.Resources.StatementIcon;
+			_statementCallIcon = Properties.Resources.StatementCallIcon;
+			_statementDeadIcon = Properties.Resources.StatementDeadIcon;
+
 			using( Graphics g = Graphics.FromHwnd( this.Handle ) )
 			{
 				g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
@@ -359,7 +455,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		protected override void OnPaint( PaintEventArgs e )
 		{
-			base.OnPaint( e );
+			this.OnPaintBackground( e );
+
 			e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
 			this.UpdateVisibleLines();
@@ -427,7 +524,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 					case LineType.Instruction:
 						{
 							// Gutter
-							// TODO
+							if( instr.Breakpoint != null )
+							{
+								Image icon = ( instr.Breakpoint.Enabled == true ) ? _breakpointOnIcon : _breakpointOffIcon;
+								g.DrawImage( icon, x + 2, y, 15, 15 );
+							}
+							if( ( _debugger.State != DebuggerState.Running ) && ( _debugger.PC == instr.Address ) )
+							{
+								g.DrawImage( _statementIcon, x + 3, y, 14, 15 );
+							}
 
 							// Address
 							g.DrawString( string.Format( "{0:X8}", instr.Address ), _font, addressBrush, addressx + 6, y, _stringFormat );

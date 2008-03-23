@@ -342,9 +342,8 @@ namespace Noxa.Emulation.Psp.Player
 			if( debugging == true )
 			{
 				Diag.Instance.WaitUntilAttached();
+				Diag.Instance.OnInstanceStarted();
 			}
-
-			Diag.Instance.OnInstanceStarted();
 
 			_state = InstanceState.Running;
 			_stateChangeEvent.Set();
@@ -361,7 +360,8 @@ namespace Noxa.Emulation.Psp.Player
 			_stateChangeEvent.Set();
 			this.OnStateChanged();
 
-			Diag.Instance.OnInstanceStopped();
+			if( Diag.IsAttached == true )
+				Diag.Instance.OnInstanceStopped();
 
 			this.Destroy();
 		}

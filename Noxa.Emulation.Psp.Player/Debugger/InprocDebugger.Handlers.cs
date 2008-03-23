@@ -31,6 +31,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			DummyDelegate del = delegate
 			{
+				this.PC = address;
 				this.JumpToAddress( NavigationTarget.Code, address, true );
 
 				this.State = DebuggerState.Broken;
@@ -55,6 +56,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 				{
 					case BreakpointType.CodeExecute:
 					case BreakpointType.Stepping:
+						this.PC = bp.Address;
 						this.JumpToAddress( NavigationTarget.Code, bp.Address, true );
 						break;
 					case BreakpointType.MemoryAccess:
@@ -80,6 +82,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			DummyDelegate del = delegate
 			{
+				this.PC = error.PC;
 				this.JumpToAddress( NavigationTarget.Code, error.PC, true );
 
 				this.State = DebuggerState.Broken;

@@ -274,16 +274,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			// Gutter
 			g.FillRectangle( _gutterBrush, x, y, _gutterWidth, height );
 			{
-				if( instr.BreakpointID != Instruction.InvalidBreakpointID )
-				{
-					Image icon;
-					Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
-					if( bp.Enabled == true )
-						icon = _breakpointOnIcon;
-					else
-						icon = _breakpointOffIcon;
-					g.DrawImage( icon, x, y - 1, 14, 14 );
-				}
+				//if( instr.BreakpointID != Instruction.InvalidBreakpointID )
+				//{
+				//    Image icon;
+				//    Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
+				//    if( bp.Enabled == true )
+				//        icon = _breakpointOnIcon;
+				//    else
+				//        icon = _breakpointOffIcon;
+				//    g.DrawImage( icon, x, y - 1, 14, 14 );
+				//}
 
 				// Show icons for address state (such as dead/parent)
 				if( this.CurrentAddress == instr.Address )
@@ -467,13 +467,13 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 					case Column.Gutter:
 						{
 							this.ContextMenuStrip = this.gutterContextMenuStrip;
-							bool hasBreakpoint = ( instr.BreakpointID != Instruction.InvalidBreakpointID );
-							if( hasBreakpoint == true )
-							{
-								tipText = "Breakpoint ????";
-							}
-							else
-								tipText = "Click to add a breakpoint";
+							//bool hasBreakpoint = ( instr.BreakpointID != Instruction.InvalidBreakpointID );
+							//if( hasBreakpoint == true )
+							//{
+							//    tipText = "Breakpoint ????";
+							//}
+							//else
+							//    tipText = "Click to add a breakpoint";
 						}
 						break;
 					case Column.Address:
@@ -623,26 +623,26 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			_contextIndex = _hoveredIndex;
 			Instruction instr = ( Instruction )this.Items[ _hoveredIndex ];
 
-			bool hasBreakpoint = ( instr.BreakpointID != Instruction.InvalidBreakpointID );
+			//bool hasBreakpoint = ( instr.BreakpointID != Instruction.InvalidBreakpointID );
 			
-			if( e.Button == MouseButtons.Left )
-			{
-				if( hasBreakpoint == true )
-				{
-					// Delete breakpoint
-					this.removeBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
-				}
-				else
-				{
-					// Add breakpoint
-					this.addBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
-				}
-			}
-			else if( e.Button == MouseButtons.Middle )
-			{
-				// Toggle
-				this.toggleBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
-			}
+			//if( e.Button == MouseButtons.Left )
+			//{
+			//    if( hasBreakpoint == true )
+			//    {
+			//        // Delete breakpoint
+			//        this.removeBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
+			//    }
+			//    else
+			//    {
+			//        // Add breakpoint
+			//        this.addBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
+			//    }
+			//}
+			//else if( e.Button == MouseButtons.Middle )
+			//{
+			//    // Toggle
+			//    this.toggleBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
+			//}
 		}
 
 		private void gutterContextMenuStrip_Opening( object sender, CancelEventArgs e )
@@ -655,18 +655,18 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			}
 			Instruction instr = ( Instruction )this.Items[ _contextIndex ];
 
-			bool hasBreakpoint = ( instr.BreakpointID != Instruction.InvalidBreakpointID );
-			bool breakpointEnabled = true;
+			//bool hasBreakpoint = ( instr.BreakpointID != Instruction.InvalidBreakpointID );
+			//bool breakpointEnabled = true;
 
-			if( breakpointEnabled == true )
-				this.toggleBreakpointToolStripMenuItem.Text = "D&isable Breakpoint";
-			else
-				this.toggleBreakpointToolStripMenuItem.Text = "&Enable Breakpoint";
-			this.toggleBreakpointToolStripMenuItem.Visible = hasBreakpoint;
-			this.renameBreakpointToolStripMenuItem.Visible = hasBreakpoint;
-			this.toolStripSeparator1.Visible = hasBreakpoint;
-			this.addBreakpointToolStripMenuItem.Visible = !hasBreakpoint;
-			this.removeBreakpointToolStripMenuItem.Visible = hasBreakpoint;
+			//if( breakpointEnabled == true )
+			//    this.toggleBreakpointToolStripMenuItem.Text = "D&isable Breakpoint";
+			//else
+			//    this.toggleBreakpointToolStripMenuItem.Text = "&Enable Breakpoint";
+			//this.toggleBreakpointToolStripMenuItem.Visible = hasBreakpoint;
+			//this.renameBreakpointToolStripMenuItem.Visible = hasBreakpoint;
+			//this.toolStripSeparator1.Visible = hasBreakpoint;
+			//this.addBreakpointToolStripMenuItem.Visible = !hasBreakpoint;
+			//this.removeBreakpointToolStripMenuItem.Visible = hasBreakpoint;
 		}
 
 		private void addBreakpointToolStripMenuItem_Click( object sender, EventArgs e )
@@ -677,7 +677,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 			Breakpoint bp = new Breakpoint( this.Debugger.AllocateID(), BreakpointType.CodeExecute, instr.Address );
 			this.Debugger.Breakpoints.Add( bp );
-			instr.BreakpointID = bp.ID;
+			//instr.BreakpointID = bp.ID;
 
 			this.ContextReturn();
 		}
@@ -688,9 +688,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				return;
 			Instruction instr = ( Instruction )this.Items[ _contextIndex ];
 
-			Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
-			this.Debugger.Breakpoints.Remove( bp );
-			instr.BreakpointID = Instruction.InvalidBreakpointID;
+			//Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
+			//this.Debugger.Breakpoints.Remove( bp );
+			//instr.BreakpointID = Instruction.InvalidBreakpointID;
 
 			this.ContextReturn();
 		}
@@ -701,7 +701,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				return;
 			Instruction instr = ( Instruction )this.Items[ _contextIndex ];
 
-			Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
+			//Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
 			// TODO: rename breakpoint
 
 			this.ContextReturn();
@@ -713,7 +713,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				return;
 			Instruction instr = ( Instruction )this.Items[ _contextIndex ];
 
-			this.Debugger.Breakpoints.ToggleBreakpoint( instr.BreakpointID );
+			//this.Debugger.Breakpoints.ToggleBreakpoint( instr.BreakpointID );
 			
 			this.ContextReturn();
 		}
