@@ -61,6 +61,7 @@ void __flushTrace();
 #ifdef DEBUGGING
 // In R4000Controller
 void SetBreakpoint( Breakpoint^ breakpoint );
+void SetBreakpoint( Breakpoint^ breakpoint, CodeBlock* block );
 #endif
 
 #define ENDADDRESS ( startAddress + ( maxCodeLength << 2 ) )
@@ -96,7 +97,7 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 	byte* mainMemory = _memory->MainMemory;
 
 #ifdef DEBUGGING
-	List<int>^ breakpoints = gcnew List<int>();
+	List<Breakpoint^>^ breakpoints = gcnew List<Breakpoint^>();
 #endif
 
 	int maxCodeLength = MAXCODELENGTH;
@@ -284,16 +285,28 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 
 				// See if this instruction has a breakpoint defined
 				if( ( _cpu->_hook != nullptr ) &&
-					( _cpu->_hook->BreakpointLookup != nullptr ) )
+					( _cpu->_hook->Breakpoints != nullptr ) )
 				{
-					int breakpointId;
-					if( _cpu->_hook->BreakpointLookup->TryGetValue( address, breakpointId ) == true )
-						breakpoints->Add( breakpointId );
-
+					bool hasStepping = false;
 					for each( Breakpoint^ bp in _cpu->_hook->SteppingBreakpoints )
 					{
 						if( bp->Address == address )
-							breakpoints->Add( bp->ID );
+						{
+							hasStepping = true;
+							breakpoints->Add( bp );
+							break;
+						}
+					}
+					if( hasStepping == false )
+					{
+						for each( Breakpoint^ bp in _cpu->_hook->Breakpoints )
+						{
+							if( bp->Address == address )
+							{
+								breakpoints->Add( bp );
+								break;
+							}
+						}
 					}
 				}
 
@@ -802,10 +815,16 @@ int R4000AdvancedBlockBuilder::InternalBuild( int startAddress, CodeBlock* block
 
 #ifdef DEBUGGING
 	// Add breakpoints that are defined in this method
-	for( int n = 0; n < breakpoints->Count; n++ )
+	for each( Breakpoint^ bp in breakpoints )
 	{
-		Breakpoint^ bp = _cpu->_hook->Breakpoints[ breakpoints[ n ] ];
-		SetBreakpoint( bp );
+		switch( bp->Type )
+		{
+		case BreakpointType::Stepping:
+		case BreakpointType::CodeExecute:
+		case BreakpointType::BiosFunction:
+			SetBreakpoint( bp, block );
+			break;
+		}
 	}
 #endif
 
