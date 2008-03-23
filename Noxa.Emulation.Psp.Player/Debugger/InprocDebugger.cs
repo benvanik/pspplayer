@@ -130,8 +130,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			DummyDelegate del = delegate
 			{
-				this.CodeCache.Update();
-				this.CodeTool.InvalidateAll();
+				try
+				{
+					this.CodeCache.Update();
+					this.CodeTool.InvalidateAll();
+				}
+				catch
+				{
+					throw;
+				}
 			};
 			this.Window.Invoke( del );
 		}
