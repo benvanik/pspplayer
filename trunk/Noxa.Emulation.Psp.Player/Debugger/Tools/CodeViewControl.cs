@@ -366,33 +366,40 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				// Address
 				g.DrawString( string.Format( "{0:X8}", instr.Address ), _font, addressBrush, addressx + 6, y, _stringFormat );
 
-				// Opcode
-				g.DrawString( instr.Opcode.ToString(), _font, codeBrush, opcodex, y, _stringFormat );
-
-				// Operands
+				// Instruction
 				int realx = operandx;
-				for( int m = 0; m < instr.Operands.Length; m++ )
+				if( instr.Code == 0x0 )
 				{
-					Operand op = instr.Operands[ m ];
-					string resolved = instr.GetResolvedOperandString( op, this.UseHex );
-					Brush fontBrush = codeBrush;
-					switch( op.Type )
-					{
-						case OperandType.BranchTarget:
-							fontBrush = _referenceFontBrush;
-							break;
-						case OperandType.JumpTarget:
-							fontBrush = _referenceFontBrush;
-							break;
-					}
-					g.DrawString( resolved, _font, fontBrush, realx, y, _stringFormat );
-					realx += ( int )_charSize.Width * resolved.Length;
+					g.DrawString( "nop", _font, _disabledFontBrush, opcodex, y, _stringFormat );
+				}
+				else
+				{
+					g.DrawString( instr.Opcode.ToString(), _font, codeBrush, opcodex, y, _stringFormat );
 
-					bool last = ( m == instr.Operands.Length - 1 );
-					if( last == false )
+					// Operands
+					for( int m = 0; m < instr.Operands.Length; m++ )
 					{
-						g.DrawString( ", ", _font, codeBrush, realx - 2, y, _stringFormat );
-						realx += ( int )_charSize.Width * 2 - 2;
+						Operand op = instr.Operands[ m ];
+						string resolved = instr.GetResolvedOperandString( op, this.UseHex );
+						Brush fontBrush = codeBrush;
+						switch( op.Type )
+						{
+							case OperandType.BranchTarget:
+								fontBrush = _referenceFontBrush;
+								break;
+							case OperandType.JumpTarget:
+								fontBrush = _referenceFontBrush;
+								break;
+						}
+						g.DrawString( resolved, _font, fontBrush, realx, y, _stringFormat );
+						realx += ( int )_charSize.Width * resolved.Length;
+
+						bool last = ( m == instr.Operands.Length - 1 );
+						if( last == false )
+						{
+							g.DrawString( ", ", _font, codeBrush, realx - 2, y, _stringFormat );
+							realx += ( int )_charSize.Width * 2 - 2;
+						}
 					}
 				}
 
