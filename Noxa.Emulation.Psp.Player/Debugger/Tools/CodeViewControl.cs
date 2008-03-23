@@ -32,6 +32,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private const int ExtraLinesPerMethod = 2;
 
+		public bool UseHex { get; set; }
+
 		public CodeViewControl()
 		{
 			this.InitializeComponent();
@@ -88,8 +90,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		}
 
 		#endregion
-
-		public bool UseHex { get; set; }
 
 		#region Method Caching
 
@@ -177,6 +177,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				foreach( MethodBody body in _codeCache.Methods )
 				{
 					// TODO: cache here?
+					body.UserTop = totalLines;
 					body.UserLines = body.TotalLines + ExtraLinesPerMethod;
 					totalLines += ( int )body.UserLines;
 				}
@@ -186,6 +187,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				_verticalScrollBar.Maximum = _totalLines;
 			}
 			_visibleLines = ( int )Math.Ceiling( ( double )( this.ClientRectangle.Height / _lineHeight ) );
+
+			if( this.UpdateVisibleLines() == true )
+				this.Invalidate();
 		}
 
 		private int IndexOfMethodAt( int y, out int lineSum )
@@ -210,6 +214,47 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		#region Scrolling/navigation
 
 		private int _scrollLine;
+
+		public void SetAddress( uint address )
+		{
+			MethodBody body = _codeCache[ address ];
+			if( body == null )
+			{
+				// TODO: status update?
+				return;
+			}
+
+			int line = body.UserTop;
+			foreach( Instruction instruction in body.Instructions )
+			{
+				if( instruction.Address == address )
+					break;
+				line++;
+			}
+
+			if( ( line >= _firstVisibleLine ) && ( line < _lastVisibleLine ) )
+			{
+				// Already in view
+				return;
+			}
+
+			int targetLine = line - ( _visibleLines / 2 );
+			targetLine = Math.Max( Math.Min( targetLine, _totalLines ), 0 );
+			this.ScrollToLine( targetLine );
+		}
+
+		private bool ScrollToLine( int targetLine )
+		{
+			if( _scrollLine == targetLine )
+				return false;
+			_scrollLine = targetLine;
+			_verticalScrollBar.Value = targetLine;
+			_verticalScrollBar.Enabled = true;
+			_verticalScrollBar.Invalidate();
+			if( this.UpdateVisibleLines() == true )
+				this.Invalidate();
+			return true;
+		}
 
 		private void _verticalScrollBar_Scroll( object sender, ScrollEventArgs e )
 		{
@@ -244,13 +289,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 					break;
 			}
 
-			_scrollLine = targetLine;
 			e.NewValue = targetLine;
-			_verticalScrollBar.Value = targetLine;
-			_verticalScrollBar.Enabled = true;
-			_verticalScrollBar.Invalidate();
-			if( this.UpdateVisibleLines() == true )
-				this.Invalidate();
+			this.ScrollToLine( targetLine );
 		}
 
 		protected override void OnMouseWheel( MouseEventArgs e )
@@ -265,12 +305,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				targetLine -= ( units * SystemInformation.MouseWheelScrollLines );
 			targetLine = Math.Max( Math.Min( targetLine, _totalLines ), 0 );
 
-			_scrollLine = targetLine;
-			_verticalScrollBar.Value = targetLine;
-			_verticalScrollBar.Enabled = true;
-			_verticalScrollBar.Invalidate();
-			if( this.UpdateVisibleLines() == true )
-				this.Invalidate();
+			this.ScrollToLine( targetLine );
 		}
 
 		protected override void OnKeyDown( KeyEventArgs e )
@@ -310,15 +345,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 					break;
 			}
 
-			if( _scrollLine != targetLine )
+			if( this.ScrollToLine( targetLine ) == true )
 			{
 				e.Handled = true;
-				_scrollLine = targetLine;
-				_verticalScrollBar.Value = targetLine;
-				_verticalScrollBar.Enabled = true;
-				_verticalScrollBar.Invalidate();
-				if( this.UpdateVisibleLines() == true )
-					this.Invalidate();
 				return;
 			}
 

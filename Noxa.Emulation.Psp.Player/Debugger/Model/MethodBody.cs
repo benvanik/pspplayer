@@ -32,6 +32,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public List<ExternalReference> OutgoingReferences;
 
 		public object UserCache;
+		public int UserTop;
 		public uint UserLines;
 
 		public MethodBody( uint address, uint length, Instruction[] instructions )
