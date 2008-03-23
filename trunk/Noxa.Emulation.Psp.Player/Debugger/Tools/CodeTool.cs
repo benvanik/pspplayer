@@ -53,10 +53,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		{
 			this.disassemblyControl.Enabled = false;
 			this.disassemblyControl.ClearAddress();
+			this.codeView.Enabled = false;
 		}
 
 		public void SetAddress( uint address, bool isCurrentStatement )
 		{
+			this.codeView.Enabled = true;
+			this.codeView.SetAddress( address );
+			
+			
 			this.disassemblyControl.Enabled = true;
 
 			IDebugDatabase db = this.Debugger.DebugHost.Database;

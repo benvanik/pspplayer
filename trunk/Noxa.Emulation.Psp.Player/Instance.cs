@@ -341,7 +341,7 @@ namespace Noxa.Emulation.Psp.Player
 
 			if( debugging == true )
 			{
-				Diag.Instance.WaitUntilAttached();
+				//Diag.Instance.WaitUntilAttached();
 				Diag.Instance.OnInstanceStarted();
 			}
 

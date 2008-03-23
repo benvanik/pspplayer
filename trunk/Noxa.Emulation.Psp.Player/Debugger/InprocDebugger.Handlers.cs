@@ -61,6 +61,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 						break;
 					case BreakpointType.MemoryAccess:
 						uint pc = this.DebugHost.CpuHook.GetCoreState( 0 ).ProgramCounter;
+						this.PC = pc;
 						this.JumpToAddress( NavigationTarget.Memory, bp.Address, true );
 						this.JumpToAddress( NavigationTarget.Code, pc, true );
 						break;
