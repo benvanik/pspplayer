@@ -108,7 +108,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private List<Line> CacheMethod( MethodBody body )
 		{
-			List<Line> lines = new List<Line>( body.TotalLines + ExtraLinesPerMethod );
+			List<Line> lines = new List<Line>( ( int )( body.TotalLines + ExtraLinesPerMethod ) );
 
 			Line line = new Line();
 			line.Type = LineType.Header;
