@@ -33,12 +33,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			Bitmap image = Properties.Resources.DisassemblyIcon as Bitmap;
 			this.Icon = Icon.FromHandle( image.GetHicon() );
 
-			this.disassemblyControl.Debugger = debugger;
-			//this.disassemblyControl.RegisterValueChanged += new EventHandler( disassemblyControl_RegisterValueChanged );
-
 			this.Disable();
 
 			this.codeView.Setup( debugger );
+			this.registersControl.Setup( debugger );
 
 			// TODO: bind to button
 			this.codeView.UseHex = true;
@@ -47,69 +45,22 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		public void InvalidateAll()
 		{
 			this.codeView.InvalidateAll();
+			this.registersControl.Invalidate();
 		}
 
 		public void Disable()
 		{
-			this.disassemblyControl.Enabled = false;
-			this.disassemblyControl.ClearAddress();
 			this.codeView.Enabled = false;
+			this.registersControl.Enabled = false;
+			this.registersControl.Invalidate();
 		}
 
 		public void SetAddress( uint address, bool isCurrentStatement )
 		{
 			this.codeView.Enabled = true;
 			this.codeView.SetAddress( address );
-			
-			
-			this.disassemblyControl.Enabled = true;
-
-			IDebugDatabase db = this.Debugger.DebugHost.Database;
-			Debug.Assert( db != null );
-
-			Method method = db.FindSymbol( address ) as Method;
-			Debug.Assert( method != null );
-
-			if( ( this.disassemblyControl.Enabled == true ) &&
-				( this.disassemblyControl.MethodBody != null ) &&
-				( this.disassemblyControl.MethodBody.Address == method.Address ) )
-			{
-				if( isCurrentStatement == true )
-					this.disassemblyControl.SetCurrentAddress( address );
-				else
-					this.disassemblyControl.SetAddress( address );
-			}
-			else
-			{
-				MethodBody methodBody = this.BuildMethodBody( method );
-				Debug.Assert( methodBody != null );
-
-				this.disassemblyControl.SetMethod( methodBody );
-				if( isCurrentStatement == true )
-					this.disassemblyControl.SetCurrentAddress( address );
-				else
-					this.disassemblyControl.SetAddress( address );
-
-				//this.ShowRegisters( this.CurrentRegisterSet );
-			}
-		}
-
-		private MethodBody BuildMethodBody( Method method )
-		{
-			Debug.Assert( this.Debugger.DebugHost.CpuHook != null );
-			uint[] codes = this.Debugger.DebugHost.CpuHook.GetMethodBody( method );
-
-			uint instrAddress = method.Address;
-			List<Instruction> instrs = new List<Instruction>( ( int )method.Length / 4 );
-			for( int n = 0; n < codes.Length; n++ )
-			{
-				Instruction instr = new Instruction( instrAddress, codes[ n ] );
-				instrs.Add( instr );
-				instrAddress += 4;
-			}
-			MethodBody methodBody = new MethodBody( method.Address, 4 * ( uint )method.Length, instrs.ToArray() );
-
-			return methodBody;
+			this.codeView.Focus();
+			this.registersControl.Invalidate();
 		}
 
 		public void ShowNextStatement()
@@ -221,56 +172,5 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		//}
 
 		#endregion
-
-		//private void TestData()
-		//{
-		//    uint[] codes = new uint[]{
-		//        0x49170001,
-		//        0xde00083f,
-		//        0x10400004,
-		//        0xcba80002,
-		//        0xd0070068,
-		//        0x64484828,
-		//        0xdc08f096,
-		//        0xd0008484,
-		//        0xdc07f918,
-		//        0xd0008585,
-		//        0x64482808,
-		//        0xdc00f004,
-		//        0xd0008686,
-		//        0xdc00f001,
-		//        0xd0008787,
-		//        0xf188a489,
-		//        0xf189a08a,
-		//        0xe88a0000,
-		//        0xe88a0005,
-		//        0xe88a000a,
-		//        0x03e00008,
-		//        0x27bd0010,
-		//        0x00801021,
-		//        0x44086000,
-		//        0x48e80001,
-		//        0xc8a00000,
-		//        0xc8a00005,
-		//        0xc8a0000a,
-		//        0x65018000,
-		//    };
-
-		//    uint address = 0x08010000;
-		//    List<Instruction> instrs = new List<Instruction>();
-		//    for( int m = 0; m < 10; m++ )
-		//    {
-		//        for( int n = 0; n < codes.Length; n++ )
-		//        {
-		//            Instruction instr = new Instruction( address, codes[ n ] );
-		//            instrs.Add( instr );
-
-		//            address += 4;
-		//        }
-		//    }
-		//    MethodBody b = new MethodBody( address, 4 * ( uint )instrs.Count, instrs.ToArray() );
-
-		//    this.disassemblyControl.SetMethod( b );
-		//}
 	}
 }
