@@ -31,6 +31,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public List<ExternalReference> IncomingReferences;
 		public List<ExternalReference> OutgoingReferences;
 
+		public object UserCache;
+		public uint UserLines;
+
 		public MethodBody( uint address, uint length, Instruction[] instructions )
 		{
 			this.Name = string.Format( "sub_{0:X8}", address );
@@ -44,6 +47,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 			if( instructions != null )
 				this.Populate( instructions );
+		}
+
+		public void Touch()
+		{
+			this.UserCache = null;
 		}
 
 		public void Populate( Instruction[] instructions )
@@ -62,10 +70,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			bool inDelay = false;
 			foreach( Instruction instruction in instructions )
 			{
-				if( instruction.Address == 0x08804318 )
-				{
-					int x = 5;
-				}
 				//lui $n, NNN
 				//addiu $n, $n, NNN
 

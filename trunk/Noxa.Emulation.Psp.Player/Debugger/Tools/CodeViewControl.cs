@@ -30,7 +30,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		// 00000000 assembly    ; comments
 		// ....
 
-		private const int ExtraLinesPerMethod = 1;
+		private const int ExtraLinesPerMethod = 2;
 
 		public CodeViewControl()
 		{
@@ -89,6 +89,58 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		public bool UseHex { get; set; }
 
+		#region Method Caching
+
+		enum LineType
+		{
+			Header,
+			Info,
+			Footer,
+			Label,
+			Instruction,
+		}
+
+		class Line
+		{
+			public LineType Type;
+			public Instruction Instruction;
+		}
+
+		private List<Line> CacheMethod( MethodBody body )
+		{
+			List<Line> lines = new List<Line>( body.TotalLines + ExtraLinesPerMethod );
+
+			Line line = new Line();
+			line.Type = LineType.Header;
+			lines.Add( line );
+
+			foreach( Instruction instruction in body.Instructions )
+			{
+				if( instruction.Label != null )
+				{
+					line = new Line();
+					line.Type = LineType.Label;
+					line.Instruction = instruction;
+					lines.Add( line );
+				}
+
+				line = new Line();
+				line.Type = LineType.Instruction;
+				line.Instruction = instruction;
+				lines.Add( line );
+			}
+
+			line = new Line();
+			line.Type = LineType.Footer;
+			lines.Add( line );
+
+			body.UserCache = lines;
+			body.UserLines = ( uint )lines.Count;
+			return lines;
+		}
+
+		#endregion
+
 		#region Sizing/locations/etc
 
 		private int _totalLines;
@@ -111,7 +163,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			{
 				int totalLines = 0;
 				foreach( MethodBody body in _codeCache.Methods )
-					totalLines += ( int )body.TotalLines + ExtraLinesPerMethod;
+				{
+					// TODO: cache here?
+					body.UserLines = body.TotalLines + ExtraLinesPerMethod;
+					totalLines += ( int )body.UserLines;
+				}
 				_totalLines = totalLines;
 				_surfaceSize = new Size( this.ClientRectangle.Width - _verticalScrollBar.Width, ( _lineHeight * _totalLines ) );
 				_verticalScrollBar.Minimum = 0;
@@ -128,8 +184,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			for( int n = 0; n < _codeCache.Methods.Count; n++ )
 			{
 				MethodBody body = _codeCache.Methods[ n ];
-				int newLineSum = lineSum + ( int )body.TotalLines + ExtraLinesPerMethod;
-				if( y <= newLineSum )
+				int newLineSum = lineSum + ( int )body.UserLines;
+				if( y < newLineSum )
 					return n;
 				else
 					lineSum = newLineSum;
@@ -319,16 +375,23 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			int y = 0;
 
 			int lineOffset = currentLine - lineSum;
-			while( currentLine < _lastVisibleLine )
+			while( currentLine <= _lastVisibleLine )
 			{
+				if( index >= _codeCache.Methods.Count )
+					break;
 				MethodBody body = _codeCache.Methods[ index++ ];
-				currentLine += ( int )body.TotalLines + ExtraLinesPerMethod - lineOffset;
-				y = this.DrawMethod( e.Graphics, body, x, y, lineOffset );
+				List<Line> lines = ( List<Line> )body.UserCache;
+				if( lines == null )
+					lines = this.CacheMethod( body );
+
+				int remainingLines = _lastVisibleLine - currentLine;
+				currentLine += ( int )body.UserLines - lineOffset;
+				y = this.DrawMethod( e.Graphics, body, lines, x, y, lineOffset, remainingLines );
 				lineOffset = 0;
 			}
 		}
 
-		private int DrawMethod( Graphics g, MethodBody body, int x, int y, int lineOffset )
+		private int DrawMethod( Graphics g, MethodBody body, List<Line> lines, int x, int y, int lineOffset, int maxLines )
 		{
 			int addressx = x + _gutterWidth + 1;
 			int codex = addressx + _addressWidth + 1 + 6;
@@ -338,79 +401,89 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			Brush codeBrush = this.Enabled ? _instrFontBrush : _disabledFontBrush;
 			Brush addressBrush = this.Enabled ? _addressFontBrush : _disabledFontBrush;
 
-			// -- method info --
-			if( lineOffset == 0 )
-			{
-				g.DrawString( string.Format( "// {0}", body.Name ), _font, _commentFontBrush, codex, y );
-				g.DrawLine( _commentLinePen, codex + ( _charSize.Width * ( body.Name.Length + 4 ) ), y + ( _charSize.Height / 2.0f ), this.ClientRectangle.Width - 10, y + ( _charSize.Height / 2.0f ) );
-				y += _lineHeight;
-			}
-			else
-				lineOffset--;
-
 			// -- lines --
-			for( int n = lineOffset; n < body.Instructions.Length; n++ )
+			for( int n = lineOffset; n < lines.Count; n++ )
 			{
-				Instruction instr = body.Instructions[ n ];
+				Line line = lines[ n ];
+				Instruction instr = line.Instruction;
 
-				// Label marker
-				if( instr.Label != null )
+				switch( line.Type )
 				{
-					g.DrawString( instr.Label.Name + ":", _font, _labelFontBrush, codex, y, _stringFormat );
-					y += _lineHeight;
-				}
-
-				// Gutter
-				// TODO
-
-				// Address
-				g.DrawString( string.Format( "{0:X8}", instr.Address ), _font, addressBrush, addressx + 6, y, _stringFormat );
-
-				// Instruction
-				int realx = operandx;
-				if( instr.Code == 0x0 )
-				{
-					g.DrawString( "nop", _font, _disabledFontBrush, opcodex, y, _stringFormat );
-				}
-				else
-				{
-					g.DrawString( instr.Opcode.ToString(), _font, codeBrush, opcodex, y, _stringFormat );
-
-					// Operands
-					for( int m = 0; m < instr.Operands.Length; m++ )
-					{
-						Operand op = instr.Operands[ m ];
-						string resolved = instr.GetResolvedOperandString( op, this.UseHex );
-						Brush fontBrush = codeBrush;
-						switch( op.Type )
+					case LineType.Header:
 						{
-							case OperandType.BranchTarget:
-								fontBrush = _referenceFontBrush;
-								break;
-							case OperandType.JumpTarget:
-								fontBrush = _referenceFontBrush;
-								break;
+							g.DrawString( string.Format( "// {0}", body.Name ), _font, _commentFontBrush, codex, y );
+							g.DrawLine( _commentLinePen, codex + ( _charSize.Width * ( body.Name.Length + 4 ) ), y + ( _charSize.Height / 2.0f ), this.ClientRectangle.Width - 10, y + ( _charSize.Height / 2.0f ) );
 						}
-						g.DrawString( resolved, _font, fontBrush, realx, y, _stringFormat );
-						realx += ( int )_charSize.Width * resolved.Length;
-
-						bool last = ( m == instr.Operands.Length - 1 );
-						if( last == false )
+						break;
+					case LineType.Footer:
 						{
-							g.DrawString( ", ", _font, codeBrush, realx - 2, y, _stringFormat );
-							realx += ( int )_charSize.Width * 2 - 2;
 						}
-					}
+						break;
+					case LineType.Label:
+						{
+							g.DrawString( instr.Label.Name + ":", _font, _labelFontBrush, codex, y, _stringFormat );
+						}
+						break;
+					case LineType.Instruction:
+						{
+							// Gutter
+							// TODO
+
+							// Address
+							g.DrawString( string.Format( "{0:X8}", instr.Address ), _font, addressBrush, addressx + 6, y, _stringFormat );
+
+							// Instruction
+							int realx = operandx;
+							if( instr.Code == 0x0 )
+							{
+								g.DrawString( "nop", _font, _disabledFontBrush, opcodex, y, _stringFormat );
+							}
+							else
+							{
+								g.DrawString( instr.Opcode.ToString(), _font, codeBrush, opcodex, y, _stringFormat );
+
+								// Operands
+								for( int m = 0; m < instr.Operands.Length; m++ )
+								{
+									Operand op = instr.Operands[ m ];
+									string resolved = instr.GetResolvedOperandString( op, this.UseHex );
+									Brush fontBrush = codeBrush;
+									switch( op.Type )
+									{
+										case OperandType.BranchTarget:
+											fontBrush = _referenceFontBrush;
+											break;
+										case OperandType.JumpTarget:
+											fontBrush = _referenceFontBrush;
+											break;
+									}
+									g.DrawString( resolved, _font, fontBrush, realx, y, _stringFormat );
+									realx += ( int )_charSize.Width * resolved.Length;
+
+									bool last = ( m == instr.Operands.Length - 1 );
+									if( last == false )
+									{
+										g.DrawString( ", ", _font, codeBrush, realx - 2, y, _stringFormat );
+										realx += ( int )_charSize.Width * 2 - 2;
+									}
+								}
+							}
+
+							// Annotations
+							if( instr.Annotation != null )
+								g.DrawString( instr.Annotation, _font, _referenceFontBrush, realx + 10, y, _stringFormat );
+
+							// Comments
+							// TODO _commentFontBrush
+						}
+						break;
 				}
-
-				// Annotations
-				if( instr.Annotation != null )
-					g.DrawString( instr.Annotation, _font, _referenceFontBrush, realx + 10, y, _stringFormat );
-
-				// Comments
-				// TODO _commentFontBrush
 
 				y += _lineHeight;
+
+				maxLines--;
+				if( maxLines == 0 )
+					break;
 			}
 
 			return y;
