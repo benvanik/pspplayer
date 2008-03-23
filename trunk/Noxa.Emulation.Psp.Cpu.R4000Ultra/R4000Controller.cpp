@@ -53,7 +53,7 @@ R4000Controller::R4000Controller( R4000Cpu^ cpu )
 	_debugResumeMode = DEBUG_RESUME_CONTINUE;
 	_debugResumeParam = 0;
 
-	array<Instruction^>^ _analysisInstructions = gcnew array<Instruction^>{
+	_analysisInstructions = gcnew array<Instruction^>{
 		gcnew Instruction( "beq",		0x10000000, 0xFC000000,	AddressBits::Bits16,		InstructionType::Branch ),
 		gcnew Instruction( "beql",		0x50000000, 0xFC000000,	AddressBits::Bits16,		InstructionType::Branch ),
 		gcnew Instruction( "bgez",		0x04010000, 0xFC1F0000,	AddressBits::Bits16,		InstructionType::Branch ),
@@ -178,7 +178,27 @@ int __debugHandlerM( int breakpointId )
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
 
 	Breakpoint^ breakpoint;
-	if( cpu->_hook->Breakpoints->TryGetValue( breakpointId, breakpoint ) == false )
+	for each( Breakpoint^ bp in cpu->_hook->SteppingBreakpoints )
+	{
+		if( bp->ID == breakpointId )
+		{
+			breakpoint = bp;
+			break;
+		}
+	}
+	if( breakpoint == nullptr )
+	{
+		for each( Breakpoint^ bp in cpu->_hook->Breakpoints )
+		{
+			if( bp->ID == breakpointId )
+			{
+				breakpoint = bp;
+				break;
+			}
+		}
+	}
+	Debug::Assert( breakpoint != nullptr, "Could not find breakpoint" );
+	if( breakpoint == nullptr )
 	{
 		// Not found? Inconceivable!
 		Log::WriteLine( Verbosity::Critical, Feature::Debug, "breakpoint {0} not found on __debugHandler - wtf?", breakpointId );
@@ -228,17 +248,19 @@ int __debugHandlerM( int breakpointId )
 			case BreakpointType::Stepping:
 				UnsetBreakpoint( breakpoint );
 				// See if we need to handle/reset an old breakpoint
-				int oldBreakpointId;
-				if( cpu->_hook->BreakpointLookup->TryGetValue( breakpoint->Address, oldBreakpointId ) == true )
+				for each( Breakpoint^ bp in cpu->_hook->Breakpoints )
 				{
-					Breakpoint^ oldBreakpoint = cpu->_hook->Breakpoints[ oldBreakpointId ];
-					oldBreakpoint->HitCount++;
-					if( oldBreakpoint->Mode == BreakpointMode::Trace )
-						HandleTracepoint( oldBreakpoint );
-					SetBreakpoint( oldBreakpoint );
+					if( ( bp->Address == breakpoint->Address ) &&
+						( bp->Enabled == true ) )
+					{
+						bp->HitCount++;
+						if( bp->Mode == BreakpointMode::Trace )
+							HandleTracepoint( bp );
+						SetBreakpoint( bp );
+						break;
+					}
 				}
 				Diag::Instance->Client->Handler->OnStepComplete( breakpoint->Address );
-				cpu->_hook->Breakpoints->Remove( breakpoint->ID );
 				cpu->_hook->SteppingBreakpoints->Remove( breakpoint );
 				break;
 			default:
@@ -261,10 +283,23 @@ int __debugHandlerM( int breakpointId )
 			case DEBUG_RESUME_STEP:
 				{
 					uint findStepAddress = FindStepAddress( cpu->_controller, breakpoint->Address, _debugResumeParam );
-					Breakpoint^ newBreakpoint = gcnew Breakpoint( Diag::Instance->Client->AllocateID(), BreakpointType::Stepping, findStepAddress );
-					cpu->_hook->Breakpoints->Add( newBreakpoint->ID, newBreakpoint );
-					cpu->_hook->SteppingBreakpoints->Add( newBreakpoint );
-					SetBreakpoint( newBreakpoint );
+					// If there's a brekapoint there, then no need to do anything, it'll get hit
+					bool breakpointExists = false;
+					for each( Breakpoint^ bp in cpu->_hook->Breakpoints )
+					{
+						if( ( bp->Address == findStepAddress ) &&
+							( bp->Enabled == true ) )
+						{
+							breakpointExists = true;
+							break;
+						}
+					}
+					if( breakpointExists == false )
+					{
+						Breakpoint^ newBreakpoint = gcnew Breakpoint( Diag::Instance->Client->AllocateID(), BreakpointType::Stepping, findStepAddress );
+						cpu->_hook->SteppingBreakpoints->Add( newBreakpoint );
+						SetBreakpoint( newBreakpoint );
+					}
 				}
 				break;
 			case DEBUG_RESUME_SET_NEXT:
@@ -424,6 +459,21 @@ byte* FindInstructionStart( CodeBlock* block, uint address, int* size )
 extern void AddMemoryBreakpoint( int id, uint address, bool isRead );
 extern void RemoveMemoryBreakpoint( uint address, bool isRead );
 
+void SetBreakpoint( Breakpoint^ breakpoint, CodeBlock* block )
+{
+	int size;
+	byte* start = FindInstructionStart( block, breakpoint->Address, &size );
+
+	// Write break jump bytes (see __debugThunk for more info)
+	Debug::Assert( start[ 0 ] == 0x90 );
+	start[ 0 ] = 0x68;
+	*( ( int* )( &start[ 1 ] ) ) = breakpoint->ID;
+	start[ 5 ] = 0xB8;
+	*( ( int* )( &start[ 6 ] ) ) = ( int )&__debugThunk;
+	start[ 10 ] = 0xFF;
+	start[ 11 ] = 0xD0;
+}
+
 void SetBreakpoint( Breakpoint^ breakpoint )
 {
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
@@ -439,17 +489,7 @@ void SetBreakpoint( Breakpoint^ breakpoint )
 			for( int n = 0; n < blockCount; n++ )
 			{
 				CodeBlock* block = blocks[ n ];
-				int size;
-				byte* start = FindInstructionStart( block, breakpoint->Address, &size );
-
-				// Write break jump bytes (see __debugThunk for more info)
-				assert( start[ 0 ] == 0x90 );
-				start[ 0 ] = 0x68;
-				*( ( int* )( &start[ 1 ] ) ) = breakpoint->ID;
-				start[ 5 ] = 0xB8;
-				*( ( int* )( &start[ 6 ] ) ) = ( int )&__debugThunk;
-				start[ 10 ] = 0xFF;
-				start[ 11 ] = 0xD0;
+				SetBreakpoint( breakpoint, block );
 			}
 		}
 		break;

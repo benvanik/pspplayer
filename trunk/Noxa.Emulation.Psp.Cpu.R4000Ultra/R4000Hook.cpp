@@ -27,8 +27,7 @@ R4000Hook::R4000Hook( R4000Cpu^ cpu )
 {
 	this->Cpu = cpu;
 
-	this->Breakpoints = gcnew Dictionary<int, Breakpoint^>();
-	this->BreakpointLookup = gcnew Dictionary<uint, int>();
+	this->Breakpoints = gcnew List<Breakpoint^>();
 	this->SteppingBreakpoints = gcnew List<Breakpoint^>();
 }
 
@@ -36,60 +35,63 @@ R4000Hook::R4000Hook( R4000Cpu^ cpu )
 
 void R4000Hook::RefreshBreakpointTable()
 {
-	// We assume we have free reign over everything now (no codegen, etc)
-	Monitor::Enter( this->BreakpointLookup );
-	try
-	{
-		this->BreakpointLookup->Clear();
-		for each( KeyValuePair<int, Breakpoint^>^ pair in this->Breakpoints )
-		{
-			uint address;
-			switch( pair->Value->Type )
-			{
-			case BreakpointType::CodeExecute:
-				address = pair->Value->Address;
-				break;
-			case BreakpointType::BiosFunction:
-				if( pair->Value->CachedFunction == nullptr )
-				{
-					pair->Value->CachedFunction = this->Cpu->Emulator->Bios->FindFunction( pair->Value->Function );
-					if( pair->Value->CachedFunction == nullptr )
-					{
-						Log::WriteLine( Verbosity::Critical, Feature::Debug, "function {0} not registered - cannot set breakpoint yet", pair->Value->Function );
-						continue;
-					}
-				}
-				if( pair->Value->CachedFunction->StubAddress == 0x0 )
-				{
-					Log::WriteLine( Verbosity::Critical, Feature::Debug, "stub address for {0} not found (unused?) - cannot set breakpoint yet", pair->Value->Function );
-					continue;
-				}
-				else
-					address = pair->Value->CachedFunction->StubAddress;
-				break;
-			case BreakpointType::MemoryAccess:
-				address = pair->Value->Address;
-				break;
-			}
-			this->BreakpointLookup->Add( address, pair->Key );
-		}
-	}
-	finally
-	{
-		Monitor::Exit( this->BreakpointLookup );
-	}
+	//// We assume we have free reign over everything now (no codegen, etc)
+	//Monitor::Enter( this->Breakpoints );
+	//try
+	//{
+	//	this->BreakpointLookup->Clear();
+	//	for each( KeyValuePair<int, Breakpoint^>^ pair in this->Breakpoints )
+	//	{
+	//		uint address;
+	//		switch( pair->Value->Type )
+	//		{
+	//		case BreakpointType::CodeExecute:
+	//			address = pair->Value->Address;
+	//			break;
+	//		case BreakpointType::BiosFunction:
+	//			if( pair->Value->CachedFunction == nullptr )
+	//			{
+	//				pair->Value->CachedFunction = this->Cpu->Emulator->Bios->FindFunction( pair->Value->Function );
+	//				if( pair->Value->CachedFunction == nullptr )
+	//				{
+	//					Log::WriteLine( Verbosity::Critical, Feature::Debug, "function {0} not registered - cannot set breakpoint yet", pair->Value->Function );
+	//					continue;
+	//				}
+	//			}
+	//			if( pair->Value->CachedFunction->StubAddress == 0x0 )
+	//			{
+	//				Log::WriteLine( Verbosity::Critical, Feature::Debug, "stub address for {0} not found (unused?) - cannot set breakpoint yet", pair->Value->Function );
+	//				continue;
+	//			}
+	//			else
+	//				address = pair->Value->CachedFunction->StubAddress;
+	//			break;
+	//		case BreakpointType::MemoryAccess:
+	//			address = pair->Value->Address;
+	//			break;
+	//		}
+	//		this->Breakpoints->Add( address, pair->Key );
+	//	}
+	//}
+	//finally
+	//{
+	//	Monitor::Exit( this->Breakpoints );
+	//}
 }
 
 void R4000Hook::AddBreakpoint( Breakpoint^ breakpoint )
 {
 	Debug::Assert( breakpoint != nullptr );
-	if( this->Breakpoints->ContainsKey( breakpoint->ID ) == true )
+	for each( Breakpoint^ bp in this->Breakpoints )
 	{
-		Debug::Assert( false );
-		return;
+		if( bp->ID == breakpoint->ID )
+		{
+			Debug::Assert( false, "Adding duplicate breakpoint ID" );
+			return;
+		}
 	}
 
-	this->Breakpoints->Add( breakpoint->ID, breakpoint );
+	this->Breakpoints->Add( breakpoint );
 	this->RefreshBreakpointTable();
 	if( breakpoint->Enabled == true )
 		SetBreakpoint( breakpoint );
@@ -97,22 +99,29 @@ void R4000Hook::AddBreakpoint( Breakpoint^ breakpoint )
 
 Breakpoint^ R4000Hook::FindBreakpoint( int id )
 {
-	Breakpoint^ breakpoint;
-	if( this->Breakpoints->TryGetValue( id, breakpoint ) == true )
-		return breakpoint;
-	else
-		return nullptr;
+	for each( Breakpoint^ bp in this->Breakpoints )
+	{
+		if( bp->ID == id )
+			return bp;
+	}
+	return nullptr;
 }
 
 bool R4000Hook::UpdateBreakpoint( Breakpoint^ newBreakpoint )
 {
 	Debug::Assert( newBreakpoint != nullptr );
-	Breakpoint^ old;
-	if( this->Breakpoints->TryGetValue( newBreakpoint->ID, old ) == false )
+	Breakpoint^ old = nullptr;
+	for each( Breakpoint^ bp in this->Breakpoints )
 	{
-		Debug::Assert( false );
-		return false;
+		if( bp->ID == newBreakpoint->ID )
+		{
+			old = bp;
+			break;
+		}
 	}
+	Debug::Assert( old != nullptr, "Could not find original breakpoint" );
+	if( old == nullptr )
+		return false;
 
 	// Mode and Enabled are the only ones we care about that can change
 	// We don't even bother with mode - that is used by the handler - we just copy
@@ -134,12 +143,19 @@ bool R4000Hook::UpdateBreakpoint( Breakpoint^ newBreakpoint )
 void R4000Hook::RemoveBreakpoint( int id )
 {
 	Breakpoint^ breakpoint;
-	if( this->Breakpoints->TryGetValue( id, breakpoint ) == false )
+	for each( Breakpoint^ bp in this->Breakpoints )
 	{
-		Debug::Assert( false );
-		return;
+		if( bp->ID == id )
+		{
+			breakpoint = bp;
+			break;
+		}
 	}
-	this->Breakpoints->Remove( id );
+	Debug::Assert( breakpoint != nullptr, "Could not find breakpoint" );
+	if( breakpoint == nullptr )
+		return;
+
+	this->Breakpoints->Remove( breakpoint );
 	this->RefreshBreakpointTable();
 	if( breakpoint->Enabled == true )
 		UnsetBreakpoint( breakpoint );

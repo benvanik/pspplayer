@@ -29,7 +29,7 @@ namespace Noxa {
 				public:
 					R4000Cpu^			Cpu;
 
-					Dictionary<int, Breakpoint^>^	Breakpoints;
+					List<Breakpoint^>^	Breakpoints;
 
 				public:
 					R4000Hook( R4000Cpu^ cpu );
@@ -64,7 +64,6 @@ namespace Noxa {
 					virtual array<uint>^ GetMethodBody( Method^ method );
 
 				public:
-					Dictionary<uint, int>^	BreakpointLookup;
 					List<Breakpoint^>^		SteppingBreakpoints;
 					void RefreshBreakpointTable();
 				};
