@@ -922,6 +922,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						// Schedule so that our thread runs
 						kernel.Schedule();
 
+						// If debugging, set start breakpoint
+						if( Diag.IsAttached == true )
+							Diag.Instance.Client.OnBootModuleLoaded( results.EntryAddress );
+
 						//kernel.MemorySystem.DumpMainMemory( "startup.bin" );
 					}
 				}

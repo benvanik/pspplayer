@@ -60,117 +60,13 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.codeView.Enabled = true;
 			this.codeView.SetAddress( address );
 			this.codeView.Focus();
+			this.registersControl.Enabled = true;
 			this.registersControl.Invalidate();
 		}
 
 		public void ShowNextStatement()
 		{
-			CoreState state = this.Debugger.DebugHost.CpuHook.GetCoreState( 0 );
-			this.SetAddress( state.ProgramCounter, true );
+			this.SetAddress( this.Debugger.PC, true );
 		}
-
-		#region Registers
-
-		//private void ShowRegisters( RegisterSet set )
-		//{
-		//    CoreState state = this.Debugger.Host.CpuHook.GetCoreState( 0 );
-		//    this.pcTextBox.Text = string.Format( "0x{0:X8}", state.ProgramCounter );
-
-		//    if( this.CurrentRegisterSet != set )
-		//    {
-		//        this.CurrentRegisterSet = set;
-		//        switch( set )
-		//        {
-		//            case RegisterSet.Gpr:
-		//                this.registerToggleToolStripSplitButton.Text = "GPR";
-		//                break;
-		//            case RegisterSet.Fpu:
-		//                this.registerToggleToolStripSplitButton.Text = "FPU";
-		//                break;
-		//            case RegisterSet.Vfpu:
-		//                this.registerToggleToolStripSplitButton.Text = "VFPU";
-		//                break;
-		//        }
-		//    }
-
-		//    RegisterBank bank;
-		//    switch( set )
-		//    {
-		//        default:
-		//        case RegisterSet.Gpr:
-		//            bank = RegisterBanks.General;
-		//            break;
-		//        case RegisterSet.Fpu:
-		//            bank = RegisterBanks.Fpu;
-		//            break;
-		//        case RegisterSet.Vfpu:
-		//            bank = RegisterBanks.Vfpu;
-		//            break;
-		//    }
-
-		//    this.registersListView.BeginUpdate();
-		//    this.registersListView.Items.Clear();
-		//    foreach( Register register in bank.Registers )
-		//    {
-		//        string prettyValue = string.Empty;
-		//        string rawValue = string.Empty;
-		//        switch( set )
-		//        {
-		//            case RegisterSet.Gpr:
-		//                uint uv = this.Debugger.Host.CpuHook.GetRegister<uint>( set, register.Ordinal );
-		//                prettyValue = uv.ToString();
-		//                rawValue = string.Format( "{0:X8}", uv );
-		//                break;
-		//            case RegisterSet.Fpu:
-		//            case RegisterSet.Vfpu:
-		//                float fv = this.Debugger.Host.CpuHook.GetRegister<float>( set, register.Ordinal );
-		//                prettyValue = fv.ToString();
-		//                break;
-		//        }
-		//        ListViewItem item = new ListViewItem( new string[]{
-		//            register.ToString(), prettyValue, rawValue,
-		//        } );
-		//        this.registersListView.Items.Add( item );
-		//    }
-		//    this.registersListView.EndUpdate();
-		//}
-
-		//private void disassemblyControl1_RegisterValueChanged( object sender, EventArgs e )
-		//{
-		//    this.ShowRegisters( this.CurrentRegisterSet );
-		//}
-
-		//private void registerToggleToolStripSplitButton_ButtonClick( object sender, EventArgs e )
-		//{
-		//    switch( this.CurrentRegisterSet )
-		//    {
-		//        case RegisterSet.Gpr:
-		//            this.ShowRegisters( RegisterSet.Fpu );
-		//            break;
-		//        case RegisterSet.Fpu:
-		//            this.ShowRegisters( RegisterSet.Vfpu );
-		//            break;
-		//        case RegisterSet.Vfpu:
-		//            this.ShowRegisters( RegisterSet.Gpr );
-		//            break;
-		//    }
-		//}
-
-		//private void generalRegistersToolStripMenuItem_Click( object sender, EventArgs e )
-		//{
-		//    this.ShowRegisters( RegisterSet.Gpr );
-		//}
-
-		//private void fPURegistersToolStripMenuItem_Click( object sender, EventArgs e )
-		//{
-		//    this.ShowRegisters( RegisterSet.Fpu );
-		//}
-
-		//private void vFPURegistersToolStripMenuItem_Click( object sender, EventArgs e )
-		//{
-		//    this.ShowRegisters( RegisterSet.Vfpu );
-		//}
-
-		#endregion
 	}
 }

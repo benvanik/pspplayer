@@ -184,6 +184,7 @@ int __debugHandlerM( int breakpointId )
 		Log::WriteLine( Verbosity::Critical, Feature::Debug, "breakpoint {0} not found on __debugHandler - wtf?", breakpointId );
 		return DEBUG_HANDLE_CONTINUE;
 	}
+	Debug::Assert( breakpoint->Enabled == true );
 
 	int cacheVersion = cpu->_codeCache->Version;
 
