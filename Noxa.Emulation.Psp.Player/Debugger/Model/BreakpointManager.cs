@@ -199,14 +199,23 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		{
 			Breakpoint breakpoint = this[ id ];
 			Debug.Assert( breakpoint != null );
+			if( breakpoint == null )
+				return;
+			this.ToggleBreakpoint( breakpoint );
+		}
+		
+		public void ToggleBreakpoint( Breakpoint breakpoint )
+		{
 			bool old = breakpoint.Enabled;
-			breakpoint.Enabled = !old;
-			this.OnBreakpointToggled( breakpoint );
+			Breakpoint dummy = new Breakpoint( breakpoint.ID, breakpoint.Type, breakpoint.Address );
+			dummy.Mode = breakpoint.Mode;
+			dummy.Enabled = !old;
+			this.OnBreakpointToggled( breakpoint, dummy );
 		}
 
-		internal void OnBreakpointToggled( Breakpoint breakpoint )
+		internal void OnBreakpointToggled( Breakpoint breakpoint, Breakpoint changed )
 		{
-			this.Debugger.DebugHost.CpuHook.UpdateBreakpoint( breakpoint );
+			this.Debugger.DebugHost.CpuHook.UpdateBreakpoint( changed );
 			if( this.Toggled != null )
 				this.Toggled( this, new BreakpointEventArgs( breakpoint ) );
 		}

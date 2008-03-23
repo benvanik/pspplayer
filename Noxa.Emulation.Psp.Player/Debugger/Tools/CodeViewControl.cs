@@ -11,8 +11,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Noxa.Emulation.Psp.Player.Debugger.Model;
 using System.Windows.Forms.VisualStyles;
+using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.Player.Debugger.Model;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 {
@@ -143,12 +144,35 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		#endregion
 
-		#region Focus
+		#region Focus/Input
+
+		private int _hoveredIndex = -1;
 
 		protected override void OnMouseDown( MouseEventArgs e )
 		{
 			base.OnMouseDown( e );
 			this.Focus();
+		}
+
+		protected override void OnMouseMove( MouseEventArgs e )
+		{
+			base.OnMouseMove( e );
+
+			int y = e.Y / _lineHeight;
+			_hoveredIndex = Math.Min( _firstVisibleLine + y, _totalLines );
+
+			if( e.X < 2 + _gutterWidth + 1 )
+				this.ContextMenuStrip = this.gutterContextMenuStrip;
+			else
+				this.ContextMenuStrip = this.lineContextMenuStrip;
+		}
+
+		protected override void OnMouseUp( MouseEventArgs e )
+		{
+			if( e.X < 2 + _gutterWidth + 1 )
+				this.GutterMouseUp( e );
+			else
+				base.OnMouseUp( e );
 		}
 
 		#endregion
@@ -221,6 +245,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			if( body == null )
 			{
 				// TODO: status update?
+				this.Invalidate();
 				return;
 			}
 
@@ -235,12 +260,14 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			if( ( line >= _firstVisibleLine ) && ( line < _lastVisibleLine ) )
 			{
 				// Already in view
+				this.Invalidate();
 				return;
 			}
 
 			int targetLine = line - ( _visibleLines / 2 );
 			targetLine = Math.Max( Math.Min( targetLine, _totalLines ), 0 );
 			this.ScrollToLine( targetLine );
+			this.Invalidate();
 		}
 
 		private bool ScrollToLine( int targetLine )
@@ -621,6 +648,330 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			}
 
 			return y;
+		}
+
+		#endregion
+
+		#region Context Menus
+
+		private int _contextIndex = -1;
+		private Operand _contextOperand;
+
+		private Instruction GetContextInstruction()
+		{
+			if( _contextIndex < 0 )
+			{
+				if( _hoveredIndex < 0 )
+					return null;
+				_contextIndex = _hoveredIndex;
+			}
+			int lineSum;
+			int methodIndex = this.IndexOfMethodAt( _contextIndex, out lineSum );
+			MethodBody method = _debugger.CodeCache.Methods[ methodIndex ];
+			int lineIndex = ( _contextIndex - lineSum );
+			List<Line> lines = ( List<Line> )method.UserCache;
+			Line line = lines[ lineIndex ];
+			return line.Instruction;
+		}
+
+		#region Gutter / Breakpoints
+
+		private void GutterMouseUp( MouseEventArgs e )
+		{
+			if( e.Button == MouseButtons.Right )
+				return;
+
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			bool hasBreakpoint = ( instr.Breakpoint != null );
+			if( e.Button == MouseButtons.Left )
+			{
+				if( hasBreakpoint == true )
+				{
+					// Delete breakpoint
+					this.removeBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
+				}
+				else
+				{
+					// Add breakpoint
+					this.addBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
+				}
+			}
+			else if( e.Button == MouseButtons.Middle )
+			{
+				// Toggle
+				this.toggleBreakpointToolStripMenuItem_Click( this, EventArgs.Empty );
+			}
+		}
+
+		private void gutterContextMenuStrip_Opening( object sender, CancelEventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			bool hasBreakpoint = ( instr.Breakpoint != null );
+
+			if( hasBreakpoint == true )
+			{
+				bool breakpointEnabled = instr.Breakpoint.Enabled;
+				if( breakpointEnabled == true )
+					this.toggleBreakpointToolStripMenuItem.Text = "D&isable Breakpoint";
+				else
+					this.toggleBreakpointToolStripMenuItem.Text = "&Enable Breakpoint";
+			}
+			this.toggleBreakpointToolStripMenuItem.Visible = hasBreakpoint;
+			this.renameBreakpointToolStripMenuItem.Visible = hasBreakpoint;
+			this.toolStripSeparator1.Visible = hasBreakpoint;
+			this.addBreakpointToolStripMenuItem.Visible = !hasBreakpoint;
+			this.removeBreakpointToolStripMenuItem.Visible = hasBreakpoint;
+		}
+
+		private void addBreakpointToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			Breakpoint bp = new Breakpoint( _debugger.AllocateID(), BreakpointType.CodeExecute, instr.Address );
+			_debugger.Breakpoints.Add( bp );
+
+			this.ContextReturn();
+		}
+
+		private void removeBreakpointToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			Breakpoint bp = instr.Breakpoint;
+			_debugger.Breakpoints.Remove( bp );
+
+			this.ContextReturn();
+		}
+
+		private void renameBreakpointToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			//Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
+			// TODO: rename breakpoint
+
+			this.ContextReturn();
+		}
+
+		private void toggleBreakpointToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			if( instr.Breakpoint == null )
+				return;
+
+			_debugger.Breakpoints.ToggleBreakpoint( instr.Breakpoint );
+
+			this.ContextReturn();
+		}
+
+		#endregion
+
+		#region Line
+
+		private void lineContextMenuStrip_Opening( object sender, CancelEventArgs e )
+		{
+			//if( _hoveredIndex < 0 )
+			//    return;
+			//_contextIndex = _hoveredIndex;
+			//if( ( _hoveredColumn == Column.Instruction ) &&
+			//    ( _hoveredValue != null ) )
+			//{
+			//    if( _hoveredValue is CachedOperand )
+			//        _contextOperand = ( ( CachedOperand )_hoveredValue ).Operand;
+			//}
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			bool hasOperand = ( _contextOperand != null );
+			bool referenceOperand = false;
+			if( hasOperand == true )
+			{
+				// Only allow editing if it's a register
+				bool readOnly =
+					( _contextOperand.Register == null ) ||
+					( _contextOperand.Register.ReadOnly == true );
+				this.valueToolStripTextBox.ReadOnly = readOnly;
+
+				// Only allow goto if a reference
+				referenceOperand =
+					( _contextOperand.Type == OperandType.BranchTarget ) ||
+					( _contextOperand.Type == OperandType.JumpTarget ) ||
+					( _contextOperand.Type == OperandType.MemoryAccess );
+
+				if( ( referenceOperand == true ) &&
+					( _contextOperand.Type == OperandType.MemoryAccess ) )
+				{
+					this.goToTargetToolStripMenuItem.Text = "&Go to Memory Address";
+					this.goToTargetToolStripMenuItem.Image = Properties.Resources.MemoryIcon;
+				}
+				else
+				{
+					this.goToTargetToolStripMenuItem.Text = "&Go to Code Address";
+					this.goToTargetToolStripMenuItem.Image = Properties.Resources.DisassemblyIcon;
+				}
+
+				//this.valueToolStripTextBox.Text = this.RequestOperandValue( instr, _contextOperand, false );
+				this.valueToolStripTextBox.Modified = false;
+			}
+			this.valueToolStripTextBox.Visible = hasOperand;
+			this.toolStripSeparator5.Visible = hasOperand;
+			this.copyOperandToolStripMenuItem.Visible = hasOperand;
+			this.goToTargetToolStripMenuItem.Visible = hasOperand && referenceOperand;
+			this.toolStripSeparator4.Visible = hasOperand;
+		}
+
+		#region Operands
+
+		private void valueToolStripTextBox_TextChanged( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			if( this.valueToolStripTextBox.Modified == true )
+			{
+				//Debug.WriteLine( "changed " + valueToolStripTextBox.Text );
+				//this.UpdateOperandValue( instr, _contextOperand, this.valueToolStripTextBox.Text );
+			}
+		}
+
+		private void copyOperandToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			Clipboard.Clear();
+			//Clipboard.SetText( this.RequestOperandValue( instr, _contextOperand, false ), TextDataFormat.Text );
+
+			this.ContextReturn();
+		}
+
+		private void goToTargetToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			this.ContextReturn();
+		}
+
+		#endregion
+
+		#region Clipboard
+
+		private void copyAddressToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			Clipboard.Clear();
+			//Clipboard.SetText( string.Format( "{0:X8}", instr.Address ) );
+
+			this.ContextReturn();
+		}
+
+		private void copyInstructionToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			Clipboard.Clear();
+			//Clipboard.SetText( instr.ToString() );
+
+			this.ContextReturn();
+		}
+
+		private void copyLineToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			StringBuilder line = new StringBuilder();
+			StringBuilder html = new StringBuilder();
+
+			//string args = instr.GetOperandsString();
+
+			//line.AppendFormat( "[{0:X8}] {1:X8} {2} {3}",
+			//	instr.Address, instr.Code, instr.Opcode.ToString(), args );
+			//html.AppendFormat( "[<b><font color=\"blue\">{0:X8}</font></b>] <font color=\"grey\">{1:X8}</font> <b>{2}</b> {3}",
+			//	instr.Address, instr.Code, instr.Opcode.ToString(), args );
+
+			Clipboard.Clear();
+			//Clipboard.SetText( line.ToString(), TextDataFormat.Html );
+			//Clipboard.SetText( html.ToString(), TextDataFormat.Text );
+
+			this.ContextReturn();
+		}
+
+		#endregion
+
+		#region Control
+
+		private void showNextToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			this.SetAddress( _debugger.PC );
+			this.Focus();
+
+			this.ContextReturn();
+		}
+
+		private void runToCursorToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			this.ContextReturn();
+		}
+
+		private void setNextToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			Instruction instr = this.GetContextInstruction();
+			if( instr == null )
+				return;
+
+			this.ContextReturn();
+		}
+
+		#endregion
+
+		#endregion
+
+		private void ContextReturn()
+		{
+			this.Invalidate();
+			_contextIndex = -1;
+			_contextOperand = null;
+		}
+
+		private void GeneralContextClosed( object sender, ToolStripDropDownClosedEventArgs e )
+		{
+			if( e.CloseReason != ToolStripDropDownCloseReason.ItemClicked )
+				this.ContextReturn();
 		}
 
 		#endregion

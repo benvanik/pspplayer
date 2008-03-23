@@ -49,6 +49,12 @@ namespace Noxa.Emulation.Psp.Debugging.Protocol
 		void OnStopped();
 
 		/// <summary>
+		/// Fired when the boot module is loaded.
+		/// </summary>
+		/// <param name="entryAddress">The entry address for the module.</param>
+		void OnBootModuleLoaded( uint entryAddress );
+
+		/// <summary>
 		/// Fired when a module is loaded.
 		/// </summary>
 		void OnModuleLoaded();
