@@ -367,8 +367,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		public string Annotation;
 
-		public const int InvalidBreakpointID = -1;
-		public int BreakpointID = InvalidBreakpointID;
+		public Breakpoint Breakpoint;
 
 		public Instruction( uint address, uint code )
 		{

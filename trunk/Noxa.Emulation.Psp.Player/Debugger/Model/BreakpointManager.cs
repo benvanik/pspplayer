@@ -39,12 +39,50 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public event EventHandler<BreakpointEventArgs> Removed;
 		public event EventHandler<BreakpointEventArgs> Toggled;
 
+		public void Update()
+		{
+			foreach( Breakpoint breakpoint in _breakpoints )
+			{
+				MethodBody body = this.Debugger.CodeCache[ breakpoint.Address ];
+				if( body != null )
+				{
+					foreach( Instruction instruction in body.Instructions )
+					{
+						if( instruction.Address == breakpoint.Address )
+						{
+							Debug.Assert( instruction.Breakpoint == null );
+							instruction.Breakpoint = breakpoint;
+							break;
+						}
+					}
+				}
+			}
+		}
+
 		public void Add( Breakpoint breakpoint )
 		{
+			_breakpoints.Add( breakpoint );
 			_breakpointLookup.Add( breakpoint.ID, breakpoint );
 			switch( breakpoint.Type )
 			{
 				case BreakpointType.CodeExecute:
+					_addressBreakpointLookup.Add( breakpoint.Address, breakpoint );
+					{
+						MethodBody body = this.Debugger.CodeCache[ breakpoint.Address ];
+						if( body != null )
+						{
+							foreach( Instruction instruction in body.Instructions )
+							{
+								if( instruction.Address == breakpoint.Address )
+								{
+									Debug.Assert( instruction.Breakpoint == null );
+									instruction.Breakpoint = breakpoint;
+									break;
+								}
+							}
+						}
+					}
+					break;
 				case BreakpointType.MemoryAccess:
 					_addressBreakpointLookup.Add( breakpoint.Address, breakpoint );
 					break;
@@ -57,10 +95,28 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		public void Remove( Breakpoint breakpoint )
 		{
+			_breakpoints.Remove( breakpoint );
 			_breakpointLookup.Remove( breakpoint.ID );
 			switch( breakpoint.Type )
 			{
 				case BreakpointType.CodeExecute:
+					_addressBreakpointLookup.Remove( breakpoint.Address );
+					{
+						MethodBody body = this.Debugger.CodeCache[ breakpoint.Address ];
+						if( body != null )
+						{
+							foreach( Instruction instruction in body.Instructions )
+							{
+								if( instruction.Address == breakpoint.Address )
+								{
+									Debug.Assert( instruction.Breakpoint == breakpoint );
+									instruction.Breakpoint = null;
+									break;
+								}
+							}
+						}
+					}
+					break;
 				case BreakpointType.MemoryAccess:
 					_addressBreakpointLookup.Remove( breakpoint.Address );
 					break;
@@ -75,21 +131,45 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		{
 			get
 			{
-				Breakpoint breakpoint;
-				if( _breakpointLookup.TryGetValue( id, out breakpoint ) == true )
-					return breakpoint;
-				else
+				if( _breakpoints.Count < 50 )
+				{
+					foreach( Breakpoint bp in _breakpoints )
+					{
+						if( bp.ID == id )
+							return bp;
+					}
 					return null;
+				}
+				else
+				{
+					Breakpoint breakpoint;
+					if( _breakpointLookup.TryGetValue( id, out breakpoint ) == true )
+						return breakpoint;
+					else
+						return null;
+				}
 			}
 		}
 
 		public Breakpoint Find( uint address )
 		{
-			Breakpoint breakpoint;
-			if( _addressBreakpointLookup.TryGetValue( address, out breakpoint ) == true )
-				return breakpoint;
-			else
+			if( _breakpoints.Count < 50 )
+			{
+				foreach( Breakpoint bp in _breakpoints )
+				{
+					if( bp.Address == address )
+						return bp;
+				}
 				return null;
+			}
+			else
+			{
+				Breakpoint breakpoint;
+				if( _addressBreakpointLookup.TryGetValue( address, out breakpoint ) == true )
+					return breakpoint;
+				else
+					return null;
+			}
 		}
 
 		public Breakpoint Find( BiosFunctionToken function )

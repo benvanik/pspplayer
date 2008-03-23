@@ -41,6 +41,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		public readonly WatchTool WatchTool;
 
 		public DebuggerState State;
+		public uint PC;
 		public BreakpointManager Breakpoints;
 		public CodeCache CodeCache;
 
@@ -133,6 +134,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 				try
 				{
 					this.CodeCache.Update();
+					this.Breakpoints.Update();
 					this.CodeTool.InvalidateAll();
 				}
 				catch
