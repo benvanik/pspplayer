@@ -62,6 +62,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			bool inDelay = false;
 			foreach( Instruction instruction in instructions )
 			{
+				if( instruction.Address == 0x08804318 )
+				{
+					int x = 5;
+				}
 				//lui $n, NNN
 				//addiu $n, $n, NNN
 
@@ -239,6 +243,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		private void AddCodeReference( List<CodeReference> codeRefs, Instruction instruction, uint target )
 		{
+			if( target == 0 )
+				return;
 			foreach( CodeReference codeRef in codeRefs )
 			{
 				if( codeRef.Address == target )
@@ -251,7 +257,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			CodeReference newCodeRef = new CodeReference();
 			newCodeRef.Address = target;
 			newCodeRef.References.Add( instruction );
-			newCodeRef.Instruction = instruction;
 			instruction.Reference = newCodeRef;
 			codeRefs.Add( newCodeRef );
 		}
@@ -279,7 +284,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				newMemRef.Reads++;
 			else
 				newMemRef.Writes++;
-			newMemRef.Instruction = instruction;
 			instruction.Reference = newMemRef;
 			instruction.Annotation = ( isRead ? "r " : "w " ) + target.ToString( "X8" );
 			memRefs.Add( newMemRef );
@@ -304,7 +308,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 	abstract class Reference
 	{
-		public Instruction Instruction;
 		public uint Address;
 		public List<Instruction> References = new List<Instruction>();
 	}

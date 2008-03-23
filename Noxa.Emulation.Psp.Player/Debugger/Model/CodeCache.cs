@@ -55,16 +55,19 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 					MethodBody other = this[ codeRef.Address ];
 					if( other == null )
 						continue;
-					ExternalReference extRef = new ExternalReference();
-					extRef.Method = method;
-					extRef.SourceAddress = codeRef.Instruction.Address;
-					extRef.TargetAddress = codeRef.Address;
-					other.IncomingReferences.Add( extRef );
-					extRef = new ExternalReference();
-					extRef.Method = other;
-					extRef.SourceAddress = codeRef.Instruction.Address;
-					extRef.TargetAddress = codeRef.Address;
-					method.OutgoingReferences.Add( extRef );
+					foreach( Instruction instruction in codeRef.References )
+					{
+						ExternalReference extRef = new ExternalReference();
+						extRef.Method = method;
+						extRef.SourceAddress = instruction.Address;
+						extRef.TargetAddress = codeRef.Address;
+						other.IncomingReferences.Add( extRef );
+						extRef = new ExternalReference();
+						extRef.Method = other;
+						extRef.SourceAddress = instruction.Address;
+						extRef.TargetAddress = codeRef.Address;
+						method.OutgoingReferences.Add( extRef );
+					}
 				}
 				if( method.OutgoingReferences.Count > 0 )
 				{
