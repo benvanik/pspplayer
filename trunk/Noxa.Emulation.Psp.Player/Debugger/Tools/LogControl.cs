@@ -33,6 +33,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private VScrollBar _verticalScrollBar;
 
+		private readonly string[] _featureNames;
+
 		private List<LogLine> _lines = new List<LogLine>( 20000 );
 		private int _firstVisibleLine;
 		private int _lastVisibleLine;
@@ -59,7 +61,40 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 			this.SetupGraphics();
 			this.CalculateSize( true );
+
+			this.copyAllToolStripMenuItem.Click += new EventHandler( copyAllToolStripMenuItem_Click );
+			this.clearToolStripMenuItem.Click += new EventHandler( clearToolStripMenuItem_Click );
+			this.ContextMenuStrip = contextMenuStrip;
+
+			// Build feature list
+			List<string> featureNames = new List<string>();
+			foreach( string feature in Enum.GetNames( typeof( Feature ) ) )
+				featureNames.Add( new string( ' ', 10 - feature.Length ) + feature );
+			_featureNames = featureNames.ToArray();
 		}
+
+		#region Context Menu
+
+		private void copyAllToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			StringBuilder sb = new StringBuilder();
+			lock( _lines )
+			{
+				foreach( LogLine line in _lines )
+					sb.AppendFormat( "{0}: {1}{2}", _featureNames[ ( int )line.Feature ], line.Value, Environment.NewLine );
+			}
+			Clipboard.Clear();
+			Clipboard.SetText( sb.ToString() );
+		}
+
+		private void clearToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			lock( _lines )
+				_lines.Clear();
+			this.CalculateSize( true );
+		}
+
+		#endregion
 
 		private int _pendingUpdates;
 
@@ -70,11 +105,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				_lines.Add( line );
 			if( Interlocked.Increment( ref _pendingUpdates ) > 1 )
 				return;
-			this.BeginInvoke( ( SafeAddLineDelegate )this.SafeAddLine, line );
+			this.BeginInvoke( ( DummyDelegate )this.SafeAddLine );
 		}
 
-		private delegate void SafeAddLineDelegate( LogLine line );
-		private void SafeAddLine( LogLine line )
+		private void SafeAddLine()
 		{
 			_pendingUpdates = 0;
 
@@ -99,7 +133,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		private void CalculateSize( bool invalidate )
 		{
 			_verticalScrollBar.Minimum = 0;
-			_verticalScrollBar.Maximum = _lines.Count + 1;
+			_verticalScrollBar.Maximum = _lines.Count + 1 - _visibleLines;
 			_visibleLines = ( int )Math.Ceiling( ( double )( this.ClientRectangle.Height / _lineHeight ) );
 
 			if( this.UpdateVisibleLines() == true )
@@ -131,8 +165,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				return false;
 			_scrollLine = targetLine;
 			if( _verticalScrollBar.Maximum < _lines.Count )
-				_verticalScrollBar.Maximum = _lines.Count;
-			_verticalScrollBar.Value = targetLine;
+				_verticalScrollBar.Maximum = _lines.Count + 1 - _visibleLines;
+			_verticalScrollBar.Value = Math.Min( _verticalScrollBar.Maximum, targetLine );
 			if( this.UpdateVisibleLines() == true )
 			{
 				_verticalScrollBar.Invalidate();
@@ -188,7 +222,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				targetLine -= ( units * ( _visibleLines - 4 ) );
 			else
 				targetLine -= ( units * SystemInformation.MouseWheelScrollLines );
-			targetLine = Math.Max( Math.Min( targetLine, _lines.Count - 1 ), 0 );
+			targetLine = Math.Max( Math.Min( targetLine, _lines.Count - _visibleLines ), 0 );
 
 			this.ScrollToLine( targetLine );
 		}
@@ -357,7 +391,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				LogLine line = _lines[ n ];
 
 				// Label
-				e.Graphics.DrawString( line.Feature.ToString(), _font, _labelFontBrushes[ ( int )line.Verbosity ], x, y, _stringFormat );
+				e.Graphics.DrawString( _featureNames[ ( int )line.Feature ], _font, _labelFontBrushes[ ( int )line.Verbosity ], x, y, _stringFormat );
 
 				// Value
 				e.Graphics.DrawString( line.Value, _font, valueBrush, x + _labelWidth + 4, y, _stringFormat );

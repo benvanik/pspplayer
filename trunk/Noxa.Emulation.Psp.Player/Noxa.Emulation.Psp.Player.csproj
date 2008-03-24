@@ -294,6 +294,10 @@
       <DependentUpon>DisassemblyControl.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Debugger\Tools\LogControl.resx">
+      <DependentUpon>LogControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Debugger\Tools\LogTool.resx">
       <DependentUpon>LogTool.cs</DependentUpon>
       <SubType>Designer</SubType>
