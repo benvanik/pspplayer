@@ -222,7 +222,7 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 					case VideoCommand.FINISH:
 						if( didRealDrawing == true )
 						{
-							Debug.WriteLine( "finished list" );
+							//Debug.WriteLine( "finished list" );
 							//this.NextFrame();
 							//Gl.glFlush();
 						}
