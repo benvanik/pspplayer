@@ -245,6 +245,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			if( body == null )
 			{
 				// TODO: status update?
+				_debugger.SetStatusText( "Could not find method for address 0x{0:X8} - unable to display", address );
 				this.Invalidate();
 				return;
 			}

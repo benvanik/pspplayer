@@ -18,6 +18,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 	partial class DebuggerWindow : Form
 	{
 		public readonly InprocDebugger Debugger;
+		public DockPanel DockPanel { get { return this.dockPanel; } }
 
 		public DebuggerWindow()
 		{
@@ -28,9 +29,39 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			: this()
 		{
 			this.Debugger = debugger;
+			this.Debugger.StateChanged += new EventHandler( Debugger_StateChanged );
 		}
 
-		public DockPanel DockPanel { get { return this.dockPanel; } }
+		private void Debugger_StateChanged( object sender, EventArgs e )
+		{
+			bool isRunning = ( this.Debugger.State == DebuggerState.Running );
+			this.resumeToolStripButton.Enabled = !isRunning;
+			this.resumeToolStripMenuItem.Enabled = !isRunning;
+			this.breakToolStripButton.Enabled = isRunning;
+			this.breakToolStripMenuItem.Enabled = isRunning;
+			this.stopToolStripButton.Enabled = false;
+			this.stopToolStripMenuItem.Enabled = false;
+			this.restartToolStripButton.Enabled = false;
+			this.restartToolStripMenuItem.Enabled = false;
+
+			this.showNextStatementToolStripMenuItem.Enabled = !isRunning;
+			this.showStatementToolStripButton.Enabled = !isRunning;
+			this.stepIntoToolStripButton.Enabled = !isRunning;
+			this.stepIntoToolStripMenuItem.Enabled = !isRunning;
+			this.stepOverToolStripButton.Enabled = !isRunning;
+			this.stepOverToolStripMenuItem.Enabled = !isRunning;
+			this.stepOutToolStripButton.Enabled = !isRunning;
+			this.stepOutToolStripMenuItem.Enabled = !isRunning;
+			
+			this.editMenu.Enabled = !isRunning;
+			this.jumpMenu.Enabled = !isRunning;
+			this.searchMenu.Enabled = !isRunning;
+		}
+
+		public void SetStatusText( string text )
+		{
+			this.toolStripStatusLabel.Text = text;
+		}
 
 		private void exitToolsStripMenuItem_Click( object sender, EventArgs e )
 		{

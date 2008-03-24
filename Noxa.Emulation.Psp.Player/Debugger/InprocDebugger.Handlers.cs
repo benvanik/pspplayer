@@ -21,6 +21,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 				if( steppingForward == false )
 					this.CodeTool.Disable();
 
+				this.SetStatusText( "Running..." );
+
 				this.State = DebuggerState.Running;
 				this.OnStateChanged();
 			};
@@ -31,6 +33,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			DummyDelegate del = delegate
 			{
+				this.SetStatusText( "Step completed, now at 0x{0:X8}", address );
+
 				this.PC = address;
 				this.JumpToAddress( NavigationTarget.Code, address, true );
 
@@ -47,6 +51,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			if( bp == null )
 			{
 				// Not found?
+				this.SetStatusText( "Breakpoint hit; ERROR BP NOT FOUND" );
 				return;
 			}
 
@@ -55,12 +60,18 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 				switch( bp.Type )
 				{
 					case BreakpointType.CodeExecute:
+						this.SetStatusText( "Breakpoint hit; now at 0x{0:X8}", bp.Address );
+						this.PC = bp.Address;
+						this.JumpToAddress( NavigationTarget.Code, bp.Address, true );
+						break;
 					case BreakpointType.Stepping:
+						this.SetStatusText( "Step completed; now at 0x{0:X8}", bp.Address );
 						this.PC = bp.Address;
 						this.JumpToAddress( NavigationTarget.Code, bp.Address, true );
 						break;
 					case BreakpointType.MemoryAccess:
 						uint pc = this.DebugHost.CpuHook.GetCoreState( 0 ).ProgramCounter;
+						this.SetStatusText( "Breakpoint hit; memory access at 0x{0:X8} of 0x{1:X8}", pc, bp.Address );
 						this.PC = pc;
 						this.JumpToAddress( NavigationTarget.Memory, bp.Address, true );
 						this.JumpToAddress( NavigationTarget.Code, pc, true );
@@ -83,6 +94,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		{
 			DummyDelegate del = delegate
 			{
+				this.SetStatusText( "Error hit at 0x{0:X8}: {1}", error.PC, error.Message );
+
 				this.PC = error.PC;
 				this.JumpToAddress( NavigationTarget.Code, error.PC, true );
 
