@@ -46,7 +46,7 @@ int niSetInterruptState( int newState )
 	if( ( newState & _pendingInterrupts ) != 0 )
 	{
 		// Handle pending interrupts
-		_cpuCtx->StopFlag = CtxInterruptPending;
+		_cpuCtx->StopFlag |= CtxInterruptPending;
 	}
 
 	return old;
@@ -56,7 +56,7 @@ void niSetPendingInterrupt( int intNumber )
 {
 	_pendingInterrupts |= ( 1 << intNumber );
 	if( _inIntHandler == false )
-		_cpuCtx->StopFlag = CtxInterruptPending;
+		_cpuCtx->StopFlag |= CtxInterruptPending;
 }
 
 void niResume()

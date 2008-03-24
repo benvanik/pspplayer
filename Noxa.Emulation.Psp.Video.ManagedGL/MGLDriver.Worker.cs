@@ -36,7 +36,8 @@ namespace Noxa.Emulation.Psp.Video.ManagedGL
 			_vsyncWaiting = true;
 
 			// HACK: this should happen in NextFrame()
-			this.Emu.Cpu.SetPendingInterrupt( 30 );
+			//lock( this )
+			//	this.Emu.Cpu.SetPendingInterrupt( 30 );
 		}
 
 		#region Frame Advancement

@@ -51,17 +51,17 @@ namespace Noxa {
 				enum CtxStopFlags
 				{
 					// Continue execution (no stop)
-					CtxContinue			= 0,
+					CtxContinue			= 0x00,
 					// BIOS requested a break
-					CtxBreakRequest		= 1,
+					CtxBreakRequest		= 0x01,
 					// BIOS wants to make a context switch
-					CtxContextSwitch	= 2,
+					CtxContextSwitch	= 0x02,
 					// BIOS is marshalling a call
-					CtxMarshal			= 3,
+					CtxMarshal			= 0x04,
 					// Interrupt pending
-					CtxInterruptPending	= 4,
+					CtxInterruptPending	= 0x08,
 					// BreakAndWait request
-					CtxBreakAndWait		= 5,
+					CtxBreakAndWait		= 0x10,
 				};
 
 				// Note: for perf, everything should be 32 bit ints
@@ -85,7 +85,7 @@ namespace Noxa {
 					float			Cp1Registers[ 32 * 4 ];	// +160 (512) - large because we want 16b aligned elements
 					SSE_ALIGN
 					float			Cp2Registers[ 128 ];	// +672 (512) - not aligned because we may access as packed
-					CtxStopFlags	StopFlag;				// +1184 - used to detect stop conditions
+					int				StopFlag;				// +1184 - used to detect stop conditions
 					int				Cp2Pfx[ 3 ];			// +1188 (12) - s, t, d prefixes
 					int				Cp2Wm;					// +1200 - write mask (bits 0-3)
 					int				Cp2ConditionBit;		// +1204

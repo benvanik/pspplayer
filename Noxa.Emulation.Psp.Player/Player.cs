@@ -8,14 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using Noxa.Emulation.Psp.Player.Configuration;
-using System.Diagnostics;
 using Noxa.Emulation.Psp.Media;
-using System.IO;
-//using Noxa.Emulation.Psp.Player.Development;
+using Noxa.Emulation.Psp.Player.Configuration;
 
 namespace Noxa.Emulation.Psp.Player
 {
@@ -45,8 +44,6 @@ namespace Noxa.Emulation.Psp.Player
 			_host = host;
 
 			this.Icon = Properties.Resources.PspIcon;
-
-			this.SetupGlass();
 
 			_widthPadding = this.Width - 480;
 			_heightPadding = this.Height - 272;
@@ -152,6 +149,7 @@ namespace Noxa.Emulation.Psp.Player
 					this.Invalidate( true );
 					this.Update();
 				}
+				this.Text = "PSP Player - " + this.GetStatusText();
 			};
 
 			this.Invoke( del );
@@ -323,16 +321,6 @@ namespace Noxa.Emulation.Psp.Player
 			return "";
 		}
 
-		private void UpdateStatusText()
-		{
-			this.PaintMe();
-		}
-
-		private void statusUpdateTimer_Tick( object sender, EventArgs e )
-		{
-			this.UpdateStatusText();
-		}
-
 		#region Display Size
 
 		private void sizeToolStripSplitButton_ButtonClick( object sender, EventArgs e )
@@ -419,8 +407,6 @@ namespace Noxa.Emulation.Psp.Player
 			{
 				_host.CurrentInstance.Video.Resize( renderSurface.ClientSize.Width, renderSurface.ClientSize.Height );
 			}
-
-			this.GlassResize();
 
 			this.Invalidate( false );
 		}
