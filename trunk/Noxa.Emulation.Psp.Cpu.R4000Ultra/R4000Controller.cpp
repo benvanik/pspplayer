@@ -465,7 +465,11 @@ void SetBreakpoint( Breakpoint^ breakpoint, CodeBlock* block )
 	byte* start = FindInstructionStart( block, breakpoint->Address, &size );
 
 	// Write break jump bytes (see __debugThunk for more info)
-	Debug::Assert( start[ 0 ] == 0x90 );
+	if( start[ 0 ] != 0x90 )
+	{
+		Debug::WriteLine( String::Format( "R4000Controller::SetBreakpoint: breakpoint already set at {0:X8} (attempted bpid {1})", breakpoint->Address, breakpoint->ID ) );
+		return;
+	}
 	start[ 0 ] = 0x68;
 	*( ( int* )( &start[ 1 ] ) ) = breakpoint->ID;
 	start[ 5 ] = 0xB8;

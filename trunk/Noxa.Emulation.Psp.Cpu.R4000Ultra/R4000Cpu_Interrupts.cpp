@@ -46,7 +46,9 @@ extern uint NativeExecute( bool* breakFlag );
 
 void PerformInterrupt()
 {
-	assert( _inIntHandler == false );
+	// Note that we are NOT reentrant - if we get back here somehow, just ignore the interrupt
+	if( _inIntHandler == true )
+		return;
 	_inIntHandler = true;
 	for( int n = 0; n < INTERRUPT_COUNT; n++ )
 	{
@@ -91,7 +93,7 @@ void R4000Cpu::InterruptsMask::set( uint value )
 	if( ( value & _pendingInterrupts ) != 0 )
 	{
 		// Handle pending interrupts
-		_cpuCtx->StopFlag = CtxInterruptPending;
+		_cpuCtx->StopFlag |= CtxInterruptPending;
 	}
 }
 
@@ -123,5 +125,5 @@ void R4000Cpu::SetPendingInterrupt( int interruptNumber )
 {
 	_pendingInterrupts |= ( 1 << interruptNumber );
 	if( _inIntHandler == false )
-		_cpuCtx->StopFlag = CtxInterruptPending;
+		_cpuCtx->StopFlag |= CtxInterruptPending;
 }

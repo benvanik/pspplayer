@@ -97,6 +97,7 @@ namespace Noxa
 				return;
 			this.Remove( entry );
 			entry.Next = _head;
+			entry.Previous = null;
 			if( _head != null )
 				_head.Previous = entry;
 			_head = entry;

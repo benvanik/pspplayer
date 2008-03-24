@@ -88,6 +88,7 @@ int						_currentTcsId;
 ThreadContext*			_currentTcs;
 
 SwitchRequest			_switchRequest;
+LL<SwitchRequest*>		_marshalRequests;
 
 // From interrupts file
 void PerformInterrupt();
@@ -225,7 +226,7 @@ void R4000Cpu::SwitchContext( int newTcsId )
 	_switchRequest.MakeCall = false;
 
 	// Put the request in
-	_cpuCtx->StopFlag = CtxContextSwitch;
+	_cpuCtx->StopFlag |= CtxContextSwitch;
 }
 
 void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, MarshalCompleteDelegate^ resultCallback, int state )
@@ -245,32 +246,29 @@ void R4000Cpu::MarshalCall( int tcsId, uint address, array<uint>^ arguments, Mar
 	ThreadContext* targetContext = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	UNLOCK;
 
-	// Don't support more than one at a time right now
-	Debug::Assert( _switchRequest.MakeCall == false );
-	if( _switchRequest.MakeCall == true )
-	{
-		Log::WriteLine( Verbosity::Critical, Feature::Cpu, "MarshalCall: attempted to marshal a call while one was already pending - THIS NEEDS TO BE FIXED" );
-		return;
-	}
-
-	// Marshal context setup
-	_switchRequest.Previous = _currentTcs;
-	_switchRequest.PreviousID = _currentTcsId;
-	_switchRequest.Target = targetContext;
-	_switchRequest.TargetID = tcsId;
+	SwitchRequest* marshalRequest = new SwitchRequest();
 	
-	_switchRequest.MakeCall = true;
-	_switchRequest.CallAddress = address;
-	_switchRequest.CallArgumentCount = arguments->Length;
+	// Marshal context setup
+	marshalRequest->Previous = _currentTcs;
+	marshalRequest->PreviousID = _currentTcsId;
+	marshalRequest->Target = targetContext;
+	marshalRequest->TargetID = tcsId;
+	
+	marshalRequest->MakeCall = true;
+	marshalRequest->CallAddress = address;
+	marshalRequest->CallArgumentCount = arguments->Length;
 	for( int n = 0; n < arguments->Length; n++ )
-		_switchRequest.CallArguments[ n ] = arguments[ n ];
+		marshalRequest->CallArguments[ n ] = arguments[ n ];
 
-	_switchRequest.ResultCallbackValid = ( resultCallback != nullptr );
-	( *_switchRequest.ResultCallback ) = resultCallback;
-	_switchRequest.CallbackState = state;
+	marshalRequest->ResultCallbackValid = ( resultCallback != nullptr );
+	marshalRequest->ResultCallback = new gcref<MarshalCompleteDelegate^>();
+	( *marshalRequest->ResultCallback ) = resultCallback;
+	marshalRequest->CallbackState = state;
+
+	_marshalRequests.Enqueue( marshalRequest );
 
 	// Put the request in
-	_cpuCtx->StopFlag = CtxMarshal;
+	_cpuCtx->StopFlag |= CtxMarshal;
 }
 
 CodeBlock* BuildBlock( int pc )
@@ -292,10 +290,10 @@ void MakeSafetyCallback( int tcsId, ThreadContext* tcs )
 	}
 }
 
-bool MakeResultCallback( int v0 )
+bool MakeResultCallback( SwitchRequest* marshalRequest, int v0 )
 {
-	MarshalCompleteDelegate^ del = ( *_switchRequest.ResultCallback );
-	return del( _currentTcsId, _switchRequest.CallbackState, v0 );
+	MarshalCompleteDelegate^ del = ( *marshalRequest->ResultCallback );
+	return del( _currentTcsId, marshalRequest->CallbackState, v0 );
 }
 
 #pragma unmanaged
@@ -313,37 +311,47 @@ void PopState()
 	memcpy( _cpuCtx, ctxCopy, sizeof( R4000Ctx ) );
 	SAFEDELETE( ctxCopy );
 
-	_cpuCtx->StopFlag = CtxContinue;
+	//_cpuCtx->StopFlag = CtxContinue;
 }
 
-void PerformSwitch()
+void PerformSwitch( SwitchRequest* request )
 {
-	assert( _switchRequest.Target != NULL );
+	//assert( request->Target != NULL );
+	if( request->Target == NULL )
+	{
+		// Bad?
+		return;
+	}
 
 	// Save old context
 	if( _currentTcs != NULL )
 	{
 		memcpy( &_currentTcs->Ctx, _cpuCtx, sizeof( R4000Ctx ) );
-		_currentTcs->Ctx.StopFlag = CtxContinue;
+		//_currentTcs->Ctx.StopFlag = CtxContinue;
 	}
 	int oldIntMask = _cpuCtx->InterruptMask;
 
 	// Switch to new context
-	_currentTcsId = _switchRequest.TargetID;
-	_currentTcs = _switchRequest.Target;
+	_currentTcsId = request->TargetID;
+	_currentTcs = request->Target;
 
 	// Restore new context
 	memcpy( _cpuCtx, &_currentTcs->Ctx, sizeof( R4000Ctx ) );
 	_cpuCtx->InterruptMask = oldIntMask;
 
 	// Clear so that we can't switch badly
-	_switchRequest.Target = NULL;
-	_switchRequest.TargetID = -1;
+	request->Target = NULL;
+	request->TargetID = -1;
 }
 
-void PerformSwitchBack( SwitchType type )
+void PerformSwitch()
 {
-	assert( _switchRequest.Previous != NULL );
+	PerformSwitch( &_switchRequest );
+}
+
+void PerformSwitchBack( SwitchRequest* request, SwitchType type )
+{
+	assert( request->Previous != NULL );
 
 	// Save new context
 	if( type == SwitchMinimal )
@@ -359,22 +367,27 @@ void PerformSwitchBack( SwitchType type )
 		// Copy everything (normal case)
 		memcpy( &_currentTcs->Ctx, _cpuCtx, sizeof( R4000Ctx ) );
 	}
-	_currentTcs->Ctx.StopFlag = CtxContinue;
+	_currentTcs->Ctx.StopFlag |= CtxContinue;
 
 	int oldIntMask = _cpuCtx->InterruptMask;
 
 	// Switch back to old context
-	_currentTcsId = _switchRequest.PreviousID;
-	_currentTcs = _switchRequest.Previous;
+	_currentTcsId = request->PreviousID;
+	_currentTcs = request->Previous;
 
 	// Restore old context
 	memcpy( _cpuCtx, &_currentTcs->Ctx, sizeof( R4000Ctx ) );
 	_cpuCtx->InterruptMask = oldIntMask;
 
 	// Clear for safety
-	_switchRequest.Previous = NULL;
-	_switchRequest.PreviousID = -1;
-	_switchRequest.MakeCall = false;
+	request->Previous = NULL;
+	request->PreviousID = -1;
+	request->MakeCall = false;
+}
+
+void PerformSwitchBack( SwitchType type )
+{
+	PerformSwitchBack( &_switchRequest, type );
 }
 
 #ifdef DEBUGBOUNCE
@@ -395,32 +408,39 @@ void __debugRunPrint( int pc, int codePointer )
 uint NativeExecute( bool* breakFlag )
 {
 	// If we came in with a switch flag, it's possible we are the first run
-	if( _cpuCtx->StopFlag == CtxContextSwitch )
+	if( ( _cpuCtx->StopFlag & CtxContextSwitch ) == CtxContextSwitch )
+	{
 		PerformSwitch();
-	_cpuCtx->StopFlag = CtxContinue;
+		_cpuCtx->StopFlag &= ~CtxContextSwitch;
+	}
 
 	// Check for callback end
 	if( _cpuCtx->PC == CALL_RETURN_DUMMY )
 	{
+		SwitchRequest* marshalRequest = _marshalRequests.Dequeue();
+		
 		int v0 = _cpuCtx->Registers[ 2 ];
 		//int v1 = _cpuCtx->Registers[ 3 ];
 		PopState();
 
 		// Switch state back
 		if( _currentTcs->MarshalSwitchback == true )
-			PerformSwitchBack( SwitchNormal );
+			PerformSwitchBack( marshalRequest, SwitchNormal );
 		
 		// Make callback
-		_switchRequest.MakeCall = false;
-		if( _switchRequest.ResultCallbackValid == true )
+		if( marshalRequest->ResultCallbackValid == true )
 		{
-			bool exitEarly = MakeResultCallback( v0 );
+			bool exitEarly = MakeResultCallback( marshalRequest, v0 );
 			if( exitEarly == true )
 			{
 				*breakFlag = false;
+				SAFEDELETE( marshalRequest->ResultCallback );
+				delete marshalRequest;
 				return 0;
 			}
 		}
+		SAFEDELETE( marshalRequest->ResultCallback );
+		delete marshalRequest;
 	}
 	else if( _cpuCtx->PC == BIOS_SAFETY_DUMMY )
 	{
@@ -482,45 +502,52 @@ executeStart:		// Arrived at from call/interrupt handling below
 #endif
 
 	// See what we need to do now
-	CtxStopFlags stopFlag = _cpuCtx->StopFlag;
-	_cpuCtx->StopFlag = CtxContinue;
-	if( stopFlag != CtxContinue )
+	while( _cpuCtx->StopFlag != CtxContinue )
 	{
-		switch( stopFlag )
+		if( ( _cpuCtx->StopFlag & CtxBreakRequest ) == CtxBreakRequest )
 		{
-		case CtxBreakRequest:
+			_cpuCtx->StopFlag &= ~CtxBreakRequest;
 			// This happens when the BIOS requests a break
 			// Not sure when this happens, really ^_^
 			*breakFlag = true;
-			break;
-		case CtxContextSwitch:
-			// Means that a context switch is pending and we should do it and continue
-			PerformSwitch();
-			break;
-		case CtxMarshal:
+		}
+		else if( ( _cpuCtx->StopFlag & CtxMarshal ) == CtxMarshal )
+		{
+			_cpuCtx->StopFlag &= ~CtxMarshal;
 			// We need to marshal a callback on to another thread and then handle
 			// what happens when it ends
-			assert( _switchRequest.MakeCall == true );
-			_currentTcs->MarshalSwitchback = ( _currentTcsId != _switchRequest.TargetID );
+			SwitchRequest* marshalRequest = _marshalRequests.PeekHead();
+			assert( marshalRequest->MakeCall == true );
+			_currentTcs->MarshalSwitchback = ( _currentTcsId != marshalRequest->TargetID );
 			if( _currentTcs->MarshalSwitchback == true )
-				PerformSwitch();
+				PerformSwitch( marshalRequest );
 			PushState();
-			_cpuCtx->PC = _switchRequest.CallAddress;
-			for( int n = 0; n < _switchRequest.CallArgumentCount; n++ )
-				_cpuCtx->Registers[ n + 4 ] = _switchRequest.CallArguments[ n ];
+			_cpuCtx->PC = marshalRequest->CallAddress;
+			for( int n = 0; n < marshalRequest->CallArgumentCount; n++ )
+				_cpuCtx->Registers[ n + 4 ] = marshalRequest->CallArguments[ n ];
 			_cpuCtx->Registers[ 31 ] = CALL_RETURN_DUMMY;
 			goto executeStart;
-		case CtxInterruptPending:
+		}
+		else if( ( _cpuCtx->StopFlag & CtxContextSwitch ) == CtxContextSwitch )
+		{
+			_cpuCtx->StopFlag &= ~CtxContextSwitch;
+			// Means that a context switch is pending and we should do it and continue
+			PerformSwitch();
+		}
+		else if( ( _cpuCtx->StopFlag & CtxInterruptPending ) == CtxInterruptPending )
+		{
+			_cpuCtx->StopFlag &= ~CtxInterruptPending;
 			// An interrupt is pending and we need to redirect to the handler
 			PerformInterrupt();
-			break;
-		case CtxBreakAndWait:
+		}
+		else if( ( _cpuCtx->StopFlag & CtxBreakAndWait ) == CtxBreakAndWait )
+		{
+			_cpuCtx->StopFlag &= ~CtxBreakAndWait;
 			// BreakAndWait request
 			WaitForSingleObject( _waitHandle, INFINITE );
-			break;
 		}
 	}
-
+	
 	return instructionCount;
 }
 
@@ -540,8 +567,7 @@ void R4000Cpu::BreakExecution()
 	// Don't overwrite a marshal and stuff
 	if( _cpuCtx == NULL )
 		return;
-	if( _cpuCtx->StopFlag == CtxContinue )
-		_cpuCtx->StopFlag = CtxBreakRequest;
+	_cpuCtx->StopFlag |= CtxBreakRequest;
 }
 
 void R4000Cpu::Resume()
@@ -576,7 +602,7 @@ void R4000Cpu::BreakAndWait()
 
 	_resumeCallback = nullptr;
 
-	_cpuCtx->StopFlag = CtxBreakAndWait;
+	_cpuCtx->StopFlag |= CtxBreakAndWait;
 }
 
 void R4000Cpu::BreakAndWait( int timeoutMs )
@@ -600,7 +626,7 @@ void R4000Cpu::BreakAndWait( int timeoutMs, CpuResumeCallback^ callback, Object^
 		_timerQueue->CreateOneShotTimer( cb, timeoutMs, TimerExecutionContext::TimerThread, false );
 	}
 
-	_cpuCtx->StopFlag = CtxBreakAndWait;
+	_cpuCtx->StopFlag |= CtxBreakAndWait;
 }
 
 void R4000Cpu::Stop()

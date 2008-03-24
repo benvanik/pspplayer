@@ -55,7 +55,6 @@ namespace Noxa.Emulation.Psp.Player
 			this.attachToolStripButton = new System.Windows.Forms.ToolStripButton();
 			this.renderSurface = new RenderControl();
 			this.splashPicture = new System.Windows.Forms.PictureBox();
-			this.statusUpdateTimer = new System.Windows.Forms.Timer( this.components );
 			this.toolStrip1.SuspendLayout();
 			this.renderSurface.SuspendLayout();
 			( ( System.ComponentModel.ISupportInitialize )( this.splashPicture ) ).BeginInit();
@@ -248,21 +247,15 @@ namespace Noxa.Emulation.Psp.Player
 			this.splashPicture.TabIndex = 0;
 			this.splashPicture.TabStop = false;
 			// 
-			// statusUpdateTimer
-			// 
-			this.statusUpdateTimer.Enabled = true;
-			this.statusUpdateTimer.Interval = 1000;
-			this.statusUpdateTimer.Tick += new System.EventHandler( this.statusUpdateTimer_Tick );
-			// 
 			// Player
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size( 480, 319 );
+			this.ClientSize = new System.Drawing.Size( 480, 297 );
 			this.Controls.Add( this.renderSurface );
 			this.Controls.Add( this.toolStrip1 );
 			this.DoubleBuffered = true;
-			this.MinimumSize = new System.Drawing.Size( 496, 355 );
+			this.MinimumSize = new System.Drawing.Size( 496, 333 );
 			this.Name = "Player";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "PSP Player";
@@ -294,7 +287,6 @@ namespace Noxa.Emulation.Psp.Player
 		private System.Windows.Forms.ToolStripMenuItem twoXToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem threeXToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem fullscreenToolStripMenuItem;
-		private System.Windows.Forms.Timer statusUpdateTimer;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
 		private System.Windows.Forms.ToolStripButton attachToolStripButton;
 		private System.Windows.Forms.ToolStripButton debugToolStripButton;
