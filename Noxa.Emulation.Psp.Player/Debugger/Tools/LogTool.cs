@@ -34,7 +34,12 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		public void WriteLine( Verbosity verbosity, Feature feature, string value )
 		{
-			Debug.WriteLine( string.Format( "{0}: {1}", feature, value ) );
+			// if log to vs
+			if( false )
+			{
+				Debug.WriteLine( string.Format( "{0}: {1}", feature, value ) );
+			}
+			this.logControl.AddLine( verbosity, feature, value );
 		}
 	}
 }

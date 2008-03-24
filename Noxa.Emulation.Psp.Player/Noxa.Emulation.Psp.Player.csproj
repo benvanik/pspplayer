@@ -152,6 +152,12 @@
     <Compile Include="Debugger\Tools\DisassemblyControl.Designer.cs">
       <DependentUpon>DisassemblyControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Debugger\Tools\LogControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Debugger\Tools\LogControl.Designer.cs">
+      <DependentUpon>LogControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Debugger\Tools\LogTool.cs">
       <SubType>Form</SubType>
     </Compile>
