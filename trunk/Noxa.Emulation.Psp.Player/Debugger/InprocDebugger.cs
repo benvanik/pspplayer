@@ -157,9 +157,19 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		public event EventHandler StateChanged;
 		private void OnStateChanged()
 		{
+			//DummyDelegate del = delegate
+			//{
+			//};
+			//this.Window.Invoke( del );
 			EventHandler handler = this.StateChanged;
 			if( handler != null )
 				handler( this, EventArgs.Empty );
+		}
+
+		public void SetStatusText( string format, params object[] args )
+		{
+			string final = ( args.Length == 0 ) ? format : string.Format( format, args );
+			this.Window.SetStatusText( final );
 		}
 	}
 }
