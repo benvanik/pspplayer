@@ -78,9 +78,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		{
 			_pendingUpdates = 0;
 
-			lock( _lines )
-				_lines.Add( line );
-
 			this.CalculateSize( false );
 
 			// if autoscroll
