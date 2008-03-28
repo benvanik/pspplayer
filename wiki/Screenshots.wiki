@@ -7,6 +7,11 @@ Although the emulator is pretty advanced, it is also in its early stages. This m
 == Movies ==
 * Short clips posted here: [http://youtube.com/user/benvanik]
 
+=== 2008-03-28 - Debugger ===
+In an attempt to revive the project a bit, I rewrote the debugger. It's now much, much nicer and works. Still a lot to do, but for basic debugging it's functional.
+
+[http://pspplayer.googlecode.com/svn/wiki/Screenshots/PspPlayer-2008.03.28.01-Debugger.png]
+
 === 2008-03-12 - Puyo Puyo Fever ===
 It gets in game, but the drawing is wonky (only every 10th frame or so draws)
 
