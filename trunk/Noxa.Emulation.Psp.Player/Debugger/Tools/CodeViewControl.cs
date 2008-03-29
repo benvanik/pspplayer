@@ -292,6 +292,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		private int _scrollLine;
 		private List<uint> _navigationStack = new List<uint>();
 		private int _navigationIndex;
+		private int _highlightedLine;
 
 		public void ClearNavigation()
 		{
@@ -358,22 +359,36 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				return;
 			}
 
-			int line = body.UserTop;
-			foreach( Instruction instruction in body.Instructions )
+			int lineIndex = body.UserTop;
+			List<Line> lines = ( List<Line> )body.UserCache;
+			if( lines == null )
+				lines = this.CacheMethod( body );
+			bool foundLine = false;
+			foreach( Line line in lines )
 			{
-				if( instruction.Address == address )
+				switch( line.Type )
+				{
+					case LineType.Label:
+					case LineType.Instruction:
+						if( line.Instruction.Address == address )
+							foundLine = true;
+						break;
+				}
+				if( foundLine == true )
 					break;
-				line++;
+				lineIndex++;
 			}
 
-			if( ( line >= _firstVisibleLine ) && ( line < _lastVisibleLine ) )
+			_highlightedLine = lineIndex;
+
+			if( ( lineIndex >= _firstVisibleLine ) && ( lineIndex < _lastVisibleLine ) )
 			{
 				// Already in view
 				this.Invalidate();
 				return;
 			}
 
-			int targetLine = line - ( _visibleLines / 2 );
+			int targetLine = lineIndex - ( _visibleLines / 2 );
 			targetLine = Math.Max( Math.Min( targetLine, _totalLines ), 0 );
 			this.ScrollToLine( targetLine );
 			this.Invalidate();
@@ -669,6 +684,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			{
 				Line line = lines[ n ];
 				Instruction instr = line.Instruction;
+
+				if( body.UserTop + n == _highlightedLine )
+				{
+					g.FillRectangle( SystemBrushes.GradientInactiveCaption, codex, y, this.ClientRectangle.Width - codex - 5, _lineHeight + 2 );
+				}
 
 				switch( line.Type )
 				{
