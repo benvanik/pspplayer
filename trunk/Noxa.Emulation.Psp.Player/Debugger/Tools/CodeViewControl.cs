@@ -152,6 +152,58 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		{
 			base.OnMouseDown( e );
 			this.Focus();
+
+			if( e.Clicks == 2 )
+			{
+				if( e.X < 2 + _gutterWidth + 1 + _addressWidth + 1 )
+					return;
+
+				int y = e.Y / _lineHeight;
+				int lineIndex = Math.Min( _firstVisibleLine + y, _totalLines );
+				int currentLine = lineIndex;
+				int lineSum;
+				int index = this.IndexOfMethodAt( currentLine, out lineSum );
+				if( index == -1 )
+					return;
+				int lineOffset = currentLine - lineSum;
+				if( currentLine <= _lastVisibleLine )
+				{
+					if( index < _codeCache.Methods.Count )
+					{
+						MethodBody body = _codeCache.Methods[ index++ ];
+						List<Line> lines = ( List<Line> )body.UserCache;
+						if( lines == null )
+							lines = this.CacheMethod( body );
+
+						Line line = lines[ lineOffset ];
+						switch( line.Type )
+						{
+							case LineType.Label:
+								Debug.WriteLine( line.Instruction.Label.ToString() );
+								break;
+							case LineType.Instruction:
+								Debug.WriteLine( line.Instruction.ToString() );
+								if( line.Instruction.Reference is CodeReference )
+								{
+									uint target = line.Instruction.Reference.Address;
+									this.NavigateToAddress( target );
+								}
+								else if( line.Instruction.Reference is Noxa.Emulation.Psp.Player.Debugger.Model.Label )
+								{
+									uint target = line.Instruction.Reference.Address;
+									this.NavigateToAddress( target );
+								}
+								else if( line.Instruction.Reference is MemoryReference )
+								{
+									uint target = line.Instruction.Reference.Address;
+									_debugger.MemoryTool.NavigateToAddress( target );
+									_debugger.MemoryTool.Activate();
+								}
+								break;
+						}
+					}
+				}
+			}
 		}
 
 		protected override void OnMouseMove( MouseEventArgs e )
@@ -238,6 +290,62 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		#region Scrolling/navigation
 
 		private int _scrollLine;
+		private List<uint> _navigationStack = new List<uint>();
+		private int _navigationIndex;
+
+		public void ClearNavigation()
+		{
+			uint head = _navigationStack[ _navigationStack.Count - 1 ];
+			_navigationStack.Clear();
+			_navigationStack.Add( head );
+			_navigationIndex = 0;
+		}
+
+		private uint PeekNavigationStack()
+		{
+			if( _navigationStack.Count == 0 )
+				return 0;
+			return _navigationStack[ _navigationIndex ];
+		}
+
+		public void NavigateBack()
+		{
+			if( _navigationIndex <= 0 )
+				return;
+			_navigationIndex--;
+			this.SetAddress( _navigationStack[ _navigationIndex ] );
+		}
+
+		public void NavigateForward()
+		{
+			if( _navigationIndex >= _navigationStack.Count - 1 )
+				return;
+			_navigationIndex++;
+			uint next = this.PeekNavigationStack();
+			this.SetAddress( next );
+		}
+
+		public void NavigateToAddress( uint address )
+		{
+			if( _navigationStack.Count == 0 )
+			{
+				_navigationStack.Add( address );
+				_navigationIndex = 0;
+			}
+			else
+			{
+				uint current = this.PeekNavigationStack();
+				if( current == address )
+				{
+					this.SetAddress( address );
+					return;
+				}
+				_navigationStack.RemoveRange( _navigationIndex + 1, _navigationStack.Count - _navigationIndex - 1 );
+				_navigationStack.Add( address );
+				_navigationIndex++;
+			}
+			this.SetAddress( address );
+		}
 
 		public void SetAddress( uint address )
 		{
@@ -947,7 +1055,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			if( instr == null )
 				return;
 
-			this.SetAddress( _debugger.PC );
+			this.NavigateToAddress( _debugger.PC );
 			this.Focus();
 
 			this.ContextReturn();

@@ -57,5 +57,69 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 					break;
 			}
 		}
+
+		private List<uint> _navigationStack = new List<uint>();
+		private int _navigationIndex;
+
+		public void ClearNavigation()
+		{
+			uint head = _navigationStack[ _navigationStack.Count - 1 ];
+			_navigationStack.Clear();
+			_navigationStack.Add( head );
+			_navigationIndex = 0;
+		}
+
+		private uint PeekNavigationStack()
+		{
+			if( _navigationStack.Count == 0 )
+				return 0;
+			return _navigationStack[ _navigationIndex ];
+		}
+
+		public void NavigateBack()
+		{
+			if( _navigationIndex <= 0 )
+				return;
+			_navigationIndex--;
+			this.SetAddress( _navigationStack[ _navigationIndex ] );
+		}
+
+		public void NavigateForward()
+		{
+			if( _navigationIndex >= _navigationStack.Count - 1 )
+				return;
+			_navigationIndex++;
+			uint next = this.PeekNavigationStack();
+			this.SetAddress( next );
+		}
+
+		public void NavigateToAddress( uint address )
+		{
+			if( _navigationStack.Count == 0 )
+			{
+				_navigationStack.Add( address );
+				_navigationIndex = 0;
+			}
+			else
+			{
+				uint current = this.PeekNavigationStack();
+				if( current == address )
+				{
+					this.SetAddress( address );
+					return;
+				}
+				_navigationStack.RemoveRange( _navigationIndex + 1, _navigationStack.Count - _navigationIndex - 1 );
+				_navigationStack.Add( address );
+				_navigationIndex++;
+			}
+			this.SetAddress( address );
+		}
+
+		private void SetAddress( uint address )
+		{
+			long translated = address - hexBox.ByteProvider.Offset;
+			hexBox.ScrollByteIntoView( translated );
+			hexBox.Select( translated, 4 );
+		}
 	}
 }

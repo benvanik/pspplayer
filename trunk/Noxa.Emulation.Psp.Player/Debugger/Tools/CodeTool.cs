@@ -58,7 +58,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		public void SetAddress( uint address, bool isCurrentStatement )
 		{
 			this.codeView.Enabled = true;
-			this.codeView.SetAddress( address );
+			this.codeView.NavigateToAddress( address );
 			this.codeView.Focus();
 			this.registersControl.Enabled = true;
 			this.registersControl.Invalidate();
