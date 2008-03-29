@@ -131,7 +131,7 @@
             this.helpMenu} );
 			this.menuStrip.Location = new System.Drawing.Point( 0, 0 );
 			this.menuStrip.Name = "menuStrip";
-			this.menuStrip.Size = new System.Drawing.Size( 986, 24 );
+			this.menuStrip.Size = new System.Drawing.Size( 1294, 24 );
 			this.menuStrip.TabIndex = 0;
 			this.menuStrip.Text = "MenuStrip";
 			// 
@@ -571,9 +571,9 @@
 			// 
 			this.statusStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel} );
-			this.statusStrip.Location = new System.Drawing.Point( 0, 683 );
+			this.statusStrip.Location = new System.Drawing.Point( 0, 784 );
 			this.statusStrip.Name = "statusStrip";
-			this.statusStrip.Size = new System.Drawing.Size( 986, 22 );
+			this.statusStrip.Size = new System.Drawing.Size( 1294, 22 );
 			this.statusStrip.TabIndex = 2;
 			this.statusStrip.Text = "StatusStrip";
 			// 
@@ -613,7 +613,7 @@
             this.toolStripSeparator12} );
 			this.controlToolStrip.Location = new System.Drawing.Point( 0, 24 );
 			this.controlToolStrip.Name = "controlToolStrip";
-			this.controlToolStrip.Size = new System.Drawing.Size( 986, 25 );
+			this.controlToolStrip.Size = new System.Drawing.Size( 1294, 25 );
 			this.controlToolStrip.TabIndex = 4;
 			// 
 			// resumeToolStripButton
@@ -840,14 +840,14 @@
 			this.dockPanel.Location = new System.Drawing.Point( 0, 49 );
 			this.dockPanel.Name = "dockPanel";
 			this.dockPanel.ShowDocumentIcon = true;
-			this.dockPanel.Size = new System.Drawing.Size( 986, 634 );
+			this.dockPanel.Size = new System.Drawing.Size( 1294, 735 );
 			this.dockPanel.TabIndex = 6;
 			// 
 			// DebuggerWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size( 986, 705 );
+			this.ClientSize = new System.Drawing.Size( 1294, 806 );
 			this.Controls.Add( this.dockPanel );
 			this.Controls.Add( this.controlToolStrip );
 			this.Controls.Add( this.statusStrip );

@@ -29,7 +29,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.callView = new DoubleBufferedListView();
+			this.callView = new Noxa.Utilities.Controls.DoubleBufferedListView();
 			this.iconHeader = new System.Windows.Forms.ColumnHeader();
 			this.nameHeader = new System.Windows.Forms.ColumnHeader();
 			this.locationHeader = new System.Windows.Forms.ColumnHeader();
@@ -42,25 +42,30 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
             this.nameHeader,
             this.locationHeader} );
 			this.callView.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.callView.ExtendedStyle = ( ( Noxa.Utilities.Controls.ListViewExtendedStyle )( ( ( ( Noxa.Utilities.Controls.ListViewExtendedStyle.GridLines | Noxa.Utilities.Controls.ListViewExtendedStyle.FullRowSelect )
+						| Noxa.Utilities.Controls.ListViewExtendedStyle.BorderSelect )
+						| Noxa.Utilities.Controls.ListViewExtendedStyle.DoubleBuffer ) ) );
+			this.callView.Font = new System.Drawing.Font( "Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
 			this.callView.FullRowSelect = true;
 			this.callView.GridLines = true;
 			this.callView.Location = new System.Drawing.Point( 0, 0 );
 			this.callView.MultiSelect = false;
 			this.callView.Name = "callView";
-			this.callView.Size = new System.Drawing.Size( 670, 168 );
+			this.callView.Size = new System.Drawing.Size( 324, 162 );
 			this.callView.TabIndex = 0;
 			this.callView.UseCompatibleStateImageBehavior = false;
 			this.callView.View = System.Windows.Forms.View.Details;
+			this.callView.MouseDown += new System.Windows.Forms.MouseEventHandler( this.callView_MouseDown );
 			// 
 			// iconHeader
 			// 
 			this.iconHeader.Text = "";
-			this.iconHeader.Width = 25;
+			this.iconHeader.Width = 0;
 			// 
 			// nameHeader
 			// 
 			this.nameHeader.Text = "Name";
-			this.nameHeader.Width = 500;
+			this.nameHeader.Width = 165;
 			// 
 			// locationHeader
 			// 
@@ -69,10 +74,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			// 
 			// CallstackTool
 			// 
-			this.Controls.Add( this.callView );
 			this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
-			this.ClientSize = new System.Drawing.Size( 670, 168 );
+			this.ClientSize = new System.Drawing.Size( 324, 162 );
 			this.CloseButton = false;
+			this.Controls.Add( this.callView );
 			this.DockAreas = ( ( WeifenLuo.WinFormsUI.Docking.DockAreas )( ( ( ( ( WeifenLuo.WinFormsUI.Docking.DockAreas.Float | WeifenLuo.WinFormsUI.Docking.DockAreas.DockLeft )
 						| WeifenLuo.WinFormsUI.Docking.DockAreas.DockRight )
 						| WeifenLuo.WinFormsUI.Docking.DockAreas.DockTop )
