@@ -72,10 +72,17 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			// ...
 
 			this.Window.Show();
-			foreach( DebuggerTool tool in this.Tools )
-			{
-				tool.Show( this.Window.DockPanel );
-			}
+
+			this.CodeTool.Show( this.Window.DockPanel );
+			this.LogTool.Show( this.Window.DockPanel );
+			
+			WeifenLuo.WinFormsUI.Docking.DockPane dp;
+			dp = this.Window.DockPanel.DockPaneFactory.CreateDockPane( this.CodeTool, WeifenLuo.WinFormsUI.Docking.DockState.Document, true );
+			this.StatisticsTool.Show( dp, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.45 );
+			dp = this.Window.DockPanel.DockPaneFactory.CreateDockPane( this.LogTool, WeifenLuo.WinFormsUI.Docking.DockState.DockBottom, true );
+			this.CallstackTool.Show( dp, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.24 );
+
+			this.MemoryTool.Show( this.StatisticsTool.DockHandler.Pane, this.StatisticsTool );
 
 			this.Host.Debugger.Activate( this, Environment.MachineName, Environment.UserName, "InprocDebugger 1.0" );
 

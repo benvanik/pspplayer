@@ -38,7 +38,6 @@
 			this.hexBox.Anchor = ( ( System.Windows.Forms.AnchorStyles )( ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom )
 						| System.Windows.Forms.AnchorStyles.Left )
 						| System.Windows.Forms.AnchorStyles.Right ) ) );
-			this.hexBox.BytesPerLine = 24;
 			this.hexBox.Font = new System.Drawing.Font( "Courier New", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ( ( byte )( 0 ) ) );
 			this.hexBox.LineInfoForeColor = System.Drawing.Color.Empty;
 			this.hexBox.LineInfoVisible = true;

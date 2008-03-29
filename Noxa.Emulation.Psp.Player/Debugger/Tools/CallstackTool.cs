@@ -12,6 +12,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.Player.Debugger.Model;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 {
@@ -47,7 +48,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				this.Clear();
 				return;
 			}
-			
+
 			this.callView.BeginUpdate();
 			this.callView.Items.Clear();
 			foreach( Frame frame in callStack )
@@ -71,7 +72,13 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 					default:
 					case FrameType.UserCode:
 						// Try to resolve the name
-						pretty = "(unknown)";
+						{
+							MethodBody body = this.Debugger.CodeCache[ ( uint )frame.Address ];
+							if( body == null )
+								pretty = "(unknown)";
+							else
+								pretty = string.Format( "{0}+0x{1:X}", body.Name, frame.Address - body.Address );
+						}
 						break;
 				}
 				ListViewItem item = new ListViewItem( new string[]{
@@ -85,6 +92,17 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			}
 			this.callView.EndUpdate();
 			this.callView.Enabled = true;
+		}
+
+		private void callView_MouseDown( object sender, MouseEventArgs e )
+		{
+			if( e.Clicks == 2 )
+			{
+				ListViewItem item = this.callView.GetItemAt( e.X, e.Y );
+				Frame frame = item.Tag as Frame;
+				if( frame.Type == FrameType.UserCode )
+					this.Debugger.CodeTool.SetAddress( ( uint )frame.Address, false );
+			}
 		}
 	}
 }
