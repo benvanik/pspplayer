@@ -42,6 +42,7 @@
 			this.jumpMenu = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpToOperandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.jumpToAddressToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.jumpToMethodToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
 			this.nextLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.previousLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -208,6 +209,7 @@
 			this.jumpMenu.DropDownItems.AddRange( new System.Windows.Forms.ToolStripItem[] {
             this.jumpToOperandToolStripMenuItem,
             this.jumpToAddressToolStripMenuItem,
+            this.jumpToMethodToolStripMenuItem,
             this.toolStripMenuItem4,
             this.nextLocationToolStripMenuItem,
             this.previousLocationToolStripMenuItem,
@@ -223,7 +225,7 @@
 			// jumpToOperandToolStripMenuItem
 			// 
 			this.jumpToOperandToolStripMenuItem.Name = "jumpToOperandToolStripMenuItem";
-			this.jumpToOperandToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.jumpToOperandToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
 			this.jumpToOperandToolStripMenuItem.Text = "Jump to &Operand";
 			this.jumpToOperandToolStripMenuItem.Click += new System.EventHandler( this.jumpToOperandToolStripMenuItem_Click );
 			// 
@@ -231,20 +233,29 @@
 			// 
 			this.jumpToAddressToolStripMenuItem.Name = "jumpToAddressToolStripMenuItem";
 			this.jumpToAddressToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G ) ) );
-			this.jumpToAddressToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.jumpToAddressToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
 			this.jumpToAddressToolStripMenuItem.Text = "Jump to &Address";
 			this.jumpToAddressToolStripMenuItem.Click += new System.EventHandler( this.jumpToAddressToolStripMenuItem_Click );
+			// 
+			// jumpToMethodToolStripMenuItem
+			// 
+			this.jumpToMethodToolStripMenuItem.Name = "jumpToMethodToolStripMenuItem";
+			this.jumpToMethodToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.M ) ) );
+			this.jumpToMethodToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
+			this.jumpToMethodToolStripMenuItem.Text = "Jump to &Method";
+			this.jumpToMethodToolStripMenuItem.Click += new System.EventHandler( this.jumpToMethodToolStripMenuItem_Click );
 			// 
 			// toolStripMenuItem4
 			// 
 			this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-			this.toolStripMenuItem4.Size = new System.Drawing.Size( 201, 6 );
+			this.toolStripMenuItem4.Size = new System.Drawing.Size( 219, 6 );
 			// 
 			// nextLocationToolStripMenuItem
 			// 
 			this.nextLocationToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.NextLocationIcon;
 			this.nextLocationToolStripMenuItem.Name = "nextLocationToolStripMenuItem";
-			this.nextLocationToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.nextLocationToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Right ) ) );
+			this.nextLocationToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
 			this.nextLocationToolStripMenuItem.Text = "&Next Location";
 			this.nextLocationToolStripMenuItem.Click += new System.EventHandler( this.nextLocationToolStripMenuItem_Click );
 			// 
@@ -252,20 +263,21 @@
 			// 
 			this.previousLocationToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PreviousLocationIcon;
 			this.previousLocationToolStripMenuItem.Name = "previousLocationToolStripMenuItem";
-			this.previousLocationToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.previousLocationToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Left ) ) );
+			this.previousLocationToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
 			this.previousLocationToolStripMenuItem.Text = "&Previous Location";
 			this.previousLocationToolStripMenuItem.Click += new System.EventHandler( this.previousLocationToolStripMenuItem_Click );
 			// 
 			// toolStripMenuItem5
 			// 
 			this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-			this.toolStripMenuItem5.Size = new System.Drawing.Size( 201, 6 );
+			this.toolStripMenuItem5.Size = new System.Drawing.Size( 219, 6 );
 			// 
 			// toggleBookmarkToolStripMenuItem
 			// 
 			this.toggleBookmarkToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.BookmarkIcon;
 			this.toggleBookmarkToolStripMenuItem.Name = "toggleBookmarkToolStripMenuItem";
-			this.toggleBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.toggleBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
 			this.toggleBookmarkToolStripMenuItem.Text = "&Toggle Bookmark";
 			this.toggleBookmarkToolStripMenuItem.Click += new System.EventHandler( this.toggleBookmarkToolStripMenuItem_Click );
 			// 
@@ -273,7 +285,7 @@
 			// 
 			this.nextBookmarkToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.NextBookmarkIcon;
 			this.nextBookmarkToolStripMenuItem.Name = "nextBookmarkToolStripMenuItem";
-			this.nextBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.nextBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
 			this.nextBookmarkToolStripMenuItem.Text = "Next &Bookmark";
 			this.nextBookmarkToolStripMenuItem.Click += new System.EventHandler( this.nextBookmarkToolStripMenuItem_Click );
 			// 
@@ -281,7 +293,7 @@
 			// 
 			this.previousBookmarkToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PreviousBookmarkIcon;
 			this.previousBookmarkToolStripMenuItem.Name = "previousBookmarkToolStripMenuItem";
-			this.previousBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.previousBookmarkToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
 			this.previousBookmarkToolStripMenuItem.Text = "P&revious Bookmark";
 			this.previousBookmarkToolStripMenuItem.Click += new System.EventHandler( this.previousBookmarkToolStripMenuItem_Click );
 			// 
@@ -289,7 +301,7 @@
 			// 
 			this.clearAllBookmarksToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.DeleteAllBookmarksIcon;
 			this.clearAllBookmarksToolStripMenuItem.Name = "clearAllBookmarksToolStripMenuItem";
-			this.clearAllBookmarksToolStripMenuItem.Size = new System.Drawing.Size( 204, 22 );
+			this.clearAllBookmarksToolStripMenuItem.Size = new System.Drawing.Size( 222, 22 );
 			this.clearAllBookmarksToolStripMenuItem.Text = "&Clear All Bookmarks";
 			this.clearAllBookmarksToolStripMenuItem.Click += new System.EventHandler( this.clearAllBookmarksToolStripMenuItem_Click );
 			// 
@@ -320,7 +332,7 @@
 			this.resumeToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PlayIcon;
 			this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
 			this.resumeToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-			this.resumeToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.resumeToolStripMenuItem.Size = new System.Drawing.Size( 239, 22 );
 			this.resumeToolStripMenuItem.Text = "&Resume";
 			this.resumeToolStripMenuItem.Click += new System.EventHandler( this.resumeToolStripMenuItem_Click );
 			// 
@@ -330,7 +342,7 @@
 			this.breakToolStripMenuItem.Name = "breakToolStripMenuItem";
 			this.breakToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt )
 						| System.Windows.Forms.Keys.B ) ) );
-			this.breakToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.breakToolStripMenuItem.Size = new System.Drawing.Size( 239, 22 );
 			this.breakToolStripMenuItem.Text = "&Break";
 			this.breakToolStripMenuItem.Click += new System.EventHandler( this.breakToolStripMenuItem_Click );
 			// 
@@ -339,7 +351,7 @@
 			this.stopToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.StopIcon;
 			this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
 			this.stopToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F5 ) ) );
-			this.stopToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.stopToolStripMenuItem.Size = new System.Drawing.Size( 239, 22 );
 			this.stopToolStripMenuItem.Text = "&Stop";
 			this.stopToolStripMenuItem.Click += new System.EventHandler( this.stopToolStripMenuItem_Click );
 			// 
@@ -349,14 +361,14 @@
 			this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
 			this.restartToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( ( System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift )
 						| System.Windows.Forms.Keys.F5 ) ) );
-			this.restartToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.restartToolStripMenuItem.Size = new System.Drawing.Size( 239, 22 );
 			this.restartToolStripMenuItem.Text = "R&estart";
 			this.restartToolStripMenuItem.Click += new System.EventHandler( this.restartToolStripMenuItem_Click );
 			// 
 			// toolStripMenuItem3
 			// 
 			this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-			this.toolStripMenuItem3.Size = new System.Drawing.Size( 203, 6 );
+			this.toolStripMenuItem3.Size = new System.Drawing.Size( 236, 6 );
 			// 
 			// showNextStatementToolStripMenuItem
 			// 
@@ -372,7 +384,7 @@
 			this.stepIntoToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.StepIntoIcon;
 			this.stepIntoToolStripMenuItem.Name = "stepIntoToolStripMenuItem";
 			this.stepIntoToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F11;
-			this.stepIntoToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.stepIntoToolStripMenuItem.Size = new System.Drawing.Size( 239, 22 );
 			this.stepIntoToolStripMenuItem.Text = "Step &Into";
 			this.stepIntoToolStripMenuItem.Click += new System.EventHandler( this.stepIntoToolStripMenuItem_Click );
 			// 
@@ -381,7 +393,7 @@
 			this.stepOverToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.StepOverIcon;
 			this.stepOverToolStripMenuItem.Name = "stepOverToolStripMenuItem";
 			this.stepOverToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F10;
-			this.stepOverToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.stepOverToolStripMenuItem.Size = new System.Drawing.Size( 239, 22 );
 			this.stepOverToolStripMenuItem.Text = "Step &Over";
 			this.stepOverToolStripMenuItem.Click += new System.EventHandler( this.stepOverToolStripMenuItem_Click );
 			// 
@@ -390,7 +402,7 @@
 			this.stepOutToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.StepOutIcon;
 			this.stepOutToolStripMenuItem.Name = "stepOutToolStripMenuItem";
 			this.stepOutToolStripMenuItem.ShortcutKeys = ( ( System.Windows.Forms.Keys )( ( System.Windows.Forms.Keys.Shift | System.Windows.Forms.Keys.F11 ) ) );
-			this.stepOutToolStripMenuItem.Size = new System.Drawing.Size( 206, 22 );
+			this.stepOutToolStripMenuItem.Size = new System.Drawing.Size( 239, 22 );
 			this.stepOutToolStripMenuItem.Text = "Step Ou&t";
 			this.stepOutToolStripMenuItem.Click += new System.EventHandler( this.stepOutToolStripMenuItem_Click );
 			// 
@@ -417,80 +429,80 @@
 			// 
 			this.codeViewToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.DisassemblyIcon;
 			this.codeViewToolStripMenuItem.Name = "codeViewToolStripMenuItem";
-			this.codeViewToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.codeViewToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.codeViewToolStripMenuItem.Text = "&Code View";
 			// 
 			// memoryToolStripMenuItem
 			// 
 			this.memoryToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.MemoryIcon;
 			this.memoryToolStripMenuItem.Name = "memoryToolStripMenuItem";
-			this.memoryToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.memoryToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.memoryToolStripMenuItem.Text = "&Memory";
 			// 
 			// callstackToolStripMenuItem
 			// 
 			this.callstackToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.CallstackIcon;
 			this.callstackToolStripMenuItem.Name = "callstackToolStripMenuItem";
-			this.callstackToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.callstackToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.callstackToolStripMenuItem.Text = "&Callstack";
 			// 
 			// registersToolStripMenuItem
 			// 
 			this.registersToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.RegistersIcon;
 			this.registersToolStripMenuItem.Name = "registersToolStripMenuItem";
-			this.registersToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.registersToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.registersToolStripMenuItem.Text = "&Registers";
 			// 
 			// toolStripMenuItem2
 			// 
 			this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-			this.toolStripMenuItem2.Size = new System.Drawing.Size( 149, 6 );
+			this.toolStripMenuItem2.Size = new System.Drawing.Size( 148, 6 );
 			// 
 			// biosToolStripMenuItem
 			// 
 			this.biosToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.OsIcon;
 			this.biosToolStripMenuItem.Name = "biosToolStripMenuItem";
-			this.biosToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.biosToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.biosToolStripMenuItem.Text = "&BIOS Inspector";
 			// 
 			// threadsToolStripMenuItem
 			// 
 			this.threadsToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.ThreadsIcon;
 			this.threadsToolStripMenuItem.Name = "threadsToolStripMenuItem";
-			this.threadsToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.threadsToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.threadsToolStripMenuItem.Text = "&Threads";
 			// 
 			// toolStripMenuItem1
 			// 
 			this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-			this.toolStripMenuItem1.Size = new System.Drawing.Size( 149, 6 );
+			this.toolStripMenuItem1.Size = new System.Drawing.Size( 148, 6 );
 			// 
 			// breakpointsToolStripMenuItem
 			// 
 			this.breakpointsToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.BreakpointsIcon;
 			this.breakpointsToolStripMenuItem.Name = "breakpointsToolStripMenuItem";
-			this.breakpointsToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.breakpointsToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.breakpointsToolStripMenuItem.Text = "B&reakpoints";
 			// 
 			// watchesToolStripMenuItem
 			// 
 			this.watchesToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.WatchesIcon;
 			this.watchesToolStripMenuItem.Name = "watchesToolStripMenuItem";
-			this.watchesToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.watchesToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.watchesToolStripMenuItem.Text = "&Watches";
 			// 
 			// statisticsToolStripMenuItem
 			// 
 			this.statisticsToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.StatisticsIcon;
 			this.statisticsToolStripMenuItem.Name = "statisticsToolStripMenuItem";
-			this.statisticsToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.statisticsToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.statisticsToolStripMenuItem.Text = "&Statistics";
 			// 
 			// logViewToolStripMenuItem
 			// 
 			this.logViewToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.OutputIcon;
 			this.logViewToolStripMenuItem.Name = "logViewToolStripMenuItem";
-			this.logViewToolStripMenuItem.Size = new System.Drawing.Size( 152, 22 );
+			this.logViewToolStripMenuItem.Size = new System.Drawing.Size( 151, 22 );
 			this.logViewToolStripMenuItem.Text = "&Log View";
 			// 
 			// toolsMenu
@@ -940,6 +952,7 @@
 		private System.Windows.Forms.ToolStripMenuItem nextBookmarkToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem previousBookmarkToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem clearAllBookmarksToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem jumpToMethodToolStripMenuItem;
 	}
 }
 

@@ -85,14 +85,19 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.Debugger.ShowJumpToAddressDialog( target );
 		}
 
+		private void jumpToMethodToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			this.Debugger.ShowJumpToMethodDialog();
+		}
+
 		private void nextLocationToolStripMenuItem_Click( object sender, EventArgs e )
 		{
-
+			this.Debugger.CodeTool.NavigateForward();
 		}
 
 		private void previousLocationToolStripMenuItem_Click( object sender, EventArgs e )
 		{
-
+			this.Debugger.CodeTool.NavigateBack();
 		}
 
 		private void toggleBookmarkToolStripMenuItem_Click( object sender, EventArgs e )
