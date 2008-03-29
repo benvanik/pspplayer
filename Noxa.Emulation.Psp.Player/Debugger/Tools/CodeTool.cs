@@ -68,5 +68,18 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		{
 			this.SetAddress( this.Debugger.PC, true );
 		}
+
+		public bool CanNavigateBack { get { return this.codeView.CanNavigateBack; } }
+		public bool CanNavigateForward { get { return this.codeView.CanNavigateForward; } }
+
+		public void NavigateBack()
+		{
+			this.codeView.NavigateBack();
+		}
+
+		public void NavigateForward()
+		{
+			this.codeView.NavigateForward();
+		}
 	}
 }

@@ -17,6 +17,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public readonly InprocDebugger Debugger;
 		public List<MethodBody> Methods;
 
+		public int Version;
+
 		public CodeCache( InprocDebugger debugger )
 		{
 			this.Debugger = debugger;
@@ -41,6 +43,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			} );
 
 			this.LinkReferences();
+
+			this.Version++;
 		}
 
 		private void LinkReferences()

@@ -294,6 +294,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		private int _navigationIndex;
 		private int _highlightedLine;
 
+		public bool CanNavigateBack
+		{
+			get { return _navigationIndex > 0; }
+		}
+
+		public bool CanNavigateForward
+		{
+			get { return _navigationIndex < _navigationStack.Count - 1; }
+		}
+
 		public void ClearNavigation()
 		{
 			uint head = _navigationStack[ _navigationStack.Count - 1 ];

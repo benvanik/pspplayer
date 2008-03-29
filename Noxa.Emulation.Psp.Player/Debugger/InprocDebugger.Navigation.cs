@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Noxa.Emulation.Psp.Player.Debugger.Dialogs;
+using Noxa.Emulation.Psp.Player.Debugger.Model;
 
 namespace Noxa.Emulation.Psp.Player.Debugger
 {
@@ -22,11 +23,13 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 	{
 		private FindDialog _findDialog;
 		private JumpToAddressDialog _jumpToAddressDialog;
+		private JumpToMethodDialog _jumpToMethodDialog;
 
 		private void SetupNavigation()
 		{
 			_findDialog = new FindDialog();
 			_jumpToAddressDialog = new JumpToAddressDialog();
+			_jumpToMethodDialog = new JumpToMethodDialog( this );
 		}
 
 		#region Find
@@ -64,6 +67,20 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 					}
 					break;
 			}
+		}
+
+		public void ShowJumpToMethodDialog()
+		{
+			if( _jumpToMethodDialog.ShowDialog( this.Window ) == System.Windows.Forms.DialogResult.OK )
+				this.JumpToMethod( _jumpToMethodDialog.Method );
+		}
+
+		public void JumpToMethod( MethodBody method )
+		{
+			this.CodeTool.Show( this.Window.DockPanel );
+			this.CodeTool.BringToFront();
+			this.CodeTool.Activate();
+			this.CodeTool.SetAddress( method.Address, false );
 		}
 
 		#endregion
