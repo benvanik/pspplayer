@@ -37,6 +37,8 @@ extern uint _codeCacheHits;
 extern uint _codeCacheMisses;
 #endif
 
+extern void BreakHandler( uint pc );
+
 typedef struct ThreadContext_t
 {
 	R4000Ctx		Ctx;
@@ -544,7 +546,7 @@ executeStart:		// Arrived at from call/interrupt handling below
 		{
 			_cpuCtx->StopFlag &= ~CtxBreakAndWait;
 			// BreakAndWait request
-			WaitForSingleObject( _waitHandle, INFINITE );
+			BreakHandler( _cpuCtx->PC );
 		}
 	}
 	
