@@ -101,6 +101,7 @@ void R4000Controller::RunUntil( uint address )
 
 void R4000Controller::Break()
 {
+	_cpuCtx->StopFlag = CtxBreakAndWait;
 }
 
 void R4000Controller::SetNext( uint address )
@@ -317,6 +318,17 @@ int __debugHandlerM( int breakpointId )
 	}
 
 	return DEBUG_HANDLE_CONTINUE;
+}
+
+void BreakHandler( uint pc )
+{
+	Breakpoint^ bp = gcnew Breakpoint( Diag::Instance->Client->AllocateID(), BreakpointType::Stepping, pc );
+	bp->Enabled = true;
+	Diag::Instance->CpuHook->AddBreakpoint( bp );
+	int handleResult = __debugHandlerM( bp->ID );
+	Diag::Instance->CpuHook->RemoveBreakpoint( bp->ID );
+	// handleResult should be 0 for continue, non-zero for death?
+	assert( handleResult == 0 );
 }
 
 int ErrorDebugBreak( uint pc )
