@@ -17,5 +17,34 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 	/// </summary>
 	public interface IBiosHook : IHook
 	{
+		/// <summary>
+		/// Gets the ID of the active thread.
+		/// </summary>
+		uint ActiveThreadID { get; }
+
+		/// <summary>
+		/// Get the states of all the living threads.
+		/// </summary>
+		/// <returns>The information of all the living threads.</returns>
+		ThreadInfo[] GetThreads();
+
+		/// <summary>
+		/// Force wake the given thread.
+		/// </summary>
+		/// <param name="threadId">The ID of the thread to wake.</param>
+		void WakeThread( uint threadId );
+
+		/// <summary>
+		/// Delay the given thread.
+		/// </summary>
+		/// <param name="threadId">The ID of the thread to delay.</param>
+		/// <param name="delayMs">The time, in milliseconds, to delay the thread.</param>
+		void DelayThread( uint threadId, uint delayMs );
+
+		/// <summary>
+		/// Kill the given thread.
+		/// </summary>
+		/// <param name="threadId">The ID of the thread to kill.</param>
+		void KillThread( uint threadId );
 	}
 }

@@ -45,6 +45,7 @@ namespace Noxa {
 
 					virtual CoreState^ GetCoreState( int core );
 					virtual void SetCoreState( int core, CoreState^ state );
+					virtual CoreState^ GetThreadCoreState( int core, int internalThreadId );
 					
 					generic<typename T>
 					virtual T GetRegister( RegisterSet set, int ordinal );

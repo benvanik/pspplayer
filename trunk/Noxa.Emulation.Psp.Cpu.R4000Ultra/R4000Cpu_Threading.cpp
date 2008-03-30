@@ -198,7 +198,10 @@ uint R4000Cpu::GetContextRegister( int tcsId, int reg )
 	ThreadContext* context = ( ThreadContext* )_threadContexts[ tcsId ].ToPointer();
 	UNLOCK;
 
-	return context->Ctx.Registers[ reg ];
+	if( reg == -1 )
+		return context->Ctx.PC;
+	else
+		return context->Ctx.Registers[ reg ];
 }
 
 void R4000Cpu::SetContextRegister( int tcsId, int reg, uint value )

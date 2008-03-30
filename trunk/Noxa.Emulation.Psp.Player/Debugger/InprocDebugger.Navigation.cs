@@ -56,6 +56,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 						this.CodeTool.Activate();
 						this.CodeTool.SetAddress( address, isCurrentStatement );
 						this.CallstackTool.RefreshCallstack();
+						this.ThreadsTool.RefreshThreads();
 					}
 					break;
 				case NavigationTarget.Memory:
