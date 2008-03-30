@@ -638,6 +638,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					db.BeginUpdate();
 				}
 
+				// Assign ID now so we can use it for symbols/etc
+				uint moduleId = _bios._kernel.AllocateID();
+				results.ModuleID = moduleId;
+
 				int variableExportCount = 0;
 				int functionExportCount = 0;
 
@@ -773,7 +777,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						// Add to debug database
 						if( db != null )
 						{
-							Method method = new Method( MethodType.Bios, function.StubAddress, 8, new BiosFunctionToken( stubImport.Function ) );
+							Method method = new Method( moduleId, MethodType.Bios, function.StubAddress, 8, new BiosFunctionToken( stubImport.Function ) );
 							db.AddSymbol( method );
 						}
 					}
@@ -815,12 +819,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 							if( symType == 0x1 )
 							{
 								// OBJECT
-								symbol = new Variable( address, sym->st_size, name );
+								symbol = new Variable( moduleId, address, sym->st_size, name );
 							}
 							else if( symType == 0x2 )
 							{
 								// FUNC
-								symbol = new Method( MethodType.User, address, sym->st_size, name );
+								symbol = new Method( moduleId, MethodType.User, address, sym->st_size, name );
 							}
 							if( symbol != null )
 								db.AddSymbol( symbol );
@@ -838,7 +842,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						uint textAddress = baseAddress + textShdr->sh_addr;
 						byte* text = memory.TranslateMainMemory( ( int )textAddress );
 						uint size = textShdr->sh_size;
-						this.Analyze( db, text, size, textAddress );
+						this.Analyze( moduleId, db, text, size, textAddress );
 
 						Log.WriteLine( Verbosity.Verbose, Feature.Loader, "Found {0} methods by analysis", db.MethodCount );
 					}
@@ -879,6 +883,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					if( type == ModuleType.Boot )
 					{
 						KModule module = new KModule( kernel, new BiosModule( results.Name, results.Exports.ToArray() ) );
+						module.UID = moduleId;
+						module.LoadParameters = parameters;
 						module.LoadResults = results;
 						kernel.UserModules.Add( module );
 						Debug.Assert( kernel.MainModule == null );
@@ -926,6 +932,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						if( Diag.IsAttached == true )
 							Diag.Instance.Client.OnBootModuleLoaded( results.EntryAddress );
 
+						if( Diag.IsAttached == true )
+							Diag.Instance.Client.OnModuleLoaded();
+
 						//kernel.MemorySystem.DumpMainMemory( "startup.bin" );
 					}
 				}
@@ -935,9 +944,6 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				if( pbuffer != IntPtr.Zero )
 					Marshal.FreeHGlobal( pbuffer );
 			}
-
-			if( Diag.IsAttached == true )
-				Diag.Instance.Client.OnModuleLoaded();
 
 			return results;
 		}

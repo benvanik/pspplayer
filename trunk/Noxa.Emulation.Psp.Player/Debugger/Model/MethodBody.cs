@@ -14,6 +14,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 {
 	class MethodBody
 	{
+		public readonly ModuleInfo Module;
 		public string Name;
 		public uint TotalLines;
 		public BiosFunctionToken Function;
@@ -35,8 +36,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public int UserTop;
 		public uint UserLines;
 
-		public MethodBody( uint address, uint length, Instruction[] instructions )
+		public MethodBody( ModuleInfo moduleInfo, uint address, uint length, Instruction[] instructions )
 		{
+			this.Module = moduleInfo;
 			this.Name = string.Format( "sub_{0:X8}", address );
 			this.TotalLines = length / 4;
 

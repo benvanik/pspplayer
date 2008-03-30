@@ -68,12 +68,33 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 	/// </summary>
 	public enum ThreadState
 	{
+		/// <summary>
+		/// The thread is currently running.
+		/// </summary>
 		Running = 1,
+		/// <summary>
+		/// The thread is ready and waiting to run.
+		/// </summary>
 		Ready = 2,
+		/// <summary>
+		/// The thread is waiting on something.
+		/// </summary>
 		Waiting = 4,
+		/// <summary>
+		/// The thread is suspended.
+		/// </summary>
 		Suspended = 8,
+		/// <summary>
+		/// The thread is suspended while waiting on something.
+		/// </summary>
 		WaitSuspended = 12,
+		/// <summary>
+		/// The thread is stopped.
+		/// </summary>
 		Stopped = 16,
+		/// <summary>
+		/// The thread is dead.
+		/// </summary>
 		Dead = 32,
 	}
 

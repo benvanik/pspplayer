@@ -17,6 +17,8 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 	/// </summary>
 	public interface IBiosHook : IHook
 	{
+		#region Threads
+
 		/// <summary>
 		/// Gets the ID of the active thread.
 		/// </summary>
@@ -58,5 +60,17 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		/// </summary>
 		/// <param name="threadId">The ID of the thread to kill.</param>
 		void KillThread( uint threadId );
+
+		#endregion
+
+		#region Modules
+
+		/// <summary>
+		/// Get the information of all loaded modules.
+		/// </summary>
+		/// <returns>Information for the loaded modules.</returns>
+		ModuleInfo[] GetModules();
+
+		#endregion
 	}
 }

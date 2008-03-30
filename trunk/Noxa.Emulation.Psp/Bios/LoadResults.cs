@@ -26,6 +26,11 @@ namespace Noxa.Emulation.Psp.Bios
 		public bool Ignored;
 
 		/// <summary>
+		/// The ID of the module to use.
+		/// </summary>
+		public uint ModuleID;
+
+		/// <summary>
 		/// The lower memory address of the module after loading.
 		/// </summary>
 		public uint LowerBounds;

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Noxa.Emulation.Psp.Bios;
 
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
 {
@@ -25,13 +26,14 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// Initializes a new <see cref="Variable"/> instance with the given parameters.
 		/// </summary>
+		/// <param name="moduleId">The ID of the module the symbol resides in.</param>
 		/// <param name="address">The start address of the variable.</param>
 		/// <param name="length">The length of the variable, in bytes.</param>
 		/// <param name="name">The name of the method, if available.</param>
-		public Variable( uint address, uint length, string name )
-			: base( address, length )
+		public Variable( uint moduleId, uint address, uint length, string name )
+			: base( moduleId, address, length )
 		{
-			Name = name;
+			this.Name = name;
 		}
 
 		/// <summary>

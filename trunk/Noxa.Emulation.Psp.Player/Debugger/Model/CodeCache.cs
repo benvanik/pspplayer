@@ -27,13 +27,24 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 
 		public void Update()
 		{
+			ModuleInfo[] moduleInfos = this.Debugger.DebugHost.BiosHook.GetModules();
+
 			//Method[] userMethods = this.Debugger.DebugHost.Database.GetMethods( MethodType.User );
 			Method[] methods = this.Debugger.DebugHost.Database.GetMethods();
 			this.Methods.Clear();
 			foreach( Method method in methods )
 			{
+				ModuleInfo module = null;
+				foreach( ModuleInfo moduleInfo in moduleInfos )
+				{
+					if( moduleInfo.ModuleID == method.ModuleID )
+					{
+						module = moduleInfo;
+						break;
+					}
+				}
 				//MethodBody body = new MethodBody( method.Address, method.Length, null );
-				MethodBody body = this.BuildMethodBody( method );
+				MethodBody body = this.BuildMethodBody( module, method );
 				// Name, etc?
 				this.Methods.Add( body );
 			}
@@ -98,7 +109,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			}
 		}
 
-		private MethodBody BuildMethodBody( Method method )
+		private MethodBody BuildMethodBody( ModuleInfo moduleInfo, Method method )
 		{
 			Debug.Assert( this.Debugger.DebugHost.CpuHook != null );
 			uint[] codes = this.Debugger.DebugHost.CpuHook.GetMethodBody( method );
@@ -111,7 +122,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				instrs.Add( instr );
 				instrAddress += 4;
 			}
-			MethodBody methodBody = new MethodBody( method.Address, ( uint )method.Length, instrs.ToArray() );
+			MethodBody methodBody = new MethodBody( moduleInfo, method.Address, ( uint )method.Length, instrs.ToArray() );
 			if( method.Type == MethodType.Bios )
 			{
 				if( method.Function.MethodName != null )

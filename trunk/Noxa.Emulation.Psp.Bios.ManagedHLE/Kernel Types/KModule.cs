@@ -16,6 +16,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public BiosModule MetaModule;
 		public Module Module;
+		public LoadParameters LoadParameters;
 		public LoadResults LoadResults;
 
 		public string Name;
