@@ -9,10 +9,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
+using System.Media;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.Debugging.Hooks;
 using Noxa.Emulation.Psp.Player.Debugger.Model;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Tools
@@ -32,12 +35,191 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.SetStyle( ControlStyles.OptimizedDoubleBuffer, true );
 
 			this.SetupGraphics();
+			this.SetupEditing();
 		}
 
 		public void Setup( InprocDebugger debugger )
 		{
 			_debugger = debugger;
 		}
+
+		enum RegisterType
+		{
+			General,
+			Fpu,
+			Vfpu,
+		}
+
+		#region Editing
+
+		private TextBox _editBox;
+		private bool _isEditing;
+		private RegisterType _editType;
+		private int _editOrdinal;
+
+		private void SetupEditing()
+		{
+			_editBox = new TextBox();
+			_editBox.Font = _font;
+			_editBox.Height = _lineHeight + 2;
+			_editBox.Visible = false;
+			_editBox.KeyDown += new KeyEventHandler( _editBox_KeyDown );
+			_editBox.LostFocus += new EventHandler( _editBox_LostFocus );
+			this.Controls.Add( _editBox );
+		}
+
+		protected override void OnMouseUp( MouseEventArgs e )
+		{
+			base.OnMouseUp( e );
+
+			if( e.X < 2 + _labelWidth )
+				return;
+
+			// Determine line and such
+			RegisterType type = RegisterType.General;
+			int line = ( e.Y - 2 ) / _lineHeight;
+
+			// Ignore PC
+			if( line == 0 )
+				return;
+
+			this.EditRegister( type, line );
+		}
+
+		private void EditRegister( RegisterType type, int ordinal )
+		{
+			if( _isEditing == true )
+				this.SaveEdit();
+			_isEditing = true;
+			_editType = type;
+			_editOrdinal = ordinal;
+
+			// Determine top
+			int line = 1; // PC
+			switch( type )
+			{
+				case RegisterType.General:
+					line += ordinal - 1; // no $0
+					break;
+				case RegisterType.Fpu:
+					line += 2 + ordinal;
+					break;
+				case RegisterType.Vfpu:
+					line += ordinal; // TODO
+					break;
+			}
+
+			_editBox.Left = 2 + _labelWidth - 3;
+			_editBox.Top = _lineHeight * line - 1;
+			_editBox.Width = this.ClientRectangle.Width - _editBox.Left;
+			_editBox.Text = this.GetRegisterValue( type, ordinal );
+			_editBox.Visible = true;
+			_editBox.Focus();
+			_editBox.SelectAll();
+		}
+
+		private void SaveEdit()
+		{
+			if( _isEditing == false )
+				return;
+			string value = _editBox.Text;
+			bool result = this.SetRegisterValue( _editType, _editOrdinal, value );
+			if( result == false )
+			{
+				SystemSounds.Exclamation.Play();
+			}
+			_isEditing = false;
+			_editBox.Visible = false;
+			this.Invalidate();
+		}
+
+		private void CancelEdit()
+		{
+			_isEditing = false;
+			_editBox.Visible = false;
+			this.Invalidate();
+		}
+
+		private void _editBox_KeyDown( object sender, KeyEventArgs e )
+		{
+			switch( e.KeyCode )
+			{
+				case Keys.Escape:
+					e.Handled = true;
+					this.CancelEdit();
+					break;
+				case Keys.Enter:
+					e.Handled = true;
+					this.SaveEdit();
+					break;
+			}
+		}
+
+		private void _editBox_LostFocus( object sender, EventArgs e )
+		{
+			this.SaveEdit();
+		}
+
+		private string GetRegisterValue( RegisterType type, int ordinal )
+		{
+			switch( type )
+			{
+				default:
+				case RegisterType.General:
+					return _debugger.DebugHost.CpuHook.GetRegister<uint>( RegisterSet.Gpr, ordinal ).ToString( "X8" );
+				case RegisterType.Fpu:
+					return _debugger.DebugHost.CpuHook.GetRegister<float>( RegisterSet.Fpu, ordinal ).ToString();
+				case RegisterType.Vfpu:
+					return _debugger.DebugHost.CpuHook.GetRegister<float>( RegisterSet.Vfpu, ordinal ).ToString();
+			}
+		}
+
+		private bool SetRegisterValue( RegisterType type, int ordinal, string value )
+		{
+			switch( type )
+			{
+				default:
+				case RegisterType.General:
+					{
+						uint uintValue;
+						if( value.EndsWith( ".d" ) == true )
+						{
+							if( value.Length == 2 )
+								return false;
+							value = value.Substring( 0, value.Length - 2 );
+							int intValue;
+							if( int.TryParse( value, out intValue ) == false )
+								return false;
+							uintValue = ( uint )intValue;
+						}
+						else
+						{
+							if( uint.TryParse( value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uintValue ) == false )
+								return false;
+						}
+						_debugger.DebugHost.CpuHook.SetRegister<uint>( RegisterSet.Gpr, ordinal, uintValue );
+						return true;
+					}
+				case RegisterType.Fpu:
+					{
+						float floatValue;
+						if( float.TryParse( value, out floatValue ) == false )
+							return false;
+						_debugger.DebugHost.CpuHook.SetRegister<float>( RegisterSet.Fpu, ordinal, floatValue );
+						return true;
+					}
+				case RegisterType.Vfpu:
+					{
+						float floatValue;
+						if( float.TryParse( value, out floatValue ) == false )
+							return false;
+						_debugger.DebugHost.CpuHook.SetRegister<float>( RegisterSet.Vfpu, ordinal, floatValue );
+						return true;
+					}
+			}
+		}
+
+		#endregion
 
 		#region Painting
 
@@ -144,10 +326,10 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			e.Graphics.DrawString( state.ProgramCounter.ToString( "X8" ), _font, valueBrush, x + _labelWidth + 3, y, _stringFormat );
 			y += _lineHeight;
 
-			DrawMode mode = DrawMode.General;
+			RegisterType mode = RegisterType.General;
 			switch( mode )
 			{
-				case DrawMode.General:
+				case RegisterType.General:
 					{
 						RegisterBank bank = RegisterBanks.General;
 						for( int n = 1; n < 32; n++ )
@@ -175,7 +357,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 						y += _lineHeight;
 					}
 					break;
-				case DrawMode.Fpu:
+				case RegisterType.Fpu:
 					{
 						// Control register
 						e.Graphics.DrawString( "fcr", _font, labelBrush, x, y, _stringFormat );
@@ -204,16 +386,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 						}
 					}
 					break;
-				case DrawMode.Vfpu:
+				case RegisterType.Vfpu:
 					break;
 			}
-		}
-
-		enum DrawMode
-		{
-			General,
-			Fpu,
-			Vfpu,
 		}
 
 		#endregion

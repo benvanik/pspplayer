@@ -211,7 +211,12 @@ T R4000Hook::GetRegister( RegisterSet set, int ordinal )
 	{
 	case RegisterSet::Gpr:
 		Debug::Assert( ( T::typeid == uint::typeid ) || ( T::typeid == int::typeid ) );
-		return ( T )( uint )_cpuCtx->Registers[ ordinal ];
+		if( ordinal == 32 )
+			return ( T )( uint )_cpuCtx->LO;
+		else if( ordinal == 33 )
+			return ( T )( uint )_cpuCtx->HI;
+		else
+			return ( T )( uint )_cpuCtx->Registers[ ordinal ];
 	case RegisterSet::Fpu:
 		Debug::Assert( T::typeid == float::typeid );
 		return ( T )_cpuCtx->Cp1Registers[ ordinal ];
@@ -229,7 +234,12 @@ void R4000Hook::SetRegister( RegisterSet set, int ordinal, T value )
 	{
 	case RegisterSet::Gpr:
 		Debug::Assert( ( T::typeid == uint::typeid ) || ( T::typeid == int::typeid ) );
-		_cpuCtx->Registers[ ordinal ] = ( uint )value;
+		if( ordinal == 32 )
+			_cpuCtx->LO = ( uint )value;
+		else if( ordinal == 33 )
+			_cpuCtx->HI = ( uint )value;
+		else
+			_cpuCtx->Registers[ ordinal ] = ( uint )value;
 		break;
 	case RegisterSet::Fpu:
 		Debug::Assert( T::typeid == float::typeid );
