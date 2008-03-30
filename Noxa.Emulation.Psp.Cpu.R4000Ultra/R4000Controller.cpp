@@ -31,6 +31,7 @@ extern R4000Ctx* _cpuCtx;
 #define DEBUG_RESUME_CONTINUE	0	// resume normal
 #define DEBUG_RESUME_STEP		1	// param = see below
 #define DEBUG_RESUME_SET_NEXT	2	// param = new address
+#define DEBUG_RESUME_RUN_UNTIL	3	// param = new address
 
 #define DEBUG_STEP_INTO			0
 #define DEBUG_STEP_OVER			1
@@ -97,6 +98,9 @@ void R4000Controller::Run()
 
 void R4000Controller::RunUntil( uint address )
 {
+	_debugResumeMode = DEBUG_RESUME_RUN_UNTIL;
+	_debugResumeParam = address;
+	PulseEvent( _debugHandle );
 }
 
 void R4000Controller::Break()
@@ -177,6 +181,7 @@ void HandleTracepoint( Breakpoint^ breakpoint )
 int __debugHandlerM( int breakpointId )
 {
 	R4000Cpu^ cpu = R4000Cpu::GlobalCpu;
+	int result = DEBUG_HANDLE_CONTINUE;
 
 	Breakpoint^ breakpoint;
 	for each( Breakpoint^ bp in cpu->_hook->SteppingBreakpoints )
@@ -304,6 +309,24 @@ int __debugHandlerM( int breakpointId )
 				}
 				break;
 			case DEBUG_RESUME_SET_NEXT:
+				// _debugResumeParam is address to jump to
+				{
+					Breakpoint^ newBreakpoint = gcnew Breakpoint( Diag::Instance->Client->AllocateID(), BreakpointType::Stepping, _debugResumeParam );
+					cpu->_hook->SteppingBreakpoints->Add( newBreakpoint );
+					SetBreakpoint( newBreakpoint );
+
+					// TODO: somehow change the cpu to execute from there, and break out of the current block
+					_cpuCtx->PC = _debugResumeParam;
+					result = DEBUG_HANDLE_BREAK;
+				}
+				break;
+			case DEBUG_RESUME_RUN_UNTIL:
+				// _debugResumeParam is the address to break on
+				{
+					Breakpoint^ newBreakpoint = gcnew Breakpoint( Diag::Instance->Client->AllocateID(), BreakpointType::Stepping, _debugResumeParam );
+					cpu->_hook->SteppingBreakpoints->Add( newBreakpoint );
+					SetBreakpoint( newBreakpoint );
+				}
 				break;
 			}
 		}
@@ -317,7 +340,7 @@ int __debugHandlerM( int breakpointId )
 		Debugger::Break();
 	}
 
-	return DEBUG_HANDLE_CONTINUE;
+	return result;
 }
 
 void BreakHandler( uint pc )
@@ -328,7 +351,8 @@ void BreakHandler( uint pc )
 	int handleResult = __debugHandlerM( bp->ID );
 	Diag::Instance->CpuHook->RemoveBreakpoint( bp->ID );
 	// handleResult should be 0 for continue, non-zero for death?
-	assert( handleResult == 0 );
+	//assert( handleResult == 0 );
+	// Since we are called from the main handler, we can survive breaking out
 }
 
 int ErrorDebugBreak( uint pc )
