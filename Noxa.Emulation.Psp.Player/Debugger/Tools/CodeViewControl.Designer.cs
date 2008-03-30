@@ -185,7 +185,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.lineBreakpointToolStripMenuItem.Name = "lineBreakpointToolStripMenuItem";
 			this.lineBreakpointToolStripMenuItem.Size = new System.Drawing.Size( 187, 22 );
 			this.lineBreakpointToolStripMenuItem.Text = "&Breakpoint";
-			this.lineBreakpointToolStripMenuItem.Text = "&Breakpoint";
 			// 
 			// gutterContextMenuStrip
 			// 
@@ -196,6 +195,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
             this.addBreakpointToolStripMenuItem,
             this.removeBreakpointToolStripMenuItem} );
 			this.gutterContextMenuStrip.Name = "gutterContextMenuStrip";
+			this.gutterContextMenuStrip.OwnerItem = this.lineBreakpointToolStripMenuItem;
 			this.gutterContextMenuStrip.Size = new System.Drawing.Size( 178, 98 );
 			this.gutterContextMenuStrip.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler( this.GeneralContextClosed );
 			this.gutterContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler( this.gutterContextMenuStrip_Opening );

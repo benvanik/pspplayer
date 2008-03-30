@@ -13,6 +13,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.Player.Debugger.Dialogs;
 using Noxa.Emulation.Psp.Player.Debugger.Model;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Tools
@@ -148,6 +149,20 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private int _hoveredIndex = -1;
 
+		private Instruction GetHoveredInstruction()
+		{
+			int index = _hoveredIndex;
+			if( index < 0 )
+				return null;
+			int lineSum;
+			int methodIndex = this.IndexOfMethodAt( index, out lineSum );
+			MethodBody method = _debugger.CodeCache.Methods[ methodIndex ];
+			int lineIndex = ( index - lineSum );
+			List<Line> lines = ( List<Line> )method.UserCache;
+			Line line = lines[ lineIndex ];
+			return line.Instruction;
+		}
+
 		protected override void OnMouseDown( MouseEventArgs e )
 		{
 			base.OnMouseDown( e );
@@ -214,9 +229,23 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			_hoveredIndex = Math.Min( _firstVisibleLine + y, _totalLines );
 
 			if( e.X < 2 + _gutterWidth + 1 )
+			{
 				this.ContextMenuStrip = this.gutterContextMenuStrip;
+				Instruction instr = this.GetHoveredInstruction();
+				if( instr.Breakpoint != null )
+				{
+					string tipText = "Breakpoint: " + ( instr.Breakpoint.Name ?? instr.Breakpoint.ID.ToString() );
+					if( this.toolTip.GetToolTip( this ) != tipText )
+						this.toolTip.SetToolTip( this, tipText );
+				}
+				else
+					this.toolTip.SetToolTip( this, null );
+			}
 			else
+			{
 				this.ContextMenuStrip = this.lineContextMenuStrip;
+				this.toolTip.SetToolTip( this, null );
+			}
 		}
 
 		protected override void OnMouseUp( MouseEventArgs e )
@@ -919,8 +948,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			if( instr == null )
 				return;
 
-			//Breakpoint bp = this.Debugger.Breakpoints[ instr.BreakpointID ];
-			// TODO: rename breakpoint
+			Breakpoint bp = instr.Breakpoint;
+			RenameDialog dialog = new RenameDialog();
+			dialog.Target = RenameTarget.Breakpoint;
+			dialog.Value = bp.Name ?? "";
+			if( dialog.ShowDialog( this.FindForm() ) == DialogResult.OK )
+			{
+				bp.Name = dialog.Value;
+				_debugger.Breakpoints.Save();
+			}
 
 			this.ContextReturn();
 		}
