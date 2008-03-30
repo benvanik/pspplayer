@@ -204,6 +204,43 @@ void R4000Hook::SetCoreState( int core, CoreState^ state )
 {
 }
 
+CoreState^ R4000Hook::GetThreadCoreState( int core, int internalThreadId )
+{
+	Debug::Assert( core == 0 );
+
+	if( core == 0 )
+	{
+		R4000Core^ core = this->Cpu->_core0;
+
+		CoreState^ state = gcnew CoreState();
+
+		/*state->ProgramCounter = *core->PC;
+		state->GeneralRegisters = core->GeneralRegisters;
+		state->Hi = ( uint )*core->HI;
+		state->Lo = ( uint )*core->LO;
+		state->LL = ( *core->LL == 1 ) ? true : false;
+
+		state->Cp0ControlRegisters = core->Cp0->Control;
+		state->Cp0Registers = core->Cp0->Registers;
+		state->Cp0ConditionBit = core->Cp0->ConditionBit;
+
+		state->FpuControlRegister = core->Cp1->Control;
+		state->FpuConditionBit = core->Cp1->ConditionBit;
+		state->FpuRegisters = core->Cp1->Registers;
+
+		state->VfpuRegisters = gcnew array<float>( 128 );
+		for( int n = 0; n < 128; n++ )
+			state->VfpuRegisters[ n ] = _cpuCtx->Cp2Registers[ n ];*/
+		//state->VfpuControlRegister
+
+		return state;
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
 generic<typename T>
 T R4000Hook::GetRegister( RegisterSet set, int ordinal )
 {

@@ -104,6 +104,14 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		/// <param name="state">State information for the given core.</param>
 		void SetCoreState( int core, CoreState state );
 
+		/// <summary>
+		/// Get the processor state for the specified thread.
+		/// </summary>
+		/// <param name="core">Core ordinal.</param>
+		/// <param name="internalThreadId">Internal thread ID.</param>
+		/// <returns>State information for the given core on the given thread.</returns>
+		CoreState GetThreadCoreState( int core, int internalThreadId );
+
 		#region Register Accessors
 
 		/// <summary>

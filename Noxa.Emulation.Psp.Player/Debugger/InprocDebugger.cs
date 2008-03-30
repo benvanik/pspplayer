@@ -69,12 +69,15 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.Tools.Add( this.MemoryTool );
 			this.StatisticsTool = new StatisticsTool( this );
 			this.Tools.Add( this.StatisticsTool );
+			this.ThreadsTool = new ThreadsTool( this );
+			this.Tools.Add( this.ThreadsTool );
 			// ...
 
 			this.Window.Show();
 
 			this.CodeTool.Show( this.Window.DockPanel );
 			this.LogTool.Show( this.Window.DockPanel );
+			this.ThreadsTool.Show( this.Window.DockPanel );
 			
 			WeifenLuo.WinFormsUI.Docking.DockPane dp;
 			dp = this.Window.DockPanel.DockPaneFactory.CreateDockPane( this.CodeTool, WeifenLuo.WinFormsUI.Docking.DockState.Document, true );

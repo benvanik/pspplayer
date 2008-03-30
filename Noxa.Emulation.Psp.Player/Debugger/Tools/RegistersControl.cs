@@ -310,6 +310,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.OnPaintBackground( e );
 			if( _debugger == null )
 				return;
+			if( _debugger.DebugHost.CpuHook == null )
+				return;
 
 			e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 

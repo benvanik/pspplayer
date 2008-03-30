@@ -14,12 +14,19 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 {
 	partial class InprocDebugger
 	{
+		private void DisableAll()
+		{
+			this.CodeTool.Disable();
+			this.CallstackTool.Clear();
+			this.ThreadsTool.Clear();
+		}
+
 		public void OnContinue( bool steppingForward )
 		{
 			DummyDelegate del = delegate
 			{
 				if( steppingForward == false )
-					this.CodeTool.Disable();
+					this.DisableAll();
 
 				this.SetStatusText( "Running..." );
 
