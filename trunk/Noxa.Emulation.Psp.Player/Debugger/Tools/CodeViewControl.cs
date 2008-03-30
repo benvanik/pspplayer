@@ -1081,10 +1081,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private void showNextToolStripMenuItem_Click( object sender, EventArgs e )
 		{
-			Instruction instr = this.GetContextInstruction();
-			if( instr == null )
-				return;
-
 			this.NavigateToAddress( _debugger.PC );
 			this.Focus();
 
@@ -1097,6 +1093,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			if( instr == null )
 				return;
 
+			_debugger.DebugHost.Controller.RunUntil( instr.Address );
+
 			this.ContextReturn();
 		}
 
@@ -1105,6 +1103,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			Instruction instr = this.GetContextInstruction();
 			if( instr == null )
 				return;
+
+			_debugger.DebugHost.Controller.SetNext( instr.Address );
 
 			this.ContextReturn();
 		}
