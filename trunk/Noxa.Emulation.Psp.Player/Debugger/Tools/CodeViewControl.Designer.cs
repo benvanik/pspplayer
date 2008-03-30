@@ -57,6 +57,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.addBreakpointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.removeBreakpointToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.lineContextMenuStrip.SuspendLayout();
 			this.gutterContextMenuStrip.SuspendLayout();
 			this.SuspendLayout();
@@ -72,6 +73,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.lineContextMenuStrip.Items.AddRange( new System.Windows.Forms.ToolStripItem[] {
             this.valueToolStripTextBox,
             this.toolStripSeparator5,
+            this.renameToolStripMenuItem,
             this.copyOperandToolStripMenuItem,
             this.goToTargetToolStripMenuItem,
             this.toolStripSeparator4,
@@ -85,7 +87,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
             this.toolStripSeparator3,
             this.lineBreakpointToolStripMenuItem} );
 			this.lineContextMenuStrip.Name = "addressContextMenuStrip";
-			this.lineContextMenuStrip.Size = new System.Drawing.Size( 188, 249 );
+			this.lineContextMenuStrip.Size = new System.Drawing.Size( 188, 271 );
 			this.lineContextMenuStrip.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler( this.GeneralContextClosed );
 			this.lineContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler( this.lineContextMenuStrip_Opening );
 			// 
@@ -236,6 +238,14 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.removeBreakpointToolStripMenuItem.Size = new System.Drawing.Size( 177, 22 );
 			this.removeBreakpointToolStripMenuItem.Text = "&Delete Breakpoint";
 			this.removeBreakpointToolStripMenuItem.Click += new System.EventHandler( this.removeBreakpointToolStripMenuItem_Click );
+			// 
+			// renameToolStripMenuItem
+			// 
+			this.renameToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.RenameIcon;
+			this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
+			this.renameToolStripMenuItem.Size = new System.Drawing.Size( 187, 22 );
+			this.renameToolStripMenuItem.Text = "Re&name";
+			this.renameToolStripMenuItem.Click += new System.EventHandler( renameToolStripMenuItem_Click );
 			this.lineContextMenuStrip.ResumeLayout( false );
 			this.lineContextMenuStrip.PerformLayout();
 			this.gutterContextMenuStrip.ResumeLayout( false );
@@ -267,5 +277,6 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 		private System.Windows.Forms.ToolStripMenuItem addBreakpointToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem removeBreakpointToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem renameToolStripMenuItem;
 	}
 }

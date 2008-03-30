@@ -15,6 +15,7 @@ using System.Windows.Forms.VisualStyles;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
 using Noxa.Emulation.Psp.Player.Debugger.Dialogs;
 using Noxa.Emulation.Psp.Player.Debugger.Model;
+using Noxa.Emulation.Psp.Player.Debugger.UserData;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 {
@@ -846,8 +847,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		private int _contextIndex = -1;
 		private Operand _contextOperand;
 
-		private Instruction GetContextInstruction()
+		private Line GetContextLine( out MethodBody method )
 		{
+			method = null;
 			if( _contextIndex < 0 )
 			{
 				if( _hoveredIndex < 0 )
@@ -856,10 +858,16 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			}
 			int lineSum;
 			int methodIndex = this.IndexOfMethodAt( _contextIndex, out lineSum );
-			MethodBody method = _debugger.CodeCache.Methods[ methodIndex ];
+			method = _debugger.CodeCache.Methods[ methodIndex ];
 			int lineIndex = ( _contextIndex - lineSum );
 			List<Line> lines = ( List<Line> )method.UserCache;
-			Line line = lines[ lineIndex ];
+			return lines[ lineIndex ];
+		}
+
+		private Instruction GetContextInstruction()
+		{
+			MethodBody method;
+			Line line = this.GetContextLine( out method );
 			return line.Instruction;
 		}
 
@@ -981,19 +989,37 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private void lineContextMenuStrip_Opening( object sender, CancelEventArgs e )
 		{
-			//if( _hoveredIndex < 0 )
-			//    return;
-			//_contextIndex = _hoveredIndex;
-			//if( ( _hoveredColumn == Column.Instruction ) &&
-			//    ( _hoveredValue != null ) )
-			//{
-			//    if( _hoveredValue is CachedOperand )
-			//        _contextOperand = ( ( CachedOperand )_hoveredValue ).Operand;
-			//}
-			Instruction instr = this.GetContextInstruction();
-			if( instr == null )
-				return;
+			this.renameToolStripMenuItem.Visible = false;
+			this.valueToolStripTextBox.Visible = false;
+			this.toolStripSeparator5.Visible = false;
+			this.copyOperandToolStripMenuItem.Visible = false;
+			this.goToTargetToolStripMenuItem.Visible = false;
+			this.toolStripSeparator4.Visible = false;
 
+			MethodBody method;
+			Line line = this.GetContextLine( out method );
+			if( line == null )
+				return;
+			switch( line.Type )
+			{
+				case LineType.Header:
+					this.renameToolStripMenuItem.Visible = true;
+					this.toolStripSeparator4.Visible = true;
+					return;
+				case LineType.Label:
+					this.renameToolStripMenuItem.Visible = true;
+					this.toolStripSeparator4.Visible = true;
+					return;
+				default:
+					if( line.Instruction == null )
+					{
+						e.Cancel = true;
+						return;
+					}
+					break;
+			}
+
+			Instruction instr = line.Instruction;
 			bool hasOperand = ( _contextOperand != null );
 			bool referenceOperand = false;
 			if( hasOperand == true )
@@ -1031,6 +1057,92 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			this.goToTargetToolStripMenuItem.Visible = hasOperand && referenceOperand;
 			this.toolStripSeparator4.Visible = hasOperand;
 		}
+
+		#region General
+
+		private void renameToolStripMenuItem_Click( object sender, System.EventArgs e )
+		{
+			MethodBody method;
+			Line line = this.GetContextLine( out method );
+			if( line == null )
+				return;
+			RenameTarget target = RenameTarget.Method;
+			string value = "";
+			switch( line.Type )
+			{
+				case LineType.Header:
+					target = RenameTarget.Method;
+					value = method.Name;
+					break;
+				case LineType.Label:
+					target = RenameTarget.Label;
+					value = line.Instruction.Label.Name;
+					break;
+				default:
+					return;
+			}
+
+			RenameDialog dialog = new RenameDialog();
+			dialog.Target = target;
+			dialog.Value = value;
+			if( dialog.ShowDialog( this.FindForm() ) == DialogResult.OK )
+			{
+				switch( line.Type )
+				{
+					case LineType.Header:
+						method.Name = dialog.Value;
+						{
+							bool found = false;
+							foreach( TagInfo tag in _debugger.UserData.CodeTags.MethodNames )
+							{
+								if( tag.Address == method.Address )
+								{
+									found = true;
+									tag.Value = dialog.Value;
+									break;
+								}
+							}
+							if( found == false )
+							{
+								TagInfo tag = new TagInfo();
+								tag.Address = method.Address;
+								tag.Value = dialog.Value;
+								_debugger.UserData.CodeTags.MethodNames.Add( tag );
+							}
+							_debugger.UserData.Save();
+						}
+						break;
+					case LineType.Label:
+						line.Instruction.Label.Name = dialog.Value;
+						{
+							bool found = false;
+							foreach( TagInfo tag in _debugger.UserData.CodeTags.LabelNames )
+							{
+								if( tag.Address == line.Instruction.Address )
+								{
+									found = true;
+									tag.Value = dialog.Value;
+									break;
+								}
+							}
+							if( found == false )
+							{
+								TagInfo tag = new TagInfo();
+								tag.Address = line.Instruction.Address;
+								tag.Value = dialog.Value;
+								_debugger.UserData.CodeTags.LabelNames.Add( tag );
+							}
+							_debugger.UserData.Save();
+						}
+						break;
+				}
+				this.Invalidate();
+			}
+
+			this.ContextReturn();
+		}
+
+		#endregion
 
 		#region Operands
 
