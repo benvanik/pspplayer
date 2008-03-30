@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.Player.Debugger.UserData;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Model
 {
@@ -54,6 +55,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			} );
 
 			this.LinkReferences();
+
+			this.ApplyTags();
 
 			this.Version++;
 		}
@@ -106,6 +109,48 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 				}
 				if( ( method.IncomingReferences.Count > 0 ) || ( method.OutgoingReferences.Count > 0 ) )
 					method.FinalizeReferences();
+			}
+		}
+
+		private void ApplyTags()
+		{
+			CodeTagStore tags = this.Debugger.UserData.CodeTags;
+			List<TagInfo> methodNames = new List<TagInfo>( tags.MethodNames );
+			List<TagInfo> labelNames = new List<TagInfo>( tags.LabelNames );
+			foreach( MethodBody method in this.Methods )
+			{
+				foreach( TagInfo tag in methodNames )
+				{
+					if( tag.Address == method.Address )
+					{
+						method.Name = tag.Value;
+						methodNames.Remove( tag );
+						break;
+					}
+				}
+
+				foreach( Label label in method.Labels )
+				{
+					foreach( TagInfo tag in labelNames )
+					{
+						if( tag.Address == label.Address )
+						{
+							label.Name = tag.Value;
+							labelNames.Remove( tag );
+							break;
+						}
+					}
+				}
+
+				foreach( TagInfo tag in tags.Comments )
+				{
+					if( ( tag.Address > method.Address ) &&
+						( tag.Address <= ( method.Address + method.Length ) ) )
+					{
+						uint offset = ( tag.Address - method.Address ) / 4;
+						method.Instructions[ ( int )offset ].Comment = tag.Value;
+					}
+				}
 			}
 		}
 

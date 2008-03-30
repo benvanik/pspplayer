@@ -16,6 +16,7 @@ using Noxa.Emulation.Psp.Games;
 using Noxa.Emulation.Psp.Player.Debugger.Dialogs;
 using Noxa.Emulation.Psp.Player.Debugger.Model;
 using Noxa.Emulation.Psp.Player.Debugger.Tools;
+using Noxa.Emulation.Psp.Player.Debugger.UserData;
 
 namespace Noxa.Emulation.Psp.Player.Debugger
 {
@@ -43,6 +44,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 		public uint PC;
 		public BreakpointManager Breakpoints;
 		public CodeCache CodeCache;
+		public UserDataStore UserData;
 
 		public InprocDebugger( Host host )
 		{
@@ -54,6 +56,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.State = DebuggerState.Idle;
 			this.Breakpoints = new BreakpointManager( this );
 			this.CodeCache = new CodeCache( this );
+			this.UserData = new UserDataStore();
 
 			this.SetupNavigation();
 
@@ -78,7 +81,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 			this.CodeTool.Show( this.Window.DockPanel );
 			this.LogTool.Show( this.Window.DockPanel );
 			this.ThreadsTool.Show( this.Window.DockPanel );
-			
+
 			WeifenLuo.WinFormsUI.Docking.DockPane dp;
 			dp = this.Window.DockPanel.DockPaneFactory.CreateDockPane( this.CodeTool, WeifenLuo.WinFormsUI.Docking.DockState.Document, true );
 			this.StatisticsTool.Show( dp, WeifenLuo.WinFormsUI.Docking.DockAlignment.Right, 0.45 );
@@ -130,6 +133,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger
 
 		public void OnBootModuleLoaded( uint entryAddress )
 		{
+			string dataPath = "Data-" + this.DebugHost.Emulator.CurrentInstance.Bios.Game.Parameters.DiscID + ".ddb";
+			this.UserData.Setup( dataPath );
+			this.UserData.Load();
+			this.Breakpoints.Load();
+
 			//Breakpoint startupBp = new Breakpoint( this.AllocateID(), BreakpointType.CodeExecute, entryAddress );
 			//this.Breakpoints.Add( startupBp );
 

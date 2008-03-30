@@ -73,14 +73,14 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		public readonly BreakpointType Type;
 
 		/// <summary>
-		/// The memory access type.
-		/// </summary>
-		public readonly MemoryAccessType AccessType;
-
-		/// <summary>
 		/// The address of the breakpoint.
 		/// </summary>
 		public readonly uint Address;
+
+		/// <summary>
+		/// The memory access type.
+		/// </summary>
+		public MemoryAccessType AccessType;
 
 		/// <summary>
 		/// The current mode of the breakpoint.

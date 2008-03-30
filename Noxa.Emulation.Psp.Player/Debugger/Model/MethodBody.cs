@@ -367,7 +367,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public Reference Reference;
 		public ExternalReference ExternalReference;
 
-		public string Annotation;
+		public string Comment;
 
 		public Breakpoint Breakpoint;
 
