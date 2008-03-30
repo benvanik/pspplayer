@@ -233,7 +233,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			{
 				this.ContextMenuStrip = this.gutterContextMenuStrip;
 				Instruction instr = this.GetHoveredInstruction();
-				if( instr.Breakpoint != null )
+				if( ( instr != null ) && ( instr.Breakpoint != null ) )
 				{
 					string tipText = "Breakpoint: " + ( instr.Breakpoint.Name ?? instr.Breakpoint.ID.ToString() );
 					if( this.toolTip.GetToolTip( this ) != tipText )
@@ -1109,6 +1109,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 								tag.Value = dialog.Value;
 								_debugger.UserData.CodeTags.MethodNames.Add( tag );
 							}
+							_debugger.CodeCache.Version++;
 							_debugger.UserData.Save();
 						}
 						break;
@@ -1132,6 +1133,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 								tag.Value = dialog.Value;
 								_debugger.UserData.CodeTags.LabelNames.Add( tag );
 							}
+							_debugger.CodeCache.Version++;
 							_debugger.UserData.Save();
 						}
 						break;

@@ -30,6 +30,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 			Bitmap image = Properties.Resources.OutputIcon as Bitmap;
 			this.Icon = Icon.FromHandle( image.GetHicon() );
+
+			this.logControl.Debugger = debugger;
 		}
 
 		public void WriteLine( Verbosity verbosity, Feature feature, string value )

@@ -58,6 +58,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Dialogs
 			}
 
 			this.nameTextBox.Text = this.Value;
+			this.nameTextBox.Focus();
+			this.nameTextBox.SelectAll();
 		}
 
 		private void renameButton_Click( object sender, EventArgs e )

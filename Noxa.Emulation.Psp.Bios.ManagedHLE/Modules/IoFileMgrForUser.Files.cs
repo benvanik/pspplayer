@@ -31,7 +31,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoClose: kernel file handle not found: {0}", fd );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoClose: kernel file handle not found: {0:X}", fd );
 				return -1;
 			}
 
@@ -55,7 +55,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoCloseAsync: kernel file handle not found: {0}", fd );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoCloseAsync: kernel file handle not found: {0:X}", fd );
 				return -1;
 			}
 
@@ -71,99 +71,99 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			return 0;
 		}
 
-		public int realIoOpen(int fileName, int flags, int mode, bool async)
+		public int realIoOpen( int fileName, int flags, int mode, bool async )
 		{
-			string path = _kernel.ReadString((uint)fileName);
-			if (string.IsNullOrEmpty(path) == true)
+			string path = _kernel.ReadString( ( uint )fileName );
+			if( string.IsNullOrEmpty( path ) == true )
 				return -1;
-			IMediaItem item = _kernel.FindPath(path);
-			if (item is IMediaFolder)
+			IMediaItem item = _kernel.FindPath( path );
+			if( item is IMediaFolder )
 			{
 				// Block access?
-				Debug.Assert(item.Device is IUmdDevice);
-				IUmdDevice umd = (IUmdDevice)item.Device;
+				Debug.Assert( item.Device is IUmdDevice );
+				IUmdDevice umd = ( IUmdDevice )item.Device;
 				Stream stream = umd.OpenImageStream();
-				if (stream == null)
+				if( stream == null )
 				{
-					Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceIoOpen: could not open image stream '{0}'", path);
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not open image stream '{0}'", path );
 
-					if (async == true)
+					if( async == true )
 					{
-						KFile fakehandle = new KFile(_kernel, false);
+						KFile fakehandle = new KFile( _kernel, false );
 						fakehandle.Result = 0x80010002;
 						fakehandle.PendingClose = true;
-						_kernel.AddHandle(fakehandle);
-						return (int)fakehandle.UID;
+						_kernel.AddHandle( fakehandle );
+						return ( int )fakehandle.UID;
 					}
 
 					return -1;
 				}
 
-				KDevice dev = _kernel.FindDevice(umd);
-				Debug.Assert(dev != null);
+				KDevice dev = _kernel.FindDevice( umd );
+				Debug.Assert( dev != null );
 
-				KFile handle = new KFile(_kernel, dev, item, stream);
+				KFile handle = new KFile( _kernel, dev, item, stream );
 				handle.IsBlockAccess = true;
-				_kernel.AddHandle(handle);
+				_kernel.AddHandle( handle );
 
 				handle.Result = handle.UID;
 
-				Log.WriteLine(Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened block access on {0} with ID {1}", path, handle.UID);
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened block access on {0} with ID {1:X}", path, handle.UID );
 
-				return (int)handle.UID;
+				return ( int )handle.UID;
 			}
 			else
 			{
-				IMediaFile file = (IMediaFile)item;
-				if (file == null)
+				IMediaFile file = ( IMediaFile )item;
+				if( file == null )
 				{
 					// Create if needed
-					if ((flags & 0x0200) != 0)
+					if( ( flags & 0x0200 ) != 0 )
 					{
 						string newName;
 						IMediaFolder parent;
-						if (path.IndexOf('/') >= 0)
+						if( path.IndexOf( '/' ) >= 0 )
 						{
-							string parentPath = path.Substring(0, path.LastIndexOf('/'));
-							newName = path.Substring(path.LastIndexOf('/') + 1);
-							parent = (IMediaFolder)_kernel.FindPath(parentPath);
+							string parentPath = path.Substring( 0, path.LastIndexOf( '/' ) );
+							newName = path.Substring( path.LastIndexOf( '/' ) + 1 );
+							parent = ( IMediaFolder )_kernel.FindPath( parentPath );
 						}
 						else
 						{
 							newName = path;
 							parent = _kernel.CurrentPath;
 						}
-						if (parent == null)
+						if( parent == null )
 						{
-							Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find parent to create file '{0}' in on open", path);
+							Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find parent to create file '{0}' in on open", path );
 
-							if (async == true)
+							if( async == true )
 							{
-								KFile fakehandle = new KFile(_kernel, false);
+								KFile fakehandle = new KFile( _kernel, false );
 								fakehandle.Result = 0x80010002;
 								fakehandle.PendingClose = true;
-								_kernel.AddHandle(fakehandle);
-								return (int)fakehandle.UID;
+								_kernel.AddHandle( fakehandle );
+								return ( int )fakehandle.UID;
 							}
 
 							return -1;
 						}
-						file = parent.CreateFile(newName);
+						file = parent.CreateFile( newName );
 					}
 					else
 					{
-						Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find path '{0}'", path);
+						Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not find path '{0}'", path );
 
-						if (async == true)
+						if( async == true )
 						{
-							KFile fakehandle = new KFile(_kernel, false);
+							KFile fakehandle = new KFile( _kernel, false );
 							fakehandle.Result = 0x80010002;
 							fakehandle.PendingClose = true;
-							_kernel.AddHandle(fakehandle);
-							return (int)fakehandle.UID;
+							_kernel.AddHandle( fakehandle );
+							return ( int )fakehandle.UID;
 						}
 
-						return unchecked((int)0x8002012f);
+						return unchecked( ( int )0x8002012f );
 					}
 				}
 				/*
@@ -178,53 +178,53 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 					#define	PSP_O_EXCL		0x0800
 					#define PSP_O_NOWAIT	0x8000*/
 				MediaFileMode fileMode = MediaFileMode.Normal;
-				if ((flags & 0x0100) == 0x0100)
+				if( ( flags & 0x0100 ) == 0x0100 )
 					fileMode = MediaFileMode.Append;
-				if ((flags & 0x0400) == 0x0400)
+				if( ( flags & 0x0400 ) == 0x0400 )
 					fileMode = MediaFileMode.Truncate;
 				MediaFileAccess fileAccess = MediaFileAccess.ReadWrite;
-				if ((flags & 0x0001) == 0x0001)
+				if( ( flags & 0x0001 ) == 0x0001 )
 					fileAccess = MediaFileAccess.Read;
-				if ((flags & 0x0002) == 0x0002)
+				if( ( flags & 0x0002 ) == 0x0002 )
 					fileAccess = MediaFileAccess.Write;
-				if ((flags & 0x0003) == 0x0003)
+				if( ( flags & 0x0003 ) == 0x0003 )
 					fileAccess = MediaFileAccess.ReadWrite;
 
-				if ((flags & 0x0800) != 0)
+				if( ( flags & 0x0800 ) != 0 )
 				{
 					// Exclusive O_EXCL
 					//int x = 1;
 				}
-				if ((flags & 0x8000) != 0)
+				if( ( flags & 0x8000 ) != 0 )
 				{
 					// Non-blocking O_NOWAIT
 					//int x = 1;
 				}
-				if ((flags & 0x0004) != 0)
+				if( ( flags & 0x0004 ) != 0 )
 				{
 					// ? O_NBLOCK
 					//int x = 1;
 				}
 
-				Stream stream = file.Open(fileMode, fileAccess);
-				if (stream == null)
+				Stream stream = file.Open( fileMode, fileAccess );
+				if( stream == null )
 				{
-					Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceIoOpen: could not open stream on file '{0}' for mode {1} access {2}", path, fileMode, fileAccess);
+					Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoOpen: could not open stream on file '{0}' for mode {1} access {2}", path, fileMode, fileAccess );
 					return -1;
 				}
 
 				IMediaDevice device = file.Device;
-				KDevice dev = _kernel.FindDevice(file.Device);
-				Debug.Assert(dev != null);
+				KDevice dev = _kernel.FindDevice( file.Device );
+				Debug.Assert( dev != null );
 
-				KFile handle = new KFile(_kernel, dev, file, stream);
-				_kernel.AddHandle(handle);
+				KFile handle = new KFile( _kernel, dev, file, stream );
+				_kernel.AddHandle( handle );
 
 				handle.Result = handle.UID;
 
-				Log.WriteLine(Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened file {0} with ID {1}", path, handle.UID);
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoOpen: opened file {0} with ID {1:X}", path, handle.UID );
 
-				return (int)handle.UID;
+				return ( int )handle.UID;
 			}
 		}
 
@@ -234,7 +234,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: SceUID sceIoOpen(const char *file, int flags, SceMode mode);
 		public int sceIoOpen( int fileName, int flags, int mode )
 		{
-			return realIoOpen(fileName, flags, mode, false);
+			return realIoOpen( fileName, flags, mode, false );
 		}
 
 		[Stateless]
@@ -243,7 +243,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		// SDK declaration: SceUID sceIoOpenAsync(const char *file, int flags, SceMode mode);
 		public int sceIoOpenAsync( int file, int flags, int mode )
 		{
-			return realIoOpen(file, flags, mode, true);
+			return realIoOpen( file, flags, mode, true );
 		}
 
 #if DONTTRACE
@@ -263,7 +263,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoRead: kernel file handle not found: {0}", fd );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoRead: kernel file handle not found: {0:X}", fd );
 				return -1;
 			}
 
@@ -314,7 +314,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoWrite: kernel file handle not found: {0}", fd );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoWrite: kernel file handle not found: {0:X}", fd );
 				return -1;
 			}
 
@@ -365,7 +365,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoLseek: kernel file handle not found: {0}", fd );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoLseek: kernel file handle not found: {0:X}", fd );
 				return -1;
 			}
 
@@ -420,7 +420,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoLseek32: kernel file handle not found: {0}", fd );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoLseek32: kernel file handle not found: {0:X}", fd );
 				return -1;
 			}
 

@@ -28,6 +28,14 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Dialogs
 			this.timeTextBox.Text = "30000";
 		}
 
+		protected override void OnShown( EventArgs e )
+		{
+			base.OnShown( e );
+
+			this.timeTextBox.Focus();
+			this.timeTextBox.SelectAll();
+		}
+
 		private void delayButton_Click( object sender, EventArgs e )
 		{
 			uint time;

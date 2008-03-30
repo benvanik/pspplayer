@@ -99,13 +99,12 @@ void __logSyscall( int syscallId, int address, bool implemented )
 			args = "";
 			break;
 		}
-		String^ log = String::Format( "{5}{0}::{1}({2}) from 0x{3:X8}{4} in {6}",
+		String^ log = String::Format( "{5}{0}::{1}({2}) from 0x{3:X8}{4}",
 			( function->Module != nullptr ) ? function->Module->Name : "*unknown*",
 			( function->Name != nullptr ) ? function->Name : String::Format( "{0:X8}", function->NID ),
 			args, address - 4,
 			function->IsImplemented ? "" : " (NI)",
-			function->IsMissing ? "(NOT FOUND) " : "",
-			_currentTcsId );
+			function->IsMissing ? "(NOT FOUND) " : "" );
 		Log::WriteLine( Verbosity::Verbose, Feature::Syscall, log );
 
 #if 0

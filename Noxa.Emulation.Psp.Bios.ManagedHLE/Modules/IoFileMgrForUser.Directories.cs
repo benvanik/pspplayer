@@ -40,7 +40,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			handle.FolderOffset = -2;
 			_kernel.AddHandle( handle );
 
-			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoDopen: opened {0} with ID {1}", path, handle.UID );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "sceIoDopen: opened {0} with ID {1:X}", path, handle.UID );
 
 			return ( int )handle.UID;
 		}
@@ -54,7 +54,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KFile handle = _kernel.GetHandle<KFile>( fd );
 			if( handle == null )
 			{
-				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDread: kernel dir handle {0} not found", fd );
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceIoDread: kernel dir handle {0:X} not found", fd );
 				return -1;
 			}
 

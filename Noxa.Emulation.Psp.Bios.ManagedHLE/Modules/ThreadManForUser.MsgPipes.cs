@@ -38,7 +38,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KMessagePipe handle = new KMessagePipe( _kernel, partition, name, size );
 			_kernel.AddHandle( handle );
 
-			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelCreateMsgPipe: opened pipe {0} with ID {1}, for partition {2}", name, handle.UID, part );
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelCreateMsgPipe: opened pipe {0} with ID {1}, for partition {2:X}", name, handle.UID, part );
 
 			return ( int )handle.UID;
 		}

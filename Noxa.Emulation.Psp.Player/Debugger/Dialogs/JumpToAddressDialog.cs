@@ -44,6 +44,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Dialogs
 					this.Text += " - Memory";
 					break;
 			}
+
+			this.addressTextBox.Focus();
+			this.addressTextBox.SelectAll();
 		}
 
 		private void jumpButton_Click( object sender, EventArgs e )

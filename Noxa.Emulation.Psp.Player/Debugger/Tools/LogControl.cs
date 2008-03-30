@@ -16,21 +16,24 @@ using System.Windows.Forms.VisualStyles;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 {
-	public partial class LogControl : Control
+	partial class LogControl : Control
 	{
 		class LogLine
 		{
+			public readonly uint ThreadID;
 			public readonly Verbosity Verbosity;
 			public readonly Feature Feature;
 			public readonly string Value;
-			public LogLine( Verbosity verbosity, Feature feature, string value )
+			public LogLine( uint threadId, Verbosity verbosity, Feature feature, string value )
 			{
+				this.ThreadID = threadId;
 				this.Verbosity = verbosity;
 				this.Feature = feature;
 				this.Value = value;
 			}
 		}
 
+		public InprocDebugger Debugger;
 		private VScrollBar _verticalScrollBar;
 
 		private readonly string[] _featureNames;
@@ -100,7 +103,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		public void AddLine( Verbosity verbosity, Feature feature, string value )
 		{
-			LogLine line = new LogLine( verbosity, feature, value );
+			uint threadId = ( this.Debugger.DebugHost.BiosHook != null ) ? this.Debugger.DebugHost.BiosHook.ActiveThreadID : 0;
+			LogLine line = new LogLine( threadId, verbosity, feature, value );
 			lock( _lines )
 				_lines.Add( line );
 			if( Interlocked.Increment( ref _pendingUpdates ) > 1 )
@@ -310,6 +314,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 		private Brush _disabledBrush;
 
 		private int _labelWidth = 100;
+		private int _threadWidth = 30;
 
 		private void SetupGraphics()
 		{
@@ -341,6 +346,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			_disabledBrush = new SolidBrush( light );
 
 			_labelWidth = ( int )( _charSize.Width * 10 + 2 + 0.5f );
+			_threadWidth = ( int )( _charSize.Width * 3 + 4 + 0.5f );
 		}
 
 		protected override void OnPaintBackground( PaintEventArgs e )
@@ -373,6 +379,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			e.Graphics.DrawLine( _vertGridPen,
 				2 + _labelWidth, 2,
 				2 + _labelWidth, this.ClientRectangle.Height - 3 );
+
+			// Thread
+			e.Graphics.DrawLine( _vertGridPen,
+				2 + _labelWidth + 2 + _threadWidth, 2,
+				2 + _labelWidth + 2 + _threadWidth, this.ClientRectangle.Height - 3 );
 		}
 
 		protected override void OnPaint( PaintEventArgs e )
@@ -393,8 +404,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				// Label
 				e.Graphics.DrawString( _featureNames[ ( int )line.Feature ], _font, _labelFontBrushes[ ( int )line.Verbosity ], x, y, _stringFormat );
 
+				// Thread ID
+				e.Graphics.DrawString( line.ThreadID.ToString( "X3" ), _font, valueBrush, x + _labelWidth + 4, y, _stringFormat );
+
 				// Value
-				e.Graphics.DrawString( line.Value, _font, valueBrush, x + _labelWidth + 4, y, _stringFormat );
+				e.Graphics.DrawString( line.Value, _font, valueBrush, x + _labelWidth + 4 + _threadWidth + 3, y, _stringFormat );
 
 				y += _lineHeight;
 			}
