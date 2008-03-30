@@ -51,6 +51,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Dialogs
 			}
 			if( this.Method != null )
 				this.methodTextBox.Text = this.Method.Name;
+			this.methodTextBox.Focus();
+			this.methodTextBox.SelectAll();
 		}
 
 		private void jumpButton_Click( object sender, EventArgs e )

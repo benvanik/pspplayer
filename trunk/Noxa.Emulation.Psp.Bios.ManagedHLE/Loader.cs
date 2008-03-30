@@ -923,7 +923,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 						// Setup handler so that we get the callback when the thread ends and we can kill it
 						cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleThreadEnd ), ( int )thread.UID );
 
-						Log.WriteLine( Verbosity.Verbose, Feature.Loader, "starting kmodule loading thread with UID {0}", thread.UID );
+						Log.WriteLine( Verbosity.Verbose, Feature.Loader, "starting kmodule loading thread with UID {0:X}", thread.UID );
 
 						// Schedule so that our thread runs
 						kernel.Schedule();
@@ -1015,7 +1015,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			KThread thread = kernel.GetHandle<KThread>( ( uint )state );
 			if( thread != null )
 			{
-				Log.WriteLine( Verbosity.Verbose, Feature.Loader, "killing kmodule loading thread with UID {0}", thread.UID );
+				Log.WriteLine( Verbosity.Verbose, Feature.Loader, "killing kmodule loading thread with UID {0:X}", thread.UID );
 
 				thread.Exit( 0 );
 				kernel.RemoveHandle( thread.UID );

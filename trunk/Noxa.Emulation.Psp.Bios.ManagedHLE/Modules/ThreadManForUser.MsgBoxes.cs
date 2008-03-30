@@ -42,7 +42,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KMessageBox handle = new KMessageBox(_kernel, name, attr );
 			_kernel.AddHandle(handle);
 
-			Log.WriteLine(Verbosity.Normal, Feature.Bios, "sceKernelCreateMbx: opened box {0} with ID {1}", name, handle.UID);
+			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceKernelCreateMbx: opened box {0} with ID {1:X}", name, handle.UID );
 			return (int)handle.UID;
 		}
 

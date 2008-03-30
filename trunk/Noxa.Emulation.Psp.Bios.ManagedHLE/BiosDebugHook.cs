@@ -30,7 +30,10 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			get
 			{
 				Kernel kernel = this.Bios._kernel;
-				return ( uint )kernel.ActiveThread.UID;
+				if( kernel.ActiveThread == null )
+					return 0;
+				else
+					return ( uint )kernel.ActiveThread.UID;
 			}
 		}
 

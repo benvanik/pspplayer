@@ -194,7 +194,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Setup handler so that we get the callback when the thread ends and we can kill it
 			_kernel.Cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleStartThreadEnd ), ( int )thread.UID );
 
-			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: starting module_start thread with UID {0} for module {1}", thread.UID, module.Name );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: starting module_start thread with UID {0:X} for module {1}", thread.UID, module.Name );
 
 			// Schedule so that our thread runs
 			_kernel.Schedule();
@@ -207,7 +207,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( thread != null );
 			if( thread != null )
 			{
-				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: killing module_start thread with UID {0}", thread.UID );
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: killing module_start thread with UID {0:X}", thread.UID );
 
 				thread.Exit( 0 );
 				_kernel.RemoveHandle( thread.UID );
@@ -238,7 +238,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			// Setup handler so that we get the callback when the thread ends and we can kill it
 			_kernel.Cpu.SetContextSafetyCallback( thread.ContextID, new ContextSafetyDelegate( this.KmoduleStopThreadEnd ), ( int )thread.UID );
 
-			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: starting module_stop thread with UID {0} for module {1}", thread.UID, module.Name );
+			Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: starting module_stop thread with UID {0:X} for module {1}", thread.UID, module.Name );
 
 			// Schedule so that our thread runs
 			_kernel.Schedule();
@@ -251,7 +251,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			Debug.Assert( thread != null );
 			if( thread != null )
 			{
-				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: killing module_stop thread with UID {0}", thread.UID );
+				Log.WriteLine( Verbosity.Verbose, Feature.Bios, "ModuleMgrForUser: killing module_stop thread with UID {0:X}", thread.UID );
 
 				thread.Exit( 0 );
 				_kernel.RemoveHandle( thread.UID );
