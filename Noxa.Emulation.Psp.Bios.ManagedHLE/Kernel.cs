@@ -182,10 +182,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			// Get bootstream
 			Debug.Assert( Bios.BootStream == null );
-			Bios.BootStream = GameLoader.FindBootStream( Bios.Game );
+			string filePath;
+			Bios.BootStream = GameLoader.FindBootStream( Bios.Game, out filePath );
 			Debug.Assert( Bios.BootStream != null );
 
 			LoadParameters loadParams = new LoadParameters();
+			loadParams.FilePath = filePath;
 			loadParams.Path = Bios.Game.Folder;
 #if DEBUG
 			loadParams.AppendDatabase = true;
@@ -215,9 +217,15 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 		public KHandle AddHandle( KHandle handle )
 		{
 			Debug.Assert( handle != null );
-			handle.UID = ( uint )Interlocked.Increment( ref _lastUid ) - 1;
+			if( handle.UID <= 0 )
+				handle.UID = this.AllocateID();
 			Handles.Add( handle.UID, handle );
 			return handle;
+		}
+
+		internal uint AllocateID()
+		{
+			return ( uint )Interlocked.Increment( ref _lastUid ) - 1;
 		}
 
 		public KHandle GetHandle( uint uid )

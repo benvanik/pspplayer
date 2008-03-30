@@ -704,8 +704,9 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				{
 					case LineType.Header:
 						{
-							g.DrawString( string.Format( "// {0}", body.Name ), _font, _commentFontBrush, codex, y );
-							g.DrawLine( _commentLinePen, codex + ( _charSize.Width * ( body.Name.Length + 4 ) ), y + ( _charSize.Height / 2.0f ), this.ClientRectangle.Width - 10, y + ( _charSize.Height / 2.0f ) );
+							string fullName = string.Format( "// {0}::{1}", body.Module.Name, body.Name );
+							g.DrawString( fullName, _font, _commentFontBrush, codex, y );
+							g.DrawLine( _commentLinePen, codex + ( _charSize.Width * ( fullName.Length + 1 ) ), y + ( _charSize.Height / 2.0f ), this.ClientRectangle.Width - 10, y + ( _charSize.Height / 2.0f ) );
 						}
 						break;
 					case LineType.Footer:
@@ -741,31 +742,38 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 							}
 							else
 							{
-								g.DrawString( instr.Opcode.ToString(), _font, codeBrush, opcodex, y, _stringFormat );
-
-								// Operands
-								for( int m = 0; m < instr.Operands.Length; m++ )
+								if( instr.Opcode == null )
 								{
-									Operand op = instr.Operands[ m ];
-									string resolved = instr.GetResolvedOperandString( op, this.UseHex );
-									Brush fontBrush = codeBrush;
-									switch( op.Type )
-									{
-										case OperandType.BranchTarget:
-											fontBrush = _referenceFontBrush;
-											break;
-										case OperandType.JumpTarget:
-											fontBrush = _referenceFontBrush;
-											break;
-									}
-									g.DrawString( resolved, _font, fontBrush, realx, y, _stringFormat );
-									realx += ( int )_charSize.Width * resolved.Length;
+									g.DrawString( "UNKNOWN", _font, codeBrush, opcodex, y, _stringFormat );
+								}
+								else
+								{
+									g.DrawString( instr.Opcode.ToString(), _font, codeBrush, opcodex, y, _stringFormat );
 
-									bool last = ( m == instr.Operands.Length - 1 );
-									if( last == false )
+									// Operands
+									for( int m = 0; m < instr.Operands.Length; m++ )
 									{
-										g.DrawString( ", ", _font, codeBrush, realx - 2, y, _stringFormat );
-										realx += ( int )_charSize.Width * 2 - 2;
+										Operand op = instr.Operands[ m ];
+										string resolved = instr.GetResolvedOperandString( op, this.UseHex );
+										Brush fontBrush = codeBrush;
+										switch( op.Type )
+										{
+											case OperandType.BranchTarget:
+												fontBrush = _referenceFontBrush;
+												break;
+											case OperandType.JumpTarget:
+												fontBrush = _referenceFontBrush;
+												break;
+										}
+										g.DrawString( resolved, _font, fontBrush, realx, y, _stringFormat );
+										realx += ( int )_charSize.Width * resolved.Length;
+
+										bool last = ( m == instr.Operands.Length - 1 );
+										if( last == false )
+										{
+											g.DrawString( ", ", _font, codeBrush, realx - 2, y, _stringFormat );
+											realx += ( int )_charSize.Width * 2 - 2;
+										}
 									}
 								}
 							}

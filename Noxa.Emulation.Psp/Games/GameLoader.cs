@@ -31,68 +31,75 @@ namespace Noxa.Emulation.Psp.Games
 		/// Find and retrieve the boot stream for the given game.
 		/// </summary>
 		/// <param name="game">Game to look for.</param>
+		/// <param name="filePath">The path of the boot file.</param>
 		/// <returns>The games boot stream (from BOOT.BIN, etc) or <c>null</c> if it could not be found.</returns>
-		public static Stream FindBootStream( GameInformation game )
+		public static Stream FindBootStream( GameInformation game, out string filePath )
 		{
+			filePath = null;
 			Debug.Assert( game != null );
 			if( game == null )
 				return null;
 
 			Stream bootStream = null;
-			
-			string kernelLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-			string prxLocation = Path.Combine(kernelLocation, "BOOT");
+
+			string kernelLocation = Path.GetDirectoryName( System.Reflection.Assembly.GetExecutingAssembly().Location );
+			string prxLocation = Path.Combine( kernelLocation, "BOOT" );
 			// DiscID might be more appropriate than Title
-			string lookasideBoot = Path.Combine(Path.Combine(prxLocation, game.Parameters.Title), "BOOT.BIN");
-			if (File.Exists(lookasideBoot) == true)
+			string lookasideBoot = Path.Combine( Path.Combine( prxLocation, game.Parameters.Title ), "BOOT.BIN" );
+			if( File.Exists( lookasideBoot ) == true )
 			{
 				// Load ours instead
-				Log.WriteLine(Verbosity.Normal, Feature.Bios, "Lookaside boot found at {0}", lookasideBoot);
-				bootStream = File.OpenRead(lookasideBoot);
+				Log.WriteLine( Verbosity.Normal, Feature.Bios, "Lookaside boot found at {0}", lookasideBoot );
+				bootStream = File.OpenRead( lookasideBoot );
+				filePath = lookasideBoot;
 			}
 			else
 			{
 				IMediaFolder folder = game.Folder;
-				if (folder["PSP_GAME"] != null)
-					folder = folder["PSP_GAME"] as IMediaFolder;
-				if (folder["SYSDIR"] != null)
-					folder = folder["SYSDIR"] as IMediaFolder;
+				if( folder[ "PSP_GAME" ] != null )
+					folder = folder[ "PSP_GAME" ] as IMediaFolder;
+				if( folder[ "SYSDIR" ] != null )
+					folder = folder[ "SYSDIR" ] as IMediaFolder;
 				IMediaFile bootBin = null;
-				bootBin = folder["BOOT.BIN"] as IMediaFile;
-				if (bootBin == null)
-					bootBin = folder["EBOOT.BIN"] as IMediaFile;
-				if (bootBin == null)
-					bootBin = folder["BOOT.ELF"] as IMediaFile;
-				if (bootBin == null)
-					bootBin = folder["EBOOT.ELF"] as IMediaFile;
-				
-				if (bootBin == null)
+				bootBin = folder[ "BOOT.BIN" ] as IMediaFile;
+				if( bootBin == null )
+					bootBin = folder[ "EBOOT.BIN" ] as IMediaFile;
+				if( bootBin == null )
+					bootBin = folder[ "BOOT.ELF" ] as IMediaFile;
+				if( bootBin == null )
+					bootBin = folder[ "EBOOT.ELF" ] as IMediaFile;
+
+				if( bootBin == null )
 				{
 					// Probably in PBP - unless exploited!
-					if (folder.Name.Contains("__SCE__") == true)
+					if( folder.Name.Contains( "__SCE__" ) == true )
 					{
 						// If this is exploited, the eboot.pbp IS the elf!
-						bootStream = (folder["EBOOT.PBP"] as IMediaFile).OpenRead();
+						IMediaFile pbp = folder[ "EBOOT.PBP" ] as IMediaFile;
+						filePath = pbp.AbsolutePath;
+						bootStream = pbp.OpenRead();
 					}
 					else
 					{
-						IMediaFile pbp = folder["EBOOT.PBP"] as IMediaFile;
-						using (Stream stream = pbp.OpenRead())
+						IMediaFile pbp = folder[ "EBOOT.PBP" ] as IMediaFile;
+						using( Stream stream = pbp.OpenRead() )
 						{
-							PbpReader reader = new PbpReader(stream);
-							if (reader.ContainsEntry(PbpReader.PbpEntryType.DataPsp) == true)
+							PbpReader reader = new PbpReader( stream );
+							if( reader.ContainsEntry( PbpReader.PbpEntryType.DataPsp ) == true )
 							{
-								bootStream = reader.Read(stream, PbpReader.PbpEntryType.DataPsp);
+								filePath = pbp.AbsolutePath;
+								bootStream = reader.Read( stream, PbpReader.PbpEntryType.DataPsp );
 							}
 						}
 					}
 				}
 				else
 				{
+					filePath = bootBin.AbsolutePath;
 					bootStream = bootBin.OpenRead();
 				}
 			}
-			
+
 			return bootStream;
 		}
 
@@ -309,7 +316,7 @@ namespace Noxa.Emulation.Psp.Games
 		{
 			IMediaFolder folder = device.Root;
 			IMediaFile umdData = folder[ "UMD_DATA.BIN" ] as IMediaFile;
-			
+
 			//[4 alpha country code]-[4 digit game id]|16 digit binhex|0001|G
 			// Get code from SFO
 			string uniqueId;
@@ -321,7 +328,7 @@ namespace Noxa.Emulation.Psp.Games
 			}
 
 			IMediaFile sfoData = folder.FindFile( @"PSP_GAME\PARAM.SFO" );
-			
+
 			GameParameters gameParams;
 			using( Stream stream = sfoData.OpenRead() )
 				gameParams = ReadSfo( stream );
@@ -389,7 +396,7 @@ namespace Noxa.Emulation.Psp.Games
 				gp.Region = ( int )reader[ "REGION" ].Data;
 			if( reader[ "LANGUAGE" ] != null )
 				gp.Language = reader[ "LANGUAGE" ].Data as string;
-			
+
 			return gp;
 		}
 

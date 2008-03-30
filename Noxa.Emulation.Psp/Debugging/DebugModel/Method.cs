@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-
 using Noxa.Emulation.Psp.Bios;
 
 namespace Noxa.Emulation.Psp.Debugging.DebugModel
@@ -52,14 +51,15 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// Initializes a new <see cref="Method"/> instance with the given parameters.
 		/// </summary>
+		/// <param name="moduleId">The ID of the module the symbol resides in.</param>
 		/// <param name="type">The type of the method.</param>
 		/// <param name="address">The start address of the method.</param>
 		/// <param name="length">The length of the method, in bytes.</param>
-		public Method( MethodType type, uint address, uint length )
-			: base( address, length )
+		public Method( uint moduleId, MethodType type, uint address, uint length )
+			: base( moduleId, address, length )
 		{
-			Type = type;
-			
+			this.Type = type;
+
 			//Debug.Assert( address % 4 == 0 );
 			Debug.Assert( length % 4 == 0 );
 		}
@@ -67,27 +67,29 @@ namespace Noxa.Emulation.Psp.Debugging.DebugModel
 		/// <summary>
 		/// Initializes a new <see cref="Method"/> instance with the given parameters.
 		/// </summary>
+		/// <param name="moduleId">The ID of the module the symbol resides in.</param>
 		/// <param name="type">The type of the method.</param>
 		/// <param name="address">The start address of the method.</param>
 		/// <param name="length">The length of the method, in bytes.</param>
 		/// <param name="name">The name of the method, if available.</param>
-		public Method( MethodType type, uint address, uint length, string name )
-			: this( type, address, length )
+		public Method( uint moduleId, MethodType type, uint address, uint length, string name )
+			: this( moduleId, type, address, length )
 		{
-			Name = name;
+			this.Name = name;
 		}
 
 		/// <summary>
 		/// Initializes a new <see cref="Method"/> instance with the given parameters.
 		/// </summary>
+		/// <param name="moduleId">The ID of the module the symbol resides in.</param>
 		/// <param name="type">The type of the method.</param>
 		/// <param name="address">The start address of the method.</param>
 		/// <param name="length">The length of the method, in bytes.</param>
 		/// <param name="function">The BIOS function, if available.</param>
-		public Method( MethodType type, uint address, uint length, BiosFunctionToken function )
-			: this( type, address, length )
+		public Method( uint moduleId, MethodType type, uint address, uint length, BiosFunctionToken function )
+			: this( moduleId, type, address, length )
 		{
-			Function = function;
+			this.Function = function;
 		}
 
 		/// <summary>

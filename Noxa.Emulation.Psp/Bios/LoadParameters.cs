@@ -17,6 +17,11 @@ namespace Noxa.Emulation.Psp.Bios
 	public class LoadParameters
 	{
 		/// <summary>
+		/// The human-readable path of the module, if available.
+		/// </summary>
+		public string FilePath;
+
+		/// <summary>
 		/// The path of the game or module.
 		/// </summary>
 		public IMediaFolder Path;

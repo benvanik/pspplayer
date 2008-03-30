@@ -23,6 +23,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.Bios = bios;
 		}
 
+		#region Threads
+
 		public uint ActiveThreadID
 		{
 			get
@@ -107,5 +109,29 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				return;
 			thread.Exit( -1 );
 		}
+
+		#endregion
+
+		#region Modules
+
+		public ModuleInfo[] GetModules()
+		{
+			Kernel kernel = this.Bios._kernel;
+			List<ModuleInfo> moduleInfos = new List<ModuleInfo>();
+			foreach( KModule module in kernel.UserModules )
+			{
+				ModuleInfo moduleInfo = new ModuleInfo();
+				moduleInfo.ModuleID = module.UID;
+				moduleInfo.Name = module.Name;
+				moduleInfo.Path = module.LoadParameters.FilePath;
+				moduleInfo.EntryAddress = module.LoadResults.EntryAddress;
+				moduleInfo.LowerBounds = module.LoadResults.LowerBounds;
+				moduleInfo.UpperBounds = module.LoadResults.UpperBounds;
+				moduleInfos.Add( moduleInfo );
+			}
+			return moduleInfos.ToArray();
+		}
+
+		#endregion
 	}
 }

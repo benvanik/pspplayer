@@ -19,7 +19,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 {
 	unsafe partial class Loader
 	{
-		private void Analyze( IDebugDatabase db, byte* text, uint textLength, uint baseAddress )
+		private void Analyze( uint moduleId, IDebugDatabase db, byte* text, uint textLength, uint baseAddress )
 		{
 			// We start at the base and try to build functions
 			// The logic here is similar to my dynarec
@@ -68,7 +68,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 					//}
 
 					// End method
-					Method method = new Method( MethodType.User, methodStart, address - methodStart + 4 );
+					Method method = new Method( moduleId, MethodType.User, methodStart, address - methodStart + 4 );
 					db.AddSymbol( method );
 					methodStart = address + 4;
 					lastBranchTarget = 0;
@@ -107,7 +107,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			if( address - 4 > methodStart )
 			{
 				// Final end - ideally we'd never have to do this
-				Method method = new Method( MethodType.User, methodStart, address - 4 - methodStart );
+				Method method = new Method( moduleId, MethodType.User, methodStart, address - 4 - methodStart );
 				db.AddSymbol( method );
 				Log.WriteLine( Verbosity.Normal, Feature.Loader, "Analyze didn't finish .text cleanly - last method: {0}", method.ToString() );
 			}

@@ -74,6 +74,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			if( file != null )
 			{
 				loadParams.Path = file.Parent;
+				loadParams.FilePath = file.AbsolutePath;
 				string fileName = file.Name.ToLowerInvariant();
 				foreach( string blacklisted in _moduleBlacklist )
 				{
@@ -124,7 +125,12 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 
 				// We spoof the caller in to thinking we worked right... by just returning 0 ^_^
 				KModule fakemod = new KModule( _kernel, null );
+				fakemod.LoadParameters = loadParams;
 				_kernel.AddHandle( fakemod );
+
+				if( Diag.IsAttached == true )
+					Diag.Instance.Client.OnModuleLoaded();
+
 				return ( int )fakemod.UID;
 			}
 
@@ -148,9 +154,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			_kernel.Bios._metaModuleLookup.Add( module.Name, module );
 
 			KModule kmod = new KModule( _kernel, module );
+			kmod.UID = results.ModuleID;
+			kmod.LoadParameters = loadParams;
 			kmod.LoadResults = results;
 			_kernel.UserModules.Add( kmod );
 			_kernel.AddHandle( kmod );
+
+			if( Diag.IsAttached == true )
+				Diag.Instance.Client.OnModuleLoaded();
 
 			return ( int )kmod.UID;
 		}
