@@ -39,8 +39,12 @@
 			this.jumpToCurrentPCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
 			this.wakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.delayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+			this.suspendToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+			this.killToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.threadContextMenuStrip.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -100,9 +104,13 @@
             this.toolStripMenuItem1,
             this.wakeToolStripMenuItem,
             this.delayToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.suspendToolStripMenuItem,
+            this.resumeToolStripMenuItem,
+            this.toolStripSeparator1,
             this.killToolStripMenuItem} );
 			this.threadContextMenuStrip.Name = "threadContextMenuStrip";
-			this.threadContextMenuStrip.Size = new System.Drawing.Size( 179, 120 );
+			this.threadContextMenuStrip.Size = new System.Drawing.Size( 179, 176 );
 			// 
 			// jumpToCurrentPCToolStripMenuItem
 			// 
@@ -119,11 +127,43 @@
 			// 
 			// wakeToolStripMenuItem
 			// 
-			this.wakeToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PlayIcon;
 			this.wakeToolStripMenuItem.Name = "wakeToolStripMenuItem";
 			this.wakeToolStripMenuItem.Size = new System.Drawing.Size( 178, 22 );
 			this.wakeToolStripMenuItem.Text = "&Wake";
 			this.wakeToolStripMenuItem.Click += new System.EventHandler( this.wakeToolStripMenuItem_Click );
+			// 
+			// delayToolStripMenuItem
+			// 
+			this.delayToolStripMenuItem.Name = "delayToolStripMenuItem";
+			this.delayToolStripMenuItem.Size = new System.Drawing.Size( 178, 22 );
+			this.delayToolStripMenuItem.Text = "&Delay";
+			this.delayToolStripMenuItem.Click += new System.EventHandler( this.delayToolStripMenuItem_Click );
+			// 
+			// toolStripSeparator2
+			// 
+			this.toolStripSeparator2.Name = "toolStripSeparator2";
+			this.toolStripSeparator2.Size = new System.Drawing.Size( 175, 6 );
+			// 
+			// suspendToolStripMenuItem
+			// 
+			this.suspendToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PauseIcon;
+			this.suspendToolStripMenuItem.Name = "suspendToolStripMenuItem";
+			this.suspendToolStripMenuItem.Size = new System.Drawing.Size( 178, 22 );
+			this.suspendToolStripMenuItem.Text = "&Suspend";
+			this.suspendToolStripMenuItem.Click += new System.EventHandler( this.suspendToolStripMenuItem_Click );
+			// 
+			// resumeToolStripMenuItem
+			// 
+			this.resumeToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PlayIcon;
+			this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
+			this.resumeToolStripMenuItem.Size = new System.Drawing.Size( 178, 22 );
+			this.resumeToolStripMenuItem.Text = "&Resume";
+			this.resumeToolStripMenuItem.Click += new System.EventHandler( this.resumeToolStripMenuItem_Click );
+			// 
+			// toolStripSeparator1
+			// 
+			this.toolStripSeparator1.Name = "toolStripSeparator1";
+			this.toolStripSeparator1.Size = new System.Drawing.Size( 175, 6 );
 			// 
 			// killToolStripMenuItem
 			// 
@@ -132,14 +172,6 @@
 			this.killToolStripMenuItem.Size = new System.Drawing.Size( 178, 22 );
 			this.killToolStripMenuItem.Text = "&Kill";
 			this.killToolStripMenuItem.Click += new System.EventHandler( this.killToolStripMenuItem_Click );
-			// 
-			// delayToolStripMenuItem
-			// 
-			this.delayToolStripMenuItem.Image = global::Noxa.Emulation.Psp.Player.Properties.Resources.PauseIcon;
-			this.delayToolStripMenuItem.Name = "delayToolStripMenuItem";
-			this.delayToolStripMenuItem.Size = new System.Drawing.Size( 178, 22 );
-			this.delayToolStripMenuItem.Text = "&Delay";
-			this.delayToolStripMenuItem.Click += new System.EventHandler( this.delayToolStripMenuItem_Click );
 			// 
 			// ThreadsTool
 			// 
@@ -174,5 +206,9 @@
 		private System.Windows.Forms.ToolStripMenuItem wakeToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem killToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem delayToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+		private System.Windows.Forms.ToolStripMenuItem suspendToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem resumeToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
 	}
 }

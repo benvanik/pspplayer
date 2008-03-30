@@ -69,7 +69,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				( thread.State == KThreadState.WaitSuspended ) )
 				thread.Resume();
 			if( thread.State == KThreadState.Waiting )
-				thread.ReleaseWait();
+				thread.ReleaseWait( false );
 		}
 
 		public void DelayThread( uint threadId, uint delayMs )
@@ -78,7 +78,25 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			KThread thread = kernel.GetHandleOrNull<KThread>( ( int )threadId );
 			if( thread == null )
 				return;
-			thread.Delay( delayMs * 1000, true );
+			thread.Delay( delayMs * 1000, false );
+		}
+
+		public void SuspendThread( uint threadId )
+		{
+			Kernel kernel = this.Bios._kernel;
+			KThread thread = kernel.GetHandleOrNull<KThread>( ( int )threadId );
+			if( thread == null )
+				return;
+			thread.Suspend();
+		}
+
+		public void ResumeThread( uint threadId )
+		{
+			Kernel kernel = this.Bios._kernel;
+			KThread thread = kernel.GetHandleOrNull<KThread>( ( int )threadId );
+			if( thread == null )
+				return;
+			thread.Resume();
 		}
 
 		public void KillThread( uint threadId )

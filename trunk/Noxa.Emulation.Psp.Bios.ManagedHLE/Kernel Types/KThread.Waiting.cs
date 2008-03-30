@@ -13,6 +13,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 {
 	partial class KThread
 	{
+		private Timer _waitTimer;
+
 		public void Wake()
 		{
 			State = KThreadState.Ready;
@@ -40,13 +42,52 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		public void ReleaseWait()
 		{
+			this.ReleaseWait( true );
+		}
+
+		public void ReleaseWait( bool clean )
+		{
 			if( ( State == KThreadState.Waiting ) ||
 				( State == KThreadState.WaitSuspended ) )
 			{
-				Debug.Assert( false, "implement nice way to cancel things - need to remove from waitingthreads list of whatever it's waiting on" );
-				//switch( this.WaitingOn )
-				//{
-				//}
+				switch( this.WaitingOn )
+				{
+					case KThreadWait.Sleep:
+						// Nothing to do
+						break;
+					case KThreadWait.Delay:
+						if( _waitTimer != null )
+							this.Kernel.CancelTimer( _waitTimer );
+						_waitTimer = null;
+						break;
+					case KThreadWait.Event:
+						{
+							KEvent ev = this.WaitHandle as KEvent;
+							ev.WaitingThreads.Remove( this );
+						}
+						break;
+					case KThreadWait.Semaphore:
+						{
+							KSemaphore sema = this.WaitHandle as KSemaphore;
+							sema.WaitingThreads.Remove( this );
+						}
+						break;
+					case KThreadWait.Fpl:
+						{
+							KFixedPool pool = this.WaitHandle as KFixedPool;
+							pool.WaitingThreads.Remove( this );
+						}
+						break;
+					case KThreadWait.Vpl:
+						{
+							KVariablePool pool = this.WaitHandle as KVariablePool;
+							pool.WaitingThreads.Remove( this );
+						}
+						break;
+					default:
+						Log.WriteLine( Verbosity.Critical, Feature.Bios, "unsupported wake wait type " + this.WaitingOn.ToString() + " - ignoring" );
+						return;
+				}
 			}
 			if( State == KThreadState.WaitSuspended )
 				State = KThreadState.Suspended;
@@ -54,7 +95,8 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 				State = KThreadState.Ready;
 
 			ReleaseCount++;
-			Kernel.Cpu.SetContextRegister( ContextID, 2, 0x800201AA );
+			if( clean == true )
+				Kernel.Cpu.SetContextRegister( ContextID, 2, 0x800201AA );
 
 			if( State == KThreadState.Ready )
 				this.AddToSchedule();
@@ -110,6 +152,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 		private void DelayCallback( Timer timer, object state )
 		{
+			if( _waitTimer != timer )
+				return;
+			_waitTimer = null;
 			if( this.State == KThreadState.WaitSuspended )
 				this.State = KThreadState.Suspended;
 			else if( ( this.State == KThreadState.Waiting ) &&
@@ -138,7 +183,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 
 			// Install timer
 			uint waitTimeMs = Math.Max( 5, waitTimeUs / 1000 );
-			Kernel.AddOneShotTimer( this.DelayCallback, this, waitTimeMs );
+			_waitTimer = Kernel.AddOneShotTimer( this.DelayCallback, this, waitTimeMs );
 
 			if( canHandleCallbacks == true )
 				this.Kernel.CheckCallbacks();
@@ -326,7 +371,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.WaitAddress = ( uint )message;
 			this.WaitAddressResult = ( uint )outSize;
 
-			if (canHandleCallbacks == true)
+			if( canHandleCallbacks == true )
 			{
 				this.Kernel.CheckCallbacks();
 			}
@@ -334,25 +379,25 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE
 			this.Kernel.Schedule();
 		}
 
-		public void Wait(KMessageBox box, int pmessage, int timeout, bool canHandleCallbacks)
+		public void Wait( KMessageBox box, int pmessage, int timeout, bool canHandleCallbacks )
 		{
 			this.State = KThreadState.Waiting;
 			this.RemoveFromSchedule();
-			
-			this.CanHandleCallbacks = canHandleCallbacks;
-			
-			box.WaitingThreads.Enqueue(this);
-			
-			this.WaitingOn = KThreadWait.Mbx;
-			this.WaitTimeoutSetup((uint)timeout);
-			this.WaitHandle = box;
-			this.WaitAddress = (uint)pmessage;
 
-			if (canHandleCallbacks == true)
+			this.CanHandleCallbacks = canHandleCallbacks;
+
+			box.WaitingThreads.Enqueue( this );
+
+			this.WaitingOn = KThreadWait.Mbx;
+			this.WaitTimeoutSetup( ( uint )timeout );
+			this.WaitHandle = box;
+			this.WaitAddress = ( uint )pmessage;
+
+			if( canHandleCallbacks == true )
 			{
 				this.Kernel.CheckCallbacks();
 			}
-			
+
 			this.Kernel.Schedule();
 		}
 	}

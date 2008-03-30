@@ -98,6 +98,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 					bool canControl = ( threadInfo.ThreadID != activeThreadId );
 					this.wakeToolStripMenuItem.Enabled = canControl;
 					this.delayToolStripMenuItem.Enabled = canControl;
+					this.suspendToolStripMenuItem.Enabled = ( ( threadInfo.State == ThreadState.Ready ) || ( threadInfo.State == ThreadState.Waiting ) );
+					this.resumeToolStripMenuItem.Enabled = ( ( threadInfo.State == ThreadState.Suspended ) || ( threadInfo.State == ThreadState.WaitSuspended ) );
 					this.killToolStripMenuItem.Enabled = canControl;
 					this.threadContextMenuStrip.Show( this.threadListView, e.Location );
 				}
@@ -138,6 +140,28 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 				this.Debugger.DebugHost.BiosHook.DelayThread( threadInfo.ThreadID, _delayThreadDialog.Time );
 				this.RefreshThreads();
 			}
+		}
+
+		private void suspendToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			if( _currentItem == null )
+				return;
+			ThreadInfo threadInfo = _currentItem.Tag as ThreadInfo;
+			if( threadInfo == null )
+				return;
+			this.Debugger.DebugHost.BiosHook.SuspendThread( threadInfo.ThreadID );
+			this.RefreshThreads();
+		}
+
+		private void resumeToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			if( _currentItem == null )
+				return;
+			ThreadInfo threadInfo = _currentItem.Tag as ThreadInfo;
+			if( threadInfo == null )
+				return;
+			this.Debugger.DebugHost.BiosHook.ResumeThread( threadInfo.ThreadID );
+			this.RefreshThreads();
 		}
 
 		private void killToolStripMenuItem_Click( object sender, EventArgs e )

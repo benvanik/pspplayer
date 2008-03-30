@@ -42,6 +42,18 @@ namespace Noxa.Emulation.Psp.Debugging.Hooks
 		void DelayThread( uint threadId, uint delayMs );
 
 		/// <summary>
+		/// Suspend the given thread.
+		/// </summary>
+		/// <param name="threadId">The ID of the thread to suspend.</param>
+		void SuspendThread( uint threadId );
+
+		/// <summary>
+		/// Resume the given thread.
+		/// </summary>
+		/// <param name="threadId">The ID of the thread to resume.</param>
+		void ResumeThread( uint threadId );
+
+		/// <summary>
 		/// Kill the given thread.
 		/// </summary>
 		/// <param name="threadId">The ID of the thread to kill.</param>
