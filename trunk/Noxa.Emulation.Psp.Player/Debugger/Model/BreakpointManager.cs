@@ -11,6 +11,7 @@ using System.Text;
 
 using Noxa.Emulation.Psp.Bios;
 using Noxa.Emulation.Psp.Debugging.DebugModel;
+using Noxa.Emulation.Psp.Player.Debugger.UserData;
 
 namespace Noxa.Emulation.Psp.Player.Debugger.Model
 {
@@ -22,6 +23,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		private Dictionary<int, Breakpoint> _breakpointLookup;
 		private Dictionary<uint, Breakpoint> _addressBreakpointLookup;
 		private Dictionary<BiosFunctionToken, Breakpoint> _biosBreakpointLookup;
+		private bool _suspendSave;
 
 		public BreakpointManager( InprocDebugger debugger )
 		{
@@ -38,6 +40,43 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 		public event EventHandler<BreakpointEventArgs> Added;
 		public event EventHandler<BreakpointEventArgs> Removed;
 		public event EventHandler<BreakpointEventArgs> Toggled;
+
+		public void Load()
+		{
+			// Remove all and readd - slow?
+			_suspendSave = true;
+			foreach( Breakpoint bp in _breakpoints )
+				this.Remove( bp );
+			foreach( BreakpointInfo info in this.Debugger.UserData.Breakpoints.Infos )
+			{
+				Breakpoint bp = new Breakpoint( this.Debugger.AllocateID(), info.Type, info.Address );
+				bp.Name = info.Name;
+				bp.AccessType = info.AccessType;
+				bp.Mode = info.Mode;
+				bp.Enabled = info.Enabled;
+				this.Add( bp );
+			}
+			_suspendSave = false;
+		}
+
+		public void Save()
+		{
+			if( _suspendSave == true )
+				return;
+			this.Debugger.UserData.Breakpoints.Infos.Clear();
+			foreach( Breakpoint bp in _breakpoints )
+			{
+				BreakpointInfo info = new BreakpointInfo();
+				info.Type = bp.Type;
+				info.Address = bp.Address;
+				info.Name = bp.Name;
+				info.AccessType = bp.AccessType;
+				info.Mode = bp.Mode;
+				info.Enabled = bp.Enabled;
+				this.Debugger.UserData.Breakpoints.Infos.Add( info );
+			}
+			this.Debugger.UserData.Save();
+		}
 
 		public void Update()
 		{
@@ -91,6 +130,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 					break;
 			}
 			this.OnBreakpointAdded( breakpoint );
+			this.Save();
 		}
 
 		public void Remove( Breakpoint breakpoint )
@@ -125,6 +165,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 					break;
 			}
 			this.OnBreakpointRemoved( breakpoint );
+			this.Save();
 		}
 
 		public Breakpoint this[ int id ]
@@ -211,6 +252,7 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Model
 			dummy.Mode = breakpoint.Mode;
 			dummy.Enabled = !old;
 			this.OnBreakpointToggled( breakpoint, dummy );
+			this.Save();
 		}
 
 		internal void OnBreakpointToggled( Breakpoint breakpoint, Breakpoint changed )

@@ -234,6 +234,10 @@
     <Compile Include="Debugger\Tools\WatchTool.Designer.cs">
       <DependentUpon>WatchTool.cs</DependentUpon>
     </Compile>
+    <Compile Include="Debugger\UserData\BookmarkStore.cs" />
+    <Compile Include="Debugger\UserData\BreakpointStore.cs" />
+    <Compile Include="Debugger\UserData\CodeTagStore.cs" />
+    <Compile Include="Debugger\UserData\UserDataStore.cs" />
     <Compile Include="GameCache.cs" />
     <Compile Include="GamePicker\AdvancedGameListing.cs">
       <SubType>UserControl</SubType>
