@@ -57,6 +57,17 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public const int DummyReturn = Module.NotImplementedReturn;
 #endif
 
+		#region sceMpeg
+
+		// THIS IS NOT THE REAL STRUCTURE
+		[StructLayout( LayoutKind.Sequential, Pack = 1 )]
+		public struct SceMpeg
+		{
+			public sceMpegRingbuffer* Ringbuffer;
+		}
+
+		#endregion
+
 		#region sceMpegRingbuffer
 
 		[StructLayout( LayoutKind.Sequential, Pack = 1, Size = 44 )]
@@ -188,7 +199,7 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceMpegQueryMemSize( int unk )
 		{
 			Debug.Assert( unk == 0 );
-			return 1234;
+			return 512 * 4;
 		}
 
 		[Stateless]
@@ -196,6 +207,14 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		public int sceMpegCreate( int mpeg, int data, int size, int ringbuffer, int framewidth, int unk1, int unk2 )
 		{
 			Log.WriteLine( Verbosity.Normal, Feature.Bios, "sceMpegCreate({0:X8}, {1:X8}, {2}, {3:X8}, {4}, {5}, {6})", mpeg, data, size, ringbuffer, framewidth, unk1, unk2 );
+			byte* pmpeg = _memorySystem.Translate( ( uint )mpeg );
+			byte* pdata = _memorySystem.Translate( ( uint )data );
+			// size = size returned from sceMpegQueryMemSize
+			byte* prb = _memorySystem.Translate( ( uint )ringbuffer );
+
+			SceMpeg* sceMpeg = ( SceMpeg* )pmpeg;
+			sceMpeg->Ringbuffer = ( sceMpegRingbuffer* )prb;
+
 			return 0;
 		}
 
@@ -323,7 +342,26 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 		{
 			Debug.Assert( num != 0 );
 
-			*( ( uint* )( _memorySystem.Translate( ( uint )num ) ) ) = 1;
+			byte* pmpeg = _memorySystem.Translate( ( uint )mpeg );
+			SceMpeg* sceMpeg = ( SceMpeg* )pmpeg;
+			byte* ptr = RingBuffer.Read(
+				_memorySystem.Translate( ( uint )sceMpeg->Ringbuffer->pData ),
+				sceMpeg->Ringbuffer->iPackets, sceMpeg->Ringbuffer->iPacketSize,
+				ref sceMpeg->Ringbuffer->iReadPackets );
+
+			uint pbuffer = *( ( uint* )_memorySystem.Translate( ( uint )buffer ) );
+			uint* ppbuffer = ( uint* )_memorySystem.Translate( pbuffer );
+			for( int n = 0; n < framewidth; n++ )
+			{
+				*( ppbuffer++ ) = ( uint )( 0xCCDDEEFF + n );
+			}
+
+			// 1 = decoded something, else 0
+			if( num != 0 )
+			{
+				uint* pnum = ( uint* )_memorySystem.Translate( ( uint )num );
+				*pnum = 1;
+			}
 
 			return 0;
 		}

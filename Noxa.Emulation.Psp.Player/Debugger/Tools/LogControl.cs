@@ -38,7 +38,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 		private readonly string[] _featureNames;
 
-		private List<LogLine> _lines = new List<LogLine>( 20000 );
+		private const int MaximumLines = 20000;
+		private List<LogLine> _lines = new List<LogLine>( MaximumLines );
 		private int _firstVisibleLine;
 		private int _lastVisibleLine;
 		private int _visibleLines;
@@ -106,7 +107,11 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 			uint threadId = ( this.Debugger.DebugHost.BiosHook != null ) ? this.Debugger.DebugHost.BiosHook.ActiveThreadID : 0;
 			LogLine line = new LogLine( threadId, verbosity, feature, value );
 			lock( _lines )
+			{
+				if( _lines.Count + 1 > MaximumLines )
+					_lines.RemoveAt( 0 );
 				_lines.Add( line );
+			}
 			if( Interlocked.Increment( ref _pendingUpdates ) > 1 )
 				return;
 			this.BeginInvoke( ( DummyDelegate )this.SafeAddLine );
@@ -399,6 +404,8 @@ namespace Noxa.Emulation.Psp.Player.Debugger.Tools
 
 			for( int n = _firstVisibleLine; n <= _lastVisibleLine; n++ )
 			{
+				if( n >= _lines.Count )
+					break;
 				LogLine line = _lines[ n ];
 
 				// Label
