@@ -89,6 +89,9 @@ namespace Noxa.Emulation.Psp.Bios.ManagedHLE.Modules
 			KThread thread = _kernel.ActiveThread;
 			thread.Delay( 16777, true );
 
+			if( buf == 0 )
+				return 0;
+
 			if( _driver == null )
 				return 0;
 
